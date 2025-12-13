@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SpotPriceCache {
+  id        Int    @id @default(autoincrement())
+  metal     String @unique
+  price     Float
+  timestamp Int
+  change    Float
+}
+
+model PriceHistory {
+  id     Int      @id @default(autoincrement())
+  metal  String
+  at     DateTime @default(now())
+  price  Float
+
+  @@index([metal, at])
+}
+
+model Comparison {
+  id          Int      @id @default(autoincrement())
+  metal       String
+  spot        Float
+  dealerPrice Float
+  premiumPct  Float
+  createdAt   DateTime @default(now())
+
+  @@index([metal, createdAt])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  sessions  Session[]
+  alerts    Alert[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model MagicLinkToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([email])
+}
+
+model Alert {
+  id        String   @id @default(cuid())
+  userId    String
+  metal     String
+  threshold Float
+  createdAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, metal])
+}
