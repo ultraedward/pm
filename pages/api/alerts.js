@@ -1,34 +1,35 @@
-import { prisma } from "../../lib/prisma.js";
-import { getSessionFromReq } from "../../lib/auth.js";
+import { prisma } from "../../lib/prisma";
+import { getSessionFromReq } from "../../lib/auth";
 
 export default async function handler(req, res) {
   const session = await getSessionFromReq(req);
-  if (!session?.user?.id) return res.status(401).json({ ok: false });
+
+  if (!session?.user?.id) {
+    return res.status(401).json({ error: "LOGIN_REQUIRED" });
+  }
 
   if (req.method === "GET") {
     const alerts = await prisma.alert.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" }
     });
-    return res.status(200).json(alerts);
+    return res.json(alerts);
   }
 
   if (req.method === "POST") {
-    const { metal, threshold } = req.body || {};
+    const { metal, threshold } = req.body;
+
     const alert = await prisma.alert.create({
-      data: { userId: session.user.id, metal: String(metal), threshold: Number(threshold) }
+      data: {
+        metal,
+        threshold: Number(threshold),
+        userId: session.user.id,
+        isActive: true
+      }
     });
-    return res.status(200).json(alert);
+
+    return res.json(alert);
   }
 
-  if (req.method === "PATCH") {
-    const { id, isActive } = req.body || {};
-    const alert = await prisma.alert.update({
-      where: { id: String(id) },
-      data: { isActive: Boolean(isActive) }
-    });
-    return res.status(200).json(alert);
-  }
-
-  return res.status(405).end();
+  res.status(405).end();
 }

@@ -8,13 +8,49 @@ export default function Pricing() {
   return (
     <main style={{ background:"#020617", color:"#e5e7eb", minHeight:"100vh", padding:24 }}>
       <div style={{ maxWidth:520, margin:"0 auto" }}>
-        <h1>Pricing</h1>
-        <div style={{ marginTop:16, padding:16, border:"1px solid #334155", borderRadius:10 }}>
-          <h2>Premium Alerts</h2>
-          <p>One-time purchase.</p>
-          <button onClick={buy} style={{ marginTop:12, padding:10, width:"100%" }}>
-            Buy $29
+        <h1>Premium Alerts</h1>
+
+        <p style={{ marginTop:12, opacity:0.9 }}>
+          Stop checking prices all day.
+        </p>
+
+        <p style={{ marginTop:8, opacity:0.9 }}>
+          Set a target premium and get notified when a metal is actually a good deal.
+        </p>
+
+        <div style={{
+          marginTop:20,
+          padding:16,
+          border:"1px solid #334155",
+          borderRadius:12
+        }}>
+          <h2>$29 — Lifetime Access</h2>
+
+          <ul style={{ marginTop:12, lineHeight:1.6 }}>
+            <li>✔ Premium alerts for Gold, Silver, Platinum, Palladium</li>
+            <li>✔ Unlimited saved comparisons</li>
+            <li>✔ Email alerts when your target is hit</li>
+            <li>✔ One-time payment (no subscription)</li>
+          </ul>
+
+          <button
+            onClick={buy}
+            style={{
+              marginTop:16,
+              padding:12,
+              width:"100%",
+              fontSize:16,
+              background:"#2563eb",
+              color:"#fff",
+              borderRadius:8
+            }}
+          >
+            Unlock Premium Alerts
           </button>
+
+          <p style={{ marginTop:10, fontSize:12, opacity:0.7 }}>
+            Early access pricing. May increase later.
+          </p>
         </div>
       </div>
     </main>

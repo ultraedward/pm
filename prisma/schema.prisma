@@ -7,34 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model SpotPriceCache {
-  id        Int    @id @default(autoincrement())
-  metal     String @unique
-  price     Float
-  timestamp Int
-  change    Float
-}
-
-model PriceHistory {
-  id     Int      @id @default(autoincrement())
-  metal  String
-  at     DateTime @default(now())
-  price  Float
-
-  @@index([metal, at])
-}
-
-model Comparison {
-  id          Int      @id @default(autoincrement())
-  metal       String
-  spot        Float
-  dealerPrice Float
-  premiumPct  Float
-  createdAt   DateTime @default(now())
-
-  @@index([metal, createdAt])
-}
-
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -46,34 +18,40 @@ model User {
 model Session {
   id        String   @id @default(cuid())
   userId    String
-  token     String   @unique
-  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
 }
 
 model MagicLinkToken {
   id        String   @id @default(cuid())
   email     String
   token     String   @unique
-  createdAt DateTime @default(now())
   expiresAt DateTime
-
-  @@index([email])
 }
 
 model Alert {
   id        String   @id @default(cuid())
   userId    String
+  user      User     @relation(fields: [userId], references: [id])
   metal     String
   threshold Float
-  createdAt DateTime @default(now())
   isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model SpotPriceCache {
+  id        Int    @id @default(autoincrement())
+  metal     String @unique
+  price     Float
+  timestamp Int
+  change    Float
+}
 
-  @@index([userId, metal])
+model Comparison {
+  id          Int      @id @default(autoincrement())
+  metal       String
+  spot        Float
+  dealerPrice Float
+  premiumPct  Float
+  createdAt   DateTime @default(now())
 }

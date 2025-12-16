@@ -1,49 +1,25 @@
-// pages/_app.js
 import "../styles/globals.css";
-import Link from "next/link";
-import { useRouter } from "next/router";
 
-function Layout({ children }) {
-  const router = useRouter();
-  const navItems = [
-    { href: "/", label: "Prices" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/alerts", label: "Alerts" },
-    { href: "/watchlist", label: "Watchlist" },
-    { href: "/charts", label: "Charts" },
-    { href: "/learn", label: "Learn" },
-  ];
-
+export default function App({ Component, pageProps }) {
   return (
     <>
-      <nav className="nav">
-        <div className="logo">Precious Metals</div>
-        <div className="nav-links">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} legacyBehavior>
-              <a
-                className={router.pathname === item.href ? "active-nav" : ""}
-              >
-                {item.label}
-              </a>
-            </Link>
-          ))}
-        </div>
+      <nav
+        style={{
+          padding: "12px 24px",
+          borderBottom: "1px solid #334155",
+          background: "#020617",
+          color: "#e5e7eb",
+          display: "flex",
+          gap: 16
+        }}
+      >
+        <a href="/" style={{ color: "#e5e7eb" }}>Prices</a>
+        <a href="/alerts" style={{ color: "#e5e7eb" }}>Alerts</a>
+        <a href="/pricing" style={{ color: "#e5e7eb" }}>Pricing</a>
+        <a href="/account" style={{ color: "#e5e7eb" }}>Account</a>
       </nav>
-      <main className="container">{children}</main>
-      <footer className="footer">
-        © 2025 Precious Metals Tracker – All rights reserved.
-      </footer>
+
+      <Component {...pageProps} />
     </>
   );
 }
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
-  );
-}
-
-export default MyApp;
