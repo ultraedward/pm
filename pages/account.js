@@ -1,79 +1,109 @@
 import { useEffect, useState } from "react";
+import Head from "next/head";
 
-const METALS = { XAU: "Gold", XAG: "Silver", XPT: "Platinum", XPD: "Palladium" };
+export default function AccountPage() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default function Account() {
-  const [alerts, setAlerts] = useState([]);
-  const [metal, setMetal] = useState("XAU");
-  const [threshold, setThreshold] = useState("5");
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      setError(null);
 
-  async function load() {
-    const r = await fetch("/api/alerts");
-    if (r.status !== 200) return;
-    const d = await r.json();
-    setAlerts(Array.isArray(d) ? d : []);
-  }
+      try {
+        const res = await fetch("/api/stats");
 
-  useEffect(() => { load(); }, []);
+        if (res.status === 401) {
+          setError("Please log in to view your account.");
+          setStats(null);
+          return;
+        }
 
-  async function add() {
-    await fetch("/api/alerts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ metal, threshold: Number(threshold) })
-    });
-    await load();
-  }
+        if (res.status === 402) {
+          setError("An active subscription is required.");
+          setStats(null);
+          return;
+        }
 
-  async function toggle(id, isActive) {
-    await fetch("/api/alerts", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, isActive })
-    });
-    await load();
-  }
+        if (!res.ok) {
+          throw new Error("Stats request failed");
+        }
+
+        const data = await res.json();
+        setStats(data);
+      } catch (err) {
+        console.error("Account stats error:", err);
+        setError("Unable to load account data.");
+        setStats(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
 
   return (
-    <main style={{ background:"#020617", color:"#e5e7eb", minHeight:"100vh", padding:24 }}>
-      <div style={{ maxWidth:520, margin:"0 auto" }}>
+    <>
+      <Head>
+        <title>Account | Precious Metals Alerts</title>
+      </Head>
+
+      <main style={{ maxWidth: 700, margin: "60px auto", padding: 20 }}>
         <h1>Account</h1>
-        <a href="/api/auth/logout" style={{ color:"#93c5fd" }}>Logout</a>
 
-        <hr style={{ margin:"16px 0" }} />
+        {loading && <p>Loading…</p>}
 
-        <h2>Alerts</h2>
+        {error && (
+          <div
+            style={{
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              padding: 12,
+              borderRadius: 6,
+              marginBottom: 16,
+            }}
+          >
+            {error}
+          </div>
+        )}
 
-        <div style={{ display:"flex", gap:8, marginTop:12 }}>
-          <select value={metal} onChange={e=>setMetal(e.target.value)} style={{ flex:1, padding:10 }}>
-            {Object.keys(METALS).map(m => <option key={m} value={m}>{METALS[m]}</option>)}
-          </select>
-          <input
-            value={threshold}
-            onChange={e=>setThreshold(e.target.value)}
-            placeholder="Threshold %"
-            style={{ width:140, padding:10 }}
-          />
-        </div>
+        {!loading && stats && (
+          <>
+            <section
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 16,
+              }}
+            >
+              <h2 style={{ marginTop: 0 }}>Subscription</h2>
+              <p>
+                Status: <strong>{stats.subscriptionStatus}</strong>
+              </p>
+              <p>Manage billing from the Pricing page.</p>
+            </section>
 
-        <button onClick={add} style={{ marginTop:10, padding:10, width:"100%" }}>
-          Add alert (premium % ≤ threshold)
-        </button>
-
-        <div style={{ marginTop:16 }}>
-          {alerts.map(a => (
-            <div key={a.id} style={{ padding:10, border:"1px solid #334155", borderRadius:10, marginBottom:8 }}>
-              <div>{METALS[a.metal]} ≤ {a.threshold.toFixed(2)}%</div>
-              <button onClick={() => toggle(a.id, !a.isActive)} style={{ marginTop:8, padding:8, width:"100%" }}>
-                {a.isActive ? "Disable" : "Enable"}
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <hr style={{ margin:"16px 0" }} />
-        <a href="/pricing" style={{ color:"#93c5fd" }}>Pricing</a>
-      </div>
-    </main>
+            <section
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: 8,
+                padding: 16,
+              }}
+            >
+              <h2 style={{ marginTop: 0 }}>Usage</h2>
+              <p>
+                Alerts total: <strong>{stats.alertsTotal}</strong>
+              </p>
+              <p>
+                Alerts active: <strong>{stats.alertsActive}</strong>
+              </p>
+            </section>
+          </>
+        )}
+      </main>
+    </>
   );
 }

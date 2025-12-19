@@ -7,51 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model SpotPriceCache {
   id        String   @id @default(cuid())
-  email     String   @unique
+  metal     String   @unique
+  price     Decimal  @db.Decimal(10, 2)
+  updatedAt DateTime @updatedAt
+}
+
+model Metal {
+  id        String   @id @default(cuid())
+  name      String
+  symbol    String   @unique
   createdAt DateTime @default(now())
-  sessions  Session[]
-  alerts    Alert[]
+
+  prices Price[] // ✅ REQUIRED back-relation
 }
 
-model Session {
+model Price {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  expiresAt DateTime
-}
+  metalId   String
+  value     Decimal  @db.Decimal(10, 2)
+  source    String
+  createdAt DateTime @default(now())
 
-model MagicLinkToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expiresAt DateTime
+  metal Metal @relation(fields: [metalId], references: [id])
 }
 
 model Alert {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  email     String
   metal     String
-  threshold Float
-  isActive  Boolean  @default(true)
+  direction String
+  target    Decimal  @db.Decimal(10, 2)
+  triggered Boolean  @default(false)
   createdAt DateTime @default(now())
-}
-
-model SpotPriceCache {
-  id        Int    @id @default(autoincrement())
-  metal     String @unique
-  price     Float
-  timestamp Int
-  change    Float
-}
-
-model Comparison {
-  id          Int      @id @default(autoincrement())
-  metal       String
-  spot        Float
-  dealerPrice Float
-  premiumPct  Float
-  createdAt   DateTime @default(now())
 }

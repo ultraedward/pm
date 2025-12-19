@@ -1,16 +1,15 @@
-import { prisma } from "../../../lib/prisma.js";
-import { clearSessionCookie, sessionCookieName } from "../../../lib/auth.js";
+import { clearSession } from "../../../lib/auth";
 
 export default async function handler(req, res) {
-  const cookie = req.headers.cookie || "";
-  const name = sessionCookieName();
-  const match = cookie.match(new RegExp(`${name}=([^;]+)`));
-  const token = match?.[1];
-
-  if (token) {
-    await prisma.session.deleteMany({ where: { token } });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  clearSessionCookie(res);
-  res.redirect("/");
+  try {
+    await clearSession(req, res);
+    return res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({ error: "Logout failed" });
+  }
 }

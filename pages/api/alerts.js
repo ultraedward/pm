@@ -1,35 +1,25 @@
-import { prisma } from "../../lib/prisma";
-import { getSessionFromReq } from "../../lib/auth";
+import prisma from "../../lib/prisma.js";
 
 export default async function handler(req, res) {
-  const session = await getSessionFromReq(req);
-
-  if (!session?.user?.id) {
-    return res.status(401).json({ error: "LOGIN_REQUIRED" });
-  }
-
-  if (req.method === "GET") {
+  try {
     const alerts = await prisma.alert.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" }
-    });
-    return res.json(alerts);
-  }
-
-  if (req.method === "POST") {
-    const { metal, threshold } = req.body;
-
-    const alert = await prisma.alert.create({
-      data: {
-        metal,
-        threshold: Number(threshold),
-        userId: session.user.id,
-        isActive: true
-      }
+      orderBy: { createdAt: "desc" },
     });
 
-    return res.json(alert);
-  }
+    // Attach current spot prices
+    const prices = await prisma.spotPriceCache.findMany();
+    const priceMap = Object.fromEntries(
+      prices.map((p) => [p.metal.toLowerCase(), Number(p.price)])
+    );
 
-  res.status(405).end();
+    const enriched = alerts.map((a) => ({
+      ...a,
+      currentPrice: priceMap[a.metal.toLowerCase()] ?? null,
+    }));
+
+    res.status(200).json(enriched);
+  } catch (error) {
+    console.error("Alerts API error:", error);
+    res.status(500).json({ error: "Failed to load alerts" });
+  }
 }

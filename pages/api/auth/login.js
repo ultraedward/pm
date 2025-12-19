@@ -18,11 +18,17 @@ export default async function handler(req, res) {
     const user = await prisma.user.upsert({
       where: { email: normalizedEmail },
       update: {
-        name: typeof name === "string" && name.trim() ? name.trim() : undefined,
+        name:
+          typeof name === "string" && name.trim()
+            ? name.trim()
+            : undefined,
       },
       create: {
         email: normalizedEmail,
-        name: typeof name === "string" && name.trim() ? name.trim() : null,
+        name:
+          typeof name === "string" && name.trim()
+            ? name.trim()
+            : null,
       },
     });
 

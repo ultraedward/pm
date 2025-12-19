@@ -1,25 +1,54 @@
+// pages/_app.js
 import "../styles/globals.css";
+import Link from "next/link";
+
+function NavLink({ href, children }) {
+  return (
+    <Link href={href} className="navLink">
+      {children}
+    </Link>
+  );
+}
 
 export default function App({ Component, pageProps }) {
   return (
     <>
-      <nav
-        style={{
-          padding: "12px 24px",
-          borderBottom: "1px solid #334155",
-          background: "#020617",
-          color: "#e5e7eb",
-          display: "flex",
-          gap: 16
-        }}
-      >
-        <a href="/" style={{ color: "#e5e7eb" }}>Prices</a>
-        <a href="/alerts" style={{ color: "#e5e7eb" }}>Alerts</a>
-        <a href="/pricing" style={{ color: "#e5e7eb" }}>Pricing</a>
-        <a href="/account" style={{ color: "#e5e7eb" }}>Account</a>
-      </nav>
+      <header className="siteHeader">
+        <div className="shell navShell">
+          <Link href="/" className="brand">
+            <span className="brandMark" aria-hidden="true">
+              ◆
+            </span>
+            <span className="brandText">Precious Metals</span>
+          </Link>
+
+          <nav className="nav" aria-label="Primary">
+            <NavLink href="/">Prices</NavLink>
+            <NavLink href="/alerts">Alerts</NavLink>
+            <NavLink href="/alerts/create">Create</NavLink>
+            <NavLink href="/charts">Charts</NavLink>
+          </nav>
+        </div>
+      </header>
 
       <Component {...pageProps} />
+
+      <footer className="siteFooter">
+        <div className="shell footerShell">
+          <div className="footerLeft">
+            <div className="footerBrand">Precious Metals</div>
+            <div className="footerSub">Spot snapshots + price alerts.</div>
+          </div>
+          <div className="footerRight">
+            <Link className="footerLink" href="/alerts/create">
+              Create Alert
+            </Link>
+            <Link className="footerLink" href="/charts">
+              Charts
+            </Link>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
