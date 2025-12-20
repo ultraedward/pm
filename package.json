@@ -2,23 +2,20 @@
   "name": "precious-metals-mvp",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "seed": "node scripts/seed.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
-    "cookie": "^1.1.1",
-    "micro": "^10.0.1",
-    "next": "^14.2.33",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "recharts": "^3.5.1",
-    "resend": "^4.8.0",
-    "stripe": "^16.0.0"
+    "cookie": "^0.6.0",
+    "next": "14.2.33",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "resend": "^3.3.0",
+    "stripe": "^14.24.0"
   },
   "devDependencies": {
     "prisma": "^5.14.0"
