@@ -1,3 +1,4 @@
+// FILE: pages/_app.js
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {
@@ -8,15 +9,18 @@ export default function App({ Component, pageProps }) {
       {demo && (
         <div
           style={{
-            background: "#111",
+            position: "sticky",
+            top: 0,
+            zIndex: 50,
+            background: "#0b0b0b",
             color: "#fff",
-            padding: "8px 16px",
+            padding: "10px 16px",
             textAlign: "center",
-            fontSize: 13,
-            letterSpacing: 0.5,
+            fontSize: 12,
+            letterSpacing: 1,
           }}
         >
-          DEMO MODE — FAKE DATA
+          DEMO MODE — FAKE DATA (Preview/Dev Only)
         </div>
       )}
       <Component {...pageProps} />
