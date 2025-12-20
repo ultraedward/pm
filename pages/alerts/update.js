@@ -1,20 +1,31 @@
 import prisma from "../../lib/prisma";
 
-export default async function handler(req, res) {
+export async function getServerSideProps({ req, res }) {
   if (req.method !== "POST") {
-    return res.status(405).end();
+    return {
+      notFound: true,
+    };
   }
 
-  const { alertId, targetPrice } = req.body;
+  const { alertId, targetPrice } = req.body || {};
 
   if (!alertId || !targetPrice) {
-    return res.status(400).json({ error: "Missing fields" });
+    res.statusCode = 400;
+    res.end("Missing fields");
+    return { props: {} };
   }
 
   await prisma.alert.update({
     where: { id: alertId },
-    data: { targetPrice },
+    data: { targetPrice: Number(targetPrice) },
   });
 
-  res.status(200).json({ success: true });
+  res.statusCode = 200;
+  res.end("OK");
+
+  return { props: {} };
+}
+
+export default function UpdateAlertPage() {
+  return null;
 }
