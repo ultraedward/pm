@@ -1,4 +1,3 @@
-// FILE: pages/api/history.js
 import { getPriceHistory } from "../../lib/dataSource";
 
 export default async function handler(req, res) {

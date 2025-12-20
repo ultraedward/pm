@@ -1,4 +1,3 @@
-// FILE: pages/api/metals.js
 import { getMetals } from "../../lib/dataSource";
 
 export default async function handler(req, res) {

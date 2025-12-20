@@ -1,4 +1,3 @@
-// FILE: pages/api/alerts.js
 import { getAlerts } from "../../lib/dataSource";
 
 export default async function handler(req, res) {
