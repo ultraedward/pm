@@ -7,15 +7,27 @@ export async function getServerSideProps() {
 
 export default function Home({ metals }) {
   return (
-    <div>
-      <h1>Precious Metals</h1>
-      <ul>
+    <main style={{ maxWidth: 720, margin: "40px auto", padding: 16 }}>
+      <h1 style={{ fontSize: 32, marginBottom: 24 }}>Precious Metals</h1>
+
+      <div style={{ display: "grid", gap: 16 }}>
         {metals.map((m) => (
-          <li key={m.id}>
-            {m.name}: ${m.price}
-          </li>
+          <div
+            key={m.id}
+            style={{
+              padding: 20,
+              borderRadius: 12,
+              background: "#f5f5f5",
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: 18,
+            }}
+          >
+            <strong>{m.name}</strong>
+            <span>${m.price}</span>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </main>
   );
 }
