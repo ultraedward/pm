@@ -1,15 +1,25 @@
-import { getMetals } from "../lib/dataSource";
+import { getMetals, getAlerts } from "../lib/dataSource";
 
 export async function getServerSideProps() {
-  const metals = await getMetals();
-  return { props: { metals } };
+  const [metals, alerts] = await Promise.all([
+    getMetals(),
+    getAlerts(),
+  ]);
+
+  return {
+    props: {
+      metals,
+      alerts,
+      generatedAt: Date.now(),
+    },
+  };
 }
 
-export default function Home({ metals }) {
+export default function Home({ metals, alerts, generatedAt }) {
   return (
     <main>
       <header>
-        <h1>Precious Metals</h1>
+        <h1>Precious Metals Dashboard</h1>
         <nav>
           <a href="/">Home</a>
           <a href="/charts">Charts</a>
@@ -17,28 +27,55 @@ export default function Home({ metals }) {
         </nav>
       </header>
 
-      <p style={{ maxWidth: 520, marginBottom: 48 }}>
-        Track precious metals in real time. Visualize trends. Set alerts when
-        prices move.
-      </p>
+      {/* Prices */}
+      <section style={{ marginBottom: 56 }}>
+        <h2>Live Prices</h2>
 
-      <section className="grid">
-        {metals.map((m) => (
-          <div key={m.id} className="tile">
-            <div className="tile-title">{m.name}</div>
-            <div className="tile-price">${m.price}</div>
+        <div className="grid">
+          {metals.map((m) => (
+            <div key={m.id} className="tile">
+              <div className="tile-title">{m.name}</div>
+              <div className="tile-price">${m.price}</div>
+              <small>Updated moments ago</small>
 
-            <div style={{ marginTop: 12, display: "flex", gap: 16 }}>
-              <a href="/charts" style={{ fontSize: 13 }}>
-                View chart →
-              </a>
-              <a href="/alerts" style={{ fontSize: 13 }}>
-                Set alert →
-              </a>
+              <div style={{ marginTop: 12 }}>
+                <a href="/charts" style={{ fontSize: 13 }}>
+                  View chart →
+                </a>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
+
+      {/* Alerts */}
+      <section>
+        <h2>Active Alerts</h2>
+
+        {alerts.length === 0 ? (
+          <small>No active alerts</small>
+        ) : (
+          <div style={{ display: "grid", gap: 16 }}>
+            {alerts.map((a) => (
+              <div key={a.id}>
+                <strong>{a.metal.name}</strong>
+                <div style={{ fontSize: 13, color: "#444" }}>
+                  Trigger when price goes{" "}
+                  <strong>{a.direction}</strong> ${a.targetPrice}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* System State */}
+      <div style={{ marginTop: 64 }}>
+        <small>
+          Data rendered at{" "}
+          {new Date(generatedAt).toLocaleTimeString()}
+        </small>
+      </div>
     </main>
   );
 }
