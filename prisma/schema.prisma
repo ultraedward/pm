@@ -7,38 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model SpotPriceCache {
+model PricePoint {
   id        String   @id @default(cuid())
-  metal     String   @unique
-  price     Decimal  @db.Decimal(10, 2)
-  updatedAt DateTime @updatedAt
-}
-
-model Metal {
-  id        String   @id @default(cuid())
-  name      String
-  symbol    String   @unique
-  createdAt DateTime @default(now())
-
-  prices Price[] // ✅ REQUIRED back-relation
-}
-
-model Price {
-  id        String   @id @default(cuid())
-  metalId   String
-  value     Decimal  @db.Decimal(10, 2)
-  source    String
-  createdAt DateTime @default(now())
-
-  metal Metal @relation(fields: [metalId], references: [id])
-}
-
-model Alert {
-  id        String   @id @default(cuid())
-  email     String
   metal     String
-  direction String
-  target    Decimal  @db.Decimal(10, 2)
-  triggered Boolean  @default(false)
+  price     Float
   createdAt DateTime @default(now())
+
+  @@index([metal, createdAt])
+}
+
+model AlertEvent {
+  id          String   @id @default(cuid())
+  metal       String
+  price       Float
+  triggeredAt DateTime @default(now())
+
+  @@index([metal, triggeredAt])
+}
+
+model AlertSettings {
+  id           String   @id @default(cuid())
+  goldThreshold   Float
+  silverThreshold Float
+  updatedAt    DateTime @updatedAt
 }
