@@ -1,37 +1,44 @@
-import { prisma } from "@/lib/prisma";
-import { sendAlertEmail } from "@/lib/mailer";
+import { prisma } from "./prisma"
+import { Resend } from "resend"
 
-export async function processAlerts(metalId: string, currentPrice: number) {
-  const alerts = await prisma.alert.findMany({
-    where: {
-      metalId,
-      triggered: false,
-    },
-    include: {
-      metal: true,
-    },
-  });
+const resend = new Resend(process.env.RESEND_API_KEY!)
 
-  for (const alert of alerts) {
-    const target = Number(alert.target);
+export async function processAlerts(
+  metalId: string,
+  currentPrice: number
+) {
+  const settings = await prisma.alertSettings.findFirst()
+  if (!settings) return
 
-    const shouldTrigger =
-      (alert.direction === "above" && currentPrice >= target) ||
-      (alert.direction === "below" && currentPrice <= target);
+  if (metalId === "gold" && currentPrice >= settings.goldThreshold) {
+    await prisma.alertEvent.create({
+      data: {
+        metal: "gold",
+        price: currentPrice,
+      },
+    })
 
-    if (!shouldTrigger) continue;
+    await resend.emails.send({
+      from: process.env.ALERT_EMAIL_FROM!,
+      to: process.env.ALERT_EMAIL_TO!,
+      subject: "🚨 Gold Alert",
+      html: `<p>Gold crossed <strong>$${currentPrice}</strong></p>`,
+    })
+  }
 
-    await sendAlertEmail({
-      to: alert.email,
-      metal: alert.metal.name,
-      price: currentPrice,
-      target,
-      direction: alert.direction,
-    });
+  if (metalId === "silver" && currentPrice >= settings.silverThreshold) {
+    await prisma.alertEvent.create({
+      data: {
+        metal: "silver",
+        price: currentPrice,
+      },
+    })
 
-    await prisma.alert.update({
-      where: { id: alert.id },
-      data: { triggered: true },
-    });
+    await resend.emails.send({
+      from: process.env.ALERT_EMAIL_FROM!,
+      to: process.env.ALERT_EMAIL_TO!,
+      subject: "🚨 Silver Alert",
+      html: `<p>Silver crossed <strong>$${currentPrice}</strong></p>`,
+    })
   }
 }
