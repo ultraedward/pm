@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
-
-const prisma = new PrismaClient()
 
 export async function GET() {
   const res = await fetch(
@@ -10,33 +8,14 @@ export async function GET() {
     { cache: "no-store" }
   )
 
-  if (!res.ok) {
-    return Response.json({ ok: false, error: "fetch failed" }, { status: 500 })
-  }
-
   const data = await res.json()
-
-  const gold = data?.rates?.USDXAU
-  const silver = data?.rates?.USDXAG
-
-  if (typeof gold !== "number" || typeof silver !== "number") {
-    return Response.json(
-      { ok: false, error: "invalid price data" },
-      { status: 500 }
-    )
-  }
 
   await prisma.pricePoint.createMany({
     data: [
-      { metal: "gold", price: gold },
-      { metal: "silver", price: silver },
+      { metal: "gold", price: data.rates.USDXAU },
+      { metal: "silver", price: data.rates.USDXAG },
     ],
   })
 
-  return Response.json({
-    ok: true,
-    gold,
-    silver,
-    insertedAt: new Date().toISOString(),
-  })
+  return Response.json({ ok: true })
 }
