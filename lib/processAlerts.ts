@@ -4,41 +4,35 @@ import { Resend } from "resend"
 const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function processAlerts(
-  metalId: string,
-  currentPrice: number
+  metal: "gold" | "silver",
+  price: number
 ) {
   const settings = await prisma.alertSettings.findFirst()
   if (!settings) return
 
-  if (metalId === "gold" && currentPrice >= settings.goldThreshold) {
-    await prisma.alertEvent.create({
-      data: {
-        metal: "gold",
-        price: currentPrice,
-      },
-    })
+  const threshold =
+    metal === "gold" ? settings.goldThreshold : settings.silverThreshold
 
-    await resend.emails.send({
-      from: process.env.ALERT_EMAIL_FROM!,
-      to: process.env.ALERT_EMAIL_TO!,
-      subject: "🚨 Gold Alert",
-      html: `<p>Gold crossed <strong>$${currentPrice}</strong></p>`,
-    })
-  }
+  if (price < threshold) return
 
-  if (metalId === "silver" && currentPrice >= settings.silverThreshold) {
-    await prisma.alertEvent.create({
-      data: {
-        metal: "silver",
-        price: currentPrice,
-      },
-    })
+  // 🚫 Dedupe: same metal within last 30 minutes
+  const recent = await prisma.alertEvent.findFirst({
+    where: {
+      metal,
+      createdAt: { gte: new Date(Date.now() - 30 * 60 * 1000) },
+    },
+  })
 
-    await resend.emails.send({
-      from: process.env.ALERT_EMAIL_FROM!,
-      to: process.env.ALERT_EMAIL_TO!,
-      subject: "🚨 Silver Alert",
-      html: `<p>Silver crossed <strong>$${currentPrice}</strong></p>`,
-    })
-  }
+  if (recent) return
+
+  await prisma.alertEvent.create({
+    data: { metal, price },
+  })
+
+  await resend.emails.send({
+    from: process.env.ALERT_EMAIL_FROM!,
+    to: process.env.ALERT_EMAIL_TO!,
+    subject: `🚨 ${metal.toUpperCase()} Alert`,
+    html: `<p>${metal} crossed <strong>$${price}</strong></p>`,
+  })
 }
