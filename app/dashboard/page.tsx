@@ -1,12 +1,7 @@
-// app/dashboard/page.tsx
+export const dynamic = "force-dynamic";
 
-import PageShell from "../components/PageShell"
-import DashboardView from "../features/dashboard/DashboardView"
+import DashboardView from "@/app/features/dashboard/DashboardView";
 
-export default function Page() {
-  return (
-    <PageShell title="Dashboard">
-      <DashboardView />
-    </PageShell>
-  )
+export default function DashboardPage() {
+  return <DashboardView />;
 }
