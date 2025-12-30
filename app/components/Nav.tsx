@@ -1,82 +1,46 @@
-// /app/components/Nav.tsx
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
-const LINKS = [
+const links = [
   { href: "/", label: "Home" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/alerts", label: "Alerts" },
   { href: "/history", label: "History" },
-  { href: "/status", label: "Status" },
-];
+  { href: "/notifications", label: "Notifications" },
+  { href: "/system", label: "System" }
+]
 
 export default function Nav() {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
-    <nav className="nav">
-      <div className="brand">Precious Metals</div>
+    <nav className="border-b bg-white">
+      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center gap-6">
+        <span className="font-bold tracking-tight">
+          Precious Metals
+        </span>
 
-      <div className="links">
-        {LINKS.map((l) => {
-          const active = pathname === l.href;
-          return (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={`link ${active ? "active" : ""}`}
-            >
-              {l.label}
-            </Link>
-          );
-        })}
+        <div className="flex gap-4 text-sm">
+          {links.map((l) => {
+            const active = pathname === l.href
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`pb-1 border-b-2 transition ${
+                  active
+                    ? "border-black text-black"
+                    : "border-transparent text-gray-500 hover:text-black"
+                }`}
+              >
+                {l.label}
+              </Link>
+            )
+          })}
+        </div>
       </div>
-
-      <style jsx>{`
-        .nav {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 24px;
-          margin-bottom: 18px;
-          background: #0b0d12;
-          border-bottom: 1px solid #1f222a;
-        }
-
-        .brand {
-          font-size: 14px;
-          font-weight: 900;
-          letter-spacing: 0.3px;
-          color: #e9ecf1;
-        }
-
-        .links {
-          display: flex;
-          gap: 14px;
-        }
-
-        .link {
-          font-size: 12px;
-          font-weight: 800;
-          padding: 8px 12px;
-          border-radius: 999px;
-          color: #b3b8c4;
-          text-decoration: none;
-          border: 1px solid transparent;
-        }
-
-        .link:hover {
-          background: #111318;
-          color: #e9ecf1;
-        }
-
-        .link.active {
-          background: #1c202a;
-          border-color: #3a3f4a;
-          color: #e9ecf1;
-        }
-      `}</style>
     </nav>
-  );
+  )
 }

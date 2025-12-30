@@ -1,5 +1,7 @@
 // app/components/PageShell.tsx
 
+import Nav from "./Nav"
+
 export default function PageShell({
   title,
   children
@@ -8,9 +10,12 @@ export default function PageShell({
   children: React.ReactNode
 }) {
   return (
-    <div className="p-10 space-y-6">
-      <h1 className="text-3xl font-bold">{title}</h1>
-      {children}
-    </div>
+    <>
+      <Nav />
+      <div className="p-10 space-y-6">
+        <h1 className="text-3xl font-bold">{title}</h1>
+        {children}
+      </div>
+    </>
   )
 }
