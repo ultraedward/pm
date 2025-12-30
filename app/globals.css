@@ -36,3 +36,4 @@ body {
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 }
+@import "./styles/ui.css";
