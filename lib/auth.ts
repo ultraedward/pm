@@ -1,5 +1,10 @@
 // lib/auth.ts
 
-export async function getCurrentUser() {
+export type User = {
+  id: string
+  role: "ADMIN" | "USER"
+}
+
+export async function getCurrentUser(): Promise<User | null> {
   return null
 }
