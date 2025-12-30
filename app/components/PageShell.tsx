@@ -19,11 +19,17 @@ export default function PageShell({
 
   useEffect(() => {
     const authed = localStorage.getItem("demo-authed")
+
     if (!authed && pathname !== "/login") {
+      localStorage.setItem("demo-redirect", pathname)
       router.replace("/login")
+      return
     }
+
     if (authed && pathname === "/login") {
-      router.replace("/dashboard")
+      const redirect = localStorage.getItem("demo-redirect") || "/dashboard"
+      localStorage.removeItem("demo-redirect")
+      router.replace(redirect === "/login" ? "/dashboard" : redirect)
     }
   }, [pathname, router])
 

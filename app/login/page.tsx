@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Button from "../components/Button"
 import Card from "../components/Card"
@@ -13,10 +13,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
+  useEffect(() => {
+    const authed = localStorage.getItem("demo-authed")
+    if (authed) {
+      const redirect = localStorage.getItem("demo-redirect") || "/dashboard"
+      localStorage.removeItem("demo-redirect")
+      router.replace(redirect === "/login" ? "/dashboard" : redirect)
+    }
+  }, [router])
+
   function handleLogin() {
     if (email === "demo@local" && password === "demo") {
       localStorage.setItem("demo-authed", "true")
-      router.push("/dashboard")
+      const redirect = localStorage.getItem("demo-redirect") || "/dashboard"
+      localStorage.removeItem("demo-redirect")
+      router.push(redirect === "/login" ? "/dashboard" : redirect)
     } else {
       setError("Invalid demo credentials")
     }

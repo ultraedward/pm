@@ -20,6 +20,7 @@ export default function Nav() {
 
   function logout() {
     localStorage.removeItem("demo-authed")
+    localStorage.removeItem("demo-redirect")
     router.push("/login")
   }
 
@@ -27,9 +28,7 @@ export default function Nav() {
     <nav className="border-b bg-white">
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <span className="font-bold tracking-tight">
-            Precious Metals
-          </span>
+          <span className="font-bold tracking-tight">Precious Metals</span>
 
           <div className="flex gap-4 text-sm">
             {links.map((l) => {
