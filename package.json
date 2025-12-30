@@ -16,6 +16,8 @@
     "recharts": "^2.12.7"
   },
   "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.79",
     "prisma": "^5.22.0",
     "typescript": "^5.3.3"
   }
