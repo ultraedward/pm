@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
-import { SessionProvider } from "next-auth/react";
+import Providers from "./providers";
 import NavClient from "@/app/components/NavClient";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +13,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider>
+        <Providers>
           <NavClient />
           {children}
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   );
