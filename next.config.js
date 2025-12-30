@@ -2,13 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // 🚫 Force-disable static export
+  // Force non-export runtime output
   output: "standalone",
-
-  // Ensure App Router runs dynamically
-  experimental: {
-    appDir: true,
-  },
 };
 
 module.exports = nextConfig;
