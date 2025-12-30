@@ -7,27 +7,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model PricePoint {
+model User {
   id        String   @id @default(cuid())
-  metal     String
+  email     String   @unique
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+}
+
+model Metal {
+  id          String   @id @default(cuid())
+  name        String
+  symbol      String   @unique
+  volatility  Float
+  trendBias   Float
+  prices      Price[]
+  alerts      Alert[]
+  createdAt   DateTime @default(now())
+}
+
+model Price {
+  id        String   @id @default(cuid())
+  metalId   String
+  metal     Metal    @relation(fields: [metalId], references: [id])
   price     Float
   createdAt DateTime @default(now())
-
-  @@index([metal, createdAt])
 }
 
-model AlertEvent {
+model Alert {
   id          String   @id @default(cuid())
-  metal       String
-  price       Float
-  triggeredAt DateTime @default(now())
-
-  @@index([metal, triggeredAt])
+  metalId     String
+  metal       Metal    @relation(fields: [metalId], references: [id])
+  condition   AlertCondition
+  targetPrice Float
+  triggered   Boolean  @default(false)
+  notified    Boolean  @default(false)
+  triggeredAt DateTime?
+  createdAt   DateTime @default(now())
 }
 
-model AlertSettings {
-  id           String   @id @default(cuid())
-  goldThreshold   Float
-  silverThreshold Float
-  updatedAt    DateTime @updatedAt
+model CronStatus {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  lastRun   DateTime
+  message   String
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  VIEWER
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
 }

@@ -1,55 +1,39 @@
-export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+// /app/api/sample-prices/route.ts
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
-import { prisma } from "../../../lib/prisma"
+/*
+  PURE API ROUTE
+  - No JSX
+  - No path aliases
+  - Self-contained Prisma client
+*/
+
+const prisma = new PrismaClient();
 
 export async function GET() {
-  try {
-    const res = await fetch(
-      `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`,
-      { cache: "no-store" }
-    )
+  const rows = await prisma.price.findMany({
+    where: {
+      metal: {
+        in: ["XAU", "XAG", "XPT"],
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
 
-    if (!res.ok) {
-      return new Response(
-        JSON.stringify({ ok: false, error: "Metals API failed" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      )
-    }
+  const result = {
+    XAU: { price: 0 },
+    XAG: { price: 0 },
+    XPT: { price: 0 },
+  };
 
-    const data = await res.json()
-
-    if (!data?.rates?.USDXAU || !data?.rates?.USDXAG) {
-      return new Response(
-        JSON.stringify({ ok: false, error: "Invalid Metals API payload" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      )
-    }
-
-    await prisma.pricePoint.createMany({
-      data: [
-        { metal: "gold", price: data.rates.USDXAU },
-        { metal: "silver", price: data.rates.USDXAG },
-      ],
-    })
-
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        gold: data.rates.USDXAU,
-        silver: data.rates.USDXAG,
-        timestamp: new Date().toISOString(),
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    )
-  } catch (err) {
-    return new Response(
-      JSON.stringify({
-        ok: false,
-        error: "Unhandled exception",
-        message: String(err),
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    )
+  for (const row of rows) {
+    if (row.metal === "XAU") result.XAU.price = row.price;
+    if (row.metal === "XAG") result.XAG.price = row.price;
+    if (row.metal === "XPT") result.XPT.price = row.price;
   }
+
+  return NextResponse.json(result);
 }

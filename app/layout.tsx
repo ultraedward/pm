@@ -1,20 +1,20 @@
-import type { ReactNode } from "react"
-
-export const metadata = {
-  title: "Precious Metals Tracker",
-  description: "Live precious metals prices and alerts",
-}
+import "./globals.css";
+import { ThemeProvider } from "./components/ThemeProvider";
+import NavClient from "./components/NavClient";
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "system-ui" }}>
-        {children}
+      <body>
+        <ThemeProvider>
+          <NavClient />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
