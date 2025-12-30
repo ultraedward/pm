@@ -1,7 +1,5 @@
-// app/api/cron/move-prices/route.ts
-
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "../../../lib/prisma"
 
 export const dynamic = "force-dynamic"
 
@@ -12,28 +10,21 @@ function randomPercent(min: number, max: number) {
 export async function GET() {
   const metals = await prisma.metal.findMany()
 
-  const updates = await Promise.all(
+  await Promise.all(
     metals.map(async (metal) => {
-      const pctMove = randomPercent(-0.6, 0.6)
-      const newPrice = Number((metal.price * (1 + pctMove)).toFixed(2))
+      const pct = randomPercent(-0.6, 0.6)
+      const price = Number((metal.price * (1 + pct)).toFixed(2))
 
       await prisma.priceHistory.create({
-        data: {
-          metalId: metal.id,
-          price: newPrice
-        }
+        data: { metalId: metal.id, price }
       })
 
-      return prisma.metal.update({
+      await prisma.metal.update({
         where: { id: metal.id },
-        data: { price: newPrice }
+        data: { price }
       })
     })
   )
 
-  return NextResponse.json({
-    status: "ok",
-    moved: updates.length,
-    timestamp: new Date().toISOString()
-  })
+  return NextResponse.json({ status: "ok" })
 }

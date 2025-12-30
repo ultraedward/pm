@@ -1,7 +1,5 @@
-// app/api/daily-summary/route.ts
-
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { prisma } from "../../../lib/prisma"
 
 export const dynamic = "force-dynamic"
 
@@ -10,7 +8,6 @@ export async function GET() {
 
   return NextResponse.json({
     status: "ok",
-    metals,
-    emailed: false
+    count: metals.length
   })
 }
