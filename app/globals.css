@@ -37,3 +37,7 @@ body {
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 }
 @import "./styles/ui.css";
+/* Table polish */
+.table-striped tbody tr:nth-child(odd) {
+  background-color: #fafafa;
+}
