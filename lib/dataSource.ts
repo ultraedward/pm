@@ -12,8 +12,5 @@ export function getDashboardData() {
     }
   }
 
-  // Real backend will plug in here later
-  // return fetch("/api/dashboard").then(res => res.json())
-
   throw new Error("Backend not enabled")
 }
