@@ -1,12 +1,10 @@
-// app/page.tsx
+export const dynamic = "force-dynamic";
 
-import PageShell from "./components/PageShell"
-import HomeView from "./features/home/HomeView"
-
-export default function Page() {
+export default function HomePage() {
   return (
-    <PageShell title="Home">
-      <HomeView />
-    </PageShell>
-  )
+    <main style={{ padding: 24 }}>
+      <h1>Precious Metals Tracker</h1>
+      <p>Live prices, alerts, and dashboards.</p>
+    </main>
+  );
 }
