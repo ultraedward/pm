@@ -1,98 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import ThemeSwitcher from "./ThemeSwitcher";
+import { usePathname } from "next/navigation";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const LINKS = [
-  { href: "/", label: "Dashboard" },
+  { href: "/", label: "Home" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/alerts", label: "Alerts" },
-  { href: "/notifications", label: "Notifications" },
-  { href: "/history", label: "History" },
-  { href: "/system", label: "System" },
   { href: "/export", label: "Export" },
 ];
 
 export default function NavClient() {
-  const path = usePathname();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-
-  async function logout() {
-    await fetch("/api/logout", { method: "POST" });
-    router.push("/signin");
-  }
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-800 bg-black">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
-        <span className="font-bold tracking-wide">PM Tracker</span>
+    <nav className="w-full border-b border-neutral-200 bg-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+        {/* Left */}
+        <div className="flex items-center gap-6">
+          <Link href="/" className="text-lg font-semibold tracking-tight">
+            Precious Metals
+          </Link>
 
-        <div className="hidden md:flex items-center gap-6">
-          {LINKS.map((l) => {
-            const active = path === l.href;
-            return (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`text-sm ${
-                  active
-                    ? "text-white border-b-2 border-white pb-1"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                {l.label}
-              </Link>
-            );
-          })}
-          <ThemeSwitcher />
-          <button
-            onClick={logout}
-            className="text-sm text-gray-400 hover:text-white"
-          >
-            Log out
-          </button>
-        </div>
-
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 rounded border border-gray-800"
-          aria-label="Menu"
-        >
-          ☰
-        </button>
-      </div>
-
-      {open && (
-        <div className="md:hidden border-t border-gray-800 bg-black">
-          <div className="px-4 py-3 flex flex-col gap-3">
-            {LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className={`py-2 ${
-                  path === l.href
-                    ? "text-white"
-                    : "text-gray-400"
-                }`}
-              >
-                {l.label}
-              </Link>
-            ))}
-            <div className="pt-2 flex items-center justify-between">
-              <ThemeSwitcher />
-              <button
-                onClick={logout}
-                className="text-sm text-gray-400"
-              >
-                Log out
-              </button>
-            </div>
+          <div className="hidden md:flex gap-4">
+            {LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm transition ${
+                    active
+                      ? "font-semibold text-black"
+                      : "text-neutral-500 hover:text-black"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
-      )}
+
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          {status === "loading" ? null : session ? (
+            <>
+              <span className="hidden sm:block text-sm text-neutral-500">
+                {session.user?.email}
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-100"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => signIn()}
+              className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-neutral-800"
+            >
+              Sign in
+            </button>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }
