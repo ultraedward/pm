@@ -1,20 +1,29 @@
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
   const { pathname } = req.nextUrl;
 
-  if (
-    pathname.startsWith("/signin") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api")
-  ) {
-    return NextResponse.next();
-  }
+  const protectedRoutes = [
+    "/dashboard",
+    "/alerts",
+    "/history",
+    "/live",
+    "/notifications",
+    "/system",
+  ];
 
-  const auth = req.cookies.get("pm_auth")?.value;
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
-  if (!auth) {
+  if (isProtected && !token) {
     const url = req.nextUrl.clone();
     url.pathname = "/signin";
     return NextResponse.redirect(url);
@@ -24,5 +33,12 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!favicon.ico).*)"],
+  matcher: [
+    "/dashboard/:path*",
+    "/alerts/:path*",
+    "/history/:path*",
+    "/live/:path*",
+    "/notifications/:path*",
+    "/system/:path*",
+  ],
 };
