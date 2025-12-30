@@ -15,6 +15,7 @@ export default function LoginPage() {
 
   function handleLogin() {
     if (email === "demo@local" && password === "demo") {
+      sessionStorage.setItem("demo-authed", "true")
       router.push("/dashboard")
     } else {
       setError("Invalid demo credentials")
@@ -44,9 +45,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button onClick={handleLogin} className="w-full">
             Sign In

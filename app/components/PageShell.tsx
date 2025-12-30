@@ -1,5 +1,9 @@
 // app/components/PageShell.tsx
 
+"use client"
+
+import { useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import Nav from "./Nav"
 
 export default function PageShell({
@@ -9,6 +13,16 @@ export default function PageShell({
   title: string
   children: React.ReactNode
 }) {
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const authed = sessionStorage.getItem("demo-authed")
+    if (!authed && pathname !== "/login") {
+      router.replace("/login")
+    }
+  }, [pathname, router])
+
   return (
     <>
       <Nav />
