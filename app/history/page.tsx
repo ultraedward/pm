@@ -1,55 +1,21 @@
-import { prisma } from "../../lib/prisma";
+// app/history/page.tsx
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
-interface HistoryPageProps {
-  searchParams?: { days?: string };
-}
-
-export default async function HistoryPage({ searchParams }: HistoryPageProps) {
-  const days = Number(searchParams?.days ?? 7);
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-
-  const prices = await prisma.price.findMany({
-    where: {
-      createdAt: { gte: since },
-    },
-    orderBy: { createdAt: "asc" },
-    include: {
-      metal: true,
-    },
-  });
-
+export default function HistoryPage() {
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Price History (Last {days} Days)</h1>
+    <div className="p-10">
+      <h1 className="text-3xl font-bold mb-4">History</h1>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border border-gray-700 text-sm">
-          <thead className="bg-gray-900">
-            <tr>
-              <th className="p-2 border border-gray-700">Metal</th>
-              <th className="p-2 border border-gray-700">Price</th>
-              <th className="p-2 border border-gray-700">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {prices.map((p) => (
-              <tr key={p.id} className="odd:bg-gray-800">
-                <td className="p-2 border border-gray-700">
-                  {p.metal.name}
-                </td>
-                <td className="p-2 border border-gray-700">
-                  ${p.price.toFixed(2)}
-                </td>
-                <td className="p-2 border border-gray-700">
-                  {p.createdAt.toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="rounded-xl border p-6 bg-white">
+        <p className="text-sm text-gray-600">
+          Price history is temporarily disabled.
+        </p>
+        <p className="text-xs text-gray-400 mt-2">
+          This page will be re-enabled once the Price / PriceHistory models are
+          added to the Prisma schema.
+        </p>
       </div>
-    </main>
-  );
+    </div>
+  )
 }
