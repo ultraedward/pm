@@ -1,18 +1,22 @@
-import { prisma } from "../../../lib/prisma";
-import { requireAdmin } from "../../../lib/auth";
+// app/api/alerts/route.ts
 
-export async function POST(req: Request) {
-  await requireAdmin();
+import { NextResponse } from "next/server"
 
-  const body = await req.json();
+export const dynamic = "force-dynamic"
 
-  const alert = await prisma.alert.create({
-    data: {
-      metalId: body.metalId,
-      condition: body.condition,
-      targetPrice: Number(body.targetPrice),
+export async function GET() {
+  return NextResponse.json({
+    status: "disabled",
+    message: "Alerts API temporarily disabled (no Alert model in schema)"
+  })
+}
+
+export async function POST() {
+  return NextResponse.json(
+    {
+      status: "disabled",
+      message: "Alert creation disabled until schema is added"
     },
-  });
-
-  return Response.json(alert);
+    { status: 501 }
+  )
 }
