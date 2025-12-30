@@ -5,6 +5,7 @@
 import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Nav from "./Nav"
+import DemoBanner from "./DemoBanner"
 
 export default function PageShell({
   title,
@@ -28,6 +29,7 @@ export default function PageShell({
 
   return (
     <>
+      <DemoBanner />
       <Nav />
       <div className="p-10 space-y-6">
         <h1 className="text-3xl font-bold">{title}</h1>
