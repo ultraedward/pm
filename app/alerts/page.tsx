@@ -1,7 +1,5 @@
-// app/alerts/page.tsx
-
-import PageShell from "@/components/PageShell"
-import AlertsView from "@/features/alerts/AlertsView"
+import PageShell from "../components/PageShell"
+import AlertsView from "../features/alerts/AlertsView"
 
 export default function Page() {
   return (
