@@ -1,37 +1,39 @@
 // app/api/cron/move-prices/route.ts
-import { prisma } from "../../../../lib/prisma";
-import { movePrices } from "../../../../lib/fakePriceEngine";
-import { evaluateAlerts } from "../../../../lib/alertEngine";
-import { sendNotifications } from "../../../../lib/notificationEngine";
 
-export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
 
-export async function GET(request: Request) {
-  const auth = request.headers.get("authorization");
+export const dynamic = "force-dynamic"
 
-  if (
-    process.env.CRON_SECRET &&
-    auth !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+function randomPercent(min: number, max: number) {
+  return (Math.random() * (max - min) + min) / 100
+}
 
-  await movePrices();
-  await evaluateAlerts();
-  await sendNotifications();
+export async function GET() {
+  const metals = await prisma.metal.findMany()
 
-  await prisma.cronStatus.upsert({
-    where: { name: "price-engine" },
-    update: {
-      lastRun: new Date(),
-      message: "Prices, alerts, notifications processed",
-    },
-    create: {
-      name: "price-engine",
-      lastRun: new Date(),
-      message: "Initial run",
-    },
-  });
+  const updates = await Promise.all(
+    metals.map(async (metal) => {
+      const pctMove = randomPercent(-0.6, 0.6)
+      const newPrice = Number((metal.price * (1 + pctMove)).toFixed(2))
 
-  return Response.json({ status: "ok" });
+      await prisma.priceHistory.create({
+        data: {
+          metalId: metal.id,
+          price: newPrice
+        }
+      })
+
+      return prisma.metal.update({
+        where: { id: metal.id },
+        data: { price: newPrice }
+      })
+    })
+  )
+
+  return NextResponse.json({
+    status: "ok",
+    moved: updates.length,
+    timestamp: new Date().toISOString()
+  })
 }
