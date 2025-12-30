@@ -17,9 +17,12 @@ export default function PageShell({
   const pathname = usePathname()
 
   useEffect(() => {
-    const authed = sessionStorage.getItem("demo-authed")
+    const authed = localStorage.getItem("demo-authed")
     if (!authed && pathname !== "/login") {
       router.replace("/login")
+    }
+    if (authed && pathname === "/login") {
+      router.replace("/dashboard")
     }
   }, [pathname, router])
 

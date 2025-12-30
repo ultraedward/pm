@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   function handleLogin() {
     if (email === "demo@local" && password === "demo") {
-      sessionStorage.setItem("demo-authed", "true")
+      localStorage.setItem("demo-authed", "true")
       router.push("/dashboard")
     } else {
       setError("Invalid demo credentials")

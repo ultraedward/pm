@@ -19,7 +19,7 @@ export default function Nav() {
   const router = useRouter()
 
   function logout() {
-    sessionStorage.removeItem("demo-authed")
+    localStorage.removeItem("demo-authed")
     router.push("/login")
   }
 
