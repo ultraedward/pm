@@ -1,62 +1,63 @@
-// app/features/dashboard/DashboardView.tsx
+"use client";
 
-"use client"
+import { useEffect, useState } from "react";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts"
-
-import { getDashboardData } from "../../../lib/dataSource"
+type Price = {
+  metal: string;
+  price: number;
+  change: number;
+  updatedAt: string;
+};
 
 export default function DashboardView() {
-  const { metals, history } = getDashboardData()
+  const [prices, setPrices] = useState<Price[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/dashboard")
+      .then((res) => res.json())
+      .then((data) => {
+        setPrices(data.prices || []);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div style={{ padding: 24 }}>Loading dashboard…</div>;
+  }
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {metals.map((m) => (
-          <div
-            key={m.id}
-            className="rounded-xl border p-6 bg-white space-y-1"
-          >
-            <div className="text-sm text-gray-500">{m.name}</div>
-            <div className="text-3xl font-bold">${m.price.toFixed(2)}</div>
-            <div
-              className={`text-sm font-medium ${
-                m.changePct >= 0 ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {m.changePct >= 0 ? "+" : ""}
-              {m.changePct}%
-            </div>
-          </div>
-        ))}
-      </div>
+    <main style={{ padding: 24 }}>
+      <h1>Dashboard</h1>
 
-      <div className="rounded-xl border p-6 bg-white h-[420px]">
-        <h2 className="text-lg font-semibold mb-4">
-          Gold — Last 24 Hours (Mock)
-        </h2>
-
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={history}>
-            <XAxis dataKey="hour" />
-            <YAxis domain={["auto", "auto"]} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="gold"
-              strokeWidth={3}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  )
+      <table style={{ marginTop: 16, width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th align="left">Metal</th>
+            <th align="right">Price</th>
+            <th align="right">Change</th>
+            <th align="right">Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {prices.map((p) => (
+            <tr key={p.metal}>
+              <td>{p.metal}</td>
+              <td align="right">${p.price.toFixed(2)}</td>
+              <td
+                align="right"
+                style={{ color: p.change >= 0 ? "green" : "red" }}
+              >
+                {p.change >= 0 ? "+" : ""}
+                {p.change.toFixed(2)}%
+              </td>
+              <td align="right">
+                {new Date(p.updatedAt).toLocaleTimeString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </main>
+  );
 }

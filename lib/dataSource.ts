@@ -1,16 +1,17 @@
-// lib/dataSource.ts
+export type MetalPrice = {
+  metal: string;
+  price: number;
+  change: number;
+  updatedAt: string;
+};
 
-import { metalSnapshots, mockHistory } from "./mockData"
+export const DATA_SOURCE: "mock" | "live" = "mock";
 
-export const UI_ONLY_MODE = true
-
-export function getDashboardData() {
-  if (UI_ONLY_MODE) {
-    return {
-      metals: metalSnapshots,
-      history: mockHistory
-    }
-  }
-
-  throw new Error("Backend not enabled")
+export function getMockPrices(): MetalPrice[] {
+  return [
+    { metal: "Gold", price: 2042.35, change: 0.42, updatedAt: new Date().toISOString() },
+    { metal: "Silver", price: 24.88, change: -0.31, updatedAt: new Date().toISOString() },
+    { metal: "Platinum", price: 921.12, change: 0.18, updatedAt: new Date().toISOString() },
+    { metal: "Palladium", price: 1012.44, change: -0.77, updatedAt: new Date().toISOString() },
+  ];
 }
