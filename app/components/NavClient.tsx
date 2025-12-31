@@ -16,58 +16,82 @@ export default function NavClient() {
   const { data: session, status } = useSession();
 
   return (
-    <nav className="w-full border-b border-neutral-200 bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        {/* Left */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+    <header
+      style={{
+        borderBottom: "1px solid #e5e5e5",
+        background: "#fff",
+        position: "sticky",
+        top: 0,
+        zIndex: 10,
+      }}
+    >
+      <nav
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "12px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <Link href="/" style={{ fontWeight: 700, fontSize: 18 }}>
             Precious Metals
           </Link>
 
-          <div className="hidden md:flex gap-4">
-            {LINKS.map((link) => {
-              const active = pathname === link.href;
+          <div style={{ display: "flex", gap: 16 }}>
+            {LINKS.map((l) => {
+              const active = pathname === l.href;
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm transition ${
-                    active
-                      ? "font-semibold text-black"
-                      : "text-neutral-500 hover:text-black"
-                  }`}
+                  key={l.href}
+                  href={l.href}
+                  style={{
+                    fontSize: 14,
+                    color: active ? "#000" : "#666",
+                    fontWeight: active ? 600 : 400,
+                    textDecoration: "none",
+                  }}
                 >
-                  {link.label}
+                  {l.label}
                 </Link>
               );
             })}
           </div>
         </div>
 
-        {/* Right */}
-        <div className="flex items-center gap-3">
+        <div>
           {status === "loading" ? null : session ? (
-            <>
-              <span className="hidden sm:block text-sm text-neutral-500">
-                {session.user?.email}
-              </span>
-              <button
-                onClick={() => signOut()}
-                className="rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-100"
-              >
-                Sign out
-              </button>
-            </>
+            <button
+              onClick={() => signOut()}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 6,
+                border: "1px solid #ccc",
+                background: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Sign out
+            </button>
           ) : (
             <button
               onClick={() => signIn()}
-              className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-neutral-800"
+              style={{
+                padding: "6px 14px",
+                borderRadius: 6,
+                border: "none",
+                background: "#000",
+                color: "#fff",
+                cursor: "pointer",
+              }}
             >
               Sign in
             </button>
           )}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }
