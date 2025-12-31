@@ -10,6 +10,13 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
+  // If already signed in, don't allow visiting /signin
+  if (token && pathname === "/signin") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
   const protectedRoutes = [
     "/dashboard",
     "/alerts",
@@ -40,5 +47,6 @@ export const config = {
     "/live/:path*",
     "/notifications/:path*",
     "/system/:path*",
+    "/signin",
   ],
 };
