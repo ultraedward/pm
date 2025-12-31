@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -22,12 +22,13 @@ export default function DashboardView() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/dashboard")
-      .then((res) => res.json())
-      .then((data) => {
-        setPrices(data.prices || []);
-        setLoading(false);
-      });
+    async function load() {
+      const res = await fetch("/api/dashboard");
+      const data = await res.json();
+      setPrices(data.prices || []);
+      setLoading(false);
+    }
+    load();
   }, []);
 
   if (loading) {
@@ -43,7 +44,6 @@ export default function DashboardView() {
     <main style={{ padding: 24 }}>
       <h1>Dashboard</h1>
 
-      {/* Chart */}
       <section style={{ marginTop: 24, width: "100%", height: 300 }}>
         <ResponsiveContainer>
           <LineChart data={chartData}>
@@ -60,7 +60,6 @@ export default function DashboardView() {
         </ResponsiveContainer>
       </section>
 
-      {/* Table */}
       <table
         style={{
           marginTop: 32,
@@ -83,3 +82,18 @@ export default function DashboardView() {
               <td align="right">${p.price.toFixed(2)}</td>
               <td
                 align="right"
+                style={{ color: p.change >= 0 ? "green" : "red" }}
+              >
+                {p.change >= 0 ? "+" : ""}
+                {p.change.toFixed(2)}%
+              </td>
+              <td align="right">
+                {new Date(p.updatedAt).toLocaleTimeString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </main>
+  );
+}
