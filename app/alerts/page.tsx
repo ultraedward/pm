@@ -50,6 +50,11 @@ export default function AlertsPage() {
     load();
   }
 
+  async function remove(id: string) {
+    await fetch(`/api/alerts/${id}`, { method: "DELETE" });
+    load();
+  }
+
   async function sendTestEmail() {
     setSending(true);
     await fetch("/api/alerts/send", { method: "POST" });
@@ -108,7 +113,9 @@ export default function AlertsPage() {
         </button>
       </section>
 
-      <h3 style={{ marginTop: 32 }}>Email delivery log</h3>
+      <h3 style={{ marginTop: 32 }}>
+        Email delivery log
+      </h3>
       <ul>
         {logs.map((l) => (
           <li key={l.id}>
@@ -119,7 +126,9 @@ export default function AlertsPage() {
         ))}
       </ul>
 
-      <h3 style={{ marginTop: 32 }}>Alerts</h3>
+      <h3 style={{ marginTop: 32 }}>
+        Alerts ({alerts.length})
+      </h3>
       <ul>
         {alerts.map((a) => (
           <li key={a.id} style={{ marginBottom: 8 }}>
@@ -127,6 +136,12 @@ export default function AlertsPage() {
             <strong>{a.active ? "ON" : "OFF"}</strong>{" "}
             <button onClick={() => toggle(a.id)} style={{ marginLeft: 8 }}>
               Toggle
+            </button>
+            <button
+              onClick={() => remove(a.id)}
+              style={{ marginLeft: 8, color: "red" }}
+            >
+              Delete
             </button>
           </li>
         ))}
