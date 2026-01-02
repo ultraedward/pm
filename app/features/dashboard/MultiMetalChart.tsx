@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  Scatter,
 } from "recharts";
 import { METAL_COLORS } from "./metalColors";
 
@@ -24,6 +25,14 @@ type AlertLine = {
   id: string;
   threshold: number;
   direction: "above" | "below";
+};
+
+type TriggerPoint = {
+  id: string;
+  metal: Metal;
+  price: number;
+  direction: "above" | "below";
+  time: string;
 };
 
 export default function MultiMetalChart({
@@ -42,6 +51,7 @@ export default function MultiMetalChart({
     Platinum: [],
     Palladium: [],
   });
+  const [triggers, setTriggers] = useState<TriggerPoint[]>([]);
 
   useEffect(() => {
     async function loadPrices() {
@@ -101,11 +111,15 @@ export default function MultiMetalChart({
     loadAlerts();
   }, []);
 
-  // 🔹 Normalize data if enabled
+  useEffect(() => {
+    fetch(`/api/alerts/triggers?hours=${hours}`)
+      .then((r) => r.json())
+      .then((d) => setTriggers(d.triggers || []));
+  }, [hours]);
+
   const data = normalized
     ? (() => {
         const bases: Partial<Record<Metal, number>> = {};
-
         rawData.forEach((row) => {
           METALS.forEach((m) => {
             if (
@@ -138,7 +152,7 @@ export default function MultiMetalChart({
     : rawData;
 
   return (
-    <div style={{ width: "100%", height: 360 }}>
+    <div style={{ width: "100%", height: 380 }}>
       <ResponsiveContainer>
         <LineChart data={data}>
           <XAxis
@@ -158,13 +172,9 @@ export default function MultiMetalChart({
           />
           <Tooltip
             labelFormatter={(v) => new Date(v).toLocaleString()}
-            formatter={(v: number) =>
-              normalized
-                ? `${v.toFixed(2)}%`
-                : `$${v.toFixed(2)}`
-            }
           />
 
+          {/* Price lines */}
           {METALS.map(
             (metal) =>
               enabled[metal] && (
@@ -179,7 +189,7 @@ export default function MultiMetalChart({
               )
           )}
 
-          {/* Alert lines only shown in absolute price mode */}
+          {/* Alert thresholds (price mode only) */}
           {!normalized &&
             METALS.map(
               (metal) =>
@@ -196,6 +206,34 @@ export default function MultiMetalChart({
                     strokeDasharray="4 4"
                   />
                 ))
+            )}
+
+          {/* Alert trigger markers (price mode only) */}
+          {!normalized &&
+            METALS.map(
+              (metal) =>
+                enabled[metal] && (
+                  <Scatter
+                    key={`${metal}-triggers`}
+                    data={triggers.filter(
+                      (t) => t.metal === metal
+                    )}
+                    dataKey="price"
+                    fill={METAL_COLORS[metal]}
+                    shape={(props: any) => (
+                      <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r={5}
+                        fill={
+                          props.payload.direction === "above"
+                            ? "#16a34a"
+                            : "#dc2626"
+                        }
+                      />
+                    )}
+                  />
+                )
             )}
         </LineChart>
       </ResponsiveContainer>
