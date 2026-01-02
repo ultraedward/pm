@@ -23,7 +23,7 @@ model Alert {
   threshold      Float
   active         Boolean       @default(true)
 
-  cooldownHours  Int           @default(24) // ⬅️ NEW
+  cooldownHours  Int           @default(24)
   cooldownUntil  DateTime?
 
   userId         String
@@ -58,4 +58,13 @@ model AlertTrigger {
   triggered Boolean
 
   createdAt DateTime @default(now())
+}
+
+model PriceHistory {
+  id        String   @id @default(uuid())
+  metal     String
+  price     Float
+  createdAt DateTime @default(now())
+
+  @@index([metal, createdAt])
 }
