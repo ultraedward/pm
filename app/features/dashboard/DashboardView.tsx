@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import PriceHeader from "./PriceHeader";
 import MultiMetalChart from "./MultiMetalChart";
+import MetalLegend from "./MetalLegend";
 
 const METALS = ["Gold", "Silver", "Platinum", "Palladium"] as const;
-
 type Metal = (typeof METALS)[number];
 
 export default function DashboardView() {
@@ -21,11 +20,12 @@ export default function DashboardView() {
     setEnabled((e) => ({ ...e, [metal]: !e[metal] }));
   }
 
+  const activeMetals = METALS.filter((m) => enabled[m]);
+
   return (
     <main style={{ padding: 24 }}>
       <h1>Dashboard</h1>
 
-      {/* Time range */}
       <section style={{ marginTop: 16 }}>
         <label style={{ marginRight: 8 }}>Time range:</label>
         <select
@@ -38,7 +38,6 @@ export default function DashboardView() {
         </select>
       </section>
 
-      {/* Metal toggles */}
       <section style={{ marginTop: 16 }}>
         {METALS.map((metal) => (
           <label key={metal} style={{ marginRight: 12 }}>
@@ -52,18 +51,13 @@ export default function DashboardView() {
         ))}
       </section>
 
-      {/* Current prices */}
+      {/* Legend */}
       <section style={{ marginTop: 24 }}>
-        {METALS.filter((m) => enabled[m]).map((metal) => (
-          <div key={metal} style={{ marginBottom: 8 }}>
-            <strong>{metal}</strong>
-            <PriceHeader metal={metal} />
-          </div>
-        ))}
+        <MetalLegend metals={activeMetals} />
       </section>
 
       {/* Chart */}
-      <section style={{ marginTop: 24 }}>
+      <section style={{ marginTop: 16 }}>
         <MultiMetalChart hours={hours} enabled={enabled} />
       </section>
     </main>
