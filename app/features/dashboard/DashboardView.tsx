@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PriceChart from "./PriceChart";
+import PriceHeader from "./PriceHeader";
 
 export default function DashboardView() {
   const [hours, setHours] = useState(48);
@@ -25,11 +26,13 @@ export default function DashboardView() {
 
       <section style={{ marginTop: 32 }}>
         <h3>Gold</h3>
+        <PriceHeader metal="Gold" />
         <PriceChart metal="Gold" hours={hours} />
       </section>
 
       <section style={{ marginTop: 32 }}>
         <h3>Silver</h3>
+        <PriceHeader metal="Silver" />
         <PriceChart metal="Silver" hours={hours} />
       </section>
     </main>
