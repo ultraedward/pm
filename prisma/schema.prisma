@@ -17,18 +17,20 @@ model User {
 }
 
 model Alert {
-  id        String   @id @default(uuid())
-  metal     String
-  direction String
-  threshold Float
-  active    Boolean  @default(true)
+  id             String        @id @default(uuid())
+  metal          String
+  direction      String
+  threshold      Float
+  active         Boolean       @default(true)
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
 
-  triggers  AlertTrigger[]
+  cooldownUntil  DateTime?     // ⬅️ NEW
 
-  createdAt DateTime @default(now())
+  triggers       AlertTrigger[]
+
+  createdAt      DateTime      @default(now())
 }
 
 model EmailLog {
