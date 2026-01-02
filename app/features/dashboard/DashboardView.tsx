@@ -9,6 +9,7 @@ type Metal = (typeof METALS)[number];
 
 export default function DashboardView() {
   const [hours, setHours] = useState(48);
+  const [normalized, setNormalized] = useState(false);
   const [enabled, setEnabled] = useState<Record<Metal, boolean>>({
     Gold: true,
     Silver: true,
@@ -36,6 +37,15 @@ export default function DashboardView() {
           <option value={168}>Last 7 days</option>
           <option value={720}>Last 30 days</option>
         </select>
+
+        <label style={{ marginLeft: 16 }}>
+          <input
+            type="checkbox"
+            checked={normalized}
+            onChange={() => setNormalized(!normalized)}
+          />{" "}
+          Normalize (%)
+        </label>
       </section>
 
       <section style={{ marginTop: 16 }}>
@@ -51,14 +61,16 @@ export default function DashboardView() {
         ))}
       </section>
 
-      {/* Legend */}
       <section style={{ marginTop: 24 }}>
         <MetalLegend metals={activeMetals} />
       </section>
 
-      {/* Chart */}
       <section style={{ marginTop: 16 }}>
-        <MultiMetalChart hours={hours} enabled={enabled} />
+        <MultiMetalChart
+          hours={hours}
+          enabled={enabled}
+          normalized={normalized}
+        />
       </section>
     </main>
   );
