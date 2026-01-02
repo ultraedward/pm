@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 
-type Alert = {
+type AlertHistory = {
   id: string;
   metal: string;
   direction: "above" | "below";
   threshold: number;
   active: boolean;
+  cooldownUntil?: string;
+  lastTrigger?: {
+    price: number;
+    triggered: boolean;
+    createdAt: string;
+  };
 };
 
 type EmailLog = {
@@ -18,7 +24,7 @@ type EmailLog = {
 };
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alerts, setAlerts] = useState<AlertHistory[]>([]);
   const [logs, setLogs] = useState<EmailLog[]>([]);
   const [metal, setMetal] = useState("Gold");
   const [direction, setDirection] = useState<"above" | "below">("above");
@@ -26,7 +32,7 @@ export default function AlertsPage() {
   const [sending, setSending] = useState(false);
 
   async function load() {
-    const a = await fetch("/api/alerts").then((r) => r.json());
+    const a = await fetch("/api/alerts/history").then((r) => r.json());
     const l = await fetch("/api/email-logs").then((r) => r.json());
     setAlerts(a.alerts || []);
     setLogs(l.logs || []);
@@ -60,6 +66,13 @@ export default function AlertsPage() {
     await fetch("/api/alerts/send", { method: "POST" });
     setSending(false);
     load();
+  }
+
+  function renderCooldown(cooldownUntil?: string) {
+    if (!cooldownUntil) return "Ready";
+    const until = new Date(cooldownUntil);
+    if (until <= new Date()) return "Ready";
+    return `Cooldown until ${until.toLocaleString()}`;
   }
 
   return (
@@ -113,28 +126,31 @@ export default function AlertsPage() {
         </button>
       </section>
 
-      <h3 style={{ marginTop: 32 }}>
-        Email delivery log
-      </h3>
-      <ul>
-        {logs.map((l) => (
-          <li key={l.id}>
-            {new Date(l.createdAt).toLocaleString()} —{" "}
-            <strong>{l.status}</strong>
-            {l.error ? ` (${l.error})` : ""}
-          </li>
-        ))}
-      </ul>
-
-      <h3 style={{ marginTop: 32 }}>
-        Alerts ({alerts.length})
-      </h3>
+      <h3 style={{ marginTop: 32 }}>Alerts</h3>
       <ul>
         {alerts.map((a) => (
-          <li key={a.id} style={{ marginBottom: 8 }}>
-            {a.metal} {a.direction} {a.threshold} —{" "}
-            <strong>{a.active ? "ON" : "OFF"}</strong>{" "}
-            <button onClick={() => toggle(a.id)} style={{ marginLeft: 8 }}>
+          <li key={a.id} style={{ marginBottom: 16 }}>
+            <div>
+              <strong>
+                {a.metal} {a.direction} {a.threshold}
+              </strong>{" "}
+              — {a.active ? "ON" : "OFF"}
+            </div>
+
+            <div style={{ fontSize: 14, opacity: 0.8 }}>
+              Last trigger:{" "}
+              {a.lastTrigger
+                ? `${new Date(a.lastTrigger.createdAt).toLocaleString()} @ ${
+                    a.lastTrigger.price
+                  }`
+                : "Never"}
+            </div>
+
+            <div style={{ fontSize: 14, opacity: 0.8 }}>
+              Status: {renderCooldown(a.cooldownUntil)}
+            </div>
+
+            <button onClick={() => toggle(a.id)} style={{ marginTop: 4 }}>
               Toggle
             </button>
             <button
@@ -143,6 +159,17 @@ export default function AlertsPage() {
             >
               Delete
             </button>
+          </li>
+        ))}
+      </ul>
+
+      <h3 style={{ marginTop: 32 }}>Email delivery log</h3>
+      <ul>
+        {logs.map((l) => (
+          <li key={l.id}>
+            {new Date(l.createdAt).toLocaleString()} —{" "}
+            <strong>{l.status}</strong>
+            {l.error ? ` (${l.error})` : ""}
           </li>
         ))}
       </ul>
