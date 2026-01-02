@@ -4,6 +4,8 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const COOLDOWN_HOURS = 24;
+
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -19,6 +21,7 @@ function getMockPrices() {
 
 export async function GET() {
   const prices = getMockPrices();
+  const now = new Date();
 
   const alerts = await prisma.alert.findMany({
     where: { active: true },
@@ -36,14 +39,21 @@ export async function GET() {
         ? price >= alert.threshold
         : price <= alert.threshold;
 
+    // cooldown check
+    const inCooldown =
+      alert.cooldownUntil && alert.cooldownUntil > now;
+
     const lastTrigger = await prisma.alertTrigger.findFirst({
       where: { alertId: alert.id },
       orderBy: { createdAt: "desc" },
     });
 
     const shouldEmail =
-      triggered && (!lastTrigger || lastTrigger.triggered === false);
+      triggered &&
+      !inCooldown &&
+      (!lastTrigger || lastTrigger.triggered === false);
 
+    // record trigger attempt
     await prisma.alertTrigger.create({
       data: {
         alertId: alert.id,
@@ -70,6 +80,7 @@ export async function GET() {
           alert.direction
         } ${alert.threshold}</p>
           <p>Current price: <strong>${price}</strong></p>
+          <p>You will not be notified again for ${COOLDOWN_HOURS} hours.</p>
         `;
 
         await resend.emails.send({
@@ -77,6 +88,16 @@ export async function GET() {
           to: alert.user.email,
           subject: `${alert.metal} price alert triggered`,
           html,
+        });
+
+        // set cooldown
+        const cooldownUntil = new Date(
+          now.getTime() + COOLDOWN_HOURS * 60 * 60 * 1000
+        );
+
+        await prisma.alert.update({
+          where: { id: alert.id },
+          data: { cooldownUntil },
         });
 
         await prisma.emailLog.create({
@@ -102,6 +123,7 @@ export async function GET() {
       price,
       threshold: alert.threshold,
       triggered,
+      inCooldown,
       emailed: shouldEmail,
     });
   }
