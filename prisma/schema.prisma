@@ -8,10 +8,11 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
   alerts    Alert[]
-  createdAt DateTime @default(now())
+  emailLogs EmailLog[]
+  createdAt DateTime   @default(now())
 }
 
 model Alert {
@@ -24,5 +25,15 @@ model Alert {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 
+  createdAt DateTime @default(now())
+}
+
+model EmailLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  status    String   // "sent" | "failed"
+  error     String?  // nullable error message
   createdAt DateTime @default(now())
 }
