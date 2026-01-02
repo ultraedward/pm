@@ -29,11 +29,13 @@ type AlertLine = {
 export default function MultiMetalChart({
   hours,
   enabled,
+  normalized,
 }: {
   hours: number;
   enabled: Record<Metal, boolean>;
+  normalized: boolean;
 }) {
-  const [data, setData] = useState<Point[]>([]);
+  const [rawData, setRawData] = useState<Point[]>([]);
   const [alerts, setAlerts] = useState<Record<Metal, AlertLine[]>>({
     Gold: [],
     Silver: [],
@@ -60,7 +62,7 @@ export default function MultiMetalChart({
         }
       }
 
-      setData(
+      setRawData(
         Array.from(map.values()).sort(
           (a, b) =>
             new Date(a.time).getTime() -
@@ -99,6 +101,42 @@ export default function MultiMetalChart({
     loadAlerts();
   }, []);
 
+  // 🔹 Normalize data if enabled
+  const data = normalized
+    ? (() => {
+        const bases: Partial<Record<Metal, number>> = {};
+
+        rawData.forEach((row) => {
+          METALS.forEach((m) => {
+            if (
+              enabled[m] &&
+              bases[m] === undefined &&
+              typeof row[m] === "number"
+            ) {
+              bases[m] = row[m] as number;
+            }
+          });
+        });
+
+        return rawData.map((row) => {
+          const next: Point = { time: row.time };
+          METALS.forEach((m) => {
+            if (
+              enabled[m] &&
+              typeof row[m] === "number" &&
+              bases[m]
+            ) {
+              next[m] =
+                (((row[m] as number) - bases[m]!) /
+                  bases[m]!) *
+                100;
+            }
+          });
+          return next;
+        });
+      })()
+    : rawData;
+
   return (
     <div style={{ width: "100%", height: 360 }}>
       <ResponsiveContainer>
@@ -112,9 +150,19 @@ export default function MultiMetalChart({
               })
             }
           />
-          <YAxis domain={["auto", "auto"]} />
+          <YAxis
+            domain={["auto", "auto"]}
+            tickFormatter={(v) =>
+              normalized ? `${v.toFixed(1)}%` : v.toFixed(2)
+            }
+          />
           <Tooltip
             labelFormatter={(v) => new Date(v).toLocaleString()}
+            formatter={(v: number) =>
+              normalized
+                ? `${v.toFixed(2)}%`
+                : `$${v.toFixed(2)}`
+            }
           />
 
           {METALS.map(
@@ -131,22 +179,24 @@ export default function MultiMetalChart({
               )
           )}
 
-          {METALS.map(
-            (metal) =>
-              enabled[metal] &&
-              alerts[metal].map((alert) => (
-                <ReferenceLine
-                  key={`${metal}-${alert.id}`}
-                  y={alert.threshold}
-                  stroke={
-                    alert.direction === "above"
-                      ? "#16a34a"
-                      : "#dc2626"
-                  }
-                  strokeDasharray="4 4"
-                />
-              ))
-          )}
+          {/* Alert lines only shown in absolute price mode */}
+          {!normalized &&
+            METALS.map(
+              (metal) =>
+                enabled[metal] &&
+                alerts[metal].map((alert) => (
+                  <ReferenceLine
+                    key={`${metal}-${alert.id}`}
+                    y={alert.threshold}
+                    stroke={
+                      alert.direction === "above"
+                        ? "#16a34a"
+                        : "#dc2626"
+                    }
+                    strokeDasharray="4 4"
+                  />
+                ))
+            )}
         </LineChart>
       </ResponsiveContainer>
     </div>
