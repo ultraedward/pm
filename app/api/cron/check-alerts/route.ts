@@ -13,6 +13,15 @@ export async function GET() {
   const prices = await getLivePrices();
   const now = new Date();
 
+  // 🔹 Persist price history (one row per metal per run)
+  await Promise.all(
+    Object.entries(prices).map(([metal, price]) =>
+      prisma.priceHistory.create({
+        data: { metal, price },
+      })
+    )
+  );
+
   const alerts = await prisma.alert.findMany({
     where: { active: true },
     include: { user: true },
@@ -78,17 +87,13 @@ export async function GET() {
           where: { id: alert.id },
           data: {
             cooldownUntil: new Date(
-              now.getTime() +
-                alert.cooldownHours * 60 * 60 * 1000
+              now.getTime() + alert.cooldownHours * 60 * 60 * 1000
             ),
           },
         });
 
         await prisma.emailLog.create({
-          data: {
-            userId: alert.userId,
-            status: "sent",
-          },
+          data: { userId: alert.userId, status: "sent" },
         });
       } catch (err: any) {
         await prisma.emailLog.create({
