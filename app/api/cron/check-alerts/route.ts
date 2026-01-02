@@ -3,22 +3,14 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getLivePrices } from "@/lib/prices";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function getMockPrices() {
-  return {
-    Gold: 2042.35,
-    Silver: 24.88,
-    Platinum: 921.12,
-    Palladium: 1012.44,
-  };
-}
-
 export async function GET() {
-  const prices = getMockPrices();
+  const prices = await getLivePrices();
   const now = new Date();
 
   const alerts = await prisma.alert.findMany({
@@ -30,7 +22,7 @@ export async function GET() {
 
   for (const alert of alerts) {
     const price = prices[alert.metal as keyof typeof prices];
-    if (price === undefined) continue;
+    if (!price) continue;
 
     const triggered =
       alert.direction === "above"
@@ -75,20 +67,21 @@ export async function GET() {
           to: alert.user.email,
           subject: `${alert.metal} price alert triggered`,
           html: `
-            <p>${alert.metal} is now ${alert.direction} ${alert.threshold}</p>
-            <p>Price: ${price}</p>
+            <h2>${alert.metal} Alert</h2>
+            <p>Condition: ${alert.direction} ${alert.threshold}</p>
+            <p>Current price: ${price}</p>
             <p>Cooldown: ${alert.cooldownHours} hours</p>
           `,
         });
 
-        const cooldownUntil = new Date(
-          now.getTime() +
-            alert.cooldownHours * 60 * 60 * 1000
-        );
-
         await prisma.alert.update({
           where: { id: alert.id },
-          data: { cooldownUntil },
+          data: {
+            cooldownUntil: new Date(
+              now.getTime() +
+                alert.cooldownHours * 60 * 60 * 1000
+            ),
+          },
         });
 
         await prisma.emailLog.create({
@@ -110,9 +103,10 @@ export async function GET() {
 
     results.push({
       alertId: alert.id,
+      metal: alert.metal,
+      price,
       triggered,
-      inCooldown,
-      cooldownHours: alert.cooldownHours,
+      emailed: shouldEmail,
     });
   }
 
