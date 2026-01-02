@@ -8,15 +8,21 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
 
 const METALS = ["Gold", "Silver", "Platinum", "Palladium"] as const;
-
 type Metal = (typeof METALS)[number];
 
 type Point = {
   time: string;
   [key: string]: number | string;
+};
+
+type AlertLine = {
+  id: string;
+  threshold: number;
+  direction: "above" | "below";
 };
 
 export default function MultiMetalChart({
@@ -27,9 +33,15 @@ export default function MultiMetalChart({
   enabled: Record<Metal, boolean>;
 }) {
   const [data, setData] = useState<Point[]>([]);
+  const [alerts, setAlerts] = useState<Record<Metal, AlertLine[]>>({
+    Gold: [],
+    Silver: [],
+    Platinum: [],
+    Palladium: [],
+  });
 
   useEffect(() => {
-    async function load() {
+    async function loadPrices() {
       const responses = await Promise.all(
         METALS.map((metal) =>
           fetch(`/api/prices/history?metal=${metal}&hours=${hours}`)
@@ -38,29 +50,56 @@ export default function MultiMetalChart({
         )
       );
 
-      // Merge by timestamp
       const map = new Map<string, Point>();
 
       for (const { metal, points } of responses) {
         for (const p of points) {
-          const key = p.time;
-          if (!map.has(key)) map.set(key, { time: key });
-          map.get(key)![metal] = p.price;
+          if (!map.has(p.time)) map.set(p.time, { time: p.time });
+          map.get(p.time)![metal] = p.price;
         }
       }
 
-      setData(Array.from(map.values()).sort(
-        (a, b) =>
-          new Date(a.time).getTime() -
-          new Date(b.time).getTime()
-      ));
+      setData(
+        Array.from(map.values()).sort(
+          (a, b) =>
+            new Date(a.time).getTime() -
+            new Date(b.time).getTime()
+        )
+      );
     }
 
-    load();
+    loadPrices();
   }, [hours]);
 
+  useEffect(() => {
+    async function loadAlerts() {
+      const results = await Promise.all(
+        METALS.map((metal) =>
+          fetch(`/api/alerts/by-metal?metal=${metal}`)
+            .then((r) => r.json())
+            .then((d) => ({ metal, alerts: d.alerts || [] }))
+        )
+      );
+
+      const next: Record<Metal, AlertLine[]> = {
+        Gold: [],
+        Silver: [],
+        Platinum: [],
+        Palladium: [],
+      };
+
+      for (const r of results) {
+        next[r.metal as Metal] = r.alerts;
+      }
+
+      setAlerts(next);
+    }
+
+    loadAlerts();
+  }, []);
+
   return (
-    <div style={{ width: "100%", height: 350 }}>
+    <div style={{ width: "100%", height: 360 }}>
       <ResponsiveContainer>
         <LineChart data={data}>
           <XAxis
@@ -77,6 +116,7 @@ export default function MultiMetalChart({
             labelFormatter={(v) => new Date(v).toLocaleString()}
           />
 
+          {/* Price lines */}
           {METALS.map(
             (metal) =>
               enabled[metal] && (
@@ -88,6 +128,33 @@ export default function MultiMetalChart({
                   dot={false}
                 />
               )
+          )}
+
+          {/* Alert thresholds */}
+          {METALS.map(
+            (metal) =>
+              enabled[metal] &&
+              alerts[metal].map((alert) => (
+                <ReferenceLine
+                  key={`${metal}-${alert.id}`}
+                  y={alert.threshold}
+                  stroke={
+                    alert.direction === "above"
+                      ? "#16a34a"
+                      : "#dc2626"
+                  }
+                  strokeDasharray="4 4"
+                  label={{
+                    value: `${metal} ${alert.direction} ${alert.threshold}`,
+                    position: "right",
+                    fontSize: 11,
+                    fill:
+                      alert.direction === "above"
+                        ? "#16a34a"
+                        : "#dc2626",
+                  }}
+                />
+              ))
           )}
         </LineChart>
       </ResponsiveContainer>
