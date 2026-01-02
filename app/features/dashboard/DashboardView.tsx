@@ -1,17 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import PriceChart from "./PriceChart";
 import PriceHeader from "./PriceHeader";
+import MultiMetalChart from "./MultiMetalChart";
+
+const METALS = ["Gold", "Silver", "Platinum", "Palladium"] as const;
+
+type Metal = (typeof METALS)[number];
 
 export default function DashboardView() {
   const [hours, setHours] = useState(48);
+  const [enabled, setEnabled] = useState<Record<Metal, boolean>>({
+    Gold: true,
+    Silver: true,
+    Platinum: false,
+    Palladium: false,
+  });
+
+  function toggle(metal: Metal) {
+    setEnabled((e) => ({ ...e, [metal]: !e[metal] }));
+  }
 
   return (
     <main style={{ padding: 24 }}>
       <h1>Dashboard</h1>
 
-      {/* Time range selector */}
+      {/* Time range */}
       <section style={{ marginTop: 16 }}>
         <label style={{ marginRight: 8 }}>Time range:</label>
         <select
@@ -24,16 +38,33 @@ export default function DashboardView() {
         </select>
       </section>
 
-      <section style={{ marginTop: 32 }}>
-        <h3>Gold</h3>
-        <PriceHeader metal="Gold" />
-        <PriceChart metal="Gold" hours={hours} />
+      {/* Metal toggles */}
+      <section style={{ marginTop: 16 }}>
+        {METALS.map((metal) => (
+          <label key={metal} style={{ marginRight: 12 }}>
+            <input
+              type="checkbox"
+              checked={enabled[metal]}
+              onChange={() => toggle(metal)}
+            />{" "}
+            {metal}
+          </label>
+        ))}
       </section>
 
-      <section style={{ marginTop: 32 }}>
-        <h3>Silver</h3>
-        <PriceHeader metal="Silver" />
-        <PriceChart metal="Silver" hours={hours} />
+      {/* Current prices */}
+      <section style={{ marginTop: 24 }}>
+        {METALS.filter((m) => enabled[m]).map((metal) => (
+          <div key={metal} style={{ marginBottom: 8 }}>
+            <strong>{metal}</strong>
+            <PriceHeader metal={metal} />
+          </div>
+        ))}
+      </section>
+
+      {/* Chart */}
+      <section style={{ marginTop: 24 }}>
+        <MultiMetalChart hours={hours} enabled={enabled} />
       </section>
     </main>
   );
