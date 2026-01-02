@@ -1,10 +1,14 @@
-// lib/auth.ts
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/authOptions";
 
-export type User = {
-  id: string
-  role: "ADMIN" | "USER"
-}
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) return null;
 
-export async function getCurrentUser(): Promise<User | null> {
-  return null
+  return prisma.user.upsert({
+    where: { email: session.user.email },
+    update: {},
+    create: { email: session.user.email },
+  });
 }
