@@ -1,19 +1,28 @@
-// prisma/schema.prisma
-
-model Metal {
-  id        String         @id @default(cuid())
-  name      String
-  price     Float
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  history   PriceHistory[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model PriceHistory {
-  id        String   @id @default(cuid())
-  metalId  String
-  price     Float
-  createdAt DateTime @default(now())
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  metal Metal @relation(fields: [metalId], references: [id])
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  alerts    Alert[]
+  createdAt DateTime @default(now())
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  metal     String
+  direction String
+  threshold Float
+  active    Boolean  @default(true)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
 }
