@@ -10,17 +10,26 @@ type Alert = {
   active: boolean;
 };
 
+type EmailLog = {
+  id: string;
+  status: string;
+  error?: string;
+  createdAt: string;
+};
+
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [logs, setLogs] = useState<EmailLog[]>([]);
   const [metal, setMetal] = useState("Gold");
   const [direction, setDirection] = useState<"above" | "below">("above");
   const [threshold, setThreshold] = useState<number>(2000);
   const [sending, setSending] = useState(false);
 
   async function load() {
-    const res = await fetch("/api/alerts");
-    const data = await res.json();
-    setAlerts(data.alerts || []);
+    const a = await fetch("/api/alerts").then((r) => r.json());
+    const l = await fetch("/api/email-logs").then((r) => r.json());
+    setAlerts(a.alerts || []);
+    setLogs(l.logs || []);
   }
 
   useEffect(() => {
@@ -43,16 +52,9 @@ export default function AlertsPage() {
 
   async function sendTestEmail() {
     setSending(true);
-    const res = await fetch("/api/alerts/send", { method: "POST" });
-    const data = await res.json();
+    await fetch("/api/alerts/send", { method: "POST" });
     setSending(false);
-
-    if (!res.ok) {
-      alert(data.error || "Failed to send email");
-      return;
-    }
-
-    alert("Test email sent successfully");
+    load();
   }
 
   return (
@@ -106,7 +108,19 @@ export default function AlertsPage() {
         </button>
       </section>
 
-      <ul style={{ marginTop: 24 }}>
+      <h3 style={{ marginTop: 32 }}>Email delivery log</h3>
+      <ul>
+        {logs.map((l) => (
+          <li key={l.id}>
+            {new Date(l.createdAt).toLocaleString()} —{" "}
+            <strong>{l.status}</strong>
+            {l.error ? ` (${l.error})` : ""}
+          </li>
+        ))}
+      </ul>
+
+      <h3 style={{ marginTop: 32 }}>Alerts</h3>
+      <ul>
         {alerts.map((a) => (
           <li key={a.id} style={{ marginBottom: 8 }}>
             {a.metal} {a.direction} {a.threshold} —{" "}

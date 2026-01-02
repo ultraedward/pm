@@ -16,6 +16,14 @@ export async function POST() {
   }
 
   if (!process.env.RESEND_API_KEY) {
+    await prisma.emailLog.create({
+      data: {
+        userId: user.id,
+        status: "failed",
+        error: "RESEND_API_KEY not configured",
+      },
+    });
+
     return NextResponse.json(
       { error: "Email service not configured" },
       { status: 500 }
@@ -23,6 +31,14 @@ export async function POST() {
   }
 
   if (!isValidEmail(user.email)) {
+    await prisma.emailLog.create({
+      data: {
+        userId: user.id,
+        status: "failed",
+        error: "Invalid email address",
+      },
+    });
+
     return NextResponse.json(
       { error: "Invalid email address" },
       { status: 400 }
@@ -40,29 +56,50 @@ export async function POST() {
     return NextResponse.json({ sent: false, reason: "No active alerts" });
   }
 
-  // 🚨 Import Resend ONLY at runtime, never at build
-  const { Resend } = await import("resend");
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const html = `
-    <h2>Precious Metals Alerts</h2>
-    <p>Your active alerts:</p>
-    <ul>
-      ${alerts
-        .map(
-          (a) =>
-            `<li>${a.metal} ${a.direction} ${a.threshold}</li>`
-        )
-        .join("")}
-    </ul>
-  `;
+    const html = `
+      <h2>Precious Metals Alerts</h2>
+      <p>Your active alerts:</p>
+      <ul>
+        ${alerts
+          .map(
+            (a) =>
+              `<li>${a.metal} ${a.direction} ${a.threshold}</li>`
+          )
+          .join("")}
+      </ul>
+    `;
 
-  await resend.emails.send({
-    from: process.env.ALERT_EMAIL_FROM!,
-    to: user.email,
-    subject: "Your Precious Metals Alerts",
-    html,
-  });
+    await resend.emails.send({
+      from: process.env.ALERT_EMAIL_FROM!,
+      to: user.email,
+      subject: "Your Precious Metals Alerts",
+      html,
+    });
 
-  return NextResponse.json({ sent: true });
+    await prisma.emailLog.create({
+      data: {
+        userId: user.id,
+        status: "sent",
+      },
+    });
+
+    return NextResponse.json({ sent: true });
+  } catch (err: any) {
+    await prisma.emailLog.create({
+      data: {
+        userId: user.id,
+        status: "failed",
+        error: err.message ?? "Unknown error",
+      },
+    });
+
+    return NextResponse.json(
+      { error: "Email failed to send" },
+      { status: 500 }
+    );
+  }
 }
