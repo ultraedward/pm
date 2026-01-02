@@ -23,10 +23,11 @@ model Alert {
   threshold      Float
   active         Boolean       @default(true)
 
+  cooldownHours  Int           @default(24) // ⬅️ NEW
+  cooldownUntil  DateTime?
+
   userId         String
   user           User          @relation(fields: [userId], references: [id])
-
-  cooldownUntil  DateTime?     // ⬅️ NEW
 
   triggers       AlertTrigger[]
 

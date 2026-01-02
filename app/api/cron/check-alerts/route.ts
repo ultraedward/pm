@@ -4,8 +4,6 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-const COOLDOWN_HOURS = 24;
-
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -39,7 +37,6 @@ export async function GET() {
         ? price >= alert.threshold
         : price <= alert.threshold;
 
-    // cooldown check
     const inCooldown =
       alert.cooldownUntil && alert.cooldownUntil > now;
 
@@ -53,7 +50,6 @@ export async function GET() {
       !inCooldown &&
       (!lastTrigger || lastTrigger.triggered === false);
 
-    // record trigger attempt
     await prisma.alertTrigger.create({
       data: {
         alertId: alert.id,
@@ -74,25 +70,20 @@ export async function GET() {
         const { Resend } = await import("resend");
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        const html = `
-          <h2>Price Alert Triggered</h2>
-          <p><strong>${alert.metal}</strong> is now ${
-          alert.direction
-        } ${alert.threshold}</p>
-          <p>Current price: <strong>${price}</strong></p>
-          <p>You will not be notified again for ${COOLDOWN_HOURS} hours.</p>
-        `;
-
         await resend.emails.send({
           from: process.env.ALERT_EMAIL_FROM!,
           to: alert.user.email,
           subject: `${alert.metal} price alert triggered`,
-          html,
+          html: `
+            <p>${alert.metal} is now ${alert.direction} ${alert.threshold}</p>
+            <p>Price: ${price}</p>
+            <p>Cooldown: ${alert.cooldownHours} hours</p>
+          `,
         });
 
-        // set cooldown
         const cooldownUntil = new Date(
-          now.getTime() + COOLDOWN_HOURS * 60 * 60 * 1000
+          now.getTime() +
+            alert.cooldownHours * 60 * 60 * 1000
         );
 
         await prisma.alert.update({
@@ -111,7 +102,7 @@ export async function GET() {
           data: {
             userId: alert.userId,
             status: "failed",
-            error: err.message ?? "Email send failed",
+            error: err.message ?? "Email failed",
           },
         });
       }
@@ -119,17 +110,11 @@ export async function GET() {
 
     results.push({
       alertId: alert.id,
-      metal: alert.metal,
-      price,
-      threshold: alert.threshold,
       triggered,
       inCooldown,
-      emailed: shouldEmail,
+      cooldownHours: alert.cooldownHours,
     });
   }
 
-  return NextResponse.json({
-    checked: alerts.length,
-    results,
-  });
+  return NextResponse.json({ results });
 }

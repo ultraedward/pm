@@ -4,9 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ alerts: [] });
-  }
+  if (!user) return NextResponse.json({ alerts: [] });
 
   const alerts = await prisma.alert.findMany({
     where: { userId: user.id },
@@ -22,16 +20,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { metal, direction, threshold } = await req.json();
+  const { metal, direction, threshold, cooldownHours } = await req.json();
 
-  // 🔒 Deduplication check
   const existing = await prisma.alert.findFirst({
-    where: {
-      userId: user.id,
-      metal,
-      direction,
-      threshold,
-    },
+    where: { userId: user.id, metal, direction, threshold },
   });
 
   if (existing) {
@@ -43,6 +35,7 @@ export async function POST(req: Request) {
       metal,
       direction,
       threshold,
+      cooldownHours: cooldownHours ?? 24,
       userId: user.id,
     },
   });
