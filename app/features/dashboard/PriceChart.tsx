@@ -10,14 +10,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-type Point = { time: string; price: number };
+type Point = {
+  time: string;
+  price: number;
+};
 
 export default function PriceChart({
   metal,
-  hours = 48,
+  hours,
 }: {
   metal: string;
-  hours?: number;
+  hours: number;
 }) {
   const [data, setData] = useState<Point[]>([]);
 
@@ -33,7 +36,12 @@ export default function PriceChart({
         <LineChart data={data}>
           <XAxis
             dataKey="time"
-            tickFormatter={(v) => new Date(v).toLocaleTimeString()}
+            tickFormatter={(v) =>
+              new Date(v).toLocaleDateString(undefined, {
+                hour: "numeric",
+                minute: "numeric",
+              })
+            }
           />
           <YAxis domain={["auto", "auto"]} />
           <Tooltip
