@@ -3,6 +3,7 @@
 import { useState } from "react";
 import MultiMetalChart from "./MultiMetalChart";
 import MetalLegend from "./MetalLegend";
+import ExportButtons from "./ExportButtons";
 
 const METALS = ["Gold", "Silver", "Platinum", "Palladium"] as const;
 type Metal = (typeof METALS)[number];
@@ -18,7 +19,10 @@ export default function DashboardView() {
   });
 
   function toggle(metal: Metal) {
-    setEnabled((e) => ({ ...e, [metal]: !e[metal] }));
+    setEnabled((prev) => ({
+      ...prev,
+      [metal]: !prev[metal],
+    }));
   }
 
   const activeMetals = METALS.filter((m) => enabled[m]);
@@ -27,6 +31,7 @@ export default function DashboardView() {
     <main style={{ padding: 24 }}>
       <h1>Dashboard</h1>
 
+      {/* Controls */}
       <section style={{ marginTop: 16 }}>
         <label style={{ marginRight: 8 }}>Time range:</label>
         <select
@@ -42,12 +47,13 @@ export default function DashboardView() {
           <input
             type="checkbox"
             checked={normalized}
-            onChange={() => setNormalized(!normalized)}
+            onChange={() => setNormalized((v) => !v)}
           />{" "}
           Normalize (%)
         </label>
       </section>
 
+      {/* Metal toggles */}
       <section style={{ marginTop: 16 }}>
         {METALS.map((metal) => (
           <label key={metal} style={{ marginRight: 12 }}>
@@ -61,11 +67,18 @@ export default function DashboardView() {
         ))}
       </section>
 
+      {/* Legend */}
       <section style={{ marginTop: 24 }}>
         <MetalLegend metals={activeMetals} />
       </section>
 
+      {/* Export */}
       <section style={{ marginTop: 16 }}>
+        <ExportButtons hours={hours} />
+      </section>
+
+      {/* Chart */}
+      <section style={{ marginTop: 24 }}>
         <MultiMetalChart
           hours={hours}
           enabled={enabled}
