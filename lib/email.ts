@@ -2,6 +2,10 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function sendAlertEmail(
   to: string,
   alerts: {
@@ -11,6 +15,10 @@ export async function sendAlertEmail(
   }[]
 ) {
   if (!alerts.length) return;
+
+  if (!isValidEmail(to)) {
+    throw new Error("Invalid email address");
+  }
 
   const html = `
     <h2>Precious Metals Alerts</h2>

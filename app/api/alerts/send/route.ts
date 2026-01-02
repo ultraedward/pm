@@ -9,21 +9,28 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const alerts = await prisma.alert.findMany({
-    where: {
-      userId: user.id,
-      active: true,
-    },
-  });
+  try {
+    const alerts = await prisma.alert.findMany({
+      where: {
+        userId: user.id,
+        active: true,
+      },
+    });
 
-  await sendAlertEmail(
-    user.email,
-    alerts.map((a) => ({
-      metal: a.metal,
-      direction: a.direction,
-      threshold: a.threshold,
-    }))
-  );
+    await sendAlertEmail(
+      user.email,
+      alerts.map((a) => ({
+        metal: a.metal,
+        direction: a.direction,
+        threshold: a.threshold,
+      }))
+    );
 
-  return NextResponse.json({ sent: true });
+    return NextResponse.json({ sent: true });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err.message || "Email failed" },
+      { status: 400 }
+    );
+  }
 }

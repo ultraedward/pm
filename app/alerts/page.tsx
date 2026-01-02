@@ -43,9 +43,16 @@ export default function AlertsPage() {
 
   async function sendTestEmail() {
     setSending(true);
-    await fetch("/api/alerts/send", { method: "POST" });
+    const res = await fetch("/api/alerts/send", { method: "POST" });
+    const data = await res.json();
     setSending(false);
-    alert("Test email sent");
+
+    if (!res.ok) {
+      alert(data.error || "Failed to send email");
+      return;
+    }
+
+    alert("Test email sent successfully");
   }
 
   return (
