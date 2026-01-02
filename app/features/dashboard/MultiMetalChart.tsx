@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { METAL_COLORS } from "./metalColors";
 
 const METALS = ["Gold", "Silver", "Platinum", "Palladium"] as const;
 type Metal = (typeof METALS)[number];
@@ -116,7 +117,6 @@ export default function MultiMetalChart({
             labelFormatter={(v) => new Date(v).toLocaleString()}
           />
 
-          {/* Price lines */}
           {METALS.map(
             (metal) =>
               enabled[metal] && (
@@ -124,13 +124,13 @@ export default function MultiMetalChart({
                   key={metal}
                   type="monotone"
                   dataKey={metal}
+                  stroke={METAL_COLORS[metal]}
                   strokeWidth={2}
                   dot={false}
                 />
               )
           )}
 
-          {/* Alert thresholds */}
           {METALS.map(
             (metal) =>
               enabled[metal] &&
@@ -144,15 +144,6 @@ export default function MultiMetalChart({
                       : "#dc2626"
                   }
                   strokeDasharray="4 4"
-                  label={{
-                    value: `${metal} ${alert.direction} ${alert.threshold}`,
-                    position: "right",
-                    fontSize: 11,
-                    fill:
-                      alert.direction === "above"
-                        ? "#16a34a"
-                        : "#dc2626",
-                  }}
                 />
               ))
           )}
