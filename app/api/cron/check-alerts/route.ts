@@ -3,10 +3,18 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getMockPrices } from "@/lib/mockPrices";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function getMockPrices() {
+  return {
+    Gold: 2042.35,
+    Silver: 24.88,
+    Platinum: 921.12,
+    Palladium: 1012.44,
+  };
 }
 
 export async function GET() {
@@ -28,7 +36,6 @@ export async function GET() {
         ? price >= alert.threshold
         : price <= alert.threshold;
 
-    // last trigger (for dedupe)
     const lastTrigger = await prisma.alertTrigger.findFirst({
       where: { alertId: alert.id },
       orderBy: { createdAt: "desc" },
@@ -37,7 +44,6 @@ export async function GET() {
     const shouldEmail =
       triggered && (!lastTrigger || lastTrigger.triggered === false);
 
-    // record trigger
     await prisma.alertTrigger.create({
       data: {
         alertId: alert.id,
@@ -48,7 +54,6 @@ export async function GET() {
       },
     });
 
-    // send email ONLY on transition false → true
     if (
       shouldEmail &&
       alert.user &&
