@@ -1,19 +1,7 @@
-import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
-export async function getAuthSession() {
-  const user = await prisma.user.findFirst({
-    select: {
-      id: true,
-      email: true,
-    },
-  });
-
-  if (!user) return null;
-
-  return {
-    user: {
-      id: user.id,
-      email: user.email,
-    },
-  };
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions);
+  return session?.user ?? null;
 }
