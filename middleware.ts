@@ -1,52 +1,17 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  const { pathname } = req.nextUrl;
-
-  // If already signed in, don't allow visiting /signin
-  if (token && pathname === "/signin") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
-  }
-
-  const protectedRoutes = [
-    "/dashboard",
-    "/alerts",
-    "/history",
-    "/live",
-    "/notifications",
-    "/system",
-  ];
-
-  const isProtected = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  if (isProtected && !token) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/signin";
-    return NextResponse.redirect(url);
+export function middleware(req: NextRequest) {
+  if (req.nextUrl.pathname.startsWith("/api/cron")) {
+    const auth = req.headers.get("authorization");
+    if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/alerts/:path*",
-    "/history/:path*",
-    "/live/:path*",
-    "/notifications/:path*",
-    "/system/:path*",
-    "/signin",
-  ],
+  matcher: ["/api/cron/:path*"],
 };

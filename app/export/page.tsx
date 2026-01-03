@@ -1,25 +1,23 @@
-export const dynamic = "force-dynamic";
-
 export default function ExportPage() {
   return (
-    <main className="p-8 bg-black text-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Export Data</h1>
+    <div className="min-h-screen bg-white text-black p-8">
+      <h1 className="text-3xl font-semibold mb-6">Export Data</h1>
 
       <div className="space-y-4 max-w-md">
         <a
           href="/api/export/prices"
-          className="block border border-gray-800 rounded-lg p-4 bg-gray-900 hover:bg-gray-800"
+          className="block px-4 py-3 border rounded-md hover:bg-gray-50"
         >
-          Download Prices (CSV)
+          Download Prices (CSV) 🔒 Pro
         </a>
 
         <a
           href="/api/export/alerts"
-          className="block border border-gray-800 rounded-lg p-4 bg-gray-900 hover:bg-gray-800"
+          className="block px-4 py-3 border rounded-md hover:bg-gray-50"
         >
-          Download Alerts (CSV)
+          Download Alerts (CSV) 🔒 Pro
         </a>
       </div>
-    </main>
+    </div>
   );
 }

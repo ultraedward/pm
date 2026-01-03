@@ -1,9 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
-import Providers from "./providers";
-import NavClient from "@/app/components/NavClient";
-
-export const dynamic = "force-dynamic";
+import Nav from "@/app/components/Nav";
 
 export default function RootLayout({
   children,
@@ -12,11 +9,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <Providers>
-          <NavClient />
-          {children}
-        </Providers>
+      <body className="bg-white text-black">
+        <Nav />
+        {children}
       </body>
     </html>
   );

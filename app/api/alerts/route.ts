@@ -1,44 +1,37 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
 
-export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ alerts: [] });
-
-  const alerts = await prisma.alert.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return NextResponse.json({ alerts });
-}
+const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const body = await req.json();
+
+    if (!body?.metalId || !body?.targetPrice || !body?.direction) {
+      return Response.json({ error: "Invalid payload" }, { status: 400 });
+    }
+
+    const user = await prisma.user.findFirst({
+      select: { id: true, stripeStatus: true },
+    });
+
+    if (!user || user.stripeStatus !== "active") {
+      return Response.json(
+        { error: "Pro subscription required" },
+        { status: 403 }
+      );
+    }
+
+    const alert = await prisma.alert.create({
+      data: {
+        userId: user.id,
+        metalId: body.metalId,
+        targetPrice: Number(body.targetPrice),
+        direction: body.direction,
+      },
+    });
+
+    return Response.json(alert);
+  } catch {
+    return Response.json({ error: "Server error" }, { status: 500 });
   }
-
-  const { metal, direction, threshold, cooldownHours } = await req.json();
-
-  const existing = await prisma.alert.findFirst({
-    where: { userId: user.id, metal, direction, threshold },
-  });
-
-  if (existing) {
-    return NextResponse.json({ alert: existing });
-  }
-
-  const alert = await prisma.alert.create({
-    data: {
-      metal,
-      direction,
-      threshold,
-      cooldownHours: cooldownHours ?? 24,
-      userId: user.id,
-    },
-  });
-
-  return NextResponse.json({ alert });
 }
