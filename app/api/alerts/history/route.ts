@@ -20,7 +20,6 @@ export async function GET() {
       id: true,
       metal: true,
       direction: true,
-      triggered: true,
       createdAt: true,
       updatedAt: true,
     },
