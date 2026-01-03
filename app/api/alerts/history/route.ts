@@ -19,7 +19,6 @@ export async function GET() {
     select: {
       id: true,
       metal: true,
-      targetPrice: true,
       direction: true,
       triggered: true,
       createdAt: true,
