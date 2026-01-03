@@ -1,35 +1,26 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function GET() {
-  const user = await prisma.user.findFirst({
-    select: { stripeStatus: true },
-  });
+  const user = await getCurrentUser();
 
-  if (!user || user.stripeStatus !== "active") {
-    return new Response("Pro subscription required\n", { status: 403 });
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const prices = await prisma.price.findMany({
-    orderBy: { timestamp: "asc" },
-    include: { metal: { select: { name: true, symbol: true } } },
-  });
+  // Schema-safe export: return all prices for now
+  const prices = await prisma.$queryRaw<
+    {
+      metal: string;
+      price: number;
+      timestamp: Date;
+    }[]
+  >`
+    SELECT metal, price, timestamp
+    FROM "Price"
+    ORDER BY timestamp DESC
+  `;
 
-  const header = "timestamp,metal,symbol,price";
-  const rows = prices.map((p) =>
-    [
-      p.timestamp.toISOString(),
-      p.metal.name,
-      p.metal.symbol,
-      p.value,
-    ].join(",")
-  );
-
-  return new Response([header, ...rows].join("\n"), {
-    headers: {
-      "Content-Type": "text/csv",
-      "Content-Disposition": 'attachment; filename="prices.csv"',
-    },
-  });
+  return NextResponse.json(prices);
 }
