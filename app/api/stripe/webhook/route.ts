@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16", // ✅ MUST match installed Stripe SDK
+  apiVersion: "2023-10-16", // must match Stripe SDK
 });
 
 export async function POST(req: Request) {
@@ -36,40 +33,24 @@ export async function POST(req: Request) {
     );
   }
 
-  try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
+  /**
+   * Webhook received successfully.
+   * We intentionally do NOT mutate Prisma here yet
+   * because Stripe-related user fields are not finalized
+   * in the schema.
+   */
+  switch (event.type) {
+    case "checkout.session.completed":
+      console.log("Checkout completed");
+      break;
 
-        if (session.customer) {
-          await prisma.user.updateMany({
-            where: {},
-            data: {
-              // keep schema-safe (no select assumptions)
-              stripeStatus: "active",
-            },
-          });
-        }
-        break;
-      }
+    case "customer.subscription.deleted":
+      console.log("Subscription deleted");
+      break;
 
-      case "customer.subscription.deleted": {
-        await prisma.user.updateMany({
-          where: {},
-          data: {
-            stripeStatus: "inactive",
-          },
-        });
-        break;
-      }
-    }
-
-    return NextResponse.json({ received: true });
-  } catch (err) {
-    console.error("Webhook handler error:", err);
-    return NextResponse.json(
-      { error: "Webhook handler failed" },
-      { status: 500 }
-    );
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
   }
+
+  return NextResponse.json({ received: true });
 }
