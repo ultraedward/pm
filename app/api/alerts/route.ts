@@ -1,37 +1,31 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+  const user = await getCurrentUser();
 
-    if (!body?.metalId || !body?.targetPrice || !body?.direction) {
-      return Response.json({ error: "Invalid payload" }, { status: 400 });
-    }
-
-    const user = await prisma.user.findFirst({
-      select: { id: true, stripeStatus: true },
-    });
-
-    if (!user || user.stripeStatus !== "active") {
-      return Response.json(
-        { error: "Pro subscription required" },
-        { status: 403 }
-      );
-    }
-
-    const alert = await prisma.alert.create({
-      data: {
-        userId: user.id,
-        metalId: body.metalId,
-        targetPrice: Number(body.targetPrice),
-        direction: body.direction,
-      },
-    });
-
-    return Response.json(alert);
-  } catch {
-    return Response.json({ error: "Server error" }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const body = await req.json();
+  const { metal, direction } = body;
+
+  if (!metal || !direction) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  const alert = await prisma.alert.create({
+    data: {
+      userId: user.id,
+      metal,
+      direction,
+    },
+  });
+
+  return NextResponse.json(alert);
 }
