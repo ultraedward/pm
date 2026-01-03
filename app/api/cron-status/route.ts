@@ -1,35 +1,22 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // Basic DB connectivity + last price timestamp
-    const lastPrice = await prisma.price.findFirst({
-      orderBy: { timestamp: "desc" },
-      select: { timestamp: true },
-    });
+    // Basic DB connectivity check
+    await prisma.$queryRaw`SELECT 1`;
 
-    return Response.json({
+    return NextResponse.json({
       status: "ok",
-      cron: {
-        prices: {
-          enabled: true,
-          lastRun: lastPrice?.timestamp ?? null,
-        },
-        alerts: {
-          enabled: true,
-        },
-      },
+      db: "connected",
+      timestamp: new Date().toISOString(),
     });
-  } catch {
-    return Response.json(
+  } catch (error) {
+    return NextResponse.json(
       {
         status: "error",
-        cron: {
-          prices: { enabled: false },
-          alerts: { enabled: false },
-        },
+        db: "disconnected",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
