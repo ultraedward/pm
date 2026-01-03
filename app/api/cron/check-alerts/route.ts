@@ -1,15 +1,15 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+export const runtime = "nodejs";
 
 export async function GET() {
-  try {
-    return Response.json({
+  return new Response(
+    JSON.stringify({
       status: "ok",
-      message: "cron route is alive",
+      message: "cron route alive (no prisma)",
       timestamp: new Date().toISOString(),
-    });
-  } catch {
-    return new Response("Internal Server Error", { status: 500 });
-  }
+    }),
+    {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    }
+  );
 }
