@@ -18,12 +18,16 @@ export async function GET() {
     },
     select: {
       id: true,
-      metalId: true,
       targetPrice: true,
       direction: true,
       triggered: true,
       createdAt: true,
       updatedAt: true,
+      metal: {
+        select: {
+          symbol: true,
+        },
+      },
     },
   });
 
