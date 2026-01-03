@@ -1,14 +1,19 @@
-import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/authOptions";
+import prisma from "@/lib/prisma";
 
-export async function getCurrentUser() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return null;
-
-  return prisma.user.upsert({
-    where: { email: session.user.email },
-    update: {},
-    create: { email: session.user.email },
+export async function getAuthSession() {
+  const user = await prisma.user.findFirst({
+    select: {
+      id: true,
+      email: true,
+    },
   });
+
+  if (!user) return null;
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+    },
+  };
 }
