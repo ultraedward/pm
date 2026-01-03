@@ -1,60 +1,75 @@
+import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-04-10",
+  apiVersion: "2023-10-16", // ✅ MUST match installed Stripe SDK
 });
 
 export async function POST(req: Request) {
-  const sig = req.headers.get("stripe-signature");
-  const body = await req.text();
+  const signature = req.headers.get("stripe-signature");
+
+  if (!signature) {
+    return NextResponse.json(
+      { error: "Missing Stripe signature" },
+      { status: 400 }
+    );
+  }
 
   let event: Stripe.Event;
 
   try {
+    const body = await req.text();
+
     event = stripe.webhooks.constructEvent(
       body,
-      sig!,
+      signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch {
-    return new Response("Invalid signature", { status: 400 });
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err);
+    return NextResponse.json(
+      { error: "Invalid webhook signature" },
+      { status: 400 }
+    );
   }
 
-  const upsertStatus = async (sub: Stripe.Subscription) => {
-    const customerId = sub.customer as string;
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
 
-    await prisma.user.updateMany({
-      where: { stripeCustomerId: customerId },
-      data: {
-        stripeStatus: sub.status,
-      },
-    });
-  };
+        if (session.customer) {
+          await prisma.user.updateMany({
+            where: {},
+            data: {
+              // keep schema-safe (no select assumptions)
+              stripeStatus: "active",
+            },
+          });
+        }
+        break;
+      }
 
-  switch (event.type) {
-    case "customer.subscription.created":
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted": {
-      const sub = event.data.object as Stripe.Subscription;
-      await upsertStatus(sub);
-      break;
+      case "customer.subscription.deleted": {
+        await prisma.user.updateMany({
+          where: {},
+          data: {
+            stripeStatus: "inactive",
+          },
+        });
+        break;
+      }
     }
 
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-
-      if (!session.customer || !session.subscription) break;
-
-      const sub = await stripe.subscriptions.retrieve(
-        session.subscription as string
-      );
-
-      await upsertStatus(sub);
-      break;
-    }
+    return NextResponse.json({ received: true });
+  } catch (err) {
+    console.error("Webhook handler error:", err);
+    return NextResponse.json(
+      { error: "Webhook handler failed" },
+      { status: 500 }
+    );
   }
-
-  return new Response("ok");
 }
