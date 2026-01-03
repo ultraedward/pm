@@ -10,9 +10,9 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { metal, direction } = body;
+  const { metal, direction, threshold } = body;
 
-  if (!metal || !direction) {
+  if (!metal || !direction || threshold === undefined) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       userId: user.id,
       metal,
       direction,
+      threshold,
     },
   });
 
