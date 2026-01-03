@@ -21,7 +21,6 @@ export async function GET() {
       metal: true,
       direction: true,
       createdAt: true,
-      updatedAt: true,
     },
   });
 
