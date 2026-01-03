@@ -13,20 +13,17 @@ export default function NavClient() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-6 px-8 py-4 text-black">
-      <div className="font-semibold text-lg">Precious Metals</div>
-
-      <div className="flex gap-4">
+    <nav className="w-full border-b bg-white">
+      <div className="mx-auto max-w-6xl px-6 py-4 flex gap-6">
         {LINKS.map((link) => {
           const active = pathname === link.href;
-
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm ${
+              className={`text-sm font-medium ${
                 active
-                  ? "font-semibold underline"
+                  ? "text-black border-b-2 border-black pb-1"
                   : "text-gray-500 hover:text-black"
               }`}
             >
