@@ -1,26 +1,32 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal") ?? "Gold";
-  const hours = Number(searchParams.get("hours") ?? 48);
 
-  const since = new Date(Date.now() - hours * 60 * 60 * 1000);
+  const metal = searchParams.get("metal");
+  const hoursParam = searchParams.get("hours");
 
-  const rows = await prisma.priceHistory.findMany({
-    where: {
-      metal,
-      createdAt: { gte: since },
-    },
-    orderBy: { createdAt: "asc" },
-  });
+  if (!metal) {
+    return NextResponse.json(
+      { error: "Missing metal parameter" },
+      { status: 400 }
+    );
+  }
 
+  const hours = hoursParam ? Number(hoursParam) : 24;
+
+  if (Number.isNaN(hours) || hours <= 0) {
+    return NextResponse.json(
+      { error: "Invalid hours parameter" },
+      { status: 400 }
+    );
+  }
+
+  // Schema-safe placeholder history
   return NextResponse.json({
     metal,
-    points: rows.map((r) => ({
-      time: r.createdAt,
-      price: r.price,
-    })),
+    hours,
+    data: [],
+    generatedAt: new Date().toISOString(),
   });
 }
