@@ -1,119 +1,101 @@
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+import { PrismaClient } from "@prisma/client";
+import { Resend } from "resend";
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getLivePrices } from "@/lib/prices";
+const prisma = new PrismaClient();
 
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export async function GET() {
-  const prices = await getLivePrices();
-  const now = new Date();
+  try {
+    console.log("CRON: check-alerts start");
 
-  // 🔹 Persist price history (one row per metal per run)
-  await Promise.all(
-    Object.entries(prices).map(([metal, price]) =>
-      prisma.priceHistory.create({
-        data: { metal, price },
-      })
-    )
-  );
-
-  const alerts = await prisma.alert.findMany({
-    where: { active: true },
-    include: { user: true },
-  });
-
-  const results = [];
-
-  for (const alert of alerts) {
-    const price = prices[alert.metal as keyof typeof prices];
-    if (!price) continue;
-
-    const triggered =
-      alert.direction === "above"
-        ? price >= alert.threshold
-        : price <= alert.threshold;
-
-    const inCooldown =
-      alert.cooldownUntil && alert.cooldownUntil > now;
-
-    const lastTrigger = await prisma.alertTrigger.findFirst({
-      where: { alertId: alert.id },
-      orderBy: { createdAt: "desc" },
-    });
-
-    const shouldEmail =
-      triggered &&
-      !inCooldown &&
-      (!lastTrigger || lastTrigger.triggered === false);
-
-    await prisma.alertTrigger.create({
-      data: {
-        alertId: alert.id,
-        userId: alert.userId,
-        metal: alert.metal,
-        price,
-        triggered,
+    const alerts = await prisma.alert.findMany({
+      where: { triggered: false },
+      include: {
+        user: true, // ✅ this relation exists
       },
     });
 
-    if (
-      shouldEmail &&
-      alert.user &&
-      isValidEmail(alert.user.email) &&
-      process.env.RESEND_API_KEY
-    ) {
-      try {
-        const { Resend } = await import("resend");
-        const resend = new Resend(process.env.RESEND_API_KEY);
+    console.log("CRON: alerts found", alerts.length);
 
-        await resend.emails.send({
-          from: process.env.ALERT_EMAIL_FROM!,
-          to: alert.user.email,
-          subject: `${alert.metal} price alert triggered`,
-          html: `
-            <h2>${alert.metal} Alert</h2>
-            <p>Condition: ${alert.direction} ${alert.threshold}</p>
-            <p>Current price: ${price}</p>
-            <p>Cooldown: ${alert.cooldownHours} hours</p>
-          `,
-        });
+    if (alerts.length === 0) {
+      return Response.json({ status: "ok", checked: 0, triggered: 0 });
+    }
 
-        await prisma.alert.update({
-          where: { id: alert.id },
-          data: {
-            cooldownUntil: new Date(
-              now.getTime() + alert.cooldownHours * 60 * 60 * 1000
-            ),
-          },
-        });
+    // Fetch metals once
+    const metals = await prisma.metal.findMany();
+    const metalMap = new Map(
+      metals.map((m) => [m.id, m])
+    );
 
-        await prisma.emailLog.create({
-          data: { userId: alert.userId, status: "sent" },
-        });
-      } catch (err: any) {
-        await prisma.emailLog.create({
-          data: {
-            userId: alert.userId,
-            status: "failed",
-            error: err.message ?? "Email failed",
-          },
-        });
+    // Fetch latest prices
+    const prices = await prisma.price.findMany({
+      orderBy: { timestamp: "desc" },
+    });
+
+    const latestPriceByMetal = new Map<string, number>();
+    for (const p of prices) {
+      if (!latestPriceByMetal.has(p.metalId)) {
+        latestPriceByMetal.set(p.metalId, p.value);
       }
     }
 
-    results.push({
-      alertId: alert.id,
-      metal: alert.metal,
-      price,
-      triggered,
-      emailed: shouldEmail,
-    });
-  }
+    let triggeredCount = 0;
 
-  return NextResponse.json({ results });
+    for (const alert of alerts) {
+      const current = latestPriceByMetal.get(alert.metalId);
+      if (current == null) continue;
+
+      const shouldTrigger =
+        (alert.direction === "above" && current >= alert.targetPrice) ||
+        (alert.direction === "below" && current <= alert.targetPrice);
+
+      if (!shouldTrigger) continue;
+
+      await prisma.alert.update({
+        where: { id: alert.id },
+        data: {
+          triggered: true,
+          triggeredAt: new Date(),
+        },
+      });
+
+      triggeredCount++;
+
+      const metal = metalMap.get(alert.metalId);
+
+      if (resend && alert.user?.email && metal) {
+        try {
+          await resend.emails.send({
+            from: "Precious Metals <alerts@yourdomain.com>",
+            to: alert.user.email,
+            subject: `${metal.name} price alert triggered`,
+            html: `
+              <h2>${metal.name} (${metal.symbol})</h2>
+              <p>Your alert has triggered.</p>
+              <p>
+                Target: <b>$${alert.targetPrice}</b><br/>
+                Current: <b>$${current.toFixed(2)}</b>
+              </p>
+            `,
+          });
+        } catch (emailErr) {
+          console.error("CRON: email failed", emailErr);
+        }
+      }
+    }
+
+    console.log("CRON: done", { triggeredCount });
+
+    return Response.json({
+      status: "ok",
+      checked: alerts.length,
+      triggered: triggeredCount,
+    });
+  } catch (err) {
+    console.error("CRON: fatal error", err);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 }
