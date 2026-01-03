@@ -1,18 +1,18 @@
 import "./globals.css";
-import type { ReactNode } from "react";
-import Nav from "@/app/components/Nav";
+
+export const metadata = {
+  title: "Precious Metals",
+  description: "Precious Metals Tracker",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className="bg-white text-black">
-        <Nav />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
