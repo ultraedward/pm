@@ -1,18 +1,25 @@
+"use client";
+
 import { ReactNode } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { useSession } from "next-auth/react";
 
 const ADMIN_EMAILS = [
-  "ultra.edward@gmail.com"
+  "admin@example.com", // replace with real admin emails
 ];
 
-export default async function AdminOnly({
+export default function AdminOnly({
   children,
 }: {
   children: ReactNode;
 }) {
-  const user = await getCurrentUser();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   if (!user) return null;
+
+  // Explicitly guard against null / undefined email
+  if (!user.email) return null;
+
   if (!ADMIN_EMAILS.includes(user.email)) return null;
 
   return <>{children}</>;
