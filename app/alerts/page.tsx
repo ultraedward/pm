@@ -1,10 +1,10 @@
-import AlertHistory from "@/app/components/AlertHistory";
-
 export default function AlertsPage() {
   return (
-    <div className="min-h-screen bg-white text-black p-8">
-      <h1 className="text-3xl font-semibold mb-6">Alert History</h1>
-      <AlertHistory />
+    <div className="min-h-screen p-8">
+      <h1 className="text-2xl font-semibold">Alerts</h1>
+      <p className="mt-2 text-gray-500">
+        Alert management is handled from the dashboard.
+      </p>
     </div>
   );
 }
