@@ -1,11 +1,13 @@
-// middleware.ts
 import { withAuth } from "next-auth/middleware";
 
-export default withAuth({
-  pages: {
-    signIn: "/login",
-  },
-});
+export default withAuth(
+  function middleware() {},
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+  }
+);
 
 export const config = {
   matcher: ["/dashboard/:path*", "/api/:path*"],

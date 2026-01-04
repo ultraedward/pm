@@ -9,7 +9,6 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
 
     const res = await signIn("credentials", {
       password,
@@ -18,7 +17,7 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      setError("Invalid credentials");
+      setError("Invalid password");
     }
   }
 
@@ -26,26 +25,25 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-4 border border-gray-800 p-6 rounded"
+        className="w-full max-w-sm space-y-4"
       >
         <h1 className="text-xl font-semibold">Login</h1>
 
         <input
           type="password"
-          name="password"
           placeholder="Password"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 bg-black border border-gray-700 rounded"
         />
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
 
         <button
           type="submit"
-          className="w-full bg-white text-black py-2 rounded font-medium"
+          className="w-full py-2 bg-white text-black rounded"
         >
-          Enter
+          Sign in
         </button>
       </form>
     </div>
