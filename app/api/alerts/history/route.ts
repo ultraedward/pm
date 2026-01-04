@@ -3,26 +3,30 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function GET() {
-  const user = await getCurrentUser();
+  const sessionUser = await getCurrentUser();
 
-  if (!user) {
+  if (!sessionUser?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // ✅ Resolve real DB user (NextAuth user has NO id)
+  const dbUser = await prisma.user.findUnique({
+    where: { email: sessionUser.email },
+    select: { id: true },
+  });
+
+  if (!dbUser) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const alerts = await prisma.alert.findMany({
     where: {
-      userId: user.id,
+      userId: dbUser.id,
     },
     orderBy: {
       createdAt: "desc",
     },
-    select: {
-      id: true,
-      metal: true,
-      direction: true,
-      createdAt: true,
-    },
   });
 
-  return NextResponse.json(alerts);
+  return NextResponse.json({ alerts });
 }
