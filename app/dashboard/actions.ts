@@ -2,70 +2,63 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
-/* ---------------- helpers ---------------- */
-
-async function getDbUserId() {
+/* CREATE ALERT */
+export async function createAlert(formData: FormData) {
   const sessionUser = await getCurrentUser();
+  if (!sessionUser?.email) return;
 
-  if (!sessionUser?.email) {
-    throw new Error("Unauthorized");
-  }
-
-  const dbUser = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email: sessionUser.email },
     select: { id: true },
   });
+  if (!user) return;
 
-  if (!dbUser) {
-    throw new Error("User not found");
-  }
-
-  return dbUser.id;
-}
-
-/* ---------------- actions ---------------- */
-
-export async function createAlert(
-  metal: string,
-  direction: "above" | "below",
-  threshold: number
-) {
-  const userId = await getDbUserId();
+  const metal = formData.get("metal") as string;
+  const direction = formData.get("direction") as string;
+  const threshold = Number(formData.get("threshold"));
 
   await prisma.alert.create({
     data: {
-      userId,
+      userId: user.id,
       metal,
       direction,
       threshold,
       active: true,
     },
   });
+
+  revalidatePath("/dashboard");
 }
 
-export async function toggleAlert(alertId: string) {
-  const userId = await getDbUserId();
+/* TOGGLE ALERT */
+export async function toggleAlert(formData: FormData) {
+  const alertId = formData.get("alertId") as string;
+  if (!alertId) return;
 
-  const alert = await prisma.alert.findFirst({
-    where: { id: alertId, userId },
+  const alert = await prisma.alert.findUnique({
+    where: { id: alertId },
     select: { active: true },
   });
-
-  if (!alert) {
-    throw new Error("Alert not found");
-  }
+  if (!alert) return;
 
   await prisma.alert.update({
     where: { id: alertId },
     data: { active: !alert.active },
   });
+
+  revalidatePath("/dashboard");
 }
 
-export async function deleteAlert(alertId: string) {
-  const userId = await getDbUserId();
+/* DELETE ALERT */
+export async function deleteAlert(formData: FormData) {
+  const alertId = formData.get("alertId") as string;
+  if (!alertId) return;
 
-  await prisma.alert.deleteMany({
-    where: { id: alertId, userId },
+  await prisma.alert.delete({
+    where: { id: alertId },
   });
+
+  revalidatePath("/dashboard");
 }
