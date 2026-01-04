@@ -8,38 +8,24 @@ datasource db {
 }
 
 model User {
-  id               String   @id @default(uuid())
-  email            String   @unique
-  stripeCustomerId String?
-  stripeStatus     String?
-  alerts           Alert[]
-  createdAt        DateTime @default(now())
-}
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String?
+  stripeStatus      String   @default("inactive")
+  stripeCustomerId  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-model Metal {
-  id        String  @id @default(uuid())
-  name      String
-  symbol    String
-  prices    Price[]
-}
-
-model Price {
-  id        String   @id @default(uuid())
-  metalId   String
-  value     Float
-  timestamp DateTime @default(now())
-
-  metal Metal @relation(fields: [metalId], references: [id])
+  alerts            Alert[]
 }
 
 model Alert {
-  id          String   @id @default(uuid())
-  userId      String
-  metalId     String
-  targetPrice Float
-  direction   String
-  triggered   Boolean  @default(false)
-  triggeredAt DateTime?
+  id         String   @id @default(cuid())
+  userId     String
+  metal      String
+  direction  String
+  threshold  Float
+  createdAt  DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 }
