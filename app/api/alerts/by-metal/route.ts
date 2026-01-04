@@ -19,7 +19,6 @@ export async function GET(req: Request) {
     where: {
       userId: user.id,
       metal,
-      enabled: true, // ✅ schema-correct
     },
     orderBy: {
       createdAt: "desc",
@@ -29,7 +28,6 @@ export async function GET(req: Request) {
       metal: true,
       direction: true,
       threshold: true,
-      enabled: true,
       createdAt: true,
     },
   });
