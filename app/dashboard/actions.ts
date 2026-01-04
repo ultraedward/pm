@@ -18,7 +18,7 @@ export async function createAlert(formData: FormData) {
       metal,
       direction,
       threshold,
-      enabled: true,
+      active: true,
     },
   });
 
@@ -39,7 +39,7 @@ export async function toggleAlert(formData: FormData) {
 
   await prisma.alert.update({
     where: { id },
-    data: { enabled: !alert.enabled },
+    data: { active: !alert.active },
   });
 
   revalidatePath("/dashboard");
