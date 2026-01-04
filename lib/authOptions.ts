@@ -2,45 +2,41 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: "jwt" },
-
-  // (optional) if you have a custom login page
-  pages: {
-    signIn: "/login",
+  session: {
+    strategy: "jwt",
   },
-
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "you@email.com" },
-        password: { label: "App Password", type: "password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const email = credentials?.email?.trim().toLowerCase();
-        const password = credentials?.password ?? "";
-
-        if (!email || !password) return null;
-
-        // single shared app password (no per-user password field in DB)
-        if (!process.env.APP_PASSWORD || password !== process.env.APP_PASSWORD) {
+        if (!credentials?.email || !credentials.password) {
           return null;
         }
 
-        // find or create user
-        const existing = await prisma.user.findFirst({
-          where: { email },
-          select: { id: true, email: true },
+        // 🔒 Single-user app: password comes from env
+        if (credentials.password !== process.env.APP_PASSWORD) {
+          return null;
+        }
+
+        // Find or create user
+        let user = await prisma.user.findUnique({
+          where: { email: credentials.email },
         });
 
-        const user =
-          existing ??
-          (await prisma.user.create({
-            data: { email },
-            select: { id: true, email: true },
-          }));
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              email: credentials.email,
+            },
+          });
+        }
 
         return {
           id: user.id,
@@ -49,19 +45,22 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
   callbacks: {
     async jwt({ token, user }) {
-      // Persist user.id into the token on sign-in
-      if (user?.id) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+      }
       return token;
     },
     async session({ session, token }) {
-      // Expose token.id on session.user.id
-      if (session.user) {
-        (session.user as any).id = (token as any).id as string | undefined;
+      if (session.user && token.id) {
+        (session.user as any).id = token.id;
       }
       return session;
     },
   },
+  pages: {
+    signIn: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
