@@ -18,7 +18,6 @@ export default async function EmailLogsPage() {
     take: 50,
     select: {
       id: true,
-      to: true,
       status: true,
       createdAt: true,
     },
@@ -38,7 +37,9 @@ export default async function EmailLogsPage() {
             key={log.id}
             className="border rounded px-3 py-2 flex justify-between"
           >
-            <span>{log.to}</span>
+            <span>
+              {new Date(log.createdAt).toLocaleString()}
+            </span>
             <span
               className={
                 log.status === "sent"
