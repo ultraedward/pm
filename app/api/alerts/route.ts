@@ -20,7 +20,8 @@ export async function POST(req: Request) {
     );
   }
 
-  // 🚫 STRIPE DISABLED — ALL USERS ARE FREE
+  // 🚫 STRIPE + ENABLED FLAGS DISABLED
+  // All users are free, all alerts are active
   const MAX_FREE_ALERTS = 1;
 
   const existingCount = await prisma.alert.count({
@@ -40,7 +41,6 @@ export async function POST(req: Request) {
       metal,
       direction,
       threshold,
-      enabled: true,
     },
   });
 
