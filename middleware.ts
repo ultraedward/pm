@@ -1,21 +1,12 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+// middleware.ts
+import { withAuth } from "next-auth/middleware";
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  // 🚫 NEVER run middleware for cron or auth
-  if (pathname.startsWith("/api/cron")) {
-    return NextResponse.next();
-  }
-
-  if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
-  }
-
-  return NextResponse.next();
-}
+export default withAuth({
+  pages: {
+    signIn: "/login",
+  },
+});
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/dashboard/:path*", "/api/:path*"],
 };
