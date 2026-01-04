@@ -1,6 +1,7 @@
+// lib/authOptions.ts
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { NextAuthOptions } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -8,36 +9,13 @@ export const authOptions: NextAuthOptions = {
 
   providers: [
     EmailProvider({
-      server: {
-        host: "smtp.resend.com",
-        port: 587,
-        auth: {
-          user: "resend",
-          pass: process.env.RESEND_API_KEY!,
-        },
-      },
-      from: "alerts@yourdomain.com",
+      server: process.env.EMAIL_SERVER!,
+      from: process.env.EMAIL_FROM!,
     }),
   ],
 
   session: {
-    strategy: "jwt",
-  },
-
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user?.id) {
-        token.id = user.id;
-      }
-      return token;
-    },
-
-    async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
-      }
-      return session;
-    },
+    strategy: "database",
   },
 
   pages: {
@@ -45,5 +23,14 @@ export const authOptions: NextAuthOptions = {
     verifyRequest: "/login?checkEmail=1",
   },
 
-  debug: process.env.NODE_ENV === "development",
+  callbacks: {
+    async session({ session, user }) {
+      if (session.user && user?.id) {
+        session.user.id = user.id;
+      }
+      return session;
+    },
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
 };
