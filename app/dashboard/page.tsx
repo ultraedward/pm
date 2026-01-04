@@ -1,41 +1,49 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const user = await getCurrentUser();
 
-  if (!session?.user?.id) {
-    redirect("/login");
+  if (!user?.id) {
+    return (
+      <div className="p-8 text-sm text-gray-500">
+        Not authenticated
+      </div>
+    );
   }
 
   const alerts = await prisma.alert.findMany({
-    where: { userId: session.user.id },
+    where: { userId: user.id },
     orderBy: { createdAt: "desc" },
   });
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+    <div className="max-w-3xl mx-auto px-6 py-10 space-y-6">
+      <h1 className="text-2xl font-semibold">Dashboard</h1>
 
-      {alerts.length === 0 && (
-        <p className="text-gray-500">No alerts yet.</p>
-      )}
+      <section>
+        <h2 className="text-lg font-medium mb-2">Alerts</h2>
 
-      <ul className="space-y-2">
-        {alerts.map((alert) => (
-          <li
-            key={alert.id}
-            className="border p-3 rounded flex justify-between"
-          >
-            <span>
-              {alert.metal} {alert.direction} {alert.threshold}
-            </span>
-            <span>{alert.enabled ? "ON" : "OFF"}</span>
-          </li>
-        ))}
-      </ul>
+        {alerts.length === 0 && (
+          <p className="text-sm text-gray-500">No alerts found.</p>
+        )}
+
+        <ul className="space-y-2">
+          {alerts.map((alert) => (
+            <li
+              key={alert.id}
+              className="flex justify-between items-center border rounded px-3 py-2 text-sm"
+            >
+              <span>
+                {alert.metal} {alert.direction} {alert.threshold}
+              </span>
+
+              {/* All alerts are implicitly active */}
+              <span className="text-green-600 font-medium">ON</span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
