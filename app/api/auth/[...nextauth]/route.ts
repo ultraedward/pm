@@ -1,18 +1,28 @@
 import NextAuth from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import EmailProvider from "next-auth/providers/email";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prisma from "@/lib/prisma";
 
 const handler = NextAuth({
-  ...authOptions,
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    EmailProvider({
+      server: process.env.EMAIL_SERVER!,
+      from: process.env.EMAIL_FROM!,
+    }),
+  ],
+  session: {
+    strategy: "database",
+  },
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // Always send user to dashboard after login
+      // Always send users to dashboard after login
+      if (url.startsWith("/")) return `${baseUrl}/dashboard`;
+      if (new URL(url).origin === baseUrl) return `${baseUrl}/dashboard`;
       return `${baseUrl}/dashboard`;
-    },
-    async session({ session, user }) {
-      if (session.user && user?.id) {
-        session.user.id = user.id;
-      }
-      return session;
     },
   },
 });
