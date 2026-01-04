@@ -3,36 +3,37 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function POST(req: Request) {
-  const sessionUser = await getCurrentUser();
-
-  if (!sessionUser?.email) {
+  const user = await getCurrentUser();
+  if (!user || !user.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // ✅ Resolve DB user (session user has no id)
-  const dbUser = await prisma.user.findUnique({
-    where: { email: sessionUser.email },
-    select: { id: true },
-  });
-
-  if (!dbUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const body = await req.json();
   const { metal, direction, threshold } = body;
 
-  if (!metal || !direction || typeof threshold !== "number") {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+  const pro = user.stripeStatus === "active";
+  const MAX_FREE_ALERTS = 1;
+
+  if (!pro) {
+    const count = await prisma.alert.count({
+      where: { userId: user.id },
+    });
+
+    if (count >= MAX_FREE_ALERTS) {
+      return NextResponse.json(
+        { error: "Upgrade required" },
+        { status: 403 }
+      );
+    }
   }
 
   const alert = await prisma.alert.create({
     data: {
-      userId: dbUser.id,
+      userId: user.id,
       metal,
       direction,
       threshold,
-      active: true, // schema-safe
+      active: true,
     },
   });
 
