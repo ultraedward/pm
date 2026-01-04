@@ -1,12 +1,15 @@
-import type { NextAuthOptions } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
-import { compare } from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -15,27 +18,22 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.email || !credentials.password) {
           return null;
         }
 
-        // ❗ DO NOT use `select` — Prisma type safety issue
-        const user = await prisma.user.findFirst({
+        const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        if (!user || !("password" in user)) {
-          return null;
-        }
+        if (!user || !user.password) return null;
 
-        const valid = await compare(
+        const valid = await bcrypt.compare(
           credentials.password,
-          (user as any).password
+          user.password
         );
 
-        if (!valid) {
-          return null;
-        }
+        if (!valid) return null;
 
         return {
           id: user.id,
