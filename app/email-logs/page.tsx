@@ -4,11 +4,10 @@ import { getCurrentUser } from "@/lib/auth";
 export default async function EmailLogsPage() {
   const user = await getCurrentUser();
 
-  if (!user || !user.id) {
+  if (!user?.id) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-10">
-        <h1 className="text-xl font-semibold">Email Logs</h1>
-        <p className="text-sm text-gray-500 mt-2">Not signed in</p>
+      <div className="p-8 text-sm text-gray-500">
+        Not authenticated
       </div>
     );
   }
@@ -19,7 +18,6 @@ export default async function EmailLogsPage() {
     take: 50,
     select: {
       id: true,
-      subject: true,
       to: true,
       status: true,
       createdAt: true,
@@ -27,46 +25,32 @@ export default async function EmailLogsPage() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Email Logs</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Delivery history for alert notifications
-        </p>
-      </div>
+    <div className="max-w-4xl mx-auto px-6 py-10 space-y-6">
+      <h1 className="text-2xl font-semibold">Email Logs</h1>
 
       {logs.length === 0 && (
-        <p className="text-sm text-gray-500">No emails sent yet.</p>
+        <p className="text-sm text-gray-500">No email activity yet.</p>
       )}
 
-      <div className="space-y-3">
+      <ul className="space-y-2 text-sm">
         {logs.map((log) => (
-          <div
+          <li
             key={log.id}
-            className="border rounded-lg p-4 flex items-center justify-between"
+            className="border rounded px-3 py-2 flex justify-between"
           >
-            <div className="space-y-1">
-              <div className="font-medium">{log.subject}</div>
-              <div className="text-xs text-gray-500">
-                To: {log.to}
-              </div>
-              <div className="text-xs text-gray-400">
-                {log.createdAt.toLocaleString()}
-              </div>
-            </div>
-
+            <span>{log.to}</span>
             <span
-              className={`text-xs px-2 py-1 rounded-full border ${
+              className={
                 log.status === "sent"
-                  ? "text-green-700 border-green-300"
-                  : "text-red-600 border-red-300"
-              }`}
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
             >
               {log.status}
             </span>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
