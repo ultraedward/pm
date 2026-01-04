@@ -20,38 +20,23 @@ export async function POST(req: Request) {
     );
   }
 
-  // 🔑 FETCH USER FROM DATABASE (not session)
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      stripeStatus: true,
-    },
-  });
-
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-
-  const isPro = user.stripeStatus === "active";
+  // 🚫 STRIPE DISABLED — ALL USERS ARE FREE
   const MAX_FREE_ALERTS = 1;
 
-  if (!isPro) {
-    const count = await prisma.alert.count({
-      where: { userId: user.id },
-    });
+  const existingCount = await prisma.alert.count({
+    where: { userId: session.user.id },
+  });
 
-    if (count >= MAX_FREE_ALERTS) {
-      return NextResponse.json(
-        { error: "Upgrade to Pro to create more alerts" },
-        { status: 403 }
-      );
-    }
+  if (existingCount >= MAX_FREE_ALERTS) {
+    return NextResponse.json(
+      { error: "Free tier limit reached" },
+      { status: 403 }
+    );
   }
 
   const alert = await prisma.alert.create({
     data: {
-      userId: user.id,
+      userId: session.user.id,
       metal,
       direction,
       threshold,
