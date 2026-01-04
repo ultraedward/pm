@@ -1,54 +1,30 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { sendEmail } from "@/lib/email";
-import { isValidEmail } from "@/lib/validators";
 
 export async function POST() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const email = user.email ?? null;
-
-  if (!email || !isValidEmail(email)) {
-    await prisma.emailLog.create({
-      data: {
-        userId: user.id,
-        status: "invalid_email",
-      },
-    });
-
+  // ✅ Prevent build-time crash
+  if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(
-      { error: "Invalid or missing email" },
-      { status: 400 }
+      { error: "Email disabled (missing RESEND_API_KEY)" },
+      { status: 200 }
     );
   }
 
-  const alerts = await prisma.alert.findMany({
-    where: {
-      userId: user.id,
-    },
-  });
+  const { Resend } = await import("resend");
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  if (alerts.length === 0) {
-    return NextResponse.json({ success: true });
+  const user = await getCurrentUser();
+  if (!user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await sendEmail({
-    to: email,
-    subject: "Precious Metals Alert",
-    text: "One or more of your alerts has triggered.",
+  await resend.emails.send({
+    from: "alerts@yourdomain.com",
+    to: user.email,
+    subject: "Test Alert",
+    html: "<p>Your alert system is working.</p>",
   });
 
-  await prisma.emailLog.create({
-    data: {
-      userId: user.id,
-      status: "sent",
-    },
-  });
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true });
 }
