@@ -4,7 +4,9 @@ import { getCurrentUser } from "@/lib/auth";
 
 export async function GET(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ alerts: [] });
+  if (!user) {
+    return NextResponse.json({ alerts: [] });
+  }
 
   const { searchParams } = new URL(req.url);
   const metal = searchParams.get("metal");
@@ -17,12 +19,18 @@ export async function GET(req: Request) {
     where: {
       userId: user.id,
       metal,
-      active: true,
+      enabled: true, // ✅ schema-correct
+    },
+    orderBy: {
+      createdAt: "desc",
     },
     select: {
       id: true,
-      threshold: true,
+      metal: true,
       direction: true,
+      threshold: true,
+      enabled: true,
+      createdAt: true,
     },
   });
 
