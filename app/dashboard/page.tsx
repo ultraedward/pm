@@ -1,52 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
-
-/* ---------------- SERVER ACTIONS ---------------- */
-
-export async function toggleAlert(id: string) {
-  "use server";
-  const alert = await prisma.alert.findUnique({ where: { id } });
-  if (!alert) return;
-
-  await prisma.alert.update({
-    where: { id },
-    data: { enabled: !alert.enabled },
-  });
-
-  revalidatePath("/dashboard");
-}
-
-export async function deleteAlert(id: string) {
-  "use server";
-  await prisma.alert.delete({ where: { id } });
-  revalidatePath("/dashboard");
-}
-
-export async function createAlert(formData: FormData) {
-  "use server";
-
-  const metal = formData.get("metal") as string;
-  const direction = formData.get("direction") as string;
-  const threshold = Number(formData.get("threshold"));
-
-  const user = await getCurrentUser();
-  if (!user) return;
-
-  await prisma.alert.create({
-    data: {
-      userId: user.id,
-      metal,
-      direction,
-      threshold,
-      enabled: true,
-    },
-  });
-
-  revalidatePath("/dashboard");
-}
-
-/* ---------------- PAGE ---------------- */
+import { toggleAlert, deleteAlert, createAlert } from "./actions";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -58,73 +12,87 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
+    <div className="max-w-3xl mx-auto px-6 py-10 space-y-10">
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-gray-500">
-          Account type: <span className="font-medium">Free</span>
-        </p>
+        <p className="text-sm text-gray-500">Account type: Free</p>
       </div>
 
-      <form
-        action={createAlert}
-        className="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-4 gap-3"
-      >
-        <select name="metal" required className="border rounded px-3 py-2">
-          <option value="gold">Gold</option>
-          <option value="silver">Silver</option>
-          <option value="platinum">Platinum</option>
-        </select>
+      {/* Create Alert */}
+      <form action={createAlert} className="space-y-4 border rounded-lg p-4">
+        <h2 className="font-medium">Create Alert</h2>
 
-        <select name="direction" required className="border rounded px-3 py-2">
-          <option value="above">Above</option>
-          <option value="below">Below</option>
-        </select>
+        <div className="grid grid-cols-3 gap-3">
+          <select
+            name="metal"
+            className="border rounded px-2 py-1"
+            required
+          >
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+          </select>
 
-        <input
-          name="threshold"
-          type="number"
-          step="0.01"
-          placeholder="Price"
-          required
-          className="border rounded px-3 py-2"
-        />
+          <select
+            name="direction"
+            className="border rounded px-2 py-1"
+            required
+          >
+            <option value="above">Above</option>
+            <option value="below">Below</option>
+          </select>
 
-        <button className="bg-black text-white rounded px-4 py-2">
+          <input
+            name="threshold"
+            type="number"
+            step="0.01"
+            placeholder="Price"
+            className="border rounded px-2 py-1"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="bg-black text-white px-4 py-2 rounded"
+        >
           Add Alert
         </button>
       </form>
 
-      <div className="space-y-3">
+      {/* Alerts List */}
+      <div className="space-y-4">
+        <h2 className="font-medium">Your Alerts</h2>
+
         {alerts.length === 0 && (
-          <p className="text-sm text-gray-500">
-            No alerts yet. Create one above.
-          </p>
+          <p className="text-sm text-gray-500">No alerts yet.</p>
         )}
 
         {alerts.map((alert) => (
           <div
             key={alert.id}
-            className="flex items-center justify-between border rounded-lg px-4 py-3"
+            className="flex items-center justify-between border rounded px-4 py-3"
           >
-            <div className="text-sm">
+            <div>
               <div className="font-medium capitalize">
-                {alert.metal} {alert.direction} {alert.threshold}
+                {alert.metal} {alert.direction} ${alert.threshold}
               </div>
-              <div className="text-gray-500">
-                Status: {alert.enabled ? "On" : "Off"}
+              <div className="text-xs text-gray-500">
+                {alert.enabled ? "Active" : "Disabled"}
               </div>
             </div>
 
             <div className="flex gap-2">
-              <form action={toggleAlert.bind(null, alert.id)}>
-                <button className="text-sm px-3 py-1 border rounded">
+              <form action={toggleAlert}>
+                <input type="hidden" name="id" value={alert.id} />
+                <button className="text-sm underline">
                   {alert.enabled ? "Disable" : "Enable"}
                 </button>
               </form>
 
-              <form action={deleteAlert.bind(null, alert.id)}>
-                <button className="text-sm px-3 py-1 border rounded text-red-600">
+              <form action={deleteAlert}>
+                <input type="hidden" name="id" value={alert.id} />
+                <button className="text-sm text-red-600 underline">
                   Delete
                 </button>
               </form>
