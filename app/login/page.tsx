@@ -1,72 +1,66 @@
 // app/login/page.tsx
+"use client";
 
-"use client"
-
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Button from "../components/Button"
-import Card from "../components/Card"
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const authed = localStorage.getItem("demo-authed")
-    if (authed) {
-      const redirect = localStorage.getItem("demo-redirect") || "/dashboard"
-      localStorage.removeItem("demo-redirect")
-      router.replace(redirect === "/login" ? "/dashboard" : redirect)
-    }
-  }, [router])
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
 
-  function handleLogin() {
-    if (email === "demo@local" && password === "demo") {
-      localStorage.setItem("demo-authed", "true")
-      const redirect = localStorage.getItem("demo-redirect") || "/dashboard"
-      localStorage.removeItem("demo-redirect")
-      router.push(redirect === "/login" ? "/dashboard" : redirect)
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      setError("Invalid credentials");
     } else {
-      setError("Invalid demo credentials")
+      window.location.href = "/dashboard";
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card>
-        <div className="space-y-4 w-80">
-          <h1 className="text-2xl font-bold">Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm space-y-4 border border-gray-800 p-6 rounded"
+      >
+        <h1 className="text-xl font-semibold">Sign in</h1>
 
-          <div className="space-y-2">
-            <input
-              className="w-full border rounded px-3 py-2"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full px-3 py-2 bg-black border border-gray-700 rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-            <input
-              type="password"
-              className="w-full border rounded px-3 py-2"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+        <input
+          type="password"
+          placeholder="App Password"
+          className="w-full px-3 py-2 bg-black border border-gray-700 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <Button onClick={handleLogin} className="w-full">
-            Sign In
-          </Button>
-
-          <p className="text-xs text-gray-500">
-            Demo login: <strong>demo@local</strong> / <strong>demo</strong>
-          </p>
-        </div>
-      </Card>
+        <button
+          type="submit"
+          className="w-full bg-white text-black py-2 rounded font-medium"
+        >
+          Sign in
+        </button>
+      </form>
     </div>
-  )
+  );
 }
