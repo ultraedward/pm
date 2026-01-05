@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import SignOutButton from "./sign-out-button";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -18,11 +19,17 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold">Dashboard</h1>
 
         <p className="mt-4 text-gray-700">
-          Signed in as{" "}
-          <strong>{session.user?.email}</strong>
+          Signed in as <strong>{session.user?.email}</strong>
         </p>
 
-        <div className="mt-6">
+        <div className="mt-6 flex gap-4">
+          <Link
+            href="/dashboard/alerts"
+            className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+          >
+            View Alerts
+          </Link>
+
           <SignOutButton />
         </div>
       </div>
