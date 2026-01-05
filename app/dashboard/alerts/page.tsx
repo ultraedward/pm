@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 
 export default async function AlertsPage() {
   const session = await getServerSession(authOptions);
@@ -14,19 +15,24 @@ export default async function AlertsPage() {
 
   const alerts = await prisma.alert.findMany({
     where: {
-      user: {
-        email: session.user.email,
-      },
+      user: { email: session.user.email },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
   });
 
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-4xl rounded-xl bg-white p-6 shadow">
-        <h1 className="text-2xl font-semibold">Your Alerts</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Your Alerts</h1>
+
+          <Link
+            href="/dashboard/alerts/new"
+            className="rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
+          >
+            New Alert
+          </Link>
+        </div>
 
         {alerts.length === 0 ? (
           <p className="mt-6 text-gray-600">
@@ -44,26 +50,11 @@ export default async function AlertsPage() {
             </thead>
             <tbody>
               {alerts.map((alert) => (
-                <tr
-                  key={alert.id}
-                  className="border-b last:border-b-0"
-                >
-                  <td className="py-3 font-medium capitalize">
-                    {alert.metal}
-                  </td>
+                <tr key={alert.id} className="border-b last:border-b-0">
+                  <td className="py-3 capitalize">{alert.metal}</td>
+                  <td className="py-3">${alert.threshold.toFixed(2)}</td>
                   <td className="py-3">
-                    ${alert.threshold.toFixed(2)}
-                  </td>
-                  <td className="py-3">
-                    {alert.active ? (
-                      <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-700">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="rounded bg-gray-200 px-2 py-1 text-xs text-gray-600">
-                        Paused
-                      </span>
-                    )}
+                    {alert.active ? "Active" : "Paused"}
                   </td>
                   <td className="py-3 text-sm text-gray-500">
                     {new Date(alert.createdAt).toLocaleDateString()}
