@@ -19,6 +19,14 @@ export default async function AlertsPage() {
       user: { email: session.user.email },
     },
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      metal: true,
+      direction: true,
+      threshold: true,
+      active: true,
+      createdAt: true,
+    },
   });
 
   return (
@@ -36,9 +44,7 @@ export default async function AlertsPage() {
         </div>
 
         {alerts.length === 0 ? (
-          <p className="mt-6 text-gray-600">
-            You don’t have any alerts yet.
-          </p>
+          <p className="mt-6 text-gray-600">You don’t have any alerts yet.</p>
         ) : (
           <table className="mt-6 w-full border-collapse">
             <thead>
@@ -55,12 +61,12 @@ export default async function AlertsPage() {
                 <tr key={alert.id} className="border-b last:border-b-0">
                   <td className="py-3 capitalize">{alert.metal}</td>
                   <td className="py-3 capitalize">{alert.direction}</td>
-                  <td className="py-3">${alert.threshold.toFixed(2)}</td>
                   <td className="py-3">
-                    {alert.active ? "Active" : "Paused"}
+                    ${Number(alert.threshold).toFixed(2)}
                   </td>
+                  <td className="py-3">{alert.active ? "Active" : "Paused"}</td>
                   <td className="py-3">
-                    <AlertActions alert={alert} />
+                    <AlertActions id={alert.id} active={alert.active} />
                   </td>
                 </tr>
               ))}
