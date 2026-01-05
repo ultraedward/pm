@@ -1,19 +1,20 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
-
   providers: [
     CredentialsProvider({
-      name: "DevLogin",
+      name: "Dev Login",
       credentials: {},
-
       async authorize() {
-        let user = await prisma.user.findFirst({
+        // DEV MODE ONLY — always return the same user
+        let user = await prisma.user.findUnique({
           where: { email: "dev@local.test" },
         });
 
@@ -21,7 +22,6 @@ export const authOptions: NextAuthOptions = {
           user = await prisma.user.create({
             data: {
               email: "dev@local.test",
-              stripeStatus: "free",
             },
           });
         }
@@ -33,25 +33,20 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
       }
       return token;
     },
-
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
+      if (session.user && token.id) {
+        (session.user as any).id = token.id;
       }
       return session;
     },
   },
-
   pages: {
     signIn: "/login",
   },
