@@ -21,6 +21,10 @@ export async function POST() {
     data: {
       alertId: alert.id,
       userId: user.id,
+
+      // REQUIRED by Prisma schema
+      metal: alert.metal,
+
       price: alert.threshold,
       triggered: true,
     },
