@@ -19,6 +19,7 @@ export async function POST() {
 
   const trigger = await prisma.alertTrigger.create({
     data: {
+      // relations
       user: {
         connect: { id: user.id },
       },
@@ -26,7 +27,8 @@ export async function POST() {
         connect: { id: alert.id },
       },
 
-      // ✅ ONLY fields that actually exist
+      // REQUIRED scalar fields (per schema)
+      metal: alert.metal,
       price: alert.threshold,
       triggered: true,
     },
