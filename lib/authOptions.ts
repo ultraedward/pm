@@ -1,12 +1,11 @@
-// lib/authOptions.ts
-
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
+  trustHost: true, // 🔴 REQUIRED on Vercel
+
   adapter: PrismaAdapter(prisma),
 
   providers: [
@@ -31,6 +30,6 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/login",
-    error: "/auth/error",
+    error: "/login",
   },
 };
