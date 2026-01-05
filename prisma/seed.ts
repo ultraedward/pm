@@ -1,42 +1,22 @@
-import { PrismaClient } from "@prisma/client";
+// prisma/seed.ts
 
-const prisma = new PrismaClient();
-
-async function ensureMetal(name: string, symbol: string, price: number) {
-  let metal = await prisma.metal.findFirst({
-    where: { symbol },
-  });
-
-  if (!metal) {
-    metal = await prisma.metal.create({
-      data: { name, symbol },
-    });
-  }
-
-  await prisma.price.create({
-    data: {
-      metalId: metal.id,
-      value: price,
-    },
-  });
-}
+import { prisma } from "@/lib/prisma";
 
 async function main() {
-  await ensureMetal("Gold", "XAU", 2350.25);
-  await ensureMetal("Silver", "XAG", 29.45);
-  await ensureMetal("Platinum", "XPT", 980.1);
+  // Minimal safe seed
+  // Do NOT reference removed models (Metal, Price)
 
-  const user = await prisma.user.findFirst({
-    where: { email: "tester@local.dev" },
-  });
+  const existingUser = await prisma.user.findFirst();
 
-  if (!user) {
+  if (!existingUser) {
     await prisma.user.create({
-      data: { email: "tester@local.dev" },
+      data: {
+        email: "seed@example.com",
+      },
     });
   }
 
-  console.log("Seed complete");
+  console.log("Seed completed successfully");
 }
 
 main()
