@@ -12,8 +12,8 @@ export default async function ChartsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  // Last 30 days of prices (per metal)
-  const prices = await prisma.price.findMany({
+  // Last 30 days of cached spot prices
+  const prices = await prisma.spotPriceCache.findMany({
     where: {
       createdAt: {
         gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
@@ -43,7 +43,7 @@ export default async function ChartsPage() {
       <div className="mx-auto max-w-6xl rounded-xl bg-white p-6 shadow">
         <h1 className="text-2xl font-semibold">Charts</h1>
         <p className="mt-2 text-sm text-gray-600">
-          30-day price history with your alert thresholds
+          30-day spot price history with your alert thresholds
         </p>
 
         <div className="mt-6">
