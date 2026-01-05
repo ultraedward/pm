@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const sessionUser = await getCurrentUser();
+  const session = await getServerSession(authOptions);
 
-  if (!sessionUser?.email) {
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // ✅ Resolve DB user (session object has no id)
   const dbUser = await prisma.user.findUnique({
-    where: { email: sessionUser.email },
+    where: { email: session.user.email },
     select: { id: true },
   });
 
@@ -19,15 +21,11 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const logs = await prisma.emailLog.findMany({
-    where: {
-      userId: dbUser.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 10,
-  });
+  // 🔴 Prisma client may be stale — access dynamically
+  const client = prisma as any;
 
-  return NextResponse.json({ logs });
-}
+  if (!client.emailLog) {
+    return NextResponse.json(
+      {
+        logs: [],
+        warn
