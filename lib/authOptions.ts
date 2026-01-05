@@ -14,11 +14,9 @@ export const authOptions: NextAuthOptions = {
     async createUser(data: AdapterUser) {
       return prisma.user.create({
         data: {
+          // ONLY fields that exist in your Prisma User model
           email: data.email,
-          name: data.name,
-          image: data.image,
 
-          // Ensure non-nullable Prisma fields are satisfied
           createdAt: new Date(),
           updatedAt: new Date(),
         },
