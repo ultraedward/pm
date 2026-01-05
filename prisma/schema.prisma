@@ -10,44 +10,49 @@ datasource db {
 model User {
   id               String   @id @default(cuid())
   email            String   @unique
-  password         String?
-  stripeStatus     String?   // MUST stay optional
   stripeCustomerId String?
+  stripeStatus     String   @default("free")
+
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   alerts           Alert[]
+  alertTriggers    AlertTrigger[]
   emailLogs        EmailLog[]
 }
 
 model Alert {
-  id         String   @id @default(cuid())
-  userId     String
-  metal      String
-  direction  String
-  threshold  Float
-  enabled    Boolean  @default(true)
-  createdAt  DateTime @default(now())
+  id            String   @id @default(cuid())
+  userId        String
+  metal         String
+  direction     String
+  threshold     Float
+  active        Boolean  @default(true)
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  triggers   AlertTrigger[]
+  createdAt     DateTime @default(now())
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  triggers      AlertTrigger[]
 }
 
 model AlertTrigger {
   id         String   @id @default(cuid())
+  userId     String
   alertId    String
   price      Float
-  triggered  Boolean  @default(true)
+  triggered  Boolean  @default(false)
+
   createdAt  DateTime @default(now())
 
-  alert      Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert      Alert  @relation(fields: [alertId], references: [id], onDelete: Cascade)
 }
 
 model EmailLog {
   id         String   @id @default(cuid())
   userId     String
-  to         String
-  subject    String
+  status     String
+
   createdAt  DateTime @default(now())
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
