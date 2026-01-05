@@ -1,24 +1,18 @@
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 export default async function AlertHistory() {
-  const user = await getCurrentUser();
-  if (!user || !user.id) return null;
-
   const triggers = await prisma.alertTrigger.findMany({
-    where: {
-      userId: user.id,
-      triggered: true,
-    },
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 50,
     select: {
       id: true,
-      metal: true,
       price: true,
       createdAt: true,
       alert: {
         select: {
+          metal: true,
           direction: true,
           threshold: true,
         },
@@ -26,32 +20,51 @@ export default async function AlertHistory() {
     },
   });
 
-  if (triggers.length === 0) {
-    return (
-      <div className="border rounded-lg p-4 text-sm text-gray-500">
-        No alert triggers yet.
-      </div>
-    );
-  }
+  const rows = triggers.map((t) => ({
+    id: t.id,
+    metal: t.alert.metal,
+    direction: t.alert.direction,
+    threshold: t.alert.threshold,
+    price: t.price,
+    createdAt: t.createdAt,
+  }));
 
   return (
-    <div className="border rounded-lg divide-y">
-      {triggers.map((t) => (
-        <div key={t.id} className="p-4 flex justify-between">
-          <div>
-            <div className="font-medium">
-              {t.metal} {t.alert.direction} {t.alert.threshold}
-            </div>
-            <div className="text-xs text-gray-500">
-              Triggered at {t.price}
-            </div>
-          </div>
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Alert History</h2>
 
-          <div className="text-xs text-gray-500">
-            {t.createdAt.toLocaleString()}
-          </div>
+      {rows.length === 0 ? (
+        <div className="text-gray-500">No alerts have triggered yet.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full border text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-3 py-2 text-left">Metal</th>
+                <th className="border px-3 py-2 text-left">Direction</th>
+                <th className="border px-3 py-2 text-right">Threshold</th>
+                <th className="border px-3 py-2 text-right">Price</th>
+                <th className="border px-3 py-2 text-left">Triggered At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id}>
+                  <td className="border px-3 py-2">{r.metal}</td>
+                  <td className="border px-3 py-2">{r.direction}</td>
+                  <td className="border px-3 py-2 text-right">
+                    {r.threshold}
+                  </td>
+                  <td className="border px-3 py-2 text-right">{r.price}</td>
+                  <td className="border px-3 py-2">
+                    {new Date(r.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      )}
     </div>
   );
 }
