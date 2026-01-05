@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import AlertActions from "./alert-actions";
 
 export default async function AlertsPage() {
   const session = await getServerSession(authOptions);
@@ -22,7 +23,7 @@ export default async function AlertsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-5xl rounded-xl bg-white p-6 shadow">
+      <div className="mx-auto max-w-6xl rounded-xl bg-white p-6 shadow">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Your Alerts</h1>
 
@@ -46,7 +47,7 @@ export default async function AlertsPage() {
                 <th className="pb-2">Direction</th>
                 <th className="pb-2">Threshold</th>
                 <th className="pb-2">Status</th>
-                <th className="pb-2">Created</th>
+                <th className="pb-2">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -58,8 +59,8 @@ export default async function AlertsPage() {
                   <td className="py-3">
                     {alert.active ? "Active" : "Paused"}
                   </td>
-                  <td className="py-3 text-sm text-gray-500">
-                    {new Date(alert.createdAt).toLocaleDateString()}
+                  <td className="py-3">
+                    <AlertActions alert={alert} />
                   </td>
                 </tr>
               ))}
