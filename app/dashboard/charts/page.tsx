@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function ChartsPage() {
-  // 🔴 Prisma client on Vercel is stale — access dynamically
+  // Prisma client is stale on Vercel — access dynamically
   const client = prisma as any;
 
   if (!client.spotPriceCache) {
@@ -32,14 +32,13 @@ export default async function ChartsPage() {
     );
   }
 
-  const grouped = prices.reduce<Record<string, typeof prices>>(
-    (acc, p) => {
-      acc[p.metal] ||= [];
-      acc[p.metal].push(p);
-      return acc;
-    },
-    {}
-  );
+  // ✅ NO generics, runtime-safe grouping
+  const grouped: Record<string, any[]> = {};
+
+  for (const p of prices) {
+    if (!grouped[p.metal]) grouped[p.metal] = [];
+    grouped[p.metal].push(p);
+  }
 
   return (
     <div className="p-6 space-y-8">
