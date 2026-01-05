@@ -4,8 +4,6 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
-  trustHost: true, // 🔴 REQUIRED on Vercel
-
   adapter: PrismaAdapter(prisma),
 
   providers: [
@@ -20,6 +18,12 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // ✅ Always allow internal redirects
+      if (url.startsWith(baseUrl)) return url;
+      return baseUrl;
+    },
+
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
