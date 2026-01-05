@@ -3,25 +3,11 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function ChartsPage() {
-  // Prisma client is stale on Vercel — access dynamically
-  const client = prisma as any;
-
-  if (!client.spotPriceCache) {
-    return (
-      <div className="p-6">
-        <h1 className="text-xl font-semibold">Charts</h1>
-        <p className="mt-4 text-gray-500">
-          Spot price cache model not available yet.
-        </p>
-      </div>
-    );
-  }
-
-  const prices = await client.spotPriceCache.findMany({
+  const prices = await prisma.spotPriceCache.findMany({
     orderBy: { createdAt: "asc" },
   });
 
-  if (!prices || prices.length === 0) {
+  if (prices.length === 0) {
     return (
       <div className="p-6">
         <h1 className="text-xl font-semibold">Charts</h1>
@@ -32,8 +18,7 @@ export default async function ChartsPage() {
     );
   }
 
-  // ✅ NO generics, runtime-safe grouping
-  const grouped: Record<string, any[]> = {};
+  const grouped: Record<string, typeof prices> = {};
 
   for (const p of prices) {
     if (!grouped[p.metal]) grouped[p.metal] = [];
@@ -55,7 +40,7 @@ export default async function ChartsPage() {
           <pre className="mt-4 bg-gray-50 p-3 rounded text-xs overflow-x-auto">
             {JSON.stringify(
               rows.map((r) => ({
-                date: new Date(r.createdAt).toISOString().slice(0, 10),
+                date: r.createdAt.toISOString().slice(0, 10),
                 price: r.price,
               })),
               null,
