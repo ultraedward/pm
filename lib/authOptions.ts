@@ -1,16 +1,24 @@
+// lib/authOptions.ts
+
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
+import type { AdapterUser } from "next-auth/adapters";
+import GoogleProvider from "next-auth/providers/google";
+
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: {
     ...PrismaAdapter(prisma),
-    async createUser(data) {
+
+    async createUser(data: AdapterUser) {
       return prisma.user.create({
         data: {
-          email: data.email!,
-          stripeStatus: "free",
+          email: data.email,
+          name: data.name,
+          image: data.image,
+
+          // Ensure non-nullable Prisma fields are satisfied
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -18,45 +26,21 @@ export const authOptions: NextAuthOptions = {
     },
   },
 
-  session: {
-    strategy: "jwt",
-  },
-
   providers: [
-    CredentialsProvider({
-      name: "Dev Login",
-      credentials: {
-        email: { label: "Email", type: "email" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email) return null;
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (user) return user;
-
-        return prisma.user.create({
-          data: {
-            email: credentials.email,
-            stripeStatus: "free",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
-      },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
 
+  session: {
+    strategy: "database",
+  },
+
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id;
       }
       return session;
     },
@@ -64,6 +48,6 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/login",
-    error: "/login",
+    error: "/auth/error",
   },
 };
