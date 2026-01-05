@@ -9,6 +9,7 @@ export default function CreateAlertForm() {
   const router = useRouter();
 
   const [metal, setMetal] = useState("gold");
+  const [direction, setDirection] = useState("above");
   const [threshold, setThreshold] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -23,6 +24,7 @@ export default function CreateAlertForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         metal,
+        direction,
         threshold: Number(threshold),
       }),
     });
@@ -53,7 +55,21 @@ export default function CreateAlertForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Threshold Price ($)</label>
+        <label className="block text-sm font-medium">Direction</label>
+        <select
+          value={direction}
+          onChange={(e) => setDirection(e.target.value)}
+          className="mt-1 w-full rounded border px-3 py-2"
+        >
+          <option value="above">Above</option>
+          <option value="below">Below</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">
+          Threshold Price ($)
+        </label>
         <input
           type="number"
           step="0.01"
@@ -64,9 +80,7 @@ export default function CreateAlertForm() {
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       <button
         type="submit"

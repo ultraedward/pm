@@ -22,7 +22,7 @@ export default async function AlertsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-4xl rounded-xl bg-white p-6 shadow">
+      <div className="mx-auto max-w-5xl rounded-xl bg-white p-6 shadow">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Your Alerts</h1>
 
@@ -43,6 +43,7 @@ export default async function AlertsPage() {
             <thead>
               <tr className="border-b text-left text-sm text-gray-500">
                 <th className="pb-2">Metal</th>
+                <th className="pb-2">Direction</th>
                 <th className="pb-2">Threshold</th>
                 <th className="pb-2">Status</th>
                 <th className="pb-2">Created</th>
@@ -52,6 +53,7 @@ export default async function AlertsPage() {
               {alerts.map((alert) => (
                 <tr key={alert.id} className="border-b last:border-b-0">
                   <td className="py-3 capitalize">{alert.metal}</td>
+                  <td className="py-3 capitalize">{alert.direction}</td>
                   <td className="py-3">${alert.threshold.toFixed(2)}</td>
                   <td className="py-3">
                     {alert.active ? "Active" : "Paused"}

@@ -14,10 +14,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const { metal, threshold } = body;
+  const { metal, threshold, direction } = await req.json();
 
-  if (!metal || !threshold) {
+  if (!metal || !threshold || !direction) {
     return NextResponse.json(
       { error: "Missing fields" },
       { status: 400 }
@@ -28,6 +27,7 @@ export async function POST(req: Request) {
     data: {
       metal,
       threshold,
+      direction,
       active: true,
       user: {
         connect: {
