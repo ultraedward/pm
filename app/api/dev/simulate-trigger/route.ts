@@ -21,11 +21,8 @@ export async function POST() {
     data: {
       alertId: alert.id,
       userId: user.id,
-
-      // DO NOT include fields that do not exist on AlertTrigger
       price: alert.threshold,
       triggered: true,
-      triggeredAt: new Date(),
     },
   });
 
