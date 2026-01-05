@@ -10,67 +10,40 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts      Account[]
-  sessions      Session[]
-  alerts        Alert[]
-  alertTriggers AlertTrigger[]
-}
-
-model Account {
-  id                String   @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
+  email        String   @unique
+  name         String?
+  image        String?
+  stripeStatus String   @default("free")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alerts        Alert[]
+  alertTriggers AlertTrigger[] // ✅ inverse relation
 }
 
 model Alert {
-  id        String   @id @default(cuid())
-  userId    String
-  metal     String
-  threshold Float
+  id         String   @id @default(cuid())
+  metal      String
+  direction  String   // above | below
+  threshold  Float
+  active     Boolean  @default(true)
+  createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User @relation(fields: [userId], references: [id])
 
-  triggers AlertTrigger[]
+  triggers AlertTrigger[] // ✅ inverse relation
 }
 
 model AlertTrigger {
-  id        String  @id @default(cuid())
-  alertId   String
-  userId    String
-  metal     String
-  price     Float
-  triggered Boolean
+  id        String   @id @default(cuid())
+  alertId  String
+  userId   String
+  price    Float
+  triggered Boolean @default(false)
+  createdAt DateTime @default(now())
 
-  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert Alert @relation(fields: [alertId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
 }
