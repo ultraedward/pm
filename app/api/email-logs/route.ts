@@ -21,11 +21,24 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // 🔴 Prisma client may be stale — access dynamically
+  // Prisma client may be stale on Vercel
   const client = prisma as any;
 
   if (!client.emailLog) {
     return NextResponse.json(
       {
         logs: [],
-        warn
+        warning: "EmailLog model not available yet",
+      },
+      { status: 200 }
+    );
+  }
+
+  const logs = await client.emailLog.findMany({
+    where: { userId: dbUser.id },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+
+  return NextResponse.json({ logs });
+}
