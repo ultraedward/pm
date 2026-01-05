@@ -1,36 +1,58 @@
-// lib/authOptions.ts
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { NextAuthOptions } from "next-auth";
-import EmailProvider from "next-auth/providers/email";
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+  },
 
   providers: [
-    EmailProvider({
-      server: process.env.EMAIL_SERVER!,
-      from: process.env.EMAIL_FROM!,
+    CredentialsProvider({
+      name: "DevLogin",
+      credentials: {},
+
+      async authorize() {
+        let user = await prisma.user.findFirst({
+          where: { email: "dev@local.test" },
+        });
+
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              email: "dev@local.test",
+              stripeStatus: "free",
+            },
+          });
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+        };
+      },
     }),
   ],
 
-  session: {
-    strategy: "database",
-  },
-
-  pages: {
-    signIn: "/login",
-    verifyRequest: "/login?checkEmail=1",
-  },
-
   callbacks: {
-    async session({ session, user }) {
-      if (session.user && user?.id) {
-        session.user.id = user.id;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
       }
       return session;
     },
   },
 
-  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/login",
+  },
 };
