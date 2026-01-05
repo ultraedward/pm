@@ -8,26 +8,24 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import ChartClient from "./chart-client";
 
+type PriceRow = {
+  metal: string;
+  price: number;
+  createdAt: Date;
+};
+
 export default async function ChartsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  // Last 30 days of cached spot prices
-  const prices = await prisma.spotPriceCache.findMany({
-    where: {
-      createdAt: {
-        gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      },
-    },
-    orderBy: { createdAt: "asc" },
-    select: {
-      metal: true,
-      price: true,
-      createdAt: true,
-    },
-  });
+  // 🔴 Use raw SQL to avoid missing Prisma model typing
+  const prices = (await prisma.$queryRaw`
+    SELECT metal, price, "createdAt"
+    FROM "SpotPriceCache"
+    WHERE "createdAt" >= NOW() - INTERVAL '30 days'
+    ORDER BY "createdAt" ASC
+  `) as PriceRow[];
 
-  // User alerts (threshold overlays)
   const alerts = await prisma.alert.findMany({
     where: { user: { email: session.user.email } },
     select: {
