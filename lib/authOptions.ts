@@ -1,11 +1,7 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -13,22 +9,31 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
+  // 🔴 FORCE JWT — no database sessions
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
 
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      // ✅ Always allow internal redirects
-      if (url.startsWith(baseUrl)) return url;
-      return baseUrl;
+    async jwt({ token, account, profile }) {
+      if (account && profile) {
+        token.email = profile.email;
+        token.name = profile.name;
+      }
+      return token;
     },
 
-    async session({ session, user }) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = user.id;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
       return session;
+    },
+
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      return baseUrl;
     },
   },
 
