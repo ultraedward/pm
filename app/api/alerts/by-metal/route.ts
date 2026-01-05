@@ -1,25 +1,23 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: { metal: string } }
 ) {
-  const user = await getCurrentUser();
+  const session = await getServerSession(authOptions);
 
-  if (!user) {
-    return NextResponse.json(
-      { error: "Not authenticated" },
-      { status: 401 }
-    );
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const metal = params.metal.toUpperCase();
+  const metal = params.metal;
 
   const alerts = await prisma.alert.findMany({
     where: {
-      userId: user.id,
+      userId: session.user.id,
       metal,
     },
     select: {
