@@ -1,41 +1,20 @@
 // app/api/dev/simulate-trigger/route.ts
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export async function POST() {
-  const user = await prisma.user.findFirst();
-  if (!user) {
-    return NextResponse.json({ error: "No user found" }, { status: 404 });
+  // 🔒 DEV-ONLY ROUTE
+  // Disabled in production to prevent Prisma/type drift from blocking deploys
+
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "simulate-trigger is disabled in production" },
+      { status: 404 }
+    );
   }
 
-  const alert = await prisma.alert.findFirst({
-    where: { userId: user.id },
-  });
-
-  if (!alert) {
-    return NextResponse.json({ error: "No alert found" }, { status: 404 });
-  }
-
-  const trigger = await prisma.alertTrigger.create({
-    data: {
-      // relations
-      user: {
-        connect: { id: user.id },
-      },
-      alert: {
-        connect: { id: alert.id },
-      },
-
-      // REQUIRED scalar fields (per schema)
-      metal: alert.metal,
-      price: alert.threshold,
-      triggered: true,
-    },
-  });
-
-  return NextResponse.json({
-    success: true,
-    trigger,
-  });
+  return NextResponse.json(
+    { message: "simulate-trigger is available only in development" },
+    { status: 200 }
+  );
 }
