@@ -1,45 +1,50 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  console.log("[CRON] Running alert check");
+  const startedAt = new Date();
 
-  const alerts = await prisma.alert.findMany({
+  const activeAlerts = await prisma.alert.findMany({
     where: { active: true },
-    select: {
-      id: true,
-      metal: true,
-      direction: true,
-      threshold: true,
-      userId: true,
-    },
   });
 
-  console.log(`[CRON] Found ${alerts.length} active alerts`);
+  let checked = 0;
+  let triggered = 0;
+  const results: any[] = [];
 
-  for (const alert of alerts) {
+  for (const alert of activeAlerts) {
+    checked++;
+
     const latest = await prisma.spotPriceCache.findFirst({
       where: { metal: alert.metal },
       orderBy: { createdAt: "desc" },
     });
 
     if (!latest) {
-      console.warn(`[CRON] No price for ${alert.metal}`);
+      results.push({
+        alertId: alert.id,
+        status: "no-price",
+      });
       continue;
     }
 
-    const hit =
+    const conditionMet =
       alert.direction === "above"
         ? latest.price >= alert.threshold
         : latest.price <= alert.threshold;
 
-    if (!hit) continue;
+    if (!conditionMet) {
+      results.push({
+        alertId: alert.id,
+        status: "not-triggered",
+        price: latest.price,
+      });
+      continue;
+    }
 
-    console.log(
-      `[CRON] Triggered alert ${alert.id} (${alert.metal} ${alert.direction} ${alert.threshold})`
-    );
+    triggered++;
 
     await prisma.alertTrigger.create({
       data: {
@@ -49,12 +54,21 @@ export async function GET() {
       },
     });
 
-    // Optional: auto-disable one-time alerts
-    await prisma.alert.update({
-      where: { id: alert.id },
-      data: { active: false },
+    results.push({
+      alertId: alert.id,
+      status: "triggered",
+      price: latest.price,
     });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    startedAt,
+    finishedAt: new Date(),
+    totals: {
+      alertsChecked: checked,
+      alertsTriggered: triggered,
+    },
+    results,
+  });
 }
