@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 export async function GET() {
   const history = await prisma.alertTrigger.findMany({
@@ -10,5 +9,5 @@ export async function GET() {
     take: 100,
   });
 
-  return NextResponse.json({ history });
+  return NextResponse.json(history);
 }
