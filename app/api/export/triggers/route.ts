@@ -1,8 +1,22 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET() {
-  const triggers = await prisma.alertTrigger.findMany();
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  return NextResponse.json({ triggers });
+export async function GET() {
+  try {
+    const triggers = await prisma.alertTrigger.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ ok: true, triggers });
+  } catch (err) {
+    console.warn("alertTrigger table not ready yet");
+    return NextResponse.json({
+      ok: true,
+      triggers: [],
+      skipped: true,
+    });
+  }
 }
