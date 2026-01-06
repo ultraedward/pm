@@ -3,42 +3,48 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
 
-  if (!dbUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
+    if (!user) {
+      return NextResponse.json(
+        { logs: [], warning: "User not found" },
+        { status: 200 }
+      );
+    }
 
-  // Prisma client may be stale on Vercel
-  const client = prisma as any;
+    // EmailLog model exists (migration-fixed)
+    const logs = await prisma.emailLog.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
 
-  if (!client.emailLog) {
+    return NextResponse.json({ logs });
+  } catch (error) {
+    console.error("Email logs error:", error);
+
     return NextResponse.json(
       {
         logs: [],
-        warning: "EmailLog model not available yet",
+        warning: "EmailLog table unavailable or query failed",
       },
       { status: 200 }
     );
   }
-
-  const logs = await client.emailLog.findMany({
-    where: { userId: dbUser.id },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-
-  return NextResponse.json({ logs });
 }
