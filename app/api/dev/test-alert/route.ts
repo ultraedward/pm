@@ -2,27 +2,22 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-/**
- * GET — allows browser testing
- * Visit: /api/dev/test-alert
- */
 export async function GET() {
   return NextResponse.json({
     ok: true,
+    route: "/api/dev/test-alert",
     method: "GET",
-    message: "dev test alert route reachable",
+    message: "Dev test alert route is reachable",
     timestamp: new Date().toISOString(),
   });
 }
 
-/**
- * POST — mirrors how cron / internal calls will work
- */
 export async function POST() {
   return NextResponse.json({
     ok: true,
+    route: "/api/dev/test-alert",
     method: "POST",
-    message: "dev test alert route reachable",
+    message: "Dev test alert POST received",
     timestamp: new Date().toISOString(),
   });
 }
