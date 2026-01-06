@@ -1,37 +1,28 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-export async function POST() {
-  const alert = await prisma.alert.findFirst({
-    where: { active: true },
-  });
-
-  if (!alert) {
-    return NextResponse.json({
-      ok: false,
-      error: "No active alerts found",
-    });
-  }
-
-  const fakePrice =
-    alert.direction === "above"
-      ? alert.threshold + 1
-      : alert.threshold - 1;
-
-  await prisma.alertTrigger.create({
-    data: {
-      alertId: alert.id,
-      userId: alert.userId,
-      price: fakePrice,
-    },
-  });
-
+/**
+ * GET — allows browser testing
+ * Visit: /api/dev/test-alert
+ */
+export async function GET() {
   return NextResponse.json({
     ok: true,
-    forced: true,
-    alertId: alert.id,
-    simulatedPrice: fakePrice,
+    method: "GET",
+    message: "dev test alert route reachable",
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * POST — mirrors how cron / internal calls will work
+ */
+export async function POST() {
+  return NextResponse.json({
+    ok: true,
+    method: "POST",
+    message: "dev test alert route reachable",
+    timestamp: new Date().toISOString(),
   });
 }
