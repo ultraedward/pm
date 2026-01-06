@@ -2,24 +2,20 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Runs alert evaluation for all active alerts.
- * This is the REAL alert engine (no email sending yet).
- * Safe to call manually or from cron.
+ * REAL alert execution engine
+ * Uses Price table (authoritative source)
  */
 export async function POST() {
   try {
     const alerts = await prisma.alert.findMany({
       where: { active: true },
-      include: {
-        user: true,
-      },
     });
 
     let triggeredCount = 0;
 
     for (const alert of alerts) {
-      // Get latest spot price for this metal
-      const latestPrice = await prisma.spotPriceCache.findFirst({
+      // Get latest price for this metal
+      const latestPrice = await prisma.price.findFirst({
         where: { metal: alert.metal },
         orderBy: { createdAt: "desc" },
       });
@@ -46,7 +42,7 @@ export async function POST() {
 
       if (alreadyTriggered) continue;
 
-      // Create trigger
+      // Create trigger record
       await prisma.alertTrigger.create({
         data: {
           alertId: alert.id,
@@ -56,11 +52,11 @@ export async function POST() {
         },
       });
 
-      // Log email intent (NO sending yet)
+      // Log email intent (no sending yet)
       await prisma.emailLog.create({
         data: {
           userId: alert.userId,
-          to: alert.user.email!,
+          to: alert.userEmail ?? "",
           subject: `Price alert: ${alert.metal}`,
           status: "queued",
         },
@@ -73,8 +69,8 @@ export async function POST() {
       ok: true,
       triggeredCount,
     });
-  } catch (err) {
-    console.error("Alert runner error:", err);
+  } catch (error) {
+    console.error("Alert runner failed:", error);
     return NextResponse.json(
       { error: "Alert runner failed" },
       { status: 500 }
