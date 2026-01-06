@@ -1,8 +1,16 @@
 {
-  "crons": [
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+
+  "routes": [
     {
-      "path": "/api/cron/run-alerts",
-      "schedule": "*/10 * * * *"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
