@@ -10,33 +10,37 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  alerts    Alert[]
 }
 
 model Alert {
   id        String   @id @default(cuid())
   metal     String
-  direction String   // "above" | "below"
-  threshold Float
-  active    Boolean  @default(true)
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-
+  target    Float
+  direction String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
-model SpotPrice {
+model AlertTrigger {
+  id        String   @id @default(cuid())
+  alertId   String
+  metal     String
+  price     Float
+  createdAt DateTime @default(now())
+}
+
+model SpotPriceCache {
   id        String   @id @default(cuid())
   metal     String
   price     Float
-  source    String   // "manual" | "cron" | "api"
+  source    String   @default("manual")
   createdAt DateTime @default(now())
+}
 
-  @@index([metal, createdAt])
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  status    String
+  createdAt DateTime @default(now())
 }
