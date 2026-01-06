@@ -7,16 +7,22 @@ export const dynamic = "force-dynamic";
 
 export async function POST() {
   /**
-   * AlertTrigger model does NOT have `userId`
-   * It only belongs to an Alert via `alertId`
+   * AlertTrigger model requires:
+   * - alertId
+   * - metal
+   * - price
    */
 
   const trigger = await prisma.alertTrigger.create({
     data: {
       alertId: "dev",
+      metal: "gold",
       price: 0,
     },
   });
 
-  return NextResponse.json({ ok: true, trigger });
+  return NextResponse.json({
+    ok: true,
+    trigger,
+  });
 }
