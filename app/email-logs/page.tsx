@@ -1,57 +1,18 @@
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+export const dynamic = "force-dynamic";
 
-export default async function EmailLogsPage() {
-  const user = await getCurrentUser();
-
-  if (!user?.id) {
-    return (
-      <div className="p-8 text-sm text-gray-500">
-        Not authenticated
-      </div>
-    );
-  }
-
-  const logs = await prisma.emailLog.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    select: {
-      id: true,
-      status: true,
-      createdAt: true,
-    },
-  });
-
+export default function EmailLogsPage() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10 space-y-6">
-      <h1 className="text-2xl font-semibold">Email Logs</h1>
+    <div className="space-y-4">
+      <h1 className="text-xl font-semibold">Email Logs</h1>
 
-      {logs.length === 0 && (
-        <p className="text-sm text-gray-500">No email activity yet.</p>
-      )}
+      <div className="rounded border border-yellow-300 bg-yellow-50 p-4 text-sm text-yellow-800">
+        Email logging is not enabled yet.
+      </div>
 
-      <ul className="space-y-2 text-sm">
-        {logs.map((log) => (
-          <li
-            key={log.id}
-            className="border rounded px-3 py-2 flex justify-between"
-          >
-            <span>
-              {new Date(log.createdAt).toLocaleString()}
-            </span>
-            <span
-              className={
-                log.status === "sent"
-                  ? "text-green-600"
-                  : "text-red-600"
-              }
-            >
-              {log.status}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="text-gray-600 text-sm">
+        This feature will be available once an <code>EmailLog</code> model is
+        added to the database schema and migrated.
+      </div>
     </div>
   );
 }
