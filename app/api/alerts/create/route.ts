@@ -1,41 +1,14 @@
-// app/api/alerts/create/route.ts
-
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { metal, threshold, direction } = await req.json();
-
-  if (!metal || !threshold || !direction) {
-    return NextResponse.json(
-      { error: "Missing fields" },
-      { status: 400 }
-    );
-  }
+  const body = await req.json();
 
   const alert = await prisma.alert.create({
-    data: {
-      metal,
-      threshold,
-      direction,
-      active: true,
-      user: {
-        connect: {
-          email: session.user.email,
-        },
-      },
-    },
+    data: body,
   });
 
-  return NextResponse.json(alert);
+  return NextResponse.json({ alert });
 }

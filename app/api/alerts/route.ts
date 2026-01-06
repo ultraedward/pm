@@ -1,48 +1,13 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
-export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  const body = await req.json();
-  const { metal, direction, threshold } = body;
-
-  if (!metal || !direction || !threshold) {
-    return NextResponse.json(
-      { error: "Missing fields" },
-      { status: 400 }
-    );
-  }
-
-  // 🚫 STRIPE + ENABLED FLAGS DISABLED
-  // All users are free, all alerts are active
-  const MAX_FREE_ALERTS = 1;
-
-  const existingCount = await prisma.alert.count({
-    where: { userId: session.user.id },
+export async function GET() {
+  const alerts = await prisma.alert.findMany({
+    orderBy: { createdAt: "desc" },
   });
 
-  if (existingCount >= MAX_FREE_ALERTS) {
-    return NextResponse.json(
-      { error: "Free tier limit reached" },
-      { status: 403 }
-    );
-  }
-
-  const alert = await prisma.alert.create({
-    data: {
-      userId: session.user.id,
-      metal,
-      direction,
-      threshold,
-    },
-  });
-
-  return NextResponse.json(alert);
+  return NextResponse.json({ alerts });
 }
