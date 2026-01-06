@@ -1,10 +1,9 @@
-// app/api/alerts/by-metal/route.ts
-
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 // 🔴 IMPORTANT: never prerender this API route
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -18,20 +17,9 @@ export async function GET(req: Request) {
   }
 
   const alerts = await prisma.alert.findMany({
-    where: {
-      metal,
-    },
-    select: {
-      id: true,
-      metal: true,
-      threshold: true,
-      createdAt: true,
-      active: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
+    where: { metal },
+    orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(alerts);
+  return NextResponse.json({ alerts });
 }
