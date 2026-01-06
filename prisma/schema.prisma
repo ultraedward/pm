@@ -8,51 +8,35 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(cuid())
-  email         String       @unique
-  name          String?
-  image         String?
-  stripeStatus  String       @default("free")
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  alerts        Alert[]
-  alertTriggers AlertTrigger[]
-  emailLogs     EmailLog[]
+  alerts    Alert[]
 }
 
 model Alert {
   id        String   @id @default(cuid())
   metal     String
+  direction String   // "above" | "below"
   threshold Float
-  direction String
   active    Boolean  @default(true)
-  userId    String
-  createdAt DateTime @default(now())
 
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
-  triggers  AlertTrigger[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model AlertTrigger {
+model SpotPrice {
   id        String   @id @default(cuid())
-  alertId  String
-  userId   String
-  price    Float
-  triggered Boolean  @default(false)
+  metal     String
+  price     Float
+  source    String   // "manual" | "cron" | "api"
   createdAt DateTime @default(now())
 
-  alert Alert @relation(fields: [alertId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
-}
-
-model EmailLog {
-  id        String   @id @default(cuid())
-  userId    String
-  to        String
-  subject   String
-  status    String
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  @@index([metal, createdAt])
 }
