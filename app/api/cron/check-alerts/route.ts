@@ -4,33 +4,38 @@ import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 export async function GET() {
-  /**
-   * IMPORTANT:
-   * This cron route must NEVER assume optional models exist.
-   * If spot price storage is not enabled yet, we exit safely.
-   */
+  const alerts = await prisma.alert.findMany({
+    where: { active: true },
+  });
 
-  const clientModels = Object.keys(prisma);
+  let checked = 0;
+  let triggered = 0;
 
-  if (!clientModels.includes("spotPriceCache")) {
-    return NextResponse.json({
-      ok: true,
-      skipped: true,
-      reason: "spotPriceCache model not available",
-      timestamp: new Date().toISOString(),
+  for (const alert of alerts) {
+    checked++;
+
+    const latest = await prisma.spotPrice.findFirst({
+      where: { metal: alert.metal },
+      orderBy: { createdAt: "desc" },
     });
-  }
 
-  // If the model exists in the future, this code can be enabled
-  // without breaking production builds.
-  //
-  // const latest = await prisma.spotPriceCache.findFirst({...})
+    if (!latest) continue;
+
+    const hit =
+      alert.direction === "above"
+        ? latest.price >= alert.threshold
+        : latest.price <= alert.threshold;
+
+    if (hit) {
+      triggered++;
+      // future: email, log, deactivate
+    }
+  }
 
   return NextResponse.json({
     ok: true,
-    checked: 0,
-    triggered: 0,
-    message: "Alert check skipped safely",
+    checked,
+    triggered,
     timestamp: new Date().toISOString(),
   });
 }
