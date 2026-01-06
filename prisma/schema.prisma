@@ -8,16 +8,15 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String?
-  image        String?
-  stripeStatus String   @default("free")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   alerts        Alert[]
   alertTriggers AlertTrigger[]
+  emailLogs     EmailLog[]
 }
 
 model Alert {
@@ -25,11 +24,11 @@ model Alert {
   metal     String
   direction String
   threshold Float
-  active    Boolean  @default(true)
+  active    Boolean @default(true)
   createdAt DateTime @default(now())
 
-  userId   String
-  user     User @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   triggers AlertTrigger[]
 }
@@ -37,21 +36,33 @@ model Alert {
 model AlertTrigger {
   id        String   @id @default(cuid())
   price     Float
-  triggered Boolean  @default(false)
+  triggered Boolean @default(true)
   createdAt DateTime @default(now())
 
   alertId String
-  userId  String
+  alert   Alert @relation(fields: [alertId], references: [id])
 
-  alert Alert @relation(fields: [alertId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  userId String
+  user   User  @relation(fields: [userId], references: [id])
 }
 
 model SpotPriceCache {
   id        String   @id @default(cuid())
   metal     String
   price     Float
+  source    String
+  createdAt DateTime @default(now())
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  status    String
+  provider  String
+  error     String?
   createdAt DateTime @default(now())
 
-  @@index([metal, createdAt])
+  userId String
+  user   User @relation(fields: [userId], references: [id])
 }
