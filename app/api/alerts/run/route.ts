@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 /**
- * REAL alert execution engine
- * Uses Price table (authoritative source)
+ * Alert execution engine
+ * Uses raw SQL to avoid Prisma client model mismatches
  */
 export async function POST() {
   try {
@@ -14,15 +14,20 @@ export async function POST() {
     let triggeredCount = 0;
 
     for (const alert of alerts) {
-      // Get latest price for this metal
-      const latestPrice = await prisma.price.findFirst({
-        where: { metal: alert.metal },
-        orderBy: { createdAt: "desc" },
-      });
+      // 🔒 Raw SQL fetch of latest price (safe, read-only)
+      const result = await prisma.$queryRaw<
+        { price: number }[]
+      >`
+        SELECT price
+        FROM "Price"
+        WHERE metal = ${alert.metal}
+        ORDER BY "createdAt" DESC
+        LIMIT 1
+      `;
 
-      if (!latestPrice) continue;
+      if (!result || result.length === 0) continue;
 
-      const price = latestPrice.price;
+      const price = result[0].price;
 
       const shouldTrigger =
         alert.direction === "above"
@@ -42,23 +47,12 @@ export async function POST() {
 
       if (alreadyTriggered) continue;
 
-      // Create trigger record
       await prisma.alertTrigger.create({
         data: {
           alertId: alert.id,
           userId: alert.userId,
           price,
           triggered: true,
-        },
-      });
-
-      // Log email intent (no sending yet)
-      await prisma.emailLog.create({
-        data: {
-          userId: alert.userId,
-          to: alert.userEmail ?? "",
-          subject: `Price alert: ${alert.metal}`,
-          status: "queued",
         },
       });
 
