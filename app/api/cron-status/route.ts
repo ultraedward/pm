@@ -1,24 +1,14 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
+
+export const runtime = "nodejs";
 
 export async function GET() {
-  try {
-    // Basic DB connectivity check
-    await prisma.$queryRaw`SELECT 1`;
+  const alertCount = await prisma.alert.count();
 
-    return NextResponse.json({
-      status: "ok",
-      db: "connected",
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        status: "error",
-        db: "disconnected",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    alerts: alertCount,
+    timestamp: new Date().toISOString(),
+  });
 }

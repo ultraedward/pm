@@ -1,29 +1,16 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+
+export const runtime = "nodejs";
 
 export async function POST() {
-  // ✅ Prevent build-time crash
-  if (!process.env.RESEND_API_KEY) {
-    return NextResponse.json(
-      { error: "Email disabled (missing RESEND_API_KEY)" },
-      { status: 200 }
-    );
-  }
-
-  const { Resend } = await import("resend");
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
-  const user = await getCurrentUser();
-  if (!user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  await resend.emails.send({
-    from: "alerts@yourdomain.com",
-    to: user.email,
-    subject: "Test Alert",
-    html: "<p>Your alert system is working.</p>",
+  await prisma.emailLog.create({
+    data: {
+      to: "test@example.com",
+      subject: "Test Alert",
+      body: "Alert fired",
+      status: "sent",
+    },
   });
 
   return NextResponse.json({ ok: true });

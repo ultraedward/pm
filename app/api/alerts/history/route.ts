@@ -1,32 +1,14 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
-  const sessionUser = await getCurrentUser();
-
-  if (!sessionUser?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // ✅ Resolve real DB user (NextAuth user has NO id)
-  const dbUser = await prisma.user.findUnique({
-    where: { email: sessionUser.email },
-    select: { id: true },
+  const history = await prisma.alertTrigger.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 100,
   });
 
-  if (!dbUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-
-  const alerts = await prisma.alert.findMany({
-    where: {
-      userId: dbUser.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return NextResponse.json({ alerts });
+  return NextResponse.json({ history });
 }
