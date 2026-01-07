@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Sparkline from "./Sparkline"
 import ExpandedChart from "./ExpandedChart"
+import PaywallModal from "./PaywallModal"
 
 type SparkPoint = { t: number; v: number }
 type AlertLine = { v: number }
@@ -26,14 +27,24 @@ export default function PriceHeader({
   range: RangeKey
 }) {
   const [openMetal, setOpenMetal] = useState<string | null>(null)
+  const [showPaywall, setShowPaywall] = useState(false)
+
+  // 🔒 FEATURE FLAG (later replaces with real entitlement)
+  const canExport = false
+
   const ranges: RangeKey[] = ["24h", "7d", "30d"]
 
-  function exportCSV() {
+  function onExport() {
+    if (!canExport) {
+      setShowPaywall(true)
+      return
+    }
     window.location.href = `/api/export/prices?range=${range}`
   }
 
   return (
     <div className="space-y-6">
+      {/* Top Controls */}
       <div className="flex items-center gap-4">
         <div className="flex gap-2">
           {ranges.map((r) => (
@@ -52,13 +63,14 @@ export default function PriceHeader({
         </div>
 
         <button
-          onClick={exportCSV}
+          onClick={onExport}
           className="ml-auto px-3 py-1 text-sm rounded border border-gray-600 hover:bg-gray-800"
         >
           Export CSV
         </button>
       </div>
 
+      {/* Prices */}
       {prices.map((p) => {
         const isUp = p.changePct !== null && p.changePct >= 0
         const open = openMetal === p.metal
@@ -105,6 +117,10 @@ export default function PriceHeader({
           </div>
         )
       })}
+
+      {showPaywall && (
+        <PaywallModal onClose={() => setShowPaywall(false)} />
+      )}
     </div>
   )
 }
