@@ -1,36 +1,57 @@
-export const dynamic = "force-dynamic";
+import Sparkline from "./Sparkline"
 
-async function getPrices() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/dashboard/prices`,
-    { cache: "no-store" }
-  );
-
-  if (!res.ok) return [];
-  return res.json();
+type SparkPoint = {
+  t: number
+  p: number
 }
 
-export default async function PriceHeader() {
-  const prices = await getPrices();
+type PriceWithSparkline = {
+  metal: string
+  price: number
+  change24h: number | null
+  spark: SparkPoint[]
+}
 
-  if (!prices.length) return null;
-
+export default function PriceHeader({
+  prices,
+}: {
+  prices: PriceWithSparkline[]
+}) {
   return (
-    <div className="flex gap-6 mb-6">
-      {prices.map((p: any) => (
-        <div
-          key={p.id}
-          className="rounded-lg bg-black text-white px-5 py-3 min-w-[140px]"
-        >
-          <div className="text-xs uppercase opacity-70">{p.metal}</div>
-          <div className="text-xl font-semibold">
-            ${Number(p.price).toFixed(2)}
+    <div className="flex flex-wrap gap-10">
+      {prices.map((p) => {
+        const isUp = p.change24h !== null && p.change24h >= 0
+
+        return (
+          <div key={p.metal} className="space-y-1">
+            <div className="text-xs uppercase tracking-wide text-gray-400">
+              {p.metal}
+            </div>
+
+            <div className="flex items-end gap-3">
+              <div className="text-2xl font-semibold">
+                ${p.price.toFixed(2)}
+              </div>
+
+              <Sparkline points={p.spark} up={isUp} />
+            </div>
+
+            <div
+              className={`text-sm font-medium ${
+                p.change24h === null
+                  ? "text-gray-400"
+                  : isUp
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              {p.change24h === null
+                ? "—"
+                : `${isUp ? "+" : ""}${p.change24h.toFixed(2)}%`}
+            </div>
           </div>
-          <div className="text-xs opacity-60">
-            {new Date(p.timestamp).toLocaleTimeString()}
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
-  );
+  )
 }
