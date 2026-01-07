@@ -4,10 +4,22 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const prices = await prisma.spotPriceCache.findMany({
+  // Pull latest prices per metal from SpotPriceCache
+  const rows = await prisma.spotPriceCache.findMany({
     orderBy: { createdAt: "desc" },
-    distinct: ["metal"],
+    take: 200,
   });
 
-  return NextResponse.json(prices);
+  // group by metal
+  const grouped: Record<string, { time: string; price: number }[]> = {};
+
+  for (const row of rows) {
+    if (!grouped[row.metal]) grouped[row.metal] = [];
+    grouped[row.metal].push({
+      time: row.createdAt.toISOString(),
+      price: row.price,
+    });
+  }
+
+  return NextResponse.json({ data: grouped });
 }
