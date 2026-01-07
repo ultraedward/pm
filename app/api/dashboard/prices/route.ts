@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const prices = await prisma.spotPriceCache.findMany({
-    orderBy: { timestamp: "desc" },
+    orderBy: { createdAt: "desc" },
     distinct: ["metal"],
   });
 
