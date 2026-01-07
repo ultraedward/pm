@@ -1,6 +1,6 @@
 "use client";
 
-import useSWR from "swr";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,35 +11,77 @@ import {
   Legend,
 } from "recharts";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+type SeriesPoint = {
+  time: string;
+  [metal: string]: number | string;
+};
 
 export default function PriceChart() {
-  const { data, error } = useSWR("/api/dashboard/prices", fetcher, {
-    refreshInterval: 30_000,
-  });
+  const [data, setData] = useState<SeriesPoint[]>([]);
+  const [metals, setMetals] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  if (error) return <div className="text-red-500">Failed to load chart</div>;
-  if (!data) return <div className="text-gray-500">Loading chart…</div>;
+  useEffect(() => {
+    let alive = true;
 
-  const metals = Object.keys(data.data);
+    async function load() {
+      try {
+        const res = await fetch("/api/dashboard/prices", {
+          cache: "no-store",
+        });
 
-  // flatten into chart-friendly rows
-  const chartData: any[] = [];
-  const timeMap: Record<string, any> = {};
+        if (!res.ok) throw new Error("Failed to load prices");
 
-  for (const metal of metals) {
-    for (const point of data.data[metal]) {
-      if (!timeMap[point.time]) timeMap[point.time] = { time: point.time };
-      timeMap[point.time][metal] = point.price;
+        const json = await res.json();
+
+        const grouped = json.data as Record<
+          string,
+          { time: string; price: number }[]
+        >;
+
+        const metalKeys = Object.keys(grouped);
+        const timeMap: Record<string, SeriesPoint> = {};
+
+        for (const metal of metalKeys) {
+          for (const point of grouped[metal]) {
+            if (!timeMap[point.time]) {
+              timeMap[point.time] = { time: point.time };
+            }
+            timeMap[point.time][metal] = point.price;
+          }
+        }
+
+        if (!alive) return;
+
+        setMetals(metalKeys);
+        setData(Object.values(timeMap));
+      } catch (e: any) {
+        if (!alive) return;
+        setError(e.message ?? "Unknown error");
+      }
     }
+
+    load();
+    const id = setInterval(load, 30_000);
+
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, []);
+
+  if (error) {
+    return <div className="text-red-500">Chart error: {error}</div>;
   }
 
-  Object.values(timeMap).forEach((row) => chartData.push(row));
+  if (!data.length) {
+    return <div className="text-gray-500">Loading price chart…</div>;
+  }
 
   return (
-    <div className="h-[400px] w-full rounded-lg border p-4">
+    <div className="h-[420px] w-full rounded-lg border p-4">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData}>
+        <LineChart data={data}>
           <XAxis
             dataKey="time"
             tickFormatter={(v) => new Date(v).toLocaleTimeString()}
