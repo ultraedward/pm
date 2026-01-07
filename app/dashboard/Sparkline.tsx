@@ -13,7 +13,6 @@ export default function Sparkline({
   up: boolean
 }) {
   if (points.length < 2) {
-    // Flat placeholder line
     return (
       <svg width={80} height={24} className="text-gray-600">
         <line
@@ -35,15 +34,12 @@ export default function Sparkline({
   const prices = points.map((p) => p.p)
   const min = Math.min(...prices)
   const max = Math.max(...prices)
-
-  // Prevent invisible flatlines
   const range = max - min || min * 0.001 || 1
 
   const path = points
     .map((p, i) => {
       const x = (i / (points.length - 1)) * width
-      const y =
-        height - ((p.p - min) / range) * (height - 4) - 2
+      const y = height - ((p.p - min) / range) * (height - 4) - 2
       return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`
     })
     .join(" ")
