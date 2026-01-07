@@ -7,11 +7,16 @@ type SparkPoint = {
   v: number
 }
 
+type AlertLine = {
+  v: number
+}
+
 type PriceWithSparkline = {
   metal: string
   price: number
   changePct: number | null
   spark: SparkPoint[]
+  alerts: AlertLine[]
 }
 
 type RangeKey = "24h" | "7d" | "30d"
@@ -29,22 +34,28 @@ async function getDashboardData(range: RangeKey) {
   const now = new Date()
   const since = new Date(now.getTime() - hours * 60 * 60 * 1000)
 
-  const rows = await prisma.spotPriceCache.findMany({
-    where: {
-      createdAt: { gte: since },
-    },
-    orderBy: { createdAt: "asc" },
-    select: {
-      metal: true,
-      price: true,
-      createdAt: true,
-    },
-    take: MAX_POINTS * 5,
-  })
+  const [pricesRaw, alertsRaw] = await Promise.all([
+    prisma.spotPriceCache.findMany({
+      where: { createdAt: { gte: since } },
+      orderBy: { createdAt: "asc" },
+      select: {
+        metal: true,
+        price: true,
+        createdAt: true,
+      },
+      take: MAX_POINTS * 5,
+    }),
+    prisma.alert.findMany({
+      select: {
+        metal: true,
+        target: true, // ✅ FIXED FIELD NAME
+      },
+    }),
+  ])
 
   const byMetal = new Map<string, { t: number; p: number }[]>()
 
-  for (const r of rows) {
+  for (const r of pricesRaw) {
     const arr = byMetal.get(r.metal) ?? []
     if (arr.length < MAX_POINTS) {
       arr.push({
@@ -55,6 +66,13 @@ async function getDashboardData(range: RangeKey) {
     }
   }
 
+  const alertsByMetal = new Map<string, number[]>()
+  for (const a of alertsRaw) {
+    const arr = alertsByMetal.get(a.metal) ?? []
+    arr.push(Number(a.target)) // ✅ FIXED
+    alertsByMetal.set(a.metal, arr)
+  }
+
   const prices: PriceWithSparkline[] = Array.from(byMetal.entries())
     .map(([metal, points]) => {
       if (points.length < 1) return null
@@ -62,7 +80,7 @@ async function getDashboardData(range: RangeKey) {
       const base = points[0].p
       if (!base || base === 0) return null
 
-      const spark = points.map((pt) => ({
+      const spark: SparkPoint[] = points.map((pt) => ({
         t: pt.t,
         v: ((pt.p - base) / base) * 100,
       }))
@@ -70,11 +88,17 @@ async function getDashboardData(range: RangeKey) {
       const last = points[points.length - 1]
       const changePct = ((last.p - base) / base) * 100
 
+      const alerts =
+        alertsByMetal.get(metal)?.map((price) => ({
+          v: ((price - base) / base) * 100,
+        })) ?? []
+
       return {
         metal,
         price: last.p,
         changePct,
         spark,
+        alerts,
       }
     })
     .filter(Boolean) as PriceWithSparkline[]
@@ -83,7 +107,6 @@ async function getDashboardData(range: RangeKey) {
   return prices
 }
 
-// 🔥 Cache per range for 60 seconds
 const getCachedDashboardData = (range: RangeKey) =>
   unstable_cache(
     () => getDashboardData(range),

@@ -1,27 +1,28 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useMemo } from "react"
 
-type SparkPoint = {
-  t: number // timestamp (ms)
-  v: number // percent change
+type SparkPoint = { t: number; v: number }
+type AlertLine = { v: number }
+
+type HitPoint = {
+  x: number
+  y: number
 }
 
 export default function Sparkline({
   points,
+  alerts,
   up,
 }: {
   points: SparkPoint[]
+  alerts: AlertLine[]
   up: boolean
 }) {
   const width = 80
   const height = 24
   const padding = 2
-  const svgRef = useRef<SVGSVGElement | null>(null)
 
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null)
-
-  // Handle very small datasets
   if (points.length < 2) {
     return (
       <svg width={width} height={height} className="text-gray-600">
@@ -38,8 +39,14 @@ export default function Sparkline({
     )
   }
 
-  const values = points.map((p) => p.v)
-  const maxAbs = Math.max(...values.map((v) => Math.abs(v))) || 1
+  const values = [
+    ...points.map((p) => p.v),
+    ...alerts.map((a) => a.v),
+  ]
+
+  const maxAbs =
+    Math.max(...values.map((v) => Math.abs(v))) || 1
+
   const zeroY = height / 2
 
   const path = useMemo(() => {
@@ -53,112 +60,89 @@ export default function Sparkline({
       .join(" ")
   }, [points, maxAbs])
 
-  function onMove(e: React.MouseEvent) {
-    if (!svgRef.current) return
+  // 🔥 Compute alert hit points
+  const hits: HitPoint[] = []
 
-    const rect = svgRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const idx = Math.round(
-      (x / width) * (points.length - 1)
-    )
+  alerts.forEach((alert) => {
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1].v
+      const curr = points[i].v
 
-    const clamped = Math.max(
-      0,
-      Math.min(points.length - 1, idx)
-    )
+      const crossed =
+        (prev < alert.v && curr >= alert.v) ||
+        (prev > alert.v && curr <= alert.v)
 
-    setHoverIdx(clamped)
-  }
+      if (crossed) {
+        const x =
+          (i / (points.length - 1)) * width
 
-  function onLeave() {
-    setHoverIdx(null)
-  }
+        const y =
+          zeroY -
+          (alert.v / maxAbs) * (height / 2 - padding)
 
-  const hoverPoint =
-    hoverIdx !== null ? points[hoverIdx] : null
-
-  const hoverX =
-    hoverIdx !== null
-      ? (hoverIdx / (points.length - 1)) * width
-      : 0
-
-  const hoverY =
-    hoverPoint !== null
-      ? zeroY -
-        (hoverPoint.v / maxAbs) * (height / 2 - padding)
-      : 0
+        hits.push({ x, y })
+      }
+    }
+  })
 
   return (
-    <div className="relative">
-      <svg
-        ref={svgRef}
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        className={up ? "text-green-500" : "text-red-500"}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-      >
-        {/* zero line */}
-        <line
-          x1="0"
-          y1={zeroY}
-          x2={width}
-          y2={zeroY}
-          stroke="currentColor"
-          strokeOpacity="0.25"
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className={up ? "text-green-500" : "text-red-500"}
+    >
+      {/* zero line */}
+      <line
+        x1="0"
+        y1={zeroY}
+        x2={width}
+        y2={zeroY}
+        stroke="currentColor"
+        strokeOpacity="0.25"
+        strokeWidth="1"
+      />
+
+      {/* alert lines */}
+      {alerts.map((a, i) => {
+        const y =
+          zeroY - (a.v / maxAbs) * (height / 2 - padding)
+        return (
+          <line
+            key={i}
+            x1="0"
+            y1={y}
+            x2={width}
+            y2={y}
+            stroke="currentColor"
+            strokeOpacity="0.4"
+            strokeDasharray="3 2"
+            strokeWidth="1"
+          />
+        )
+      })}
+
+      {/* price path */}
+      <path
+        d={path}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      {/* 🔴 alert hit dots */}
+      {hits.map((h, i) => (
+        <circle
+          key={i}
+          cx={h.x}
+          cy={h.y}
+          r="2.5"
+          fill="currentColor"
+          stroke="white"
           strokeWidth="1"
         />
-
-        {/* main path */}
-        <path
-          d={path}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-
-        {/* hover guide */}
-        {hoverIdx !== null && (
-          <>
-            <line
-              x1={hoverX}
-              y1="0"
-              x2={hoverX}
-              y2={height}
-              stroke="currentColor"
-              strokeOpacity="0.3"
-              strokeWidth="1"
-            />
-            <circle
-              cx={hoverX}
-              cy={hoverY}
-              r="2.5"
-              fill="currentColor"
-            />
-          </>
-        )}
-      </svg>
-
-      {/* Tooltip */}
-      {hoverPoint && (
-        <div
-          className="absolute z-10 px-2 py-1 text-xs rounded bg-black text-white whitespace-nowrap pointer-events-none"
-          style={{
-            left: hoverX + 6,
-            top: -28,
-          }}
-        >
-          <div>
-            {new Date(hoverPoint.t).toLocaleString()}
-          </div>
-          <div className="font-medium">
-            {hoverPoint.v >= 0 ? "+" : ""}
-            {hoverPoint.v.toFixed(2)}%
-          </div>
-        </div>
-      )}
-    </div>
+      ))}
+    </svg>
   )
 }
