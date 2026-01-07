@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma"
 import PriceHeader from "./PriceHeader"
+import { unstable_cache } from "next/cache"
 
 type SparkPoint = {
   t: number
-  p: number
+  v: number
 }
 
 type PriceWithSparkline = {
@@ -21,14 +22,10 @@ const RANGE_TO_HOURS: Record<RangeKey, number> = {
   "30d": 30 * 24,
 }
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { range?: RangeKey }
-}) {
-  const range: RangeKey = searchParams.range ?? "24h"
-  const hours = RANGE_TO_HOURS[range]
+const MAX_POINTS = 300
 
+async function getDashboardData(range: RangeKey) {
+  const hours = RANGE_TO_HOURS[range]
   const now = new Date()
   const since = new Date(now.getTime() - hours * 60 * 60 * 1000)
 
@@ -37,41 +34,70 @@ export default async function DashboardPage({
       createdAt: { gte: since },
     },
     orderBy: { createdAt: "asc" },
+    select: {
+      metal: true,
+      price: true,
+      createdAt: true,
+    },
+    take: MAX_POINTS * 5,
   })
 
-  const byMetal = new Map<string, SparkPoint[]>()
+  const byMetal = new Map<string, { t: number; p: number }[]>()
 
   for (const r of rows) {
     const arr = byMetal.get(r.metal) ?? []
-    arr.push({
-      t: r.createdAt.getTime(),
-      p: Number(r.price),
-    })
-    byMetal.set(r.metal, arr)
+    if (arr.length < MAX_POINTS) {
+      arr.push({
+        t: r.createdAt.getTime(),
+        p: Number(r.price),
+      })
+      byMetal.set(r.metal, arr)
+    }
   }
 
   const prices: PriceWithSparkline[] = Array.from(byMetal.entries())
     .map(([metal, points]) => {
-      if (points.length === 0) return null
+      if (points.length < 1) return null
 
-      const first = points[0]
+      const base = points[0].p
+      if (!base || base === 0) return null
+
+      const spark = points.map((pt) => ({
+        t: pt.t,
+        v: ((pt.p - base) / base) * 100,
+      }))
+
       const last = points[points.length - 1]
-
-      const changePct =
-        first && last && first.p !== 0
-          ? ((last.p - first.p) / first.p) * 100
-          : null
+      const changePct = ((last.p - base) / base) * 100
 
       return {
         metal,
         price: last.p,
         changePct,
-        spark: points,
+        spark,
       }
     })
     .filter(Boolean) as PriceWithSparkline[]
 
   prices.sort((a, b) => a.metal.localeCompare(b.metal))
+  return prices
+}
+
+// 🔥 Cache per range for 60 seconds
+const getCachedDashboardData = (range: RangeKey) =>
+  unstable_cache(
+    () => getDashboardData(range),
+    ["dashboard-data", range],
+    { revalidate: 60 }
+  )()
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { range?: RangeKey }
+}) {
+  const range: RangeKey = searchParams.range ?? "24h"
+  const prices = await getCachedDashboardData(range)
 
   return (
     <main className="p-6 space-y-6">

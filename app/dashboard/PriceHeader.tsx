@@ -3,7 +3,7 @@ import Sparkline from "./Sparkline"
 
 type SparkPoint = {
   t: number
-  p: number
+  v: number
 }
 
 type PriceWithSparkline = {
