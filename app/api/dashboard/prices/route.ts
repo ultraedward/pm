@@ -10,5 +10,5 @@ export async function GET() {
     take: 10,
   });
 
-  return NextResponse.json({ prices });
+  return NextResponse.json(prices);
 }
