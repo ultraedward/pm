@@ -1,8 +1,1 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-
-export async function GET() {
-  const alerts = await prisma.alert.findMany();
-
-  return NextResponse.json({ alerts });
-}
+export { GET, POST, dynamic } from "@/app/api/_disabled/route";

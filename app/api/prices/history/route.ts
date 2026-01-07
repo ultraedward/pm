@@ -1,32 +1,30 @@
+// app/api/prices/history/route.ts
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+function rangeToDate(range: string) {
+  const now = new Date();
+  if (range === "7d") now.setDate(now.getDate() - 7);
+  else if (range === "30d") now.setDate(now.getDate() - 30);
+  else now.setHours(now.getHours() - 24);
+  return now;
+}
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const range = searchParams.get("range") || "24h";
 
-  const metal = searchParams.get("metal");
-  const hoursParam = searchParams.get("hours");
+  const since = rangeToDate(range);
 
-  if (!metal) {
-    return NextResponse.json(
-      { error: "Missing metal parameter" },
-      { status: 400 }
-    );
-  }
-
-  const hours = hoursParam ? Number(hoursParam) : 24;
-
-  if (Number.isNaN(hours) || hours <= 0) {
-    return NextResponse.json(
-      { error: "Invalid hours parameter" },
-      { status: 400 }
-    );
-  }
-
-  // Schema-safe placeholder history
-  return NextResponse.json({
-    metal,
-    hours,
-    data: [],
-    generatedAt: new Date().toISOString(),
+  const prices = await prisma.spotPriceCache.findMany({
+    where: {
+      metal: "gold",
+      createdAt: { gte: since },
+    },
+    orderBy: { createdAt: "asc" },
   });
+
+  return NextResponse.json(prices);
 }

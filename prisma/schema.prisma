@@ -16,8 +16,8 @@ model User {
 model Alert {
   id        String   @id @default(cuid())
   metal     String
-  target    Float
   direction String
+  target    Float
   createdAt DateTime @default(now())
 }
 
@@ -33,7 +33,6 @@ model SpotPriceCache {
   id        String   @id @default(cuid())
   metal     String
   price     Float
-  source    String   @default("manual")
   createdAt DateTime @default(now())
 }
 
