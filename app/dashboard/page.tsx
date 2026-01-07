@@ -1,18 +1,64 @@
-import PriceHeader from "./PriceHeader";
-import PriceChart from "./PriceChart";
+import { prisma } from "@/lib/prisma"
+import PriceHeader from "./PriceHeader"
 
-export const dynamic = "force-dynamic";
+type SparkPoint = {
+  t: number
+  p: number
+}
 
-export default function DashboardPage() {
+type PriceWithSparkline = {
+  metal: string
+  price: number
+  change24h: number | null
+  spark: SparkPoint[]
+}
+
+export default async function DashboardPage() {
+  const now = new Date()
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+
+  const rows = await prisma.spotPriceCache.findMany({
+    where: {
+      createdAt: { gte: twentyFourHoursAgo },
+    },
+    orderBy: { createdAt: "asc" },
+  })
+
+  const byMetal = new Map<string, SparkPoint[]>()
+
+  for (const r of rows) {
+    const arr = byMetal.get(r.metal) ?? []
+    arr.push({
+      t: r.createdAt.getTime(),
+      p: Number(r.price),
+    })
+    byMetal.set(r.metal, arr)
+  }
+
+  const prices: PriceWithSparkline[] = Array.from(byMetal.entries()).map(
+    ([metal, points]) => {
+      const first = points[0]
+      const last = points[points.length - 1]
+
+      const change24h =
+        first && last && first.p !== 0
+          ? ((last.p - first.p) / first.p) * 100
+          : null
+
+      return {
+        metal,
+        price: last.p,
+        change24h,
+        spark: points,
+      }
+    }
+  )
+
+  prices.sort((a, b) => a.metal.localeCompare(b.metal))
+
   return (
-    <div className="p-6 space-y-6">
-      <PriceHeader />
-
-      <PriceChart />
-
-      <div className="rounded-lg border p-4 text-gray-500">
-        Alerts module coming next
-      </div>
-    </div>
-  );
+    <main className="p-6 space-y-6">
+      <PriceHeader prices={prices} />
+    </main>
+  )
 }

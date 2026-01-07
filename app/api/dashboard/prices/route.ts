@@ -1,25 +1,15 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
 
 export async function GET() {
-  // Pull latest prices per metal from SpotPriceCache
   const rows = await prisma.spotPriceCache.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 200,
-  });
+    orderBy: { metal: "asc" },
+  })
 
-  // group by metal
-  const grouped: Record<string, { time: string; price: number }[]> = {};
+  const prices = rows.map((row) => ({
+    metal: row.metal,
+    price: Number(row.price),
+  }))
 
-  for (const row of rows) {
-    if (!grouped[row.metal]) grouped[row.metal] = [];
-    grouped[row.metal].push({
-      time: row.createdAt.toISOString(),
-      price: row.price,
-    });
-  }
-
-  return NextResponse.json({ data: grouped });
+  return NextResponse.json(prices)
 }
