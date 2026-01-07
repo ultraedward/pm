@@ -13,7 +13,7 @@ async function getPrices() {
 export default async function PriceHeader() {
   const prices = await getPrices();
 
-  if (!prices?.length) return null;
+  if (!prices.length) return null;
 
   return (
     <div className="flex gap-6 mb-6">
@@ -25,6 +25,9 @@ export default async function PriceHeader() {
           <div className="text-xs uppercase opacity-70">{p.metal}</div>
           <div className="text-xl font-semibold">
             ${Number(p.price).toFixed(2)}
+          </div>
+          <div className="text-xs opacity-60">
+            {new Date(p.timestamp).toLocaleTimeString()}
           </div>
         </div>
       ))}

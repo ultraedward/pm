@@ -4,10 +4,9 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const prices = await prisma.price.findMany({
+  const prices = await prisma.spotPriceCache.findMany({
     orderBy: { timestamp: "desc" },
     distinct: ["metal"],
-    take: 10,
   });
 
   return NextResponse.json(prices);
