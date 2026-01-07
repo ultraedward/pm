@@ -9,17 +9,32 @@ type SparkPoint = {
 type PriceWithSparkline = {
   metal: string
   price: number
-  change24h: number | null
+  changePct: number | null
   spark: SparkPoint[]
 }
 
-export default async function DashboardPage() {
+type RangeKey = "24h" | "7d" | "30d"
+
+const RANGE_TO_HOURS: Record<RangeKey, number> = {
+  "24h": 24,
+  "7d": 7 * 24,
+  "30d": 30 * 24,
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { range?: RangeKey }
+}) {
+  const range: RangeKey = searchParams.range ?? "24h"
+  const hours = RANGE_TO_HOURS[range]
+
   const now = new Date()
-  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+  const since = new Date(now.getTime() - hours * 60 * 60 * 1000)
 
   const rows = await prisma.spotPriceCache.findMany({
     where: {
-      createdAt: { gte: twentyFourHoursAgo },
+      createdAt: { gte: since },
     },
     orderBy: { createdAt: "asc" },
   })
@@ -35,12 +50,14 @@ export default async function DashboardPage() {
     byMetal.set(r.metal, arr)
   }
 
-  const prices: PriceWithSparkline[] = Array.from(byMetal.entries()).map(
-    ([metal, points]) => {
+  const prices: PriceWithSparkline[] = Array.from(byMetal.entries())
+    .map(([metal, points]) => {
+      if (points.length === 0) return null
+
       const first = points[0]
       const last = points[points.length - 1]
 
-      const change24h =
+      const changePct =
         first && last && first.p !== 0
           ? ((last.p - first.p) / first.p) * 100
           : null
@@ -48,17 +65,17 @@ export default async function DashboardPage() {
       return {
         metal,
         price: last.p,
-        change24h,
+        changePct,
         spark: points,
       }
-    }
-  )
+    })
+    .filter(Boolean) as PriceWithSparkline[]
 
   prices.sort((a, b) => a.metal.localeCompare(b.metal))
 
   return (
     <main className="p-6 space-y-6">
-      <PriceHeader prices={prices} />
+      <PriceHeader prices={prices} range={range} />
     </main>
   )
 }
