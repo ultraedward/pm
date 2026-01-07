@@ -1,5 +1,9 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import Sparkline from "./Sparkline"
+import ExpandedChart from "./ExpandedChart"
 
 type SparkPoint = { t: number; v: number }
 type AlertLine = { v: number }
@@ -21,37 +25,57 @@ export default function PriceHeader({
   prices: PriceWithSparkline[]
   range: RangeKey
 }) {
+  const [openMetal, setOpenMetal] = useState<string | null>(null)
   const ranges: RangeKey[] = ["24h", "7d", "30d"]
+
+  function exportCSV() {
+    window.location.href = `/api/export/prices?range=${range}`
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2">
-        {ranges.map((r) => (
-          <Link
-            key={r}
-            href={`/dashboard?range=${r}`}
-            className={`px-3 py-1 rounded text-sm ${
-              r === range
-                ? "bg-white text-black"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            {r}
-          </Link>
-        ))}
+      <div className="flex items-center gap-4">
+        <div className="flex gap-2">
+          {ranges.map((r) => (
+            <Link
+              key={r}
+              href={`/dashboard?range=${r}`}
+              className={`px-3 py-1 rounded text-sm ${
+                r === range
+                  ? "bg-white text-black"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              {r}
+            </Link>
+          ))}
+        </div>
+
+        <button
+          onClick={exportCSV}
+          className="ml-auto px-3 py-1 text-sm rounded border border-gray-600 hover:bg-gray-800"
+        >
+          Export CSV
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-10">
-        {prices.map((p) => {
-          const isUp = p.changePct !== null && p.changePct >= 0
+      {prices.map((p) => {
+        const isUp = p.changePct !== null && p.changePct >= 0
+        const open = openMetal === p.metal
 
-          return (
-            <div key={p.metal} className="space-y-1">
-              <div className="text-xs uppercase tracking-wide text-gray-400">
-                {p.metal}
-              </div>
+        return (
+          <div key={p.metal} className="space-y-3">
+            <button
+              onClick={() =>
+                setOpenMetal(open ? null : p.metal)
+              }
+              className="w-full text-left"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-20 text-xs uppercase text-gray-400">
+                  {p.metal}
+                </div>
 
-              <div className="flex items-end gap-3">
                 <div className="text-2xl font-semibold">
                   ${p.price.toFixed(2)}
                 </div>
@@ -61,25 +85,26 @@ export default function PriceHeader({
                   alerts={p.alerts}
                   up={isUp}
                 />
-              </div>
 
-              <div
-                className={`text-sm font-medium ${
-                  p.changePct === null
-                    ? "text-gray-400"
-                    : isUp
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                {p.changePct === null
-                  ? "—"
-                  : `${isUp ? "+" : ""}${p.changePct.toFixed(2)}%`}
+                <div
+                  className={`text-sm font-medium ${
+                    isUp ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {p.changePct?.toFixed(2)}%
+                </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            </button>
+
+            {open && (
+              <ExpandedChart
+                points={p.spark}
+                alerts={p.alerts}
+              />
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
