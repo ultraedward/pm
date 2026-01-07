@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -8,11 +8,24 @@ export default async function AlertsPage() {
   });
 
   return (
-    <div className="p-6 space-y-4">
-      <h1 className="text-xl font-semibold">Alerts</h1>
-      <pre className="text-sm bg-gray-100 p-4 rounded">
-        {JSON.stringify(alerts, null, 2)}
-      </pre>
+    <div className="p-6">
+      <h1 className="text-xl font-semibold mb-4">Alerts</h1>
+
+      <ul className="space-y-2">
+        {alerts.map((alert) => (
+          <li
+            key={alert.id}
+            className="border rounded p-3 text-sm flex justify-between"
+          >
+            <span>
+              {alert.metal} @ {alert.targetPrice}
+            </span>
+            <span className="text-gray-500">
+              {new Date(alert.createdAt).toLocaleString()}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
