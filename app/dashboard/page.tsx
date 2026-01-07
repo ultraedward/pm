@@ -1,42 +1,87 @@
 // app/dashboard/page.tsx
+"use client";
 
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
-import SignOutButton from "./sign-out-button";
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
-export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
+type SpotPrice = {
+  id: string;
+  metal: string;
+  price: number;
+  createdAt: string;
+};
+
+export default function DashboardPage() {
+  const [data, setData] = useState<SpotPrice[]>([]);
+  const [range, setRange] = useState<"24h" | "7d" | "30d">("24h");
+
+  useEffect(() => {
+    fetch(`/api/prices/history?range=${range}`)
+      .then((res) => res.json())
+      .then((json) => setData(json));
+  }, [range]);
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-
-        <p className="mt-4 text-gray-700">
-          Signed in as <strong>{session.user?.email}</strong>
-        </p>
-
-        <div className="mt-6 flex gap-3">
-          <Link
-            href="/dashboard/alerts"
-            className="rounded bg-black px-4 py-2 text-sm text-white"
-          >
-            Alerts
-          </Link>
-
-          <Link
-            href="/dashboard/charts"
-            className="rounded bg-gray-200 px-4 py-2 text-sm"
-          >
-            Charts
-          </Link>
-
-          <SignOutButton />
+    <div className="p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Spot Price History</h1>
+        <div className="flex gap-2">
+          {(["24h", "7d", "30d"] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`px-3 py-1 rounded text-sm ${
+                range === r
+                  ? "bg-black text-white"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
         </div>
       </div>
-    </main>
+
+      <div className="h-[420px] w-full bg-white rounded-xl border p-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="createdAt"
+              tickFormatter={(v) =>
+                new Date(v).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              }
+            />
+            <YAxis
+              domain={["auto", "auto"]}
+              tickFormatter={(v) => `$${v}`}
+            />
+            <Tooltip
+              formatter={(v: number) => `$${v.toFixed(2)}`}
+              labelFormatter={(l) =>
+                new Date(l).toLocaleString()
+              }
+            />
+            <Line
+              type="monotone"
+              dataKey="price"
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   );
 }
