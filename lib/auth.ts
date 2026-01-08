@@ -1,7 +1,28 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "./authOptions";
+// lib/auth.ts
+import NextAuth, { NextAuthOptions } from "next-auth"
+import GitHubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "@/lib/prisma"
 
-export async function getCurrentUser() {
-  const session = await getServerSession(authOptions);
-  return session?.user ?? null;
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  session: {
+    strategy: "database",
+  },
 }
+
+export const {
+  handlers: { GET, POST },
+  auth,
+} = NextAuth(authOptions)
