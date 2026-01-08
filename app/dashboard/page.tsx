@@ -1,9 +1,9 @@
 // app/dashboard/page.tsx
-// FULL SHEET — REPLACE ENTIRE FILE (FIXES IMPORT PATH)
+// FULL SHEET — REPLACE ENTIRE FILE
+// FIX: use `auth()` instead of authOptions
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import PriceHeader from "./PriceHeader"
 import ManageSubscriptionButton from "./ManageSubscriptionButton"
 import { unstable_cache } from "next/cache"
@@ -96,7 +96,7 @@ export default async function DashboardPage({
 }: {
   searchParams: { range?: RangeKey }
 }) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   const range: RangeKey = searchParams.range ?? "24h"
   const prices = await getCachedDashboardData(range)
 
