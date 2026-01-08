@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 
+  // Auth guard
   if (!session?.user?.id) {
     return NextResponse.json(
       { error: "Unauthorized" },
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     )
   }
 
+  // PRO guard
   if (!session.user.isPro) {
     return NextResponse.json(
       { error: "PRO plan required" },
@@ -21,15 +23,11 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json()
-  const { metal, direction, target } = body
+  const { metal, target, direction } = body
 
-  if (
-    typeof metal !== "string" ||
-    typeof direction !== "string" ||
-    typeof target !== "number"
-  ) {
+  if (!metal || !target || !direction) {
     return NextResponse.json(
-      { error: "Invalid request body" },
+      { error: "Missing required fields" },
       { status: 400 }
     )
   }
@@ -38,10 +36,11 @@ export async function POST(req: Request) {
     data: {
       userId: session.user.id,
       metal,
+      target,
       direction,
-      target, // ✅ MATCHES PRISMA SCHEMA
     },
   })
 
-  return NextResponse.json({ ok: true, alert })
+  // 🔴 THIS was missing before
+  return NextResponse.json(alert)
 }
