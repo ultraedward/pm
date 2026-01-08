@@ -1,9 +1,7 @@
-// app/api/stripe/webhook/route.ts
-
 import Stripe from "stripe"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma" // ✅ NAMED import
+import { prisma } from "@/lib/prisma"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
@@ -14,7 +12,7 @@ export async function POST(req: Request) {
   const signature = headers().get("stripe-signature")
 
   if (!signature) {
-    return new NextResponse("Missing Stripe signature", { status: 400 })
+    return new NextResponse("Missing signature", { status: 400 })
   }
 
   let event: Stripe.Event
@@ -26,30 +24,47 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     )
   } catch (err: any) {
-    console.error("❌ Webhook signature verification failed:", err.message)
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 })
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session
+  /* ------------------------------
+     SUBSCRIPTION EVENTS (SOURCE OF TRUTH)
+     ------------------------------ */
+  if (
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    const subscription = event.data.object as Stripe.Subscription
 
-    const email = session.customer_details?.email
-    const customerId = session.customer?.toString()
-
-    if (!email || !customerId) {
-      console.warn("⚠️ Missing email or customerId in session")
+    const customerId = subscription.customer?.toString()
+    if (!customerId) {
       return NextResponse.json({ received: true })
     }
 
-    await prisma.user.updateMany({
-      where: { email },
-      data: {
-        isPro: true,
-        stripeCustomerId: customerId,
-      },
-    })
+    const isActive = subscription.status === "active"
 
-    console.log(`✅ User upgraded to Pro: ${email}`)
+    await prisma.user.updateMany({
+      where: { stripeCustomerId: customerId },
+      data: { isPro: isActive },
+    })
+  }
+
+  /* ------------------------------
+     CHECKOUT (initial link)
+     ------------------------------ */
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session
+
+    if (session.customer && session.client_reference_id) {
+      await prisma.user.update({
+        where: { id: session.client_reference_id },
+        data: {
+          stripeCustomerId: session.customer.toString(),
+          isPro: true,
+        },
+      })
+    }
   }
 
   return NextResponse.json({ received: true })
