@@ -1,56 +1,64 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
+// app/api/stripe/webhook/route.ts
 
+import Stripe from "stripe"
+import { headers } from "next/headers"
+import { NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
+
+// Stripe client
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16", // must match Stripe SDK
-});
+  apiVersion: "2023-10-16",
+})
 
 export async function POST(req: Request) {
-  const signature = req.headers.get("stripe-signature");
+  // Read raw body (REQUIRED for Stripe signature verification)
+  const body = await req.text()
+  const signature = headers().get("stripe-signature")
 
   if (!signature) {
-    return NextResponse.json(
-      { error: "Missing Stripe signature" },
-      { status: 400 }
-    );
+    return new NextResponse("Missing Stripe signature", { status: 400 })
   }
 
-  let event: Stripe.Event;
+  let event: Stripe.Event
 
+  // Verify webhook signature
   try {
-    const body = await req.text();
-
     event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err) {
-    console.error("Webhook signature verification failed:", err);
-    return NextResponse.json(
-      { error: "Invalid webhook signature" },
-      { status: 400 }
-    );
+    )
+  } catch (err: any) {
+    console.error("❌ Webhook signature verification failed:", err.message)
+    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 })
   }
 
-  /**
-   * Webhook received successfully.
-   * We intentionally do NOT mutate Prisma here yet
-   * because Stripe-related user fields are not finalized
-   * in the schema.
-   */
-  switch (event.type) {
-    case "checkout.session.completed":
-      console.log("Checkout completed");
-      break;
+  // Handle successful checkout
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session
 
-    case "customer.subscription.deleted":
-      console.log("Subscription deleted");
-      break;
+    const customerEmail = session.customer_details?.email
+    const customerId = session.customer?.toString()
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+    if (!customerEmail || !customerId) {
+      console.warn("⚠️ Missing customer email or customer ID")
+      return NextResponse.json({ received: true })
+    }
+
+    // Upgrade user to Pro
+    await prisma.user.updateMany({
+      where: {
+        email: customerEmail,
+        isPro: false,
+      },
+      data: {
+        isPro: true,
+        stripeCustomerId: customerId,
+      },
+    })
+
+    console.log(`✅ User upgraded to Pro: ${customerEmail}`)
   }
 
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true })
 }
