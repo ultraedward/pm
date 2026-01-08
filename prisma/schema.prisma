@@ -12,22 +12,26 @@ datasource db {
 // =========================
 
 model User {
-  id                String   @id @default(cuid())
-  name              String?
-  email             String   @unique
-  emailVerified     DateTime?
-  image             String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Stripe / Billing
-  stripeCustomerId  String?  @unique
-  isPro             Boolean  @default(false)
+  stripeCustomerId String? @unique
+  isPro            Boolean @default(false)
 
-  accounts          Account[]
-  sessions          Session[]
-  alerts            Alert[]
+  accounts Account[]
+  sessions Session[]
+  alerts   Alert[]
 }
+
+// =========================
+// NEXTAUTH
+// =========================
 
 model Account {
   id                String  @id @default(cuid())
@@ -69,7 +73,8 @@ model Alert {
   target    Decimal
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alertTriggers AlertTrigger[] // ✅ REQUIRED BACK-RELATION
 }
 
 model AlertTrigger {
