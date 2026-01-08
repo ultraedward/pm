@@ -6,6 +6,17 @@ import PriceHeader from "./PriceHeader"
 import ManageSubscriptionButton from "./ManageSubscriptionButton"
 import { unstable_cache } from "next/cache"
 
+type SparkPoint = { t: number; v: number }
+type AlertLine = { v: number }
+
+type PriceWithSparkline = {
+  metal: string
+  price: number
+  changePct: number | null
+  spark: SparkPoint[]
+  alerts: AlertLine[]
+}
+
 type RangeKey = "24h" | "7d" | "30d"
 
 const RANGE_TO_HOURS: Record<RangeKey, number> = {
@@ -16,21 +27,80 @@ const RANGE_TO_HOURS: Record<RangeKey, number> = {
 
 const MAX_POINTS = 500
 
-async function getDashboardData(range: RangeKey) {
+async function getDashboardData(
+  range: RangeKey
+): Promise<PriceWithSparkline[]> {
   const since = new Date(Date.now() - RANGE_TO_HOURS[range] * 3600 * 1000)
 
-  const prices = await prisma.spotPriceCache.findMany({
-    where: { createdAt: { gte: since } },
-    orderBy: { createdAt: "asc" },
+  const [pricesRaw, alertsRaw] = await Promise.all([
+    prisma.spotPriceCache.findMany({
+      where: { createdAt: { gte: since } },
+      orderBy: { createdAt: "asc" },
+      select: { metal: true, price: true, createdAt: true },
+    }),
+    prisma.alert.findMany({
+      select: { metal: true, target: true },
+    }),
+  ])
+
+  const pricesByMetal = new Map<
+    string,
+    { t: number; p: number }[]
+  >()
+
+  pricesRaw.forEach((r) => {
+    const arr = pricesByMetal.get(r.metal) ?? []
+    if (arr.length < MAX_POINTS) {
+      arr.push({
+        t: r.createdAt.getTime(),
+        p: Number(r.price),
+      })
+      pricesByMetal.set(r.metal, arr)
+    }
   })
 
-  return prices
+  const alertsByMetal = new Map<string, number[]>()
+  alertsRaw.forEach((a) => {
+    const arr = alertsByMetal.get(a.metal) ?? []
+    arr.push(Number(a.target))
+    alertsByMetal.set(a.metal, arr)
+  })
+
+  return Array.from(pricesByMetal.entries()).map(
+    ([metal, points]) => {
+      const base = points[0]?.p ?? 0
+      const last = points[points.length - 1]
+
+      return {
+        metal,
+        price: last?.p ?? 0,
+        changePct:
+          base > 0
+            ? ((last.p - base) / base) * 100
+            : null,
+        spark: points.map((pt) => ({
+          t: pt.t,
+          v:
+            base > 0
+              ? ((pt.p - base) / base) * 100
+              : 0,
+        })),
+        alerts:
+          alertsByMetal.get(metal)?.map((p) => ({
+            v:
+              base > 0
+                ? ((p - base) / base) * 100
+                : 0,
+          })) ?? [],
+      }
+    }
+  )
 }
 
 const getCachedDashboardData = (range: RangeKey) =>
   unstable_cache(
     () => getDashboardData(range),
-    ["dashboard", range],
+    ["dashboard-data", range],
     { revalidate: 60 }
   )()
 
