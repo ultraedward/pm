@@ -1,26 +1,18 @@
 // app/api/pro/ping/route.ts
-import { NextResponse } from "next/server";
-import { requirePro } from "@/lib/requirePro";
+import { NextResponse } from "next/server"
+import { requirePro } from "@/lib/requirePro"
 
 export async function GET() {
-  try {
-    const { user } = await requirePro();
-    return NextResponse.json({
-      ok: true,
-      message: "PRO access confirmed",
-      userId: user.id,
-    });
-  } catch (err: any) {
-    const msg = String(err?.message || "");
+  const session = await requirePro()
 
-    if (msg === "AUTH_REQUIRED") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (msg === "PRO_REQUIRED") {
-      return NextResponse.json({ error: "PRO required" }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  // If requirePro already returned a response (403), forward it
+  if (session instanceof NextResponse) {
+    return session
   }
+
+  return NextResponse.json({
+    ok: true,
+    plan: "PRO",
+    userId: session.user.id,
+  })
 }
