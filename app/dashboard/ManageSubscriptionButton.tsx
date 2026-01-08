@@ -1,29 +1,40 @@
-// app/dashboard/ManageSubscriptionButton.tsx
-// FULL SHEET — ENSURE THIS FILE EXISTS AT THIS EXACT PATH
+"use client";
 
-"use client"
+import { useState } from "react";
 
 export default function ManageSubscriptionButton() {
+  const [loading, setLoading] = useState(false);
+
   async function openPortal() {
-    const res = await fetch("/api/stripe/portal", {
-      method: "POST",
-    })
+    try {
+      setLoading(true);
 
-    const data = await res.json()
+      const res = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnUrl: window.location.href }),
+      });
 
-    if (data?.url) {
-      window.location.href = data.url
-    } else {
-      alert("Unable to open billing portal.")
+      const data = (await res.json()) as { url?: string; error?: string };
+
+      if (!res.ok || !data.url) {
+        alert(data.error ?? "Unable to open billing portal");
+        return;
+      }
+
+      window.location.href = data.url;
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <button
       onClick={openPortal}
-      className="px-3 py-1 text-sm rounded border border-gray-600 hover:bg-gray-800"
+      disabled={loading}
+      className="rounded-md border px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
     >
-      Manage Subscription
+      {loading ? "Opening portal…" : "Manage subscription"}
     </button>
-  )
+  );
 }
