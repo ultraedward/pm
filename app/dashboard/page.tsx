@@ -1,13 +1,16 @@
-import UpgradeButton from "./UpgradeButton";
+// app/dashboard/page.tsx
+"use client"
+
+import { useSession } from "next-auth/react"
 
 export default function DashboardPage() {
+  const { data: session, status } = useSession()
+
+  if (status === "loading") return <pre>Loading…</pre>
+
   return (
-    <main className="p-6 space-y-4">
-      <h1 className="text-xl font-semibold">Dashboard</h1>
-
-      <p>You are on the free plan.</p>
-
-      <UpgradeButton />
-    </main>
-  );
+    <pre style={{ whiteSpace: "pre-wrap", color: "white" }}>
+      {JSON.stringify(session, null, 2)}
+    </pre>
+  )
 }
