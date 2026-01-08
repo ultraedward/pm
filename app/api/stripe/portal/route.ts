@@ -1,10 +1,11 @@
 // app/api/stripe/portal/route.ts
 // FULL SHEET — REPLACE THIS FILE COMPLETELY
-// FIX: use `auth()` instead of non-exported authOptions
+// FIX: use DEFAULT export from "@/lib/auth"
 
 import Stripe from "stripe"
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getServerSession } from "next-auth"
+import authOptions from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -12,7 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 export async function POST() {
-  const session = await auth()
+  const session = await getServerSession(authOptions)
 
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
