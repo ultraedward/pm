@@ -7,9 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* =========================
-   USER / AUTH
-   ========================= */
+// =========================
+// USER / AUTH
+// =========================
 
 model User {
   id                String   @id @default(cuid())
@@ -57,9 +57,9 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/* =========================
-   ALERTS
-   ========================= */
+// =========================
+// ALERTS
+// =========================
 
 model Alert {
   id        String   @id @default(cuid())
@@ -73,17 +73,17 @@ model Alert {
 }
 
 model AlertTrigger {
-  id        String   @id @default(cuid())
-  alertId   String
-  price     Decimal
+  id          String   @id @default(cuid())
+  alertId     String
+  price       Decimal
   triggeredAt DateTime @default(now())
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
 }
 
-/* =========================
-   PRICE DATA
-   ========================= */
+// =========================
+// PRICE DATA
+// =========================
 
 model SpotPriceCache {
   id        String   @id @default(cuid())
