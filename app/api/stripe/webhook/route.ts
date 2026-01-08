@@ -3,15 +3,13 @@
 import Stripe from "stripe"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma" // ✅ NAMED import
 
-// Stripe client
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
 })
 
 export async function POST(req: Request) {
-  // Read raw body (REQUIRED for Stripe signature verification)
   const body = await req.text()
   const signature = headers().get("stripe-signature")
 
@@ -21,7 +19,6 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event
 
-  // Verify webhook signature
   try {
     event = stripe.webhooks.constructEvent(
       body,
@@ -33,31 +30,26 @@ export async function POST(req: Request) {
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 })
   }
 
-  // Handle successful checkout
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session
 
-    const customerEmail = session.customer_details?.email
+    const email = session.customer_details?.email
     const customerId = session.customer?.toString()
 
-    if (!customerEmail || !customerId) {
-      console.warn("⚠️ Missing customer email or customer ID")
+    if (!email || !customerId) {
+      console.warn("⚠️ Missing email or customerId in session")
       return NextResponse.json({ received: true })
     }
 
-    // Upgrade user to Pro
     await prisma.user.updateMany({
-      where: {
-        email: customerEmail,
-        isPro: false,
-      },
+      where: { email },
       data: {
         isPro: true,
         stripeCustomerId: customerId,
       },
     })
 
-    console.log(`✅ User upgraded to Pro: ${customerEmail}`)
+    console.log(`✅ User upgraded to Pro: ${email}`)
   }
 
   return NextResponse.json({ received: true })
