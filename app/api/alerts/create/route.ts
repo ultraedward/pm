@@ -1,41 +1,47 @@
-// app/api/alerts/create/route.ts
-import { NextResponse } from "next/server";
-import { requirePro } from "@/lib/requirePro";
-import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 export async function POST(req: Request) {
-  try {
-    const { user } = await requirePro();
+  const session = await getServerSession(authOptions)
 
-    const body = await req.json();
-    const { metal, targetPrice, direction } = body;
-
-    if (!metal || !targetPrice || !direction) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const alert = await prisma.alert.create({
-      data: {
-        userId: user.id,
-        metal,
-        targetPrice,
-        direction,
-      },
-    });
-
-    return NextResponse.json({ alert });
-  } catch (err: any) {
-    if (err.message === "AUTH_REQUIRED") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (err.message === "PRO_REQUIRED") {
-      return NextResponse.json({ error: "PRO plan required" }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    )
   }
+
+  if (!session.user.isPro) {
+    return NextResponse.json(
+      { error: "PRO plan required" },
+      { status: 403 }
+    )
+  }
+
+  const body = await req.json()
+  const { metal, direction, target } = body
+
+  if (
+    typeof metal !== "string" ||
+    typeof direction !== "string" ||
+    typeof target !== "number"
+  ) {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    )
+  }
+
+  const alert = await prisma.alert.create({
+    data: {
+      userId: session.user.id,
+      metal,
+      direction,
+      target, // ✅ MATCHES PRISMA SCHEMA
+    },
+  })
+
+  return NextResponse.json({ ok: true, alert })
 }
