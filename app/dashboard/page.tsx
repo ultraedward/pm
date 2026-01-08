@@ -1,130 +1,78 @@
-// app/dashboard/page.tsx
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import ManageSubscriptionButton from "./ManageSubscriptionButton";
 
-import { prisma } from "@/lib/prisma"
-import { auth } from "@/lib/auth"
-import PriceHeader from "./PriceHeader"
-import ManageSubscriptionButton from "./ManageSubscriptionButton"
-import { unstable_cache } from "next/cache"
+export const dynamic = "force-dynamic";
 
-type SparkPoint = { t: number; v: number }
-type AlertLine = { v: number }
+type Row = {
+  metal: string;
+  price: number;
+  createdAt: Date;
+};
 
-type PriceWithSparkline = {
-  metal: string
-  price: number
-  changePct: number | null
-  spark: SparkPoint[]
-  alerts: AlertLine[]
-}
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
 
-type RangeKey = "24h" | "7d" | "30d"
+  // If you want dashboard to require auth:
+  if (!session?.user?.email) {
+    return (
+      <main className="p-6">
+        <h1 className="text-xl font-semibold">Dashboard</h1>
+        <p className="mt-2 text-gray-600">Please sign in to continue.</p>
+      </main>
+    );
+  }
 
-const RANGE_TO_HOURS: Record<RangeKey, number> = {
-  "24h": 24,
-  "7d": 168,
-  "30d": 720,
-}
+  // latest price per metal (SpotPriceCache has createdAt, not updatedAt)
+  const latest = await prisma.spotPriceCache.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 200,
+    select: { metal: true, price: true, createdAt: true },
+  });
 
-const MAX_POINTS = 500
-
-async function getDashboardData(
-  range: RangeKey
-): Promise<PriceWithSparkline[]> {
-  const since = new Date(Date.now() - RANGE_TO_HOURS[range] * 3600 * 1000)
-
-  const [pricesRaw, alertsRaw] = await Promise.all([
-    prisma.spotPriceCache.findMany({
-      where: { createdAt: { gte: since } },
-      orderBy: { createdAt: "asc" },
-      select: { metal: true, price: true, createdAt: true },
-    }),
-    prisma.alert.findMany({
-      select: { metal: true, target: true },
-    }),
-  ])
-
-  const pricesByMetal = new Map<
-    string,
-    { t: number; p: number }[]
-  >()
-
-  pricesRaw.forEach((r) => {
-    const arr = pricesByMetal.get(r.metal) ?? []
-    if (arr.length < MAX_POINTS) {
-      arr.push({
-        t: r.createdAt.getTime(),
-        p: Number(r.price),
-      })
-      pricesByMetal.set(r.metal, arr)
+  const byMetal = new Map<string, Row>();
+  for (const r of latest) {
+    if (!byMetal.has(r.metal)) {
+      byMetal.set(r.metal, {
+        metal: r.metal,
+        price: Number(r.price),
+        createdAt: r.createdAt,
+      });
     }
-  })
+  }
 
-  const alertsByMetal = new Map<string, number[]>()
-  alertsRaw.forEach((a) => {
-    const arr = alertsByMetal.get(a.metal) ?? []
-    arr.push(Number(a.target))
-    alertsByMetal.set(a.metal, arr)
-  })
-
-  return Array.from(pricesByMetal.entries()).map(
-    ([metal, points]) => {
-      const base = points[0]?.p ?? 0
-      const last = points[points.length - 1]
-
-      return {
-        metal,
-        price: last?.p ?? 0,
-        changePct:
-          base > 0
-            ? ((last.p - base) / base) * 100
-            : null,
-        spark: points.map((pt) => ({
-          t: pt.t,
-          v:
-            base > 0
-              ? ((pt.p - base) / base) * 100
-              : 0,
-        })),
-        alerts:
-          alertsByMetal.get(metal)?.map((p) => ({
-            v:
-              base > 0
-                ? ((p - base) / base) * 100
-                : 0,
-          })) ?? [],
-      }
-    }
-  )
-}
-
-const getCachedDashboardData = (range: RangeKey) =>
-  unstable_cache(
-    () => getDashboardData(range),
-    ["dashboard-data", range],
-    { revalidate: 60 }
-  )()
-
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { range?: RangeKey }
-}) {
-  const session = await auth()
-  const range: RangeKey = searchParams.range ?? "24h"
-  const prices = await getCachedDashboardData(range)
-
-  const user =
-    session?.user?.email
-      ? await prisma.user.findUnique({
-          where: { email: session.user.email },
-          select: { isPro: true },
-        })
-      : null
+  const prices = Array.from(byMetal.values()).sort((a, b) =>
+    a.metal.localeCompare(b.metal)
+  );
 
   return (
     <main className="p-6 space-y-6">
-      {user?.isPro && <ManageSubscriptionButton />}
-      <PriceHeader prices={prices} range={range} />
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-gray-500">
+            Signed in as {session.user.email}
+          </p>
+        </div>
+
+        {/* show button for everyone (portal handles access); you can gate later */}
+        <ManageSubscriptionButton />
+      </header>
+
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {prices.map((p) => (
+          <div key={p.metal} className="rounded-lg border p-4">
+            <div className="text-xs text-gray-500">{p.metal.toUpperCase()}</div>
+            <div className="mt-1 text-2xl font-semibold">
+              ${p.price.toFixed(2)}
+            </div>
+            <div className="mt-1 text-xs text-gray-500">
+              Updated {p.createdAt.toLocaleString()}
+            </div>
+          </div>
+        ))}
+      </section>
     </main>
-  )
+  );
 }

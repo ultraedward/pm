@@ -1,27 +1,36 @@
-// lib/auth.ts
+import type { NextAuthOptions } from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
 
-import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
-import Google from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
-
-export const {
-  handlers: { GET, POST },
-  auth,
-} = NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  session: { strategy: "database" },
   providers: [
-    GitHub({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
+    // Keep whichever providers you actually use / have env vars for.
+    // If you only use one, you can delete the other safely.
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID ?? "",
+      clientSecret: process.env.GITHUB_SECRET ?? "",
     }),
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     }),
   ],
-  session: {
-    strategy: "database",
+  callbacks: {
+    async session({ session, user }) {
+      // expose user id + isPro on the session
+      if (session.user) {
+        // @ts-expect-error augment session.user
+        session.user.id = user.id;
+        // @ts-expect-error augment session.user
+        session.user.isPro = (user as any).isPro ?? false;
+      }
+      return session;
+    },
   },
-})
+  // In prod, keep this off unless you want verbose logs.
+  debug: process.env.NODE_ENV === "development",
+};
