@@ -1,43 +1,50 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { PrismaClient } from "@prisma/client";
+// app/api/stripe/portal/route.ts
+// FULL SHEET — COPY / PASTE
 
-const prisma = new PrismaClient();
+import Stripe from "stripe"
+import { NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16", // must match SDK
-});
+  apiVersion: "2023-10-16",
+})
 
 export async function POST() {
-  try {
-    // Fetch full user (no select = no Prisma type errors)
-    const user = await prisma.user.findFirst();
+  const session = await getServerSession(authOptions)
 
-    // Safely read Stripe customer id (whatever your schema uses)
-    const stripeCustomerId =
-      (user as any)?.stripeCustomerId ||
-      (user as any)?.stripe_customer_id ||
-      (user as any)?.customerId ||
-      null;
-
-    if (!stripeCustomerId) {
-      return NextResponse.json(
-        { error: "Stripe customer not found for user" },
-        { status: 400 }
-      );
-    }
-
-    const session = await stripe.billingPortal.sessions.create({
-      customer: stripeCustomerId,
-      return_url: process.env.NEXT_PUBLIC_APP_URL!,
-    });
-
-    return NextResponse.json({ url: session.url });
-  } catch (error) {
-    console.error("Stripe portal error:", error);
-    return NextResponse.json(
-      { error: "Failed to create Stripe portal session" },
-      { status: 500 }
-    );
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { email: true },
+  })
+
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 })
+  }
+
+  // Find Stripe customer by email
+  const customers = await stripe.customers.list({
+    email: user.email,
+    limit: 1,
+  })
+
+  if (customers.data.length === 0) {
+    return NextResponse.json(
+      { error: "No Stripe customer found" },
+      { status: 404 }
+    )
+  }
+
+  const portalSession =
+    await stripe.billingPortal.sessions.create({
+      customer: customers.data[0].id,
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
+    })
+
+  return NextResponse.json({ url: portalSession.url })
 }
