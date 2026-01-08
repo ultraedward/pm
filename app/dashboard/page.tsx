@@ -1,6 +1,5 @@
 // app/dashboard/page.tsx
-// FULL SHEET — REPLACE ENTIRE FILE
-// (Adds Manage Subscription button when user is Pro)
+// FULL SHEET — REPLACE ENTIRE FILE (FIXES IMPORT PATH)
 
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
