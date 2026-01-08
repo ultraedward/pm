@@ -16,11 +16,14 @@ export async function POST() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
+    select: {
+      stripeCustomerId: true,
+    },
   });
 
   if (!user?.stripeCustomerId) {
     return NextResponse.json(
-      { error: "No Stripe customer" },
+      { error: "No Stripe customer on file" },
       { status: 400 }
     );
   }

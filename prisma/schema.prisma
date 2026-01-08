@@ -7,43 +7,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =========================
-// NEXTAUTH MODELS
-// =========================
+/* =========================
+   USER / AUTH
+   ========================= */
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
+  id                String   @id @default(cuid())
+  name              String?
+  email             String   @unique
+  emailVerified     DateTime?
+  image             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  // Monetization entitlement
-  isPro         Boolean   @default(false)
+  // Stripe / Billing
+  stripeCustomerId  String?  @unique
+  isPro             Boolean  @default(false)
 
-  accounts      Account[]
-  sessions      Session[]
-  alerts        Alert[]
-  alertTriggers AlertTrigger[]
-  emailLogs     EmailLog[]
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  accounts          Account[]
+  sessions          Session[]
+  alerts            Alert[]
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -59,61 +57,37 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-// =========================
-// ALERTS
-// =========================
+/* =========================
+   ALERTS
+   ========================= */
 
 model Alert {
   id        String   @id @default(cuid())
   userId    String
   metal     String
-  target    Decimal
   direction String
+  target    Decimal
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AlertTrigger {
-  id          String   @id @default(cuid())
-  userId      String
-  metal       String
-  price       Decimal
+  id        String   @id @default(cuid())
+  alertId   String
+  price     Decimal
   triggeredAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
 }
 
-// =========================
-// PRICE DATA
-// =========================
+/* =========================
+   PRICE DATA
+   ========================= */
 
 model SpotPriceCache {
   id        String   @id @default(cuid())
   metal     String
   price     Decimal
   createdAt DateTime @default(now())
-
-  @@index([metal, createdAt])
-}
-
-// =========================
-// EMAIL LOGGING
-// =========================
-
-model EmailLog {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
