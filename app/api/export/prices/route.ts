@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
 import { requirePro } from "@/lib/requirePro"
 
-export async function GET() {
-  const gate = await requirePro()
-  if ("error" in gate) return gate.error
+export async function GET(): Promise<Response> {
+  const session = await requirePro()
+  if (session instanceof NextResponse) return session
 
   const prices = await prisma.pricePoint.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "asc" },
   })
 
   return NextResponse.json(prices)
