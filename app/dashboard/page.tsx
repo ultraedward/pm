@@ -1,16 +1,40 @@
 // app/dashboard/page.tsx
-"use client"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import UpgradeButton from "./UpgradeButton"
 
-import { useSession } from "next-auth/react"
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions)
 
-export default function DashboardPage() {
-  const { data: session, status } = useSession()
+  if (!session?.user?.id) {
+    return <div>Please sign in</div>
+  }
 
-  if (status === "loading") return <pre>Loading…</pre>
+  // 🔴 THIS IS THE FIX
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isPro: true },
+  })
+
+  const isPro = user?.isPro === true
 
   return (
-    <pre style={{ whiteSpace: "pre-wrap", color: "white" }}>
-      {JSON.stringify(session, null, 2)}
-    </pre>
+    <main className="p-6 space-y-4">
+      <h1 className="text-xl font-bold">Dashboard</h1>
+
+      <p>
+        Signed in as <strong>{session.user.email}</strong>
+      </p>
+
+      <p>
+        Plan:{" "}
+        <strong className={isPro ? "text-green-600" : "text-gray-500"}>
+          {isPro ? "PRO" : "FREE"}
+        </strong>
+      </p>
+
+      {!isPro && <UpgradeButton />}
+    </main>
   )
 }
