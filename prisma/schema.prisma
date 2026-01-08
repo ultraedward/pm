@@ -7,9 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* =========================
-   NEXTAUTH MODELS
-   ========================= */
+// =========================
+// NEXTAUTH MODELS
+// =========================
 
 model User {
   id            String    @id @default(cuid())
@@ -18,7 +18,7 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  // 🔐 Monetization entitlement
+  // Monetization entitlement
   isPro         Boolean   @default(false)
 
   accounts      Account[]
@@ -67,34 +67,34 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-/* =========================
-   ALERTS
-   ========================= */
+// =========================
+// ALERTS
+// =========================
 
 model Alert {
   id        String   @id @default(cuid())
   userId    String
   metal     String
   target    Decimal
-  direction String   // "above" | "below"
+  direction String
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AlertTrigger {
-  id        String   @id @default(cuid())
-  userId    String
-  metal     String
-  price     Decimal
+  id          String   @id @default(cuid())
+  userId      String
+  metal       String
+  price       Decimal
   triggeredAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/* =========================
-   PRICE DATA
-   ========================= */
+// =========================
+// PRICE DATA
+// =========================
 
 model SpotPriceCache {
   id        String   @id @default(cuid())
@@ -105,9 +105,9 @@ model SpotPriceCache {
   @@index([metal, createdAt])
 }
 
-/* =========================
-   EMAIL LOGGING
-   ========================= */
+// =========================
+// EMAIL LOGGING
+// =========================
 
 model EmailLog {
   id        String   @id @default(cuid())
