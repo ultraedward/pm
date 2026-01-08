@@ -1,11 +1,8 @@
 // app/api/stripe/portal/route.ts
-// FULL SHEET — REPLACE THIS FILE COMPLETELY
-// FIX: use DEFAULT export from "@/lib/auth"
 
 import Stripe from "stripe"
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import authOptions from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -13,23 +10,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 export async function POST() {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
 
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { email: true },
-  })
-
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 })
-  }
-
   const customers = await stripe.customers.list({
-    email: user.email,
+    email: session.user.email,
     limit: 1,
   })
 
