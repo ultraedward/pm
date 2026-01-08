@@ -1,5 +1,12 @@
+// app/dashboard/page.tsx
+// FULL SHEET — REPLACE ENTIRE FILE
+// (Adds Manage Subscription button when user is Pro)
+
 import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import PriceHeader from "./PriceHeader"
+import ManageSubscriptionButton from "./ManageSubscriptionButton"
 import { unstable_cache } from "next/cache"
 
 type SparkPoint = { t: number; v: number }
@@ -24,8 +31,9 @@ const RANGE_TO_HOURS: Record<RangeKey, number> = {
 const MAX_POINTS = 500
 
 async function getDashboardData(range: RangeKey) {
-  const hours = RANGE_TO_HOURS[range]
-  const since = new Date(Date.now() - hours * 60 * 60 * 1000)
+  const since = new Date(
+    Date.now() - RANGE_TO_HOURS[range] * 60 * 60 * 1000
+  )
 
   const [pricesRaw, alertsRaw] = await Promise.all([
     prisma.spotPriceCache.findMany({
@@ -89,11 +97,21 @@ export default async function DashboardPage({
 }: {
   searchParams: { range?: RangeKey }
 }) {
+  const session = await getServerSession(authOptions)
   const range: RangeKey = searchParams.range ?? "24h"
   const prices = await getCachedDashboardData(range)
 
+  const user =
+    session?.user?.email
+      ? await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { isPro: true },
+        })
+      : null
+
   return (
-    <main className="p-6 space-y-8">
+    <main className="p-6 space-y-6">
+      {user?.isPro && <ManageSubscriptionButton />}
       <PriceHeader prices={prices} range={range} />
     </main>
   )
