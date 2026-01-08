@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
 import { requirePro } from "@/lib/requirePro"
 
 export async function GET() {
-  const gate = await requirePro()
-  if ("error" in gate) return gate.error
+  const session = await requirePro()
+  if (session instanceof NextResponse) return session
 
   const alerts = await prisma.alert.findMany({
-    where: { userId: gate.userId },
+    where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
   })
 
