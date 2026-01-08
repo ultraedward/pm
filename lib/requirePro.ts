@@ -1,47 +1,23 @@
-// lib/requirePro.ts
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+import { NextResponse } from "next/server"
 
-export type RequireProResult = {
-  user: {
-    id: string;
-    email?: string | null;
-    name?: string | null;
-    image?: string | null;
-    isPro: boolean;
-  };
-};
-
-/**
- * Server-side PRO gate. Use inside:
- * - Route handlers (app/api/*)
- * - Server components
- *
- * Throws on:
- * - Not signed in
- * - Not PRO
- */
-export async function requirePro(): Promise<RequireProResult> {
-  const session = await getServerSession(authOptions);
+export async function requirePro() {
+  const session = await getServerSession(authOptions)
 
   if (!session?.user?.id) {
-    throw new Error("AUTH_REQUIRED");
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) }
   }
 
-  // next-auth session typing doesn't always include custom fields
-  const isPro = Boolean((session.user as any).isPro);
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isPro: true },
+  })
 
-  if (!isPro) {
-    throw new Error("PRO_REQUIRED");
+  if (!user?.isPro) {
+    return { error: NextResponse.json({ error: "PRO plan required" }, { status: 403 }) }
   }
 
-  return {
-    user: {
-      id: session.user.id,
-      email: session.user.email ?? null,
-      name: session.user.name ?? null,
-      image: session.user.image ?? null,
-      isPro: true,
-    },
-  };
+  return { userId: session.user.id }
 }
