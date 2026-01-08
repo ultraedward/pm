@@ -1,23 +1,16 @@
 // app/dashboard/page.tsx
 // FULL SHEET — REPLACE ENTIRE FILE
-// FIX: use `auth()` instead of authOptions
+// FIX: use DEFAULT authOptions import
 
 import { prisma } from "@/lib/prisma"
-import { auth } from "@/lib/auth"
+import { getServerSession } from "next-auth"
+import authOptions from "@/lib/auth"
 import PriceHeader from "./PriceHeader"
 import ManageSubscriptionButton from "./ManageSubscriptionButton"
 import { unstable_cache } from "next/cache"
 
 type SparkPoint = { t: number; v: number }
 type AlertLine = { v: number }
-
-type PriceWithSparkline = {
-  metal: string
-  price: number
-  changePct: number | null
-  spark: SparkPoint[]
-  alerts: AlertLine[]
-}
 
 type RangeKey = "24h" | "7d" | "30d"
 
@@ -96,7 +89,7 @@ export default async function DashboardPage({
 }: {
   searchParams: { range?: RangeKey }
 }) {
-  const session = await auth()
+  const session = await getServerSession(authOptions)
   const range: RangeKey = searchParams.range ?? "24h"
   const prices = await getCachedDashboardData(range)
 
