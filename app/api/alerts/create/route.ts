@@ -7,10 +7,7 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 
   if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    )
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const user = await prisma.user.findUnique({
@@ -19,15 +16,10 @@ export async function POST(req: Request) {
   })
 
   if (!user) {
-    return NextResponse.json(
-      { error: "User not found" },
-      { status: 404 }
-    )
+    return NextResponse.json({ error: "User not found" }, { status: 404 })
   }
 
-  /* ----------------------------
-     FREE PLAN LIMIT (1 ALERT)
-  -----------------------------*/
+  // 🔒 FREE PLAN LIMIT (1 ALERT TOTAL)
   if (!user.isPro) {
     const count = await prisma.alert.count({
       where: { userId: session.user.id },
@@ -47,21 +39,29 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { metal, direction, targetPrice } = body
 
-  if (!metal || !direction || !targetPrice) {
+  if (!metal || !direction || typeof targetPrice !== "number") {
     return NextResponse.json(
-      { error: "Missing required fields" },
+      { error: "Invalid payload" },
       { status: 400 }
     )
   }
 
+  // 1️⃣ Create the Alert (NO price here)
   const alert = await prisma.alert.create({
     data: {
       userId: session.user.id,
       metal,
-      direction,
-      targetPrice,
     },
   })
 
-  return NextResponse.json({ alert })
+  // 2️⃣ Create the Trigger (price lives here)
+  await prisma.alertTrigger.create({
+    data: {
+      alertId: alert.id,
+      direction,
+      price: targetPrice,
+    },
+  })
+
+  return NextResponse.json({ alertId: alert.id })
 }
