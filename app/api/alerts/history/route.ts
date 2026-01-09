@@ -1,23 +1,46 @@
-// app/api/alerts/history/route.ts
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { requirePro } from "@/lib/requirePro"
 
-export async function GET() {
-  const gate = await requirePro()
-  if (gate instanceof NextResponse) return gate
+export const runtime = "nodejs"
 
-  const alerts = await prisma.alert.findMany({
+export async function GET() {
+  const session = await requirePro()
+  if (session instanceof NextResponse) return session
+
+  const userId = session.user.id
+
+  const history = await prisma.alertTrigger.findMany({
     where: {
-      userId: gate.userId,
+      alert: {
+        userId,
+      },
     },
     orderBy: {
       createdAt: "desc",
+    },
+    take: 100,
+    include: {
+      alert: {
+        select: {
+          metal: true,
+          direction: true,
+          target: true,
+        },
+      },
     },
   })
 
   return NextResponse.json({
     ok: true,
-    alerts,
+    count: history.length,
+    history: history.map(t => ({
+      id: t.id,
+      metal: t.alert.metal,
+      direction: t.alert.direction,
+      target: t.alert.target,
+      triggeredPrice: t.price,
+      triggeredAt: t.createdAt,
+    })),
   })
 }

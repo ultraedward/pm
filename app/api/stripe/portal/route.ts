@@ -1,3 +1,4 @@
+// app/api/stripe/portal/route.ts
 import Stripe from "stripe"
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
@@ -17,14 +18,11 @@ export async function POST() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: {
-      stripeCustomerId: true,
-    },
   })
 
   if (!user?.stripeCustomerId) {
     return NextResponse.json(
-      { error: "No Stripe customer" },
+      { error: "No Stripe customer found" },
       { status: 400 }
     )
   }
