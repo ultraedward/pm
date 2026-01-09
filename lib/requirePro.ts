@@ -1,3 +1,4 @@
+// lib/requirePro.ts
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import { authOptions } from "@/lib/auth"
@@ -6,8 +7,11 @@ import { prisma } from "@/lib/prisma"
 export async function requirePro() {
   const session = await getServerSession(authOptions)
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!session || !session.user?.id) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    )
   }
 
   const user = await prisma.user.findUnique({
@@ -15,12 +19,12 @@ export async function requirePro() {
     select: { isPro: true },
   })
 
-  if (!user?.isPro) {
+  if (!user || !user.isPro) {
     return NextResponse.json(
       { error: "PRO plan required" },
       { status: 403 }
     )
   }
 
-  return session
+  return { userId: session.user.id }
 }
