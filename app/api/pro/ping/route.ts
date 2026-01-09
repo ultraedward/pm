@@ -3,16 +3,12 @@ import { NextResponse } from "next/server"
 import { requirePro } from "@/lib/requirePro"
 
 export async function GET() {
-  const session = await requirePro()
-
-  // If requirePro already returned a response (403), forward it
-  if (session instanceof NextResponse) {
-    return session
-  }
+  const result = await requirePro()
+  if (result instanceof NextResponse) return result
 
   return NextResponse.json({
     ok: true,
     plan: "PRO",
-    userId: session.user.id,
+    time: new Date().toISOString(),
   })
 }
