@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic"
 
 /**
  * Backfill prices to smooth hourly → 5-minute intervals.
- * Uses `createdAt` (NOT timestamp) to match SpotPriceCache schema.
- * Decimal-safe math throughout.
+ * Matches SpotPriceCache schema exactly (NO extra fields).
+ * Decimal-safe math.
  */
 export async function POST() {
   try {
@@ -49,7 +49,6 @@ export async function POST() {
               metal,
               price,
               createdAt: new Date(t),
-              source: "backfill",
             },
           })
 
@@ -58,10 +57,7 @@ export async function POST() {
       }
     }
 
-    return NextResponse.json({
-      ok: true,
-      inserted,
-    })
+    return NextResponse.json({ ok: true, inserted })
   } catch (err: any) {
     console.error("BACKFILL FAILED", err)
     return NextResponse.json(
