@@ -1,3 +1,6 @@
+// prisma/schema.prisma
+// FULL SHEET — COPY / PASTE ENTIRE FILE
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,92 +10,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =========================
-// USER / AUTH
-// =========================
-
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Stripe / Billing
-  stripeCustomerId String? @unique
-  isPro            Boolean @default(false)
-
-  accounts Account[]
-  sessions Session[]
-  alerts   Alert[]
+  alerts Alert[]
 }
-
-// =========================
-// NEXTAUTH
-// =========================
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// =========================
-// ALERTS
-// =========================
 
 model Alert {
   id        String   @id @default(cuid())
-  userId    String
-  metal     String
+  userId   String
+  metal    String
   direction String
-  target    Decimal
+  target   Decimal
   createdAt DateTime @default(now())
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  alertTriggers AlertTrigger[] // ✅ REQUIRED BACK-RELATION
+  user User @relation(fields: [userId], references: [id])
+  alertTriggers AlertTrigger[]
 }
 
 model AlertTrigger {
   id          String   @id @default(cuid())
-  alertId     String
-  price       Decimal
+  alertId    String
+  price      Decimal
   triggeredAt DateTime @default(now())
 
-  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  alert Alert @relation(fields: [alertId], references: [id])
 }
-
-// =========================
-// PRICE DATA
-// =========================
 
 model SpotPriceCache {
   id        String   @id @default(cuid())
   metal     String
   price     Decimal
+  createdAt DateTime @default(now())
+}
+
+model CronRun {
+  id        String   @id @default(cuid())
+  name      String
+  status    String
+  message   String?
   createdAt DateTime @default(now())
 }
