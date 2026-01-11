@@ -1,10 +1,10 @@
 // app/api/cron/backfill-prices/route.ts
-// FULL SHEET — COPY / PASTE
+// FULL SHEET — COPY / PASTE (FIXED prisma import)
 
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Backfill prices to smooth hourly → 5-minute intervals.
@@ -14,8 +14,14 @@ export async function GET(req: Request) {
   try {
     // Optional auth via header (kept dynamic-safe)
     const auth = req.headers.get("authorization");
-    if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    if (
+      process.env.CRON_SECRET &&
+      auth !== `Bearer ${process.env.CRON_SECRET}`
+    ) {
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const metals = ["gold", "silver", "platinum", "palladium"] as const;
@@ -24,7 +30,7 @@ export async function GET(req: Request) {
     const skipped: string[] = [];
 
     for (const metal of metals) {
-      // Get last 24h of hourly-ish points
+      // Get recent points (enough to interpolate)
       const rows = await prisma.spotPriceCache.findMany({
         where: { metal },
         orderBy: { createdAt: "asc" },
