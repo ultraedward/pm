@@ -1,5 +1,5 @@
 // app/dashboard/charts/chart-client.tsx
-// FULL SHEET — REPLACE COMPLETELY
+// FULL SHEET — COPY / PASTE ENTIRE FILE
 
 "use client";
 
@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Legend,
+  Scatter,
 } from "recharts";
 
 type PricePoint = {
@@ -27,6 +28,12 @@ type Alert = {
   target: number;
 };
 
+type AlertTrigger = {
+  metal: string;
+  price: number;
+  triggeredAt: string | Date;
+};
+
 const COLORS: Record<string, string> = {
   gold: "#d4af37",
   silver: "#9ca3af",
@@ -37,10 +44,12 @@ const COLORS: Record<string, string> = {
 export default function ChartClient({
   prices,
   alerts,
+  alertTriggers,
   range,
 }: {
   prices: PricePoint[];
   alerts: Alert[];
+  alertTriggers: AlertTrigger[];
   range: "24h" | "7d" | "30d";
 }) {
   const metals = Array.from(new Set(prices.map((p) => p.metal)));
@@ -48,6 +57,7 @@ export default function ChartClient({
   const [activeMetals, setActiveMetals] = useState<string[]>(metals);
   const [normalized, setNormalized] = useState(false);
 
+  /* ---------------- Base prices (for % normalize) ---------------- */
   const basePrices = useMemo(() => {
     const bases: Record<string, number> = {};
     metals.forEach((m) => {
@@ -57,6 +67,7 @@ export default function ChartClient({
     return bases;
   }, [prices, metals]);
 
+  /* ---------------- Chart data ---------------- */
   const data = useMemo(() => {
     const grouped: Record<number, any> = {};
 
@@ -72,18 +83,29 @@ export default function ChartClient({
     return Object.values(grouped).sort((a, b) => a.t - b.t);
   }, [prices, normalized, basePrices]);
 
+  /* ---------------- Alert trigger points ---------------- */
+  const triggerPoints = useMemo(() => {
+    if (normalized) return [];
+
+    return alertTriggers
+      .filter((t) => activeMetals.includes(t.metal))
+      .map((t) => ({
+        t: new Date(t.triggeredAt).getTime(),
+        price: t.price,
+        metal: t.metal,
+      }));
+  }, [alertTriggers, activeMetals, normalized]);
+
+  /* ---------------- Legend stats ---------------- */
   const latestStats = useMemo(() => {
-    const stats: Record<
-      string,
-      { last: number; pct: number }
-    > = {};
+    const stats: Record<string, { last: number; pct: number }> = {};
 
     metals.forEach((m) => {
-      const metalPrices = prices.filter((p) => p.metal === m);
-      if (metalPrices.length < 2) return;
+      const mPrices = prices.filter((p) => p.metal === m);
+      if (mPrices.length < 2) return;
 
-      const first = metalPrices[0].price;
-      const last = metalPrices.at(-1)!.price;
+      const first = mPrices[0].price;
+      const last = mPrices.at(-1)!.price;
 
       stats[m] = {
         last,
@@ -132,34 +154,31 @@ export default function ChartClient({
         </label>
       </div>
 
-      {/* LEGEND SUMMARY */}
+      {/* SUMMARY CARDS */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
         {activeMetals.map((m) => {
           const stat = latestStats[m];
           if (!stat) return null;
 
           return (
-            <div
-              key={m}
-              className="rounded border p-3 flex flex-col gap-1"
-            >
-              <span className="capitalize font-medium">{m}</span>
-              <span>${stat.last.toFixed(2)}</span>
-              <span
+            <div key={m} className="rounded border p-3">
+              <div className="capitalize font-medium">{m}</div>
+              <div>${stat.last.toFixed(2)}</div>
+              <div
                 className={
                   stat.pct >= 0 ? "text-green-600" : "text-red-600"
                 }
               >
                 {stat.pct >= 0 ? "+" : ""}
                 {stat.pct.toFixed(2)}%
-              </span>
+              </div>
             </div>
           );
         })}
       </div>
 
       {/* CHART */}
-      <div className="h-[420px]">
+      <div className="h-[440px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <XAxis
@@ -184,6 +203,7 @@ export default function ChartClient({
             />
             <Legend />
 
+            {/* PRICE LINES */}
             {activeMetals.map((m) => (
               <Line
                 key={m}
@@ -195,12 +215,13 @@ export default function ChartClient({
               />
             ))}
 
+            {/* ALERT THRESHOLDS */}
             {!normalized &&
               alerts
                 .filter((a) => activeMetals.includes(a.metal))
                 .map((a, i) => (
                   <ReferenceLine
-                    key={i}
+                    key={`ref-${i}`}
                     y={a.target}
                     strokeDasharray="4 4"
                     stroke={COLORS[a.metal] || "#000"}
@@ -210,6 +231,16 @@ export default function ChartClient({
                     }}
                   />
                 ))}
+
+            {/* ALERT TRIGGER DOTS */}
+            {!normalized &&
+              activeMetals.map((m) => (
+                <Scatter
+                  key={`scatter-${m}`}
+                  data={triggerPoints.filter((t) => t.metal === m)}
+                  fill={COLORS[m] || "#000"}
+                />
+              ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
