@@ -14,6 +14,7 @@ import {
   ReferenceLine,
   Legend,
   Scatter,
+  CartesianGrid,
 } from "recharts";
 
 type PricePoint = {
@@ -83,7 +84,7 @@ export default function ChartClient({
     return Object.values(grouped).sort((a, b) => a.t - b.t);
   }, [prices, normalized, basePrices]);
 
-  /* ---------------- Alert trigger points ---------------- */
+  /* ---------------- Alert trigger dots ---------------- */
   const triggerPoints = useMemo(() => {
     if (normalized) return [];
 
@@ -96,7 +97,7 @@ export default function ChartClient({
       }));
   }, [alertTriggers, activeMetals, normalized]);
 
-  /* ---------------- Legend stats ---------------- */
+  /* ---------------- Summary stats ---------------- */
   const latestStats = useMemo(() => {
     const stats: Record<string, { last: number; pct: number }> = {};
 
@@ -178,9 +179,11 @@ export default function ChartClient({
       </div>
 
       {/* CHART */}
-      <div className="h-[440px]">
+      <div className="h-[460px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+
             <XAxis
               dataKey="t"
               type="number"
@@ -188,12 +191,15 @@ export default function ChartClient({
               tickFormatter={tickFormatter}
               minTickGap={24}
             />
+
             <YAxis
               tickFormatter={(v) =>
                 normalized ? `${v.toFixed(1)}%` : `$${v}`
               }
             />
+
             <Tooltip
+              cursor={{ stroke: "#111", strokeWidth: 1 }}
               labelFormatter={(v) =>
                 new Date(Number(v)).toLocaleString()
               }
@@ -201,6 +207,7 @@ export default function ChartClient({
                 normalized ? `${v.toFixed(2)}%` : `$${v.toFixed(2)}`
               }
             />
+
             <Legend />
 
             {/* PRICE LINES */}
@@ -212,6 +219,7 @@ export default function ChartClient({
                 stroke={COLORS[m] || "#000"}
                 strokeWidth={2}
                 dot={false}
+                isAnimationActive={false}
               />
             ))}
 
