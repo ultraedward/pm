@@ -1,10 +1,11 @@
 // app/dashboard/components/CurrentPrices.tsx
 // FULL SHEET — COPY / PASTE ENTIRE FILE
-// Adds mini sparklines per metal using recent cached prices
+// Click a card to open the full chart for that metal
 
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type PriceRow = {
   metal: string;
@@ -78,9 +79,10 @@ export default function CurrentPrices() {
         const values = series.map((x) => x.price);
 
         return (
-          <div
+          <Link
             key={p.metal}
-            className="rounded-xl border p-4 bg-white shadow-sm"
+            href={`/dashboard/charts?metal=${p.metal}`}
+            className="rounded-xl border p-4 bg-white shadow-sm hover:shadow-md transition block"
           >
             <div className="text-xs uppercase text-gray-500">
               {p.metal}
@@ -104,16 +106,12 @@ export default function CurrentPrices() {
               </div>
             )}
 
-            {/* Sparkline */}
-            <Sparkline
-              values={values}
-              up={up}
-            />
+            <Sparkline values={values} up={up} />
 
             <div className="text-xs text-gray-400 mt-1">
-              Updated {new Date(p.createdAt).toLocaleTimeString()}
+              Click for full chart
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>
