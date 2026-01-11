@@ -1,29 +1,30 @@
-// middleware.ts
-
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-/**
- * IMPORTANT:
- * - DO NOT protect dashboard data APIs
- * - Charts must load without auth middleware
- */
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl
-
-  // 🔑 allow these paths ALWAYS
+  // ✅ ALWAYS ALLOW THESE (NO AUTH, NO REDIRECTS)
   if (
-    pathname.startsWith("/api/dashboard") ||
     pathname.startsWith("/api/prices") ||
+    pathname.startsWith("/api/dashboard") ||
     pathname.startsWith("/api/cron")
   ) {
     return NextResponse.next()
   }
 
+  // ✅ Allow Next.js internals
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon.ico")
+  ) {
+    return NextResponse.next()
+  }
+
+  // 🔒 Everything else behaves normally (auth, redirects, etc.)
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 }
