@@ -6,7 +6,14 @@ export const dynamic = "force-dynamic"
 export async function GET() {
   try {
     const rows = await prisma.spotPriceCache.findMany({
-      orderBy: { createdAt: "asc" },
+      select: {
+        metal: true,
+        price: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
       take: 500,
     })
 
@@ -18,19 +25,26 @@ export async function GET() {
     }
 
     for (const r of rows) {
-      if (!prices[r.metal]) continue
+      const metal = r.metal?.toLowerCase?.()
 
-      prices[r.metal].push({
+      if (!metal || !prices[metal]) continue
+
+      prices[metal].push({
         t: r.createdAt.getTime(),
         price: Number(r.price),
       })
     }
 
     return NextResponse.json({ prices })
-  } catch (e) {
-    console.error("PRICES API ERROR", e)
+  } catch (err) {
+    console.error("🔥 /api/prices FAILED", err)
+
     return NextResponse.json(
-      { error: "prices api failed" },
+      {
+        error: "prices api failed",
+        message:
+          err instanceof Error ? err.message : "unknown error",
+      },
       { status: 500 }
     )
   }
