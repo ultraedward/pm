@@ -1,35 +1,44 @@
 // app/dashboard/components/CurrentPrices.tsx
 // FULL SHEET — COPY / PASTE ENTIRE FILE
-// Auto-refreshes prices every 60 seconds
+// Adds mini sparklines per metal using recent cached prices
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type Price = {
+type PriceRow = {
+  metal: string;
+  price: number;
+  createdAt: string;
+};
+
+type CurrentPrice = {
   metal: string;
   price: number;
   createdAt: string;
   changePct: number | null;
 };
 
-const REFRESH_MS = 60_000; // 60 seconds
+const REFRESH_MS = 60_000;
+const SPARK_POINTS = 20;
 
 export default function CurrentPrices() {
-  const [prices, setPrices] = useState<Price[]>([]);
+  const [current, setCurrent] = useState<CurrentPrice[]>([]);
+  const [history, setHistory] = useState<PriceRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const load = async () => {
-    const res = await fetch("/api/prices/current", {
-      cache: "no-store",
-    });
-    const data = await res.json();
+    const [curRes, histRes] = await Promise.all([
+      fetch("/api/prices/current", { cache: "no-store" }),
+      fetch("/api/export/prices", { cache: "no-store" }),
+    ]);
 
-    if (data.ok) {
-      setPrices(data.prices);
-      setLastUpdated(new Date());
-    }
+    const cur = await curRes.json();
+    const hist = await histRes.json();
+
+    if (cur.ok) setCurrent(cur.prices);
+    if (hist.ok) setHistory(hist.prices);
+
     setLoading(false);
   };
 
@@ -38,6 +47,20 @@ export default function CurrentPrices() {
     const id = setInterval(load, REFRESH_MS);
     return () => clearInterval(id);
   }, []);
+
+  const seriesByMetal = useMemo(() => {
+    const map: Record<string, PriceRow[]> = {};
+    for (const row of history) {
+      map[row.metal] ||= [];
+      map[row.metal].push(row);
+    }
+    for (const k of Object.keys(map)) {
+      map[k] = map[k]
+        .sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt))
+        .slice(-SPARK_POINTS);
+    }
+    return map;
+  }, [history]);
 
   if (loading) {
     return (
@@ -48,48 +71,88 @@ export default function CurrentPrices() {
   }
 
   return (
-    <div className="space-y-2">
-      <div className="text-xs text-gray-400">
-        Auto-refreshes every 60s
-        {lastUpdated && (
-          <> · Last update {lastUpdated.toLocaleTimeString()}</>
-        )}
-      </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {current.map((p) => {
+        const up = p.changePct !== null && p.changePct >= 0;
+        const series = seriesByMetal[p.metal] || [];
+        const values = series.map((x) => x.price);
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {prices.map((p) => {
-          const up = p.changePct !== null && p.changePct >= 0;
-
-          return (
-            <div
-              key={p.metal}
-              className="rounded-xl border p-4 bg-white shadow-sm"
-            >
-              <div className="text-xs uppercase text-gray-500">
-                {p.metal}
-              </div>
-
-              <div className="text-2xl font-semibold">
-                ${p.price.toFixed(2)}
-              </div>
-
-              {p.changePct !== null && (
-                <div
-                  className={`text-sm mt-1 font-medium ${
-                    up ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {up ? "▲" : "▼"}{" "}
-                  {Math.abs(p.changePct).toFixed(2)}%
-                  <span className="text-xs text-gray-400 ml-1">
-                    (24h)
-                  </span>
-                </div>
-              )}
+        return (
+          <div
+            key={p.metal}
+            className="rounded-xl border p-4 bg-white shadow-sm"
+          >
+            <div className="text-xs uppercase text-gray-500">
+              {p.metal}
             </div>
-          );
-        })}
-      </div>
+
+            <div className="text-2xl font-semibold">
+              ${p.price.toFixed(2)}
+            </div>
+
+            {p.changePct !== null && (
+              <div
+                className={`text-sm mt-1 font-medium ${
+                  up ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {up ? "▲" : "▼"}{" "}
+                {Math.abs(p.changePct).toFixed(2)}%
+                <span className="text-xs text-gray-400 ml-1">
+                  (24h)
+                </span>
+              </div>
+            )}
+
+            {/* Sparkline */}
+            <Sparkline
+              values={values}
+              up={up}
+            />
+
+            <div className="text-xs text-gray-400 mt-1">
+              Updated {new Date(p.createdAt).toLocaleTimeString()}
+            </div>
+          </div>
+        );
+      })}
     </div>
+  );
+}
+
+function Sparkline({
+  values,
+  up,
+}: {
+  values: number[];
+  up: boolean;
+}) {
+  if (values.length < 2) return null;
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+
+  const points = values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * 100;
+      const y = 100 - ((v - min) / range) * 100;
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      className="mt-2 h-10 w-full"
+      preserveAspectRatio="none"
+    >
+      <polyline
+        fill="none"
+        stroke={up ? "#16a34a" : "#dc2626"}
+        strokeWidth="3"
+        points={points}
+      />
+    </svg>
   );
 }
