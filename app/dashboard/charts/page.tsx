@@ -11,25 +11,24 @@ import {
 } from "recharts"
 
 type Point = { t: number; price: number }
-type ApiResponse = {
-  prices: Record<string, Point[]>
-}
 
 export default function ChartsPage() {
   const [prices, setPrices] = useState<Record<string, Point[]>>({})
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch("/api/prices/current")
+    fetch("/api/prices/current", {
+      credentials: "same-origin",
+    })
       .then((r) => {
         if (!r.ok) throw new Error("Fetch failed")
         return r.json()
       })
-      .then((data: ApiResponse) => {
+      .then((data) => {
         setPrices(data.prices || {})
       })
       .catch((e) => {
-        console.error("DASHBOARD FETCH ERROR", e)
+        console.error("CHART FETCH ERROR", e)
         setError("Failed to load prices")
       })
   }, [])
