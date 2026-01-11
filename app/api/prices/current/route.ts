@@ -1,6 +1,7 @@
 // app/api/prices/current/route.ts
 // FULL SHEET — COPY / PASTE ENTIRE FILE
 // Returns latest price + 24h % change per metal
+// FIX: Convert Prisma Decimal -> number before arithmetic
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -33,14 +34,17 @@ export async function GET() {
           orderBy: { createdAt: "desc" },
         });
 
+        const latestPrice = Number(latest.price);
+        const pastPrice = past ? Number(past.price) : null;
+
         const changePct =
-          past && past.price
-            ? ((latest.price - past.price) / past.price) * 100
+          pastPrice !== null && pastPrice !== 0
+            ? ((latestPrice - pastPrice) / pastPrice) * 100
             : null;
 
         return {
           metal,
-          price: latest.price,
+          price: latestPrice,
           createdAt: latest.createdAt,
           changePct,
         };
