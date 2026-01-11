@@ -1,16 +1,16 @@
 // lib/getSpotPrice.ts
 
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/prisma";
 
 export async function getSpotPrice(metal: string): Promise<number> {
   const latest = await prisma.spotPriceCache.findFirst({
     where: { metal },
-    orderBy: { fetchedAt: "desc" },
-  })
+    orderBy: { createdAt: "desc" },
+  });
 
   if (!latest) {
-    throw new Error(`No price data for ${metal}`)
+    throw new Error(`No price data for ${metal}`);
   }
 
-  return latest.price
+  return Number(latest.price);
 }
