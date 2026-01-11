@@ -5,6 +5,14 @@ import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
+/**
+ * Dashboard data API
+ * FIX:
+ * - alertTrigger does NOT have `metal`
+ * - metal comes from related Alert → AlertTrigger.alertId
+ * - we must join Alert to get metal
+ */
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const range = searchParams.get("range") ?? "24h"
@@ -19,13 +27,20 @@ export async function GET(req: Request) {
 
   const since = new Date(now - rangeMs)
 
+  // prices
   const prices = await prisma.spotPriceCache.findMany({
     where: { createdAt: { gte: since } },
     orderBy: { createdAt: "asc" },
   })
 
+  // triggers WITH alert join
   const triggers = await prisma.alertTrigger.findMany({
     where: { triggeredAt: { gte: since } },
+    include: {
+      alert: {
+        select: { metal: true },
+      },
+    },
     orderBy: { triggeredAt: "asc" },
   })
 
@@ -42,7 +57,7 @@ export async function GET(req: Request) {
   const alertTriggers = triggers.map(t => ({
     t: t.triggeredAt.getTime(),
     price: Number(t.price),
-    metal: t.metal,
+    metal: t.alert.metal,
   }))
 
   return NextResponse.json({
