@@ -1,142 +1,82 @@
 // app/api/cron/backfill-prices/route.ts
-// FULL SHEET — COPY / PASTE ENTIRE FILE
-// GOLDAPI BACKFILL (VERCEL SAFE)
+// FULL SHEET — COPY / PASTE
+
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-export const runtime = "nodejs";
-
-const METALS = ["gold", "silver", "platinum", "palladium"] as const;
-const HOURS_BACK = 24;
-const BUCKET_MINUTES = 5;
-const MAX_INSERTS = 3000;
-
-type GoldApiResponse = {
-  price: number;
-};
+import prisma from "@/lib/prisma";
 
 /**
- * Fetch live spot price from GoldAPI
+ * Backfill prices to smooth hourly → 5-minute intervals.
+ * Intended to be called by a cron job.
  */
-async function fetchGoldApi(metal: string): Promise<number> {
-  const apiKey = process.env.GOLDAPI_KEY;
-  if (!apiKey) throw new Error("GOLDAPI_KEY is missing");
-
-  const symbolMap: Record<string, string> = {
-    gold: "XAU",
-    silver: "XAG",
-    platinum: "XPT",
-    palladium: "XPD",
-  };
-
-  const res = await fetch(
-    `https://www.goldapi.io/api/${symbolMap[metal]}/USD`,
-    {
-      headers: {
-        "x-access-token": apiKey,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    }
-  );
-
-  if (!res.ok) {
-    throw new Error(`GoldAPI error: ${res.status}`);
-  }
-
-  const json = (await res.json()) as GoldApiResponse;
-  if (!json.price) {
-    throw new Error("Invalid GoldAPI response");
-  }
-
-  return json.price;
-}
-
-/**
- * Generate smoothed historical buckets
- */
-function generateBuckets(
-  price: number,
-  start: Date,
-  count: number
-): { createdAt: Date; price: number }[] {
-  const rows = [];
-
-  for (let i = 0; i < count; i++) {
-    // gentle random walk ±0.2%
-    const noise = 1 + (Math.random() - 0.5) * 0.004;
-
-    rows.push({
-      createdAt: new Date(start.getTime() - i * BUCKET_MINUTES * 60_000),
-      price: price * noise,
-    });
-  }
-
-  return rows;
-}
-
 export async function GET(req: Request) {
   try {
-    /**
-     * 🔐 SECURITY
-     */
-    if (req.headers.get("x-cron-secret") !== process.env.CRON_SECRET) {
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    // Optional auth via header (kept dynamic-safe)
+    const auth = req.headers.get("authorization");
+    if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const bucketsPerMetal = Math.floor(
-      (HOURS_BACK * 60) / BUCKET_MINUTES
-    );
+    const metals = ["gold", "silver", "platinum", "palladium"] as const;
 
-    let inserted = 0;
-    const writes = [];
+    const inserted: Record<string, number> = {};
+    const skipped: string[] = [];
 
-    for (const metal of METALS) {
-      const price = await fetchGoldApi(metal);
+    for (const metal of metals) {
+      // Get last 24h of hourly-ish points
+      const rows = await prisma.spotPriceCache.findMany({
+        where: { metal },
+        orderBy: { createdAt: "asc" },
+        take: 300,
+      });
 
-      const rows = generateBuckets(
-        price,
-        new Date(),
-        bucketsPerMetal
-      );
+      if (rows.length < 2) {
+        skipped.push(metal);
+        continue;
+      }
 
-      for (const r of rows) {
-        if (inserted >= MAX_INSERTS) break;
+      let count = 0;
 
-        writes.push(
-          prisma.spotPriceCache.create({
+      for (let i = 0; i < rows.length - 1; i++) {
+        const a = rows[i];
+        const b = rows[i + 1];
+
+        const start = new Date(a.createdAt).getTime();
+        const end = new Date(b.createdAt).getTime();
+        const step = 5 * 60 * 1000; // 5 minutes
+
+        const steps = Math.floor((end - start) / step);
+        if (steps <= 1) continue;
+
+        for (let s = 1; s < steps; s++) {
+          const t = start + s * step;
+          const ratio = s / steps;
+          const price = a.price + (b.price - a.price) * ratio;
+
+          await prisma.spotPriceCache.create({
             data: {
               metal,
-              price: r.price,
-              createdAt: r.createdAt,
+              price,
+              createdAt: new Date(t),
             },
-          })
-        );
+          });
 
-        inserted++;
+          count++;
+        }
       }
-    }
 
-    if (writes.length) {
-      await prisma.$transaction(writes);
+      inserted[metal] = count;
     }
 
     return NextResponse.json({
       ok: true,
       inserted,
-      provider: "GoldAPI",
-      hoursBack: HOURS_BACK,
-      bucketMinutes: BUCKET_MINUTES,
+      skipped,
     });
   } catch (err: any) {
-    console.error("BACKFILL FAILED", err);
-
     return NextResponse.json(
-      { ok: false, error: err.message ?? "Unknown error" },
+      { ok: false, error: err?.message ?? "Backfill failed" },
       { status: 500 }
     );
   }
