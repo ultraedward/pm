@@ -1,7 +1,9 @@
 // app/dashboard/charts/chart-client.tsx
+// FULL SHEET — REPLACE COMPLETELY
 
 "use client";
 
+import { useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -25,6 +27,13 @@ type Alert = {
   target: number;
 };
 
+const COLORS: Record<string, string> = {
+  gold: "#d4af37",
+  silver: "#9ca3af",
+  platinum: "#60a5fa",
+  palladium: "#f472b6",
+};
+
 export default function ChartClient({
   prices,
   alerts,
@@ -36,6 +45,55 @@ export default function ChartClient({
 }) {
   const metals = Array.from(new Set(prices.map((p) => p.metal)));
 
+  const [activeMetals, setActiveMetals] = useState<string[]>(metals);
+  const [normalized, setNormalized] = useState(false);
+
+  const basePrices = useMemo(() => {
+    const bases: Record<string, number> = {};
+    metals.forEach((m) => {
+      const first = prices.find((p) => p.metal === m);
+      if (first) bases[m] = first.price;
+    });
+    return bases;
+  }, [prices, metals]);
+
+  const data = useMemo(() => {
+    const grouped: Record<number, any> = {};
+
+    prices.forEach((p) => {
+      const t = new Date(p.createdAt).getTime();
+      grouped[t] ??= { t };
+
+      grouped[t][p.metal] = normalized
+        ? ((p.price - basePrices[p.metal]) / basePrices[p.metal]) * 100
+        : p.price;
+    });
+
+    return Object.values(grouped).sort((a, b) => a.t - b.t);
+  }, [prices, normalized, basePrices]);
+
+  const latestStats = useMemo(() => {
+    const stats: Record<
+      string,
+      { last: number; pct: number }
+    > = {};
+
+    metals.forEach((m) => {
+      const metalPrices = prices.filter((p) => p.metal === m);
+      if (metalPrices.length < 2) return;
+
+      const first = metalPrices[0].price;
+      const last = metalPrices.at(-1)!.price;
+
+      stats[m] = {
+        last,
+        pct: ((last - first) / first) * 100,
+      };
+    });
+
+    return stats;
+  }, [prices, metals]);
+
   const tickFormatter = (ts: number) => {
     const d = new Date(ts);
     if (range === "24h")
@@ -44,57 +102,117 @@ export default function ChartClient({
   };
 
   return (
-    <div className="space-y-12">
-      {metals.map((metal) => {
-        const data = prices
-          .filter((p) => p.metal === metal)
-          .map((p) => ({
-            t: new Date(p.createdAt).getTime(),
-            price: p.price,
-          }));
+    <div className="space-y-6">
+      {/* CONTROLS */}
+      <div className="flex flex-wrap items-center gap-4">
+        {metals.map((m) => (
+          <label key={m} className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={activeMetals.includes(m)}
+              onChange={() =>
+                setActiveMetals((prev) =>
+                  prev.includes(m)
+                    ? prev.filter((x) => x !== m)
+                    : [...prev, m]
+                )
+              }
+            />
+            <span className="capitalize">{m}</span>
+          </label>
+        ))}
 
-        const metalAlerts = alerts.filter((a) => a.metal === metal);
+        <label className="flex items-center gap-2 text-sm ml-auto">
+          <input
+            type="checkbox"
+            checked={normalized}
+            onChange={() => setNormalized((v) => !v)}
+          />
+          Normalize (% change)
+        </label>
+      </div>
 
-        return (
-          <div key={metal} className="h-80">
-            <h2 className="mb-2 text-lg font-medium capitalize">{metal}</h2>
+      {/* LEGEND SUMMARY */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+        {activeMetals.map((m) => {
+          const stat = latestStats[m];
+          if (!stat) return null;
 
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <XAxis
-                  dataKey="t"
-                  type="number"
-                  domain={["dataMin", "dataMax"]}
-                  tickFormatter={tickFormatter}
-                  minTickGap={24}
-                />
-                <YAxis domain={["auto", "auto"]} />
-                <Tooltip
-                  labelFormatter={(value) =>
-                    new Date(Number(value)).toLocaleString()
-                  }
-                />
-                <Legend />
+          return (
+            <div
+              key={m}
+              className="rounded border p-3 flex flex-col gap-1"
+            >
+              <span className="capitalize font-medium">{m}</span>
+              <span>${stat.last.toFixed(2)}</span>
+              <span
+                className={
+                  stat.pct >= 0 ? "text-green-600" : "text-red-600"
+                }
+              >
+                {stat.pct >= 0 ? "+" : ""}
+                {stat.pct.toFixed(2)}%
+              </span>
+            </div>
+          );
+        })}
+      </div>
 
-                <Line type="monotone" dataKey="price" strokeWidth={2} dot={false} />
+      {/* CHART */}
+      <div className="h-[420px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data}>
+            <XAxis
+              dataKey="t"
+              type="number"
+              domain={["dataMin", "dataMax"]}
+              tickFormatter={tickFormatter}
+              minTickGap={24}
+            />
+            <YAxis
+              tickFormatter={(v) =>
+                normalized ? `${v.toFixed(1)}%` : `$${v}`
+              }
+            />
+            <Tooltip
+              labelFormatter={(v) =>
+                new Date(Number(v)).toLocaleString()
+              }
+              formatter={(v: number) =>
+                normalized ? `${v.toFixed(2)}%` : `$${v.toFixed(2)}`
+              }
+            />
+            <Legend />
 
-                {metalAlerts.map((a, i) => (
+            {activeMetals.map((m) => (
+              <Line
+                key={m}
+                type="monotone"
+                dataKey={m}
+                stroke={COLORS[m] || "#000"}
+                strokeWidth={2}
+                dot={false}
+              />
+            ))}
+
+            {!normalized &&
+              alerts
+                .filter((a) => activeMetals.includes(a.metal))
+                .map((a, i) => (
                   <ReferenceLine
                     key={i}
                     y={a.target}
                     strokeDasharray="4 4"
+                    stroke={COLORS[a.metal] || "#000"}
                     label={{
-                      value: `${a.direction} $${a.target}`,
-                      position: "right",
+                      value: `${a.metal} ${a.direction} $${a.target}`,
                       fontSize: 10,
                     }}
                   />
                 ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      })}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
