@@ -1,5 +1,6 @@
 // app/api/cron/backfill-prices/route.ts
-// FULL SHEET — COPY / PASTE (FIXED prisma import)
+// FULL SHEET — COPY / PASTE
+// Fixes Prisma Decimal math by converting to number explicitly
 
 export const dynamic = "force-dynamic";
 
@@ -8,11 +9,10 @@ import { prisma } from "@/lib/prisma";
 
 /**
  * Backfill prices to smooth hourly → 5-minute intervals.
- * Intended to be called by a cron job.
+ * Safe for Vercel cron.
  */
 export async function GET(req: Request) {
   try {
-    // Optional auth via header (kept dynamic-safe)
     const auth = req.headers.get("authorization");
     if (
       process.env.CRON_SECRET &&
@@ -30,7 +30,6 @@ export async function GET(req: Request) {
     const skipped: string[] = [];
 
     for (const metal of metals) {
-      // Get recent points (enough to interpolate)
       const rows = await prisma.spotPriceCache.findMany({
         where: { metal },
         orderBy: { createdAt: "asc" },
@@ -48,6 +47,11 @@ export async function GET(req: Request) {
         const a = rows[i];
         const b = rows[i + 1];
 
+        const aPrice = Number(a.price);
+        const bPrice = Number(b.price);
+
+        if (!Number.isFinite(aPrice) || !Number.isFinite(bPrice)) continue;
+
         const start = new Date(a.createdAt).getTime();
         const end = new Date(b.createdAt).getTime();
         const step = 5 * 60 * 1000; // 5 minutes
@@ -58,7 +62,8 @@ export async function GET(req: Request) {
         for (let s = 1; s < steps; s++) {
           const t = start + s * step;
           const ratio = s / steps;
-          const price = a.price + (b.price - a.price) * ratio;
+
+          const price = aPrice + (bPrice - aPrice) * ratio;
 
           await prisma.spotPriceCache.create({
             data: {
