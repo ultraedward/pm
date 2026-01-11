@@ -9,6 +9,7 @@ type Price = {
   metal: string;
   price: number;
   createdAt: string;
+  changePct: number | null;
 };
 
 export default function CurrentPrices() {
@@ -34,22 +35,41 @@ export default function CurrentPrices() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {prices.map((p) => (
-        <div
-          key={p.metal}
-          className="rounded-xl border p-4 bg-white shadow-sm"
-        >
-          <div className="text-xs uppercase text-gray-500">
-            {p.metal}
+      {prices.map((p) => {
+        const up = p.changePct !== null && p.changePct >= 0;
+
+        return (
+          <div
+            key={p.metal}
+            className="rounded-xl border p-4 bg-white shadow-sm"
+          >
+            <div className="text-xs uppercase text-gray-500">
+              {p.metal}
+            </div>
+
+            <div className="text-2xl font-semibold">
+              ${p.price.toFixed(2)}
+            </div>
+
+            {p.changePct !== null && (
+              <div
+                className={`text-sm mt-1 font-medium ${
+                  up ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {up ? "▲" : "▼"} {Math.abs(p.changePct).toFixed(2)}%
+                <span className="text-xs text-gray-400 ml-1">
+                  (24h)
+                </span>
+              </div>
+            )}
+
+            <div className="text-xs text-gray-400 mt-1">
+              Updated {new Date(p.createdAt).toLocaleTimeString()}
+            </div>
           </div>
-          <div className="text-2xl font-semibold">
-            ${p.price.toFixed(2)}
-          </div>
-          <div className="text-xs text-gray-400 mt-1">
-            Updated {new Date(p.createdAt).toLocaleTimeString()}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
