@@ -1,94 +1,71 @@
 // app/api/cron/backfill-prices/route.ts
-// FULL SHEET — COPY / PASTE
-// Fixes Prisma Decimal math by converting to number explicitly
 
-export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic"
 
 /**
  * Backfill prices to smooth hourly → 5-minute intervals.
- * Safe for Vercel cron.
+ * Safely converts Prisma Decimal → number before math.
  */
-export async function GET(req: Request) {
+export async function POST() {
   try {
-    const auth = req.headers.get("authorization");
-    if (
-      process.env.CRON_SECRET &&
-      auth !== `Bearer ${process.env.CRON_SECRET}`
-    ) {
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    const metals = ["gold", "silver", "platinum", "palladium"] as const
+    const STEP_MS = 5 * 60 * 1000 // 5 minutes
 
-    const metals = ["gold", "silver", "platinum", "palladium"] as const;
-
-    const inserted: Record<string, number> = {};
-    const skipped: string[] = [];
+    let inserted = 0
 
     for (const metal of metals) {
       const rows = await prisma.spotPriceCache.findMany({
         where: { metal },
-        orderBy: { createdAt: "asc" },
-        take: 300,
-      });
+        orderBy: { timestamp: "asc" },
+      })
 
-      if (rows.length < 2) {
-        skipped.push(metal);
-        continue;
-      }
-
-      let count = 0;
+      if (rows.length < 2) continue
 
       for (let i = 0; i < rows.length - 1; i++) {
-        const a = rows[i];
-        const b = rows[i + 1];
+        const a = rows[i]
+        const b = rows[i + 1]
 
-        const aPrice = Number(a.price);
-        const bPrice = Number(b.price);
+        const start = a.timestamp.getTime()
+        const end = b.timestamp.getTime()
+        const gap = end - start
 
-        if (!Number.isFinite(aPrice) || !Number.isFinite(bPrice)) continue;
+        if (gap <= STEP_MS) continue
 
-        const start = new Date(a.createdAt).getTime();
-        const end = new Date(b.createdAt).getTime();
-        const step = 5 * 60 * 1000; // 5 minutes
-
-        const steps = Math.floor((end - start) / step);
-        if (steps <= 1) continue;
+        const steps = Math.floor(gap / STEP_MS)
+        const priceA = Number(a.price)
+        const priceB = Number(b.price)
 
         for (let s = 1; s < steps; s++) {
-          const t = start + s * step;
-          const ratio = s / steps;
-
-          const price = aPrice + (bPrice - aPrice) * ratio;
+          const t = start + s * STEP_MS
+          const ratio = s / steps
+          const price = priceA + (priceB - priceA) * ratio
 
           await prisma.spotPriceCache.create({
             data: {
               metal,
               price,
-              createdAt: new Date(t),
+              timestamp: new Date(t),
+              source: "backfill",
             },
-          });
+          })
 
-          count++;
+          inserted++
         }
       }
-
-      inserted[metal] = count;
     }
 
     return NextResponse.json({
       ok: true,
       inserted,
-      skipped,
-    });
+    })
   } catch (err: any) {
+    console.error("BACKFILL FAILED", err)
     return NextResponse.json(
-      { ok: false, error: err?.message ?? "Backfill failed" },
+      { ok: false, error: err.message },
       { status: 500 }
-    );
+    )
   }
 }
