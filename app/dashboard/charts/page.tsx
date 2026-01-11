@@ -1,12 +1,70 @@
-import { Suspense } from "react"
-import ChartsClient from "./ChartsClient"
+"use client"
 
-export const dynamic = "force-dynamic"
+import { useEffect, useState } from "react"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts"
+
+type Point = { t: number; price: number }
+type PricesResponse = {
+  prices: Record<string, Point[]>
+}
 
 export default function ChartsPage() {
+  const [data, setData] = useState<Record<string, Point[]>>({})
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch("/api/prices")
+      .then((r) => {
+        if (!r.ok) throw new Error("API failed")
+        return r.json()
+      })
+      .then((json: PricesResponse) => {
+        setData(json.prices || {})
+      })
+      .catch((e) => {
+        console.error("CHART FETCH ERROR", e)
+        setError("Failed to load prices")
+      })
+  }, [])
+
+  if (error) return <div className="p-4 text-red-500">{error}</div>
+
   return (
-    <Suspense fallback={<div className="p-6">Loading charts…</div>}>
-      <ChartsClient />
-    </Suspense>
+    <div className="p-6 space-y-8">
+      {Object.entries(data).map(([metal, points]) => (
+        <div key={metal} className="h-72">
+          <h2 className="mb-2 font-semibold capitalize">{metal}</h2>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={points}>
+              <XAxis
+                dataKey="t"
+                tickFormatter={(t) =>
+                  new Date(t).toLocaleTimeString()
+                }
+              />
+              <YAxis />
+              <Tooltip
+                labelFormatter={(t) =>
+                  new Date(Number(t)).toLocaleString()
+                }
+              />
+              <Line
+                type="monotone"
+                dataKey="price"
+                stroke="#2563eb"
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      ))}
+    </div>
   )
 }
