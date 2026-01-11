@@ -1,43 +1,51 @@
+// app/api/alerts/history/route.ts
+// FULL SHEET — COPY / PASTE ENTIRE FILE
+// FIX: requirePro no longer returns NextResponse or userId
+
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { requirePro } from "@/lib/requirePro";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const gate = await requirePro();
-  if (gate instanceof NextResponse) return gate;
-  const userId = gate.userId;
+  try {
+    // Auth check (pro gating disabled)
+    await requirePro();
 
-  const history = await prisma.alertTrigger.findMany({
-    where: {
-      alert: { userId },
-    },
-    orderBy: {
-      triggeredAt: "desc",
-    },
-    take: 100,
-    include: {
-      alert: {
-        select: {
-          metal: true,
-          direction: true,
-          target: true,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const history = await prisma.alertTrigger.findMany({
+      where: { alert: { userId: session.user.id } },
+      orderBy: { triggeredAt: "desc" },
+      take: 50,
+      select: {
+        id: true,
+        price: true,
+        triggeredAt: true,
+        alert: {
+          select: {
+            metal: true,
+            direction: true,
+            target: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return NextResponse.json({
-    ok: true,
-    count: history.length,
-    history: history.map((t) => ({
-      id: t.id,
-      metal: t.alert.metal,
-      direction: t.alert.direction,
-      target: t.alert.target,
-      triggeredPrice: t.price,
-      triggeredAt: t.triggeredAt,
-    })),
-  });
+    return NextResponse.json({ ok: true, history });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err.message ?? "Unable to load alert history" },
+      { status: 500 }
+    );
+  }
 }
