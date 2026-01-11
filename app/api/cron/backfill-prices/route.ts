@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic"
 
 /**
  * Backfill prices to smooth hourly → 5-minute intervals.
- * Safely converts Prisma Decimal → number before math.
+ * Uses `createdAt` (NOT timestamp) to match SpotPriceCache schema.
+ * Decimal-safe math throughout.
  */
 export async function POST() {
   try {
@@ -19,7 +20,7 @@ export async function POST() {
     for (const metal of metals) {
       const rows = await prisma.spotPriceCache.findMany({
         where: { metal },
-        orderBy: { timestamp: "asc" },
+        orderBy: { createdAt: "asc" },
       })
 
       if (rows.length < 2) continue
@@ -28,8 +29,8 @@ export async function POST() {
         const a = rows[i]
         const b = rows[i + 1]
 
-        const start = a.timestamp.getTime()
-        const end = b.timestamp.getTime()
+        const start = a.createdAt.getTime()
+        const end = b.createdAt.getTime()
         const gap = end - start
 
         if (gap <= STEP_MS) continue
@@ -47,7 +48,7 @@ export async function POST() {
             data: {
               metal,
               price,
-              timestamp: new Date(t),
+              createdAt: new Date(t),
               source: "backfill",
             },
           })
