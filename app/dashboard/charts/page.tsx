@@ -1,14 +1,14 @@
 // app/dashboard/charts/page.tsx
-// FULL SHEET
-// Suspense wrapper required for useSearchParams()
 
-import { Suspense } from "react";
-import MetalChartClient from "./view";
+import { Suspense } from "react"
+import ChartsClient from "./ChartsClient"
 
-export default function Page() {
+export const dynamic = "force-dynamic"
+
+export default function ChartsPage() {
   return (
-    <Suspense fallback={<div className="p-6">Loading chart…</div>}>
-      <MetalChartClient />
+    <Suspense fallback={<div className="p-6 text-sm text-gray-500">Loading charts…</div>}>
+      <ChartsClient />
     </Suspense>
-  );
+  )
 }
