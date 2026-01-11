@@ -7,7 +7,6 @@ export async function GET() {
   try {
     const rows = await prisma.spotPriceCache.findMany({
       orderBy: { createdAt: "asc" },
-      take: 500,
     })
 
     const prices: Record<string, { t: number; price: number }[]> = {}
@@ -32,11 +31,16 @@ export async function GET() {
         },
       }
     )
-  } catch (err) {
-    console.error("PRICES CURRENT ERROR", err)
+  } catch (e) {
+    console.error(e)
     return new NextResponse(
-      JSON.stringify({ ok: false }),
-      { status: 500 }
+      JSON.stringify({ error: "Failed to load prices" }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     )
   }
 }
