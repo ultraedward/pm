@@ -2,21 +2,23 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
-export const runtime = "nodejs"
 
 export async function GET() {
   try {
     const rows = await prisma.spotPriceCache.findMany({
       orderBy: { createdAt: "asc" },
-      take: 5000,
+      take: 500,
     })
 
-    const prices: Record<string, { t: number; price: number }[]> = {}
+    const prices: Record<string, { t: number; price: number }[]> = {
+      gold: [],
+      silver: [],
+      platinum: [],
+      palladium: [],
+    }
 
-    for (const r of rows ?? []) {
-      if (!r?.metal || !r?.createdAt || r?.price == null) continue
-
-      if (!prices[r.metal]) prices[r.metal] = []
+    for (const r of rows) {
+      if (!prices[r.metal]) continue
 
       prices[r.metal].push({
         t: r.createdAt.getTime(),
@@ -25,13 +27,11 @@ export async function GET() {
     }
 
     return NextResponse.json({ prices })
-  } catch (err) {
-    console.error("PRICES API FAILED", err)
-
-    // 🔑 ABSOLUTELY NEVER 500
+  } catch (e) {
+    console.error("PRICES API ERROR", e)
     return NextResponse.json(
-      { prices: {} },
-      { status: 200 }
+      { error: "prices api failed" },
+      { status: 500 }
     )
   }
 }
