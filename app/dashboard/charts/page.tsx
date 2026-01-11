@@ -9,52 +9,65 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
 } from "recharts"
 
+type Point = { t: number; price: number }
+
 export default function ChartsPage() {
-  const [data, setData] = useState<any>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [prices, setPrices] = useState<Record<string, Point[]>>({})
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     console.log("Charts page mounted")
 
     fetch("/api/prices/current")
-      .then((r) => {
-        if (!r.ok) throw new Error("fetch failed")
-        return r.json()
-      })
-      .then((d) => {
-        console.log("Prices loaded", d)
-        setData(d.prices)
-      })
-      .catch((e) => {
-        console.error(e)
-        setError("FETCH FAILED")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Prices loaded", data)
+        setPrices(data.prices || {})
+        setLoading(false)
       })
   }, [])
 
-  if (error) return <div className="p-6 text-red-500">{error}</div>
-  if (!data) return <div className="p-6">Loading…</div>
+  if (loading) {
+    return <div className="p-6">Loading charts…</div>
+  }
 
   return (
-    <div className="p-6 space-y-10">
-      {Object.entries(data).map(([metal, points]: any) => (
-        <div key={metal} className="h-72">
-          <h2 className="mb-2 font-semibold capitalize">{metal}</h2>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={points}>
-              <XAxis dataKey="t" />
+    <div className="p-6 space-y-12">
+      {Object.entries(prices).map(([metal, points]) => (
+        <div key={metal}>
+          <h2 className="mb-2 font-bold capitalize">{metal}</h2>
+
+          {/* DEBUG BORDER */}
+          <div style={{ border: "2px solid red", display: "inline-block" }}>
+            <LineChart
+              width={800}
+              height={300}
+              data={points}
+            >
+              <XAxis
+                dataKey="t"
+                tickFormatter={(t) =>
+                  new Date(t).toLocaleTimeString()
+                }
+              />
               <YAxis />
-              <Tooltip />
+              <Tooltip
+                labelFormatter={(t) =>
+                  new Date(Number(t)).toLocaleString()
+                }
+              />
               <Line
                 type="monotone"
                 dataKey="price"
                 stroke="#2563eb"
-                dot={false}
+                strokeWidth={2}
+                dot
+                isAnimationActive={false}
               />
             </LineChart>
-          </ResponsiveContainer>
+          </div>
         </div>
       ))}
     </div>
