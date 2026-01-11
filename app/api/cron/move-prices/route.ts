@@ -1,26 +1,21 @@
 // app/api/cron/move-prices/route.ts
 // FULL SHEET — COPY / PASTE ENTIRE FILE
-// LIVE PRICE CRON (METALS-API) — SECURED
+// LIVE PRICE CRON (METALS-API) — SECURED + SANITY GUARDED
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-/**
- * Metals we track
- */
 const METALS = ["gold", "silver", "platinum", "palladium"] as const;
-
-/**
- * Minimum % change required to store a new row
- * Prevents noisy duplicates
- */
 const MIN_CHANGE_PCT = 0.02; // 0.02%
+const MAX_ABSOLUTE_CHANGE_PCT = 20; // hard guard against bad provider data
 
 type MetalsApiLatestResponse = {
   success: boolean;
+  base?: string;
   rates?: {
+    USD?: number;
     XAU?: number;
     XAG?: number;
     XPT?: number;
@@ -29,7 +24,7 @@ type MetalsApiLatestResponse = {
 };
 
 /**
- * Fetch live prices from Metals-API
+ * Fetch live prices and normalize to USD/oz
  */
 async function fetchLatestPrices(): Promise<Record<string, number>> {
   const apiKey = process.env.METALS_API_KEY;
@@ -38,7 +33,7 @@ async function fetchLatestPrices(): Promise<Record<string, number>> {
   const url =
     "https://metals-api.com/api/latest" +
     `?access_key=${apiKey}` +
-    "&base=USD&symbols=XAU,XAG,XPT,XPD";
+    "&symbols=USD,XAU,XAG,XPT,XPD";
 
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
@@ -47,23 +42,27 @@ async function fetchLatestPrices(): Promise<Record<string, number>> {
 
   const json = (await res.json()) as MetalsApiLatestResponse;
 
-  if (!json.success || !json.rates) {
+  if (!json.success || !json.rates || !json.rates.USD) {
     throw new Error("Invalid Metals API response");
   }
 
+  /**
+   * Normalize:
+   * Metals-API often returns base=EUR even when USD is requested.
+   * USD rate tells us how to convert.
+   */
+  const usd = json.rates.USD;
+
   return {
-    gold: json.rates.XAU ? 1 / json.rates.XAU : NaN,
-    silver: json.rates.XAG ? 1 / json.rates.XAG : NaN,
-    platinum: json.rates.XPT ? 1 / json.rates.XPT : NaN,
-    palladium: json.rates.XPD ? 1 / json.rates.XPD : NaN,
+    gold: json.rates.XAU ? usd / json.rates.XAU : NaN,
+    silver: json.rates.XAG ? usd / json.rates.XAG : NaN,
+    platinum: json.rates.XPT ? usd / json.rates.XPT : NaN,
+    palladium: json.rates.XPD ? usd / json.rates.XPD : NaN,
   };
 }
 
 export async function GET(req: Request) {
   try {
-    /**
-     * 🔐 SECURITY CHECK
-     */
     if (req.headers.get("x-cron-secret") !== process.env.CRON_SECRET) {
       return NextResponse.json(
         { ok: false, error: "Unauthorized" },
@@ -96,6 +95,11 @@ export async function GET(req: Request) {
         const pctChange =
           Math.abs((newPrice - lastPrice) / lastPrice) * 100;
 
+        if (pctChange > MAX_ABSOLUTE_CHANGE_PCT) {
+          skipped.push(`${metal} (spike)`);
+          continue;
+        }
+
         if (pctChange < MIN_CHANGE_PCT) {
           skipped.push(metal);
           continue;
@@ -104,10 +108,7 @@ export async function GET(req: Request) {
 
       writes.push(
         prisma.spotPriceCache.create({
-          data: {
-            metal,
-            price: newPrice,
-          },
+          data: { metal, price: newPrice },
         })
       );
     }
@@ -120,6 +121,7 @@ export async function GET(req: Request) {
       ok: true,
       inserted: writes.length,
       skipped,
+      prices,
       minChangePct: MIN_CHANGE_PCT,
       provider: "Metals-API",
     });
