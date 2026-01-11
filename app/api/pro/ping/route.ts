@@ -1,14 +1,25 @@
 // app/api/pro/ping/route.ts
-import { NextResponse } from "next/server"
-import { requirePro } from "@/lib/requirePro"
+// FULL SHEET — COPY / PASTE ENTIRE FILE
+// FIX: requirePro no longer returns NextResponse
+
+import { NextResponse } from "next/server";
+import { requirePro } from "@/lib/requirePro";
+
+export const runtime = "nodejs";
 
 export async function GET() {
-  const result = await requirePro()
-  if (result instanceof NextResponse) return result
+  try {
+    // Auth check only (pro gating disabled)
+    await requirePro();
 
-  return NextResponse.json({
-    ok: true,
-    plan: "PRO",
-    time: new Date().toISOString(),
-  })
+    return NextResponse.json({
+      ok: true,
+      proEnabled: false,
+    });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err.message ?? "Unauthorized" },
+      { status: 401 }
+    );
+  }
 }
