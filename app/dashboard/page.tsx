@@ -1,41 +1,30 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import ManageSubscriptionButton from "./ManageSubscriptionButton"
+// app/dashboard/page.tsx
+// FULL SHEET — COPY / PASTE ENTIRE FILE
 
-export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
+import CurrentPrices from "./components/CurrentPrices";
 
-  if (!session?.user) {
-    return (
-      <div className="p-6">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p>Please sign in to continue.</p>
-      </div>
-    )
-  }
+export const metadata = {
+  title: "Dashboard | Precious Metals Tracker",
+};
 
+export default function DashboardPage() {
   return (
-    <div className="p-6 space-y-4">
-      <h1 className="text-xl font-semibold">Dashboard</h1>
-
-      <div className="rounded border p-4">
-        <p className="font-medium">
-          Signed in as {session.user.email}
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <p className="text-sm text-gray-500">
+          Live precious metal prices and alerts
         </p>
-
-        <p className="mt-1">
-          Plan:{" "}
-          <span className="font-semibold">
-            {session.user.isPro ? "PRO" : "FREE"}
-          </span>
-        </p>
-
-        {session.user.isPro && (
-          <div className="mt-4">
-            <ManageSubscriptionButton />
-          </div>
-        )}
       </div>
+
+      {/* Current Prices */}
+      <section>
+        <h2 className="text-lg font-medium mb-3">
+          Current Metal Prices
+        </h2>
+        <CurrentPrices />
+      </section>
     </div>
-  )
+  );
 }
