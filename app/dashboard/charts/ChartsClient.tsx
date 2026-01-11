@@ -1,4 +1,3 @@
-// app/dashboard/charts/ChartsClient.tsx
 "use client"
 
 import { useSearchParams } from "next/navigation"
@@ -56,7 +55,16 @@ export default function ChartsClient() {
   }
 
   const metal = "gold"
-  const prices = data.prices[metal] ?? []
+  let prices = data.prices[metal] ?? []
+
+  // 🔑 FIX: duplicate single point so Recharts can draw
+  if (prices.length === 1) {
+    const p = prices[0]
+    prices = [
+      { t: p.t - 60_000, price: p.price },
+      { t: p.t, price: p.price },
+    ]
+  }
 
   const triggerDots = data.alertTriggers
     .filter(t => t.metal === metal)
@@ -64,6 +72,9 @@ export default function ChartsClient() {
       t: t.t,
       price: t.price,
     }))
+
+  const minPrice = Math.min(...prices.map(p => p.price))
+  const maxPrice = Math.max(...prices.map(p => p.price))
 
   return (
     <div className="p-6 h-[420px]">
@@ -74,7 +85,12 @@ export default function ChartsClient() {
             dataKey="t"
             tickFormatter={v => new Date(v).toLocaleTimeString()}
           />
-          <YAxis domain={["auto", "auto"]} />
+          <YAxis
+            domain={[
+              minPrice * 0.995,
+              maxPrice * 1.005,
+            ]}
+          />
           <Tooltip
             labelFormatter={v => new Date(Number(v)).toLocaleString()}
           />
@@ -82,12 +98,11 @@ export default function ChartsClient() {
             type="monotone"
             dataKey="price"
             strokeWidth={2}
-            dot={false}
+            dot={{ r: 3 }}
           />
           <Scatter
             data={triggerDots}
             dataKey="price"
-            shape="circle"
           />
         </LineChart>
       </ResponsiveContainer>
