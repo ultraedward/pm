@@ -3,17 +3,21 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export const dynamic = "force-dynamic"
-
 /**
  * Backfill prices to smooth hourly → 5-minute intervals.
- * Matches SpotPriceCache schema exactly (NO extra fields).
- * Decimal-safe math.
+ * IMPORTANT:
+ * - Uses createdAt (NOT timestamp)
+ * - Decimal-safe math
+ * - NO fields that don't exist in Prisma schema
  */
-export async function POST() {
+
+export const dynamic = "force-dynamic"
+
+const STEP_MS = 5 * 60 * 1000 // 5 minutes
+
+export async function GET() {
   try {
     const metals = ["gold", "silver", "platinum", "palladium"] as const
-    const STEP_MS = 5 * 60 * 1000 // 5 minutes
 
     let inserted = 0
 
@@ -31,11 +35,12 @@ export async function POST() {
 
         const start = a.createdAt.getTime()
         const end = b.createdAt.getTime()
-        const gap = end - start
 
+        const gap = end - start
         if (gap <= STEP_MS) continue
 
         const steps = Math.floor(gap / STEP_MS)
+
         const priceA = Number(a.price)
         const priceB = Number(b.price)
 
@@ -57,11 +62,14 @@ export async function POST() {
       }
     }
 
-    return NextResponse.json({ ok: true, inserted })
+    return NextResponse.json({
+      ok: true,
+      inserted,
+    })
   } catch (err: any) {
     console.error("BACKFILL FAILED", err)
     return NextResponse.json(
-      { ok: false, error: err.message },
+      { ok: false, error: err?.message ?? "unknown error" },
       { status: 500 }
     )
   }
