@@ -24,7 +24,7 @@ export async function GET() {
   } catch (e) {
     console.error("PRICES API ERROR", e)
     return NextResponse.json(
-      { ok: false, error: "prices failed" },
+      { ok: false },
       { status: 500 }
     )
   }
