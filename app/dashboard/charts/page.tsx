@@ -11,34 +11,36 @@ import {
 } from "recharts"
 
 type Point = { t: number; price: number }
-type PricesResponse = {
+type ApiResponse = {
   prices: Record<string, Point[]>
 }
 
 export default function ChartsPage() {
-  const [data, setData] = useState<Record<string, Point[]>>({})
+  const [prices, setPrices] = useState<Record<string, Point[]>>({})
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch("/api/prices")
+    fetch("/api/prices/current")
       .then((r) => {
-        if (!r.ok) throw new Error("API failed")
+        if (!r.ok) throw new Error("Fetch failed")
         return r.json()
       })
-      .then((json: PricesResponse) => {
-        setData(json.prices || {})
+      .then((data: ApiResponse) => {
+        setPrices(data.prices || {})
       })
       .catch((e) => {
-        console.error("CHART FETCH ERROR", e)
+        console.error("DASHBOARD FETCH ERROR", e)
         setError("Failed to load prices")
       })
   }, [])
 
-  if (error) return <div className="p-4 text-red-500">{error}</div>
+  if (error) {
+    return <div className="p-6 text-red-500">{error}</div>
+  }
 
   return (
-    <div className="p-6 space-y-8">
-      {Object.entries(data).map(([metal, points]) => (
+    <div className="p-6 space-y-10">
+      {Object.entries(prices).map(([metal, points]) => (
         <div key={metal} className="h-72">
           <h2 className="mb-2 font-semibold capitalize">{metal}</h2>
           <ResponsiveContainer width="100%" height="100%">
