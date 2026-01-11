@@ -1,6 +1,6 @@
 // app/api/dashboard/route.ts
 // FULL SHEET — COPY / PASTE ENTIRE FILE
-// FIX: remove non-existent `isPro` field
+// FIX: remove non-existent stripeCustomerId field
 
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -21,7 +21,6 @@ export async function GET() {
     select: {
       id: true,
       email: true,
-      stripeCustomerId: true,
       createdAt: true,
     },
   });
