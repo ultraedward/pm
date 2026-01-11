@@ -18,15 +18,22 @@ export async function GET(req: Request) {
 
     const since = new Date(now - rangeMs)
 
-    // ---- prices ----
-    const prices = await prisma.spotPriceCache.findMany({
-      where: { createdAt: { gte: since } },
-      orderBy: { createdAt: "asc" },
-    })
+    /* ---------------- PRICES ---------------- */
+    let prices: any[] = []
+    try {
+      prices = await prisma.spotPriceCache.findMany({
+        where: { createdAt: { gte: since } },
+        orderBy: { createdAt: "asc" },
+      })
+    } catch (e) {
+      console.error("PRICE QUERY FAILED", e)
+    }
 
     const groupedPrices: Record<string, { t: number; price: number }[]> = {}
 
-    for (const p of prices) {
+    for (const p of prices ?? []) {
+      if (!p?.metal || !p?.createdAt || p?.price == null) continue
+
       if (!groupedPrices[p.metal]) groupedPrices[p.metal] = []
       groupedPrices[p.metal].push({
         t: p.createdAt.getTime(),
@@ -34,34 +41,40 @@ export async function GET(req: Request) {
       })
     }
 
-    // ---- triggers (SAFE) ----
-    const triggers = await prisma.alertTrigger.findMany({
-      where: { triggeredAt: { gte: since } },
-      include: {
-        alert: {
-          select: { metal: true },
+    /* ---------------- ALERT TRIGGERS ---------------- */
+    let triggers: any[] = []
+    try {
+      triggers = await prisma.alertTrigger.findMany({
+        where: { triggeredAt: { gte: since } },
+        include: {
+          alert: { select: { metal: true } },
         },
-      },
-      orderBy: { triggeredAt: "asc" },
-    })
+        orderBy: { triggeredAt: "asc" },
+      })
+    } catch (e) {
+      console.error("TRIGGER QUERY FAILED", e)
+    }
 
-    const alertTriggers = triggers
-      .filter(t => t.alert !== null) // 🔑 CRITICAL FIX
+    const alertTriggers = (triggers ?? [])
+      .filter(t => t?.alert?.metal && t?.triggeredAt && t?.price != null)
       .map(t => ({
         t: t.triggeredAt.getTime(),
         price: Number(t.price),
-        metal: t.alert!.metal,
+        metal: t.alert.metal,
       }))
 
+    /* ---------------- ALWAYS RETURN 200 ---------------- */
     return NextResponse.json({
       prices: groupedPrices,
       alertTriggers,
     })
   } catch (err) {
-    console.error("DASHBOARD API ERROR", err)
-    return NextResponse.json(
-      { error: "Dashboard API failed" },
-      { status: 500 }
-    )
+    console.error("DASHBOARD HARD FAIL", err)
+
+    // 🔑 NEVER 500
+    return NextResponse.json({
+      prices: {},
+      alertTriggers: [],
+    })
   }
 }
