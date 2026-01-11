@@ -5,22 +5,26 @@ export const dynamic = "force-dynamic"
 
 export async function GET() {
   try {
-    const latest = await prisma.spotPriceCache.findMany({
-      distinct: ["metal"],
-      orderBy: { createdAt: "desc" },
+    const rows = await prisma.spotPriceCache.findMany({
+      orderBy: { createdAt: "asc" },
+      take: 500,
     })
 
-    const prices: Record<string, number> = {}
+    const prices: Record<string, { t: number; price: number }[]> = {}
 
-    for (const r of latest) {
-      prices[r.metal] = Number(r.price)
+    for (const r of rows) {
+      if (!prices[r.metal]) prices[r.metal] = []
+      prices[r.metal].push({
+        t: r.createdAt.getTime(),
+        price: Number(r.price),
+      })
     }
 
     return NextResponse.json({ prices })
-  } catch (e) {
-    console.error("CURRENT PRICES ERROR", e)
+  } catch (err) {
+    console.error("PRICES CURRENT ERROR", err)
     return NextResponse.json(
-      { error: "current prices failed" },
+      { ok: false },
       { status: 500 }
     )
   }
