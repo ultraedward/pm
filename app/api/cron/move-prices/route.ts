@@ -1,6 +1,6 @@
 // app/api/cron/move-prices/route.ts
 // FULL SHEET — COPY / PASTE ENTIRE FILE
-// LIVE PRICE CRON (METALS-API) — SECURED + SANITY GUARDED
+// LIVE PRICE CRON + HEALTH LOGGING
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -8,12 +8,11 @@ import { prisma } from "@/lib/prisma";
 export const runtime = "nodejs";
 
 const METALS = ["gold", "silver", "platinum", "palladium"] as const;
-const MIN_CHANGE_PCT = 0.02; // 0.02%
-const MAX_ABSOLUTE_CHANGE_PCT = 20; // hard guard against bad provider data
+const MIN_CHANGE_PCT = 0.02;
+const MAX_ABSOLUTE_CHANGE_PCT = 20;
 
 type MetalsApiLatestResponse = {
   success: boolean;
-  base?: string;
   rates?: {
     USD?: number;
     XAU?: number;
@@ -23,51 +22,38 @@ type MetalsApiLatestResponse = {
   };
 };
 
-/**
- * Fetch live prices and normalize to USD/oz
- */
 async function fetchLatestPrices(): Promise<Record<string, number>> {
   const apiKey = process.env.METALS_API_KEY;
-  if (!apiKey) throw new Error("METALS_API_KEY is missing");
+  if (!apiKey) throw new Error("METALS_API_KEY missing");
 
-  const url =
-    "https://metals-api.com/api/latest" +
-    `?access_key=${apiKey}` +
-    "&symbols=USD,XAU,XAG,XPT,XPD";
+  const res = await fetch(
+    `https://metals-api.com/api/latest?access_key=${apiKey}&symbols=USD,XAU,XAG,XPT,XPD`,
+    { cache: "no-store" }
+  );
 
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`Metals API error: ${res.status}`);
-  }
+  if (!res.ok) throw new Error(`Metals API ${res.status}`);
 
   const json = (await res.json()) as MetalsApiLatestResponse;
-
-  if (!json.success || !json.rates || !json.rates.USD) {
+  if (!json.success || !json.rates?.USD) {
     throw new Error("Invalid Metals API response");
   }
 
-  /**
-   * Normalize:
-   * Metals-API often returns base=EUR even when USD is requested.
-   * USD rate tells us how to convert.
-   */
   const usd = json.rates.USD;
 
   return {
-    gold: json.rates.XAU ? usd / json.rates.XAU : NaN,
-    silver: json.rates.XAG ? usd / json.rates.XAG : NaN,
-    platinum: json.rates.XPT ? usd / json.rates.XPT : NaN,
-    palladium: json.rates.XPD ? usd / json.rates.XPD : NaN,
+    gold: usd / json.rates.XAU!,
+    silver: usd / json.rates.XAG!,
+    platinum: usd / json.rates.XPT!,
+    palladium: usd / json.rates.XPD!,
   };
 }
 
 export async function GET(req: Request) {
+  const name = "move-prices";
+
   try {
     if (req.headers.get("x-cron-secret") !== process.env.CRON_SECRET) {
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ ok: false }, { status: 401 });
     }
 
     const prices = await fetchLatestPrices();
@@ -82,54 +68,44 @@ export async function GET(req: Request) {
       latest.map((p) => [p.metal, Number(p.price)])
     );
 
-    const writes = [];
-    const skipped: string[] = [];
+    let inserted = 0;
 
     for (const metal of METALS) {
       const newPrice = prices[metal];
-      if (!newPrice || Number.isNaN(newPrice)) continue;
+      const last = latestMap[metal];
 
-      const lastPrice = latestMap[metal];
-
-      if (lastPrice) {
-        const pctChange =
-          Math.abs((newPrice - lastPrice) / lastPrice) * 100;
-
-        if (pctChange > MAX_ABSOLUTE_CHANGE_PCT) {
-          skipped.push(`${metal} (spike)`);
-          continue;
-        }
-
-        if (pctChange < MIN_CHANGE_PCT) {
-          skipped.push(metal);
-          continue;
-        }
+      if (last) {
+        const pct = Math.abs((newPrice - last) / last) * 100;
+        if (pct < MIN_CHANGE_PCT || pct > MAX_ABSOLUTE_CHANGE_PCT) continue;
       }
 
-      writes.push(
-        prisma.spotPriceCache.create({
-          data: { metal, price: newPrice },
-        })
-      );
+      await prisma.spotPriceCache.create({
+        data: { metal, price: newPrice },
+      });
+
+      inserted++;
     }
 
-    if (writes.length) {
-      await prisma.$transaction(writes);
-    }
-
-    return NextResponse.json({
-      ok: true,
-      inserted: writes.length,
-      skipped,
-      prices,
-      minChangePct: MIN_CHANGE_PCT,
-      provider: "Metals-API",
+    await prisma.cronRun.create({
+      data: {
+        name,
+        status: "success",
+        message: `Inserted ${inserted} rows`,
+      },
     });
+
+    return NextResponse.json({ ok: true, inserted });
   } catch (err: any) {
-    console.error("MOVE PRICES CRON FAILED", err);
+    await prisma.cronRun.create({
+      data: {
+        name,
+        status: "error",
+        message: err.message,
+      },
+    });
 
     return NextResponse.json(
-      { ok: false, error: err.message ?? "Unknown error" },
+      { ok: false, error: err.message },
       { status: 500 }
     );
   }
