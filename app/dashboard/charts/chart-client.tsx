@@ -21,19 +21,27 @@ type PricePoint = {
 
 type Alert = {
   metal: string;
-  threshold: number;
   direction: string;
-  active: boolean;
+  target: number;
 };
 
 export default function ChartClient({
   prices,
   alerts,
+  range,
 }: {
   prices: PricePoint[];
   alerts: Alert[];
+  range: "24h" | "7d" | "30d";
 }) {
   const metals = Array.from(new Set(prices.map((p) => p.metal)));
+
+  const tickFormatter = (ts: number) => {
+    const d = new Date(ts);
+    if (range === "24h")
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleDateString();
+  };
 
   return (
     <div className="space-y-12">
@@ -41,13 +49,11 @@ export default function ChartClient({
         const data = prices
           .filter((p) => p.metal === metal)
           .map((p) => ({
-            date: new Date(p.createdAt).toLocaleDateString(),
+            t: new Date(p.createdAt).getTime(),
             price: p.price,
           }));
 
-        const metalAlerts = alerts.filter(
-          (a) => a.metal === metal && a.active
-        );
+        const metalAlerts = alerts.filter((a) => a.metal === metal);
 
         return (
           <div key={metal} className="h-80">
@@ -55,25 +61,30 @@ export default function ChartClient({
 
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
-                <XAxis dataKey="date" />
+                <XAxis
+                  dataKey="t"
+                  type="number"
+                  domain={["dataMin", "dataMax"]}
+                  tickFormatter={tickFormatter}
+                  minTickGap={24}
+                />
                 <YAxis domain={["auto", "auto"]} />
-                <Tooltip />
+                <Tooltip
+                  labelFormatter={(value) =>
+                    new Date(Number(value)).toLocaleString()
+                  }
+                />
                 <Legend />
 
-                <Line
-                  type="monotone"
-                  dataKey="price"
-                  strokeWidth={2}
-                  dot={false}
-                />
+                <Line type="monotone" dataKey="price" strokeWidth={2} dot={false} />
 
                 {metalAlerts.map((a, i) => (
                   <ReferenceLine
                     key={i}
-                    y={a.threshold}
+                    y={a.target}
                     strokeDasharray="4 4"
                     label={{
-                      value: `${a.direction} $${a.threshold}`,
+                      value: `${a.direction} $${a.target}`,
                       position: "right",
                       fontSize: 10,
                     }}

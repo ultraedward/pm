@@ -1,31 +1,27 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { requirePro } from "@/lib/requirePro"
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requirePro } from "@/lib/requirePro";
 
 export async function POST(req: Request) {
-  // 1️⃣ Enforce PRO + get session
-  const session = await requirePro()
-  if (session instanceof NextResponse) return session
+  const gate = await requirePro();
+  if (gate instanceof NextResponse) return gate;
+  const userId = gate.userId;
 
-  const body = await req.json()
-  const { metal, direction, target } = body
+  const body = await req.json();
+  const { metal, direction, target } = body;
 
   if (!metal || !direction || !target) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // 2️⃣ Create alert (schema-aligned)
   const alert = await prisma.alert.create({
     data: {
-      userId: session.user.id,
+      userId,
       metal,
       direction,
       target,
     },
-  })
+  });
 
-  return NextResponse.json({ ok: true, alert })
+  return NextResponse.json({ ok: true, alert });
 }

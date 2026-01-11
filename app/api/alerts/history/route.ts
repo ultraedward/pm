@@ -1,23 +1,20 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { requirePro } from "@/lib/requirePro"
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requirePro } from "@/lib/requirePro";
 
-export const runtime = "nodejs"
+export const runtime = "nodejs";
 
 export async function GET() {
-  const session = await requirePro()
-  if (session instanceof NextResponse) return session
-
-  const userId = session.user.id
+  const gate = await requirePro();
+  if (gate instanceof NextResponse) return gate;
+  const userId = gate.userId;
 
   const history = await prisma.alertTrigger.findMany({
     where: {
-      alert: {
-        userId,
-      },
+      alert: { userId },
     },
     orderBy: {
-      createdAt: "desc",
+      triggeredAt: "desc",
     },
     take: 100,
     include: {
@@ -29,18 +26,18 @@ export async function GET() {
         },
       },
     },
-  })
+  });
 
   return NextResponse.json({
     ok: true,
     count: history.length,
-    history: history.map(t => ({
+    history: history.map((t) => ({
       id: t.id,
       metal: t.alert.metal,
       direction: t.alert.direction,
       target: t.alert.target,
       triggeredPrice: t.price,
-      triggeredAt: t.createdAt,
+      triggeredAt: t.triggeredAt,
     })),
-  })
+  });
 }
