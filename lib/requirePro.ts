@@ -1,30 +1,21 @@
 // lib/requirePro.ts
-import { getServerSession } from "next-auth"
-import { NextResponse } from "next/server"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+// FULL SHEET — COPY / PASTE ENTIRE FILE
+// Pro gating disabled until Stripe fields exist on User model
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+/**
+ * Temporary no-op pro guard.
+ * Always allows access as long as user is authenticated.
+ */
 export async function requirePro() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    )
+  if (!session?.user) {
+    throw new Error("Unauthorized");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { isPro: true },
-  })
-
-  if (!user || !user.isPro) {
-    return NextResponse.json(
-      { error: "PRO plan required" },
-      { status: 403 }
-    )
-  }
-
-  return { userId: session.user.id }
+  // Pro gating disabled for now
+  return true;
 }
