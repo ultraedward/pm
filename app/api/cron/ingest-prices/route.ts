@@ -14,27 +14,43 @@ function mockPrices(): Record<Metal, number> {
 }
 
 export async function GET() {
-  const LIVE = process.env.PRICE_MODE === "LIVE";
-
-  // TODO: replace with real provider when ready
   const prices = mockPrices();
 
-  const now = new Date();
+  // check if we already have history
+  const count = await prisma.price.count();
 
-  for (const metal of METALS) {
-    await prisma.price.create({
-      data: {
-        metal,
-        price: prices[metal],
-        timestamp: now,
-      },
-    });
+  const now = Date.now();
+
+  // SEED 24 HOURS (hourly) IF EMPTY
+  if (count === 0) {
+    for (let h = 24; h >= 0; h--) {
+      const t = new Date(now - h * 60 * 60 * 1000);
+
+      for (const metal of METALS) {
+        await prisma.price.create({
+          data: {
+            metal,
+            price:
+              prices[metal] *
+              (1 + (Math.random() - 0.5) * 0.02),
+            timestamp: t,
+          },
+        });
+      }
+    }
+  } else {
+    // normal ingest
+    const t = new Date();
+    for (const metal of METALS) {
+      await prisma.price.create({
+        data: {
+          metal,
+          price: prices[metal],
+          timestamp: t,
+        },
+      });
+    }
   }
 
-  return NextResponse.json({
-    ok: true,
-    mode: LIVE ? "live" : "mock",
-    inserted: METALS.length,
-    at: now.toISOString(),
-  });
+  return NextResponse.json({ ok: true });
 }
