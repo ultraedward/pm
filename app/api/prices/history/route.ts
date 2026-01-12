@@ -8,9 +8,5 @@ export async function GET(req: Request) {
 
   const history = await getPriceHistory(hours);
 
-  return NextResponse.json({
-    hours,
-    count: history.length,
-    data: history,
-  });
+  return NextResponse.json(history);
 }

@@ -5,7 +5,8 @@ async function fetchHistory() {
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=24`,
     { cache: "no-store" }
   );
-  return res.json();
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 }
 
 async function fetchCurrent() {
@@ -23,7 +24,8 @@ export default async function DashboardPage() {
   ]);
 
   const grouped: Record<string, any[]> = {};
-  history.data.forEach((p: any) => {
+
+  history.forEach((p: any) => {
     grouped[p.metal] ??= [];
     grouped[p.metal].push({
       timestamp: new Date(p.timestamp).toLocaleTimeString(),
@@ -36,8 +38,8 @@ export default async function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold">Precious Metals</h1>
         <p className="text-sm text-muted-foreground">
-          Source: {current.source} • Last updated:{" "}
-          {current.updatedAt
+          Source: {current?.source ?? "unknown"} • Last updated:{" "}
+          {current?.updatedAt
             ? new Date(current.updatedAt).toLocaleString()
             : "N/A"}
         </p>
