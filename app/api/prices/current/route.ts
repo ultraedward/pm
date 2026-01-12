@@ -2,56 +2,54 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
 
 export async function GET() {
   try {
     const rows = await prisma.spotPriceCache.findMany({
       orderBy: { createdAt: "asc" },
+      take: 500,
     })
 
     const prices: Record<string, { t: number; price: number }[]> = {}
 
     for (const r of rows) {
       if (!prices[r.metal]) prices[r.metal] = []
+
       prices[r.metal].push({
         t: r.createdAt.getTime(),
         price: Number(r.price),
       })
     }
 
-    return new NextResponse(
-      JSON.stringify({ prices }),
+    return NextResponse.json(
+      { prices },
       {
-        status: 200,
         headers: {
-          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET,OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
         },
       }
     )
-  } catch (e) {
-    console.error(e)
-    return new NextResponse(
-      JSON.stringify({ error: "Failed to load prices" }),
+  } catch (err) {
+    console.error("prices/current failed", err)
+
+    return NextResponse.json(
       {
-        status: 500,
+        prices: {
+          gold: [],
+          silver: [],
+          platinum: [],
+          palladium: [],
+        },
+        error: "prices api failed",
+      },
+      {
+        status: 200, // DO NOT 500 — dashboard must render
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
       }
     )
   }
-}
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
-  })
 }
