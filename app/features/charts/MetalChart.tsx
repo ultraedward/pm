@@ -9,13 +9,29 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+type RawPoint = {
+  timestamp?: string;
+  t?: number;
+  price?: number;
+};
+
 type Props = {
-  data: { timestamp: string; price: number }[];
+  data: unknown;
   metal: string;
 };
 
 export default function MetalChart({ data, metal }: Props) {
-  if (!data || data.length === 0) {
+  const safeData = Array.isArray(data)
+    ? data.filter(
+        (d: any) =>
+          d &&
+          typeof d === "object" &&
+          typeof d.price === "number" &&
+          (typeof d.timestamp === "string" || typeof d.t === "number")
+      )
+    : [];
+
+  if (safeData.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-muted-foreground">
         No data available
@@ -23,11 +39,21 @@ export default function MetalChart({ data, metal }: Props) {
     );
   }
 
+  const normalized = safeData.map((d: any) => ({
+    t: d.t ?? new Date(d.timestamp).getTime(),
+    price: d.price,
+  }));
+
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <XAxis dataKey="timestamp" hide />
+        <LineChart data={normalized}>
+          <XAxis
+            dataKey="t"
+            type="number"
+            domain={["auto", "auto"]}
+            hide
+          />
           <YAxis domain={["auto", "auto"]} />
           <Tooltip />
           <Line
