@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/app/lib/prisma";
 
 type Metal = "gold" | "silver" | "platinum" | "palladium";
-
 const METALS: Metal[] = ["gold", "silver", "platinum", "palladium"];
 
 function mockPrices(): Record<Metal, number> {
@@ -14,23 +14,27 @@ function mockPrices(): Record<Metal, number> {
 }
 
 export async function GET() {
-  // Toggle LIVE later by setting PRICE_MODE=LIVE
   const LIVE = process.env.PRICE_MODE === "LIVE";
 
-  let prices: Record<Metal, number>;
+  // TODO: replace with real provider when ready
+  const prices = mockPrices();
 
-  if (!LIVE) {
-    prices = mockPrices();
-  } else {
-    // Placeholder for real provider (Metals-API, etc.)
-    // Keep schema-safe: no DB writes yet
-    prices = mockPrices();
+  const now = new Date();
+
+  for (const metal of METALS) {
+    await prisma.price.create({
+      data: {
+        metal,
+        price: prices[metal],
+        timestamp: now,
+      },
+    });
   }
 
   return NextResponse.json({
     ok: true,
     mode: LIVE ? "live" : "mock",
-    prices,
-    ingestedAt: new Date().toISOString(),
+    inserted: METALS.length,
+    at: now.toISOString(),
   });
 }

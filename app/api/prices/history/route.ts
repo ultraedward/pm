@@ -1,12 +1,18 @@
-// app/api/prices/history/route.ts
 import { NextResponse } from "next/server";
-import { getPriceHistory } from "@/app/lib/priceSource";
+import { prisma } from "@/app/lib/prisma";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const hours = Number(searchParams.get("hours") ?? 24);
 
-  const history = await getPriceHistory(hours);
+  const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 
-  return NextResponse.json(history);
+  const rows = await prisma.price.findMany({
+    where: {
+      timestamp: { gte: since },
+    },
+    orderBy: { timestamp: "asc" },
+  });
+
+  return NextResponse.json(rows);
 }

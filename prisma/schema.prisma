@@ -1,6 +1,3 @@
-// prisma/schema.prisma
-// FULL SHEET — COPY / PASTE ENTIRE FILE
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,47 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  alerts Alert[]
-}
-
-model Alert {
-  id        String   @id @default(cuid())
-  userId   String
-  metal    String
-  direction String
-  target   Decimal
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-  alertTriggers AlertTrigger[]
-}
-
-model AlertTrigger {
-  id          String   @id @default(cuid())
-  alertId    String
-  price      Decimal
-  triggeredAt DateTime @default(now())
-
-  alert Alert @relation(fields: [alertId], references: [id])
-}
-
-model SpotPriceCache {
+model Price {
   id        String   @id @default(cuid())
   metal     String
-  price     Decimal
-  createdAt DateTime @default(now())
-}
+  price     Float
+  timestamp DateTime @default(now())
 
-model CronRun {
-  id        String   @id @default(cuid())
-  name      String
-  status    String
-  message   String?
-  createdAt DateTime @default(now())
+  @@index([metal, timestamp])
 }
