@@ -10,6 +10,7 @@ import {
   YAxis,
   Tooltip,
   Scatter,
+  Legend,
 } from "recharts"
 
 type RangeKey = "24h" | "7d" | "30d"
@@ -59,50 +60,46 @@ export default function ChartsPage() {
 
   const cutoff = Date.now() - RANGE_MS[range]
 
-  const filteredPrices = useMemo(() => {
-    const out: Record<string, PricePoint[]> = {}
-    for (const [metal, points] of Object.entries(prices)) {
-      out[metal] = points.filter((p) => p.t >= cutoff)
+  const combinedData = useMemo(() => {
+    const map = new Map<number, any>()
+
+    for (const [metal, pts] of Object.entries(prices)) {
+      const filtered = pts.filter((p) => p.t >= cutoff)
+      if (filtered.length === 0) continue
+
+      const base = filtered[0].price || 1
+
+      for (const p of filtered) {
+        if (!map.has(p.t)) map.set(p.t, { t: p.t })
+        const row = map.get(p.t)
+
+        row[metal] =
+          mode === "price"
+            ? p.price
+            : ((p.price - base) / base) * 100
+      }
     }
-    return out
-  }, [prices, cutoff])
 
-  const filteredTriggers = useMemo(
-    () => triggers.filter((t) => t.t >= cutoff),
-    [triggers, cutoff]
-  )
+    return Array.from(map.values()).sort((a, b) => a.t - b.t)
+  }, [prices, cutoff, mode])
 
-  const normalizedPrices = useMemo(() => {
-    if (mode === "price") return filteredPrices
-
-    const out: Record<string, any[]> = {}
-    for (const [metal, pts] of Object.entries(filteredPrices)) {
-      if (pts.length === 0) continue
-      const base = pts[0].price || 1
-      out[metal] = pts.map((p) => ({
-        t: p.t,
-        pct: ((p.price - base) / base) * 100,
-        price: p.price,
+  const triggerPoints = useMemo(() => {
+    return triggers
+      .filter((t) => t.t >= cutoff)
+      .map((t) => ({
+        t: t.t,
+        [t.metal]:
+          mode === "price" ? t.price : 0, // plotted at baseline for pct
+        metal: t.metal,
       }))
-    }
-    return out
-  }, [filteredPrices, mode])
-
-  const lastPrices = useMemo(() => {
-    const out: Record<string, number> = {}
-    for (const [metal, pts] of Object.entries(filteredPrices)) {
-      if (pts.length > 0) out[metal] = pts[pts.length - 1].price
-    }
-    return out
-  }, [filteredPrices])
+  }, [triggers, cutoff, mode])
 
   if (loading) return <div className="p-6">Loading charts…</div>
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-6">
       {/* CONTROLS */}
       <div className="flex flex-wrap gap-3 items-center">
-        {/* RANGE */}
         {(["24h", "7d", "30d"] as RangeKey[]).map((r) => (
           <button
             key={r}
@@ -115,7 +112,6 @@ export default function ChartsPage() {
           </button>
         ))}
 
-        {/* MODE */}
         <div className="ml-4 flex gap-2">
           <button
             onClick={() => setMode("price")}
@@ -136,75 +132,51 @@ export default function ChartsPage() {
         </div>
       </div>
 
-      {/* LEGEND */}
-      <div className="flex flex-wrap gap-4 text-sm">
-        {Object.entries(lastPrices).map(([metal, price]) => (
-          <div
+      {/* CHART */}
+      <LineChart width={900} height={400} data={combinedData}>
+        <XAxis
+          dataKey="t"
+          tickFormatter={(t) =>
+            new Date(t).toLocaleTimeString()
+          }
+        />
+        <YAxis
+          tickFormatter={(v) =>
+            mode === "pct" ? `${v.toFixed(1)}%` : `$${v}`
+          }
+        />
+        <Tooltip
+          formatter={(v: any) =>
+            mode === "pct"
+              ? `${v.toFixed(2)}%`
+              : `$${Number(v).toFixed(2)}`
+          }
+          labelFormatter={(t) =>
+            new Date(Number(t)).toLocaleString()
+          }
+        />
+        <Legend />
+
+        {Object.keys(COLORS).map((metal) => (
+          <Line
             key={metal}
-            className="flex items-center gap-2 border rounded px-3 py-1"
-          >
-            <span
-              className="inline-block w-3 h-3 rounded-full"
-              style={{ backgroundColor: COLORS[metal] || "#000" }}
-            />
-            <span className="capitalize font-medium">{metal}</span>
-            <span className="text-gray-600">
-              ${price.toFixed(2)}
-            </span>
-          </div>
+            type="monotone"
+            dataKey={metal}
+            stroke={COLORS[metal]}
+            dot={false}
+            strokeWidth={2}
+            isAnimationActive={false}
+          />
         ))}
-      </div>
 
-      {/* CHARTS */}
-      {Object.entries(normalizedPrices).map(([metal, points]) => {
-        if (!points || points.length === 0) return null
-        const metalTriggers = filteredTriggers.filter(
-          (t) => t.metal === metal
-        )
-
-        return (
-          <div key={metal}>
-            <h2 className="mb-2 font-bold capitalize">
-              {metal} ({range}) — {mode === "price" ? "Price" : "% Change"}
-            </h2>
-
-            <LineChart width={800} height={300} data={points}>
-              <XAxis
-                dataKey="t"
-                tickFormatter={(t) =>
-                  new Date(t).toLocaleTimeString()
-                }
-              />
-              <YAxis
-                tickFormatter={(v) =>
-                  mode === "pct" ? `${v.toFixed(1)}%` : `$${v}`
-                }
-              />
-              <Tooltip
-                formatter={(v: any) =>
-                  mode === "pct"
-                    ? `${v.toFixed(2)}%`
-                    : `$${Number(v).toFixed(2)}`
-                }
-                labelFormatter={(t) =>
-                  new Date(Number(t)).toLocaleString()
-                }
-              />
-
-              <Line
-                type="monotone"
-                dataKey={mode === "price" ? "price" : "pct"}
-                stroke={COLORS[metal] || "#000"}
-                strokeWidth={2}
-                dot={false}
-                isAnimationActive={false}
-              />
-
-              <Scatter data={metalTriggers} fill="#dc2626" />
-            </LineChart>
-          </div>
-        )
-      })}
+        {triggerPoints.map((p, i) => (
+          <Scatter
+            key={i}
+            data={[p]}
+            fill="#dc2626"
+          />
+        ))}
+      </LineChart>
     </div>
   )
 }
