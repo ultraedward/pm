@@ -31,16 +31,13 @@ export default async function DashboardPage() {
     fetchHistory(),
   ]);
 
-  const grouped: Record<string, any[]> = {};
-
-  history.forEach((p: any) => {
-    if (!p || typeof p !== "object") return;
-    if (typeof p.price !== "number") return;
-    if (!p.metal) return;
-
-    grouped[p.metal] ??= [];
-    grouped[p.metal].push(p);
-  });
+  const metals = Array.from(
+    new Set(
+      history
+        .filter((p: any) => p && typeof p.metal === "string")
+        .map((p: any) => p.metal)
+    )
+  );
 
   return (
     <div className="space-y-8 p-6">
@@ -54,10 +51,10 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {Object.entries(grouped).map(([metal, data]) => (
+      {metals.map((metal) => (
         <div key={metal}>
           <h2 className="text-lg font-semibold capitalize">{metal}</h2>
-          <MetalChart metal={metal} data={data} />
+          <MetalChart metal={metal} data={[]} />
         </div>
       ))}
     </div>
