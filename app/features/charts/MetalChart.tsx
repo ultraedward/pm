@@ -14,7 +14,6 @@ import {
   LinearScale,
   TimeScale,
   Tooltip,
-  Legend,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 
@@ -23,37 +22,28 @@ ChartJS.register(
   PointElement,
   LinearScale,
   TimeScale,
-  Tooltip,
-  Legend
+  Tooltip
 );
 
-type Props = {
-  data: unknown;
+export default function MetalChart({
+  data,
+  metal,
+}: {
+  data: any[];
   metal: string;
-};
-
-export default function MetalChart({ data, metal }: Props) {
-  const safe = Array.isArray(data)
-    ? data
-        .filter(
-          (d: any) =>
-            d &&
-            typeof d.price === "number" &&
-            typeof d.timestamp === "string"
-        )
-        .map((d: any) => ({
-          x: new Date(d.timestamp),
-          y: d.price,
-        }))
-    : [];
-
-  if (safe.length === 0) {
+}) {
+  if (!Array.isArray(data) || data.length < 2) {
     return (
-      <div className="h-64 flex items-center justify-center border rounded text-muted-foreground">
-        No data
+      <div className="h-64 flex items-center justify-center text-muted-foreground border rounded">
+        Waiting for data…
       </div>
     );
   }
+
+  const points = data.map((p) => ({
+    x: new Date(p.timestamp),
+    y: p.price,
+  }));
 
   return (
     <div className="h-64 border rounded p-2">
@@ -62,7 +52,7 @@ export default function MetalChart({ data, metal }: Props) {
           datasets: [
             {
               label: metal,
-              data: safe,
+              data: points,
               borderWidth: 2,
               pointRadius: 0,
             },
@@ -74,11 +64,8 @@ export default function MetalChart({ data, metal }: Props) {
           parsing: false,
           scales: {
             x: { type: "time", display: false },
-            y: { beginAtZero: false },
           },
-          plugins: {
-            legend: { display: false },
-          },
+          plugins: { legend: { display: false } },
         }}
       />
     </div>
