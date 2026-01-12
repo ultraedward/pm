@@ -36,12 +36,10 @@ export default async function DashboardPage() {
   history.forEach((p: any) => {
     if (!p || typeof p !== "object") return;
     if (typeof p.price !== "number") return;
+    if (!p.metal) return;
 
     grouped[p.metal] ??= [];
-    grouped[p.metal].push({
-      timestamp: p.timestamp,
-      price: p.price,
-    });
+    grouped[p.metal].push(p);
   });
 
   return (
