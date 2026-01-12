@@ -53,20 +53,11 @@ export async function getCurrentPrices() {
     };
   }
 
-  const latest = await prisma.price.findMany({
-    orderBy: { timestamp: "desc" },
-    take: 4,
-  });
-
-  const prices: Partial<Record<Metal, number>> = {};
-  latest.forEach((p) => {
-    prices[p.metal as Metal] = p.price;
-  });
-
+  // LIVE MODE (schema-safe placeholder)
   return {
     source: "live",
-    prices,
-    updatedAt: latest[0]?.timestamp ?? null,
+    prices: {},
+    updatedAt: null,
   };
 }
 
@@ -75,12 +66,6 @@ export async function getPriceHistory(hours = 24): Promise<PricePoint[]> {
     return mockHistory(hours);
   }
 
-  return prisma.price.findMany({
-    where: {
-      timestamp: {
-        gte: new Date(Date.now() - hours * 60 * 60 * 1000),
-      },
-    },
-    orderBy: { timestamp: "asc" },
-  }) as Promise<PricePoint[]>;
+  // LIVE MODE (schema-safe placeholder)
+  return [];
 }
