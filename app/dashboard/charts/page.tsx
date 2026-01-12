@@ -47,6 +47,13 @@ export default function ChartsPage() {
   const [mode, setMode] = useState<Mode>("price")
   const [loading, setLoading] = useState(true)
 
+  const [visible, setVisible] = useState<Record<string, boolean>>({
+    gold: true,
+    silver: true,
+    platinum: true,
+    palladium: true,
+  })
+
   useEffect(() => {
     Promise.all([
       fetch("/api/prices/current").then((r) => r.json()),
@@ -64,6 +71,8 @@ export default function ChartsPage() {
     const map = new Map<number, any>()
 
     for (const [metal, pts] of Object.entries(prices)) {
+      if (!visible[metal]) continue
+
       const filtered = pts.filter((p) => p.t >= cutoff)
       if (filtered.length === 0) continue
 
@@ -81,25 +90,26 @@ export default function ChartsPage() {
     }
 
     return Array.from(map.values()).sort((a, b) => a.t - b.t)
-  }, [prices, cutoff, mode])
+  }, [prices, cutoff, mode, visible])
 
   const triggerPoints = useMemo(() => {
     return triggers
-      .filter((t) => t.t >= cutoff)
+      .filter((t) => t.t >= cutoff && visible[t.metal])
       .map((t) => ({
         t: t.t,
         [t.metal]:
-          mode === "price" ? t.price : 0, // plotted at baseline for pct
+          mode === "price" ? t.price : 0,
         metal: t.metal,
       }))
-  }, [triggers, cutoff, mode])
+  }, [triggers, cutoff, mode, visible])
 
   if (loading) return <div className="p-6">Loading charts…</div>
 
   return (
     <div className="p-6 space-y-6">
       {/* CONTROLS */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap gap-4 items-center">
+        {/* RANGE */}
         {(["24h", "7d", "30d"] as RangeKey[]).map((r) => (
           <button
             key={r}
@@ -112,6 +122,7 @@ export default function ChartsPage() {
           </button>
         ))}
 
+        {/* MODE */}
         <div className="ml-4 flex gap-2">
           <button
             onClick={() => setMode("price")}
@@ -132,8 +143,32 @@ export default function ChartsPage() {
         </div>
       </div>
 
+      {/* METAL TOGGLES */}
+      <div className="flex flex-wrap gap-4">
+        {Object.keys(COLORS).map((metal) => (
+          <label
+            key={metal}
+            className="flex items-center gap-2 text-sm cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={visible[metal]}
+              onChange={() =>
+                setVisible((v) => ({
+                  ...v,
+                  [metal]: !v[metal],
+                }))
+              }
+            />
+            <span style={{ color: COLORS[metal] }}>
+              {metal.toUpperCase()}
+            </span>
+          </label>
+        ))}
+      </div>
+
       {/* CHART */}
-      <LineChart width={900} height={400} data={combinedData}>
+      <LineChart width={900} height={420} data={combinedData}>
         <XAxis
           dataKey="t"
           tickFormatter={(t) =>
@@ -157,24 +192,23 @@ export default function ChartsPage() {
         />
         <Legend />
 
-        {Object.keys(COLORS).map((metal) => (
-          <Line
-            key={metal}
-            type="monotone"
-            dataKey={metal}
-            stroke={COLORS[metal]}
-            dot={false}
-            strokeWidth={2}
-            isAnimationActive={false}
-          />
-        ))}
+        {Object.keys(COLORS).map(
+          (metal) =>
+            visible[metal] && (
+              <Line
+                key={metal}
+                type="monotone"
+                dataKey={metal}
+                stroke={COLORS[metal]}
+                dot={false}
+                strokeWidth={2}
+                isAnimationActive={false}
+              />
+            )
+        )}
 
         {triggerPoints.map((p, i) => (
-          <Scatter
-            key={i}
-            data={[p]}
-            fill="#dc2626"
-          />
+          <Scatter key={i} data={[p]} fill="#dc2626" />
         ))}
       </LineChart>
     </div>
