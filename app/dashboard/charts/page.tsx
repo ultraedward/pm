@@ -31,6 +31,13 @@ const RANGE_MS: Record<RangeKey, number> = {
   "30d": 30 * 24 * 60 * 60 * 1000,
 }
 
+const COLORS: Record<string, string> = {
+  gold: "#d97706",
+  silver: "#6b7280",
+  platinum: "#2563eb",
+  palladium: "#7c3aed",
+}
+
 export default function ChartsPage() {
   const [prices, setPrices] = useState<Record<string, PricePoint[]>>({})
   const [triggers, setTriggers] = useState<TriggerPoint[]>([])
@@ -58,16 +65,27 @@ export default function ChartsPage() {
     return out
   }, [prices, cutoff])
 
-  const filteredTriggers = useMemo(() => {
-    return triggers.filter((t) => t.t >= cutoff)
-  }, [triggers, cutoff])
+  const filteredTriggers = useMemo(
+    () => triggers.filter((t) => t.t >= cutoff),
+    [triggers, cutoff]
+  )
+
+  const lastPrices = useMemo(() => {
+    const out: Record<string, number> = {}
+    for (const [metal, pts] of Object.entries(filteredPrices)) {
+      if (pts.length > 0) {
+        out[metal] = pts[pts.length - 1].price
+      }
+    }
+    return out
+  }, [filteredPrices])
 
   if (loading) {
     return <div className="p-6">Loading charts…</div>
   }
 
   return (
-    <div className="p-6 space-y-10">
+    <div className="p-6 space-y-8">
       {/* RANGE SELECTOR */}
       <div className="flex gap-2">
         {(["24h", "7d", "30d"] as RangeKey[]).map((r) => (
@@ -85,13 +103,32 @@ export default function ChartsPage() {
         ))}
       </div>
 
+      {/* LEGEND */}
+      <div className="flex flex-wrap gap-4 text-sm">
+        {Object.entries(lastPrices).map(([metal, price]) => (
+          <div
+            key={metal}
+            className="flex items-center gap-2 border rounded px-3 py-1"
+          >
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ backgroundColor: COLORS[metal] || "#000" }}
+            />
+            <span className="capitalize font-medium">{metal}</span>
+            <span className="text-gray-600">
+              ${price.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
+
       {/* CHARTS */}
       {Object.entries(filteredPrices).map(([metal, points]) => {
+        if (points.length === 0) return null
+
         const metalTriggers = filteredTriggers.filter(
           (t) => t.metal === metal
         )
-
-        if (points.length === 0) return null
 
         return (
           <div key={metal}>
@@ -117,13 +154,13 @@ export default function ChartsPage() {
               <Line
                 type="monotone"
                 dataKey="price"
-                stroke="#2563eb"
+                stroke={COLORS[metal] || "#000"}
                 strokeWidth={2}
                 dot={false}
                 isAnimationActive={false}
               />
 
-              {/* ALERT TRIGGER DOTS */}
+              {/* ALERT DOTS */}
               <Scatter
                 data={metalTriggers}
                 fill="#dc2626"
