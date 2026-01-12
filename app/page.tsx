@@ -1,20 +1,28 @@
 import MetalChart from "@/app/features/charts/MetalChart";
 
 async function fetchHistory() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=24`,
-    { cache: "no-store" }
-  );
-  const data = await res.json();
-  return Array.isArray(data) ? data : [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=24`,
+      { cache: "no-store" }
+    );
+    const json = await res.json();
+    return Array.isArray(json) ? json : [];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchCurrent() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/current`,
-    { cache: "no-store" }
-  );
-  return res.json();
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/current`,
+      { cache: "no-store" }
+    );
+    return await res.json();
+  } catch {
+    return {};
+  }
 }
 
 export default async function DashboardPage() {
@@ -26,9 +34,12 @@ export default async function DashboardPage() {
   const grouped: Record<string, any[]> = {};
 
   history.forEach((p: any) => {
+    if (!p || typeof p !== "object") return;
+    if (typeof p.price !== "number") return;
+
     grouped[p.metal] ??= [];
     grouped[p.metal].push({
-      timestamp: new Date(p.timestamp).toLocaleTimeString(),
+      timestamp: p.timestamp,
       price: p.price,
     });
   });
@@ -38,7 +49,7 @@ export default async function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold">Precious Metals</h1>
         <p className="text-sm text-muted-foreground">
-          Source: {current?.source ?? "unknown"} • Last updated:{" "}
+          Source: {current?.source ?? "mock"} • Last updated:{" "}
           {current?.updatedAt
             ? new Date(current.updatedAt).toLocaleString()
             : "N/A"}
