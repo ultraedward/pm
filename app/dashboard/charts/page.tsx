@@ -3,36 +3,47 @@
 import { useEffect, useState } from "react";
 import PriceChart from "@/components/PriceChart";
 
+type RangeKey = "24h" | "7d" | "30d";
+
 export default function ChartsPage() {
-  const [data, setData] = useState<any>(null);
+  const [range, setRange] = useState<RangeKey>("24h");
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/charts/prices")
-      .then((res) => res.json())
-      .then(setData)
-      .catch(console.error);
-  }, []);
-
-  if (!data) return <p>Loading charts...</p>;
+    setLoading(true);
+    fetch(`/api/charts/prices?range=${range}`)
+      .then((r) => r.json())
+      .then((res) => {
+        setData(res.data);
+        setLoading(false);
+      });
+  }, [range]);
 
   return (
-    <div className="space-y-10 p-6">
-      <h1 className="text-2xl font-bold">Price Charts (24h)</h1>
+    <div style={{ padding: 24 }}>
+      <h1>Charts</h1>
 
-      <div>
-        <h2 className="font-semibold mb-2">Gold</h2>
-        <PriceChart data={data.gold} color="#facc15" />
+      <div style={{ marginBottom: 16 }}>
+        {(["24h", "7d", "30d"] as RangeKey[]).map((r) => (
+          <button
+            key={r}
+            onClick={() => setRange(r)}
+            style={{
+              marginRight: 8,
+              padding: "6px 12px",
+              background: range === r ? "#444" : "#222",
+              color: "white",
+              border: "1px solid #555",
+              cursor: "pointer",
+            }}
+          >
+            {r}
+          </button>
+        ))}
       </div>
 
-      <div>
-        <h2 className="font-semibold mb-2">Silver</h2>
-        <PriceChart data={data.silver} color="#d1d5db" />
-      </div>
-
-      <div>
-        <h2 className="font-semibold mb-2">Platinum</h2>
-        <PriceChart data={data.platinum} color="#60a5fa" />
-      </div>
+      {loading ? <p>Loading chart…</p> : <PriceChart data={data} />}
     </div>
   );
 }

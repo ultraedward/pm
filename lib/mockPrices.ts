@@ -1,29 +1,35 @@
-export type Metal = "gold" | "silver" | "platinum";
+export type RangeKey = "24h" | "7d" | "30d";
 
-export type PricePoint = {
-  t: number;
-  price: number;
+const HOURS_BY_RANGE: Record<RangeKey, number> = {
+  "24h": 24,
+  "7d": 24 * 7,
+  "30d": 24 * 30,
 };
 
-export function generateMockPrices(
-  metal: Metal,
-  hours = 24
-): PricePoint[] {
-  const base =
-    metal === "gold" ? 2050 :
-    metal === "silver" ? 25 :
-    950;
+type Point = { t: number; gold: number; silver: number; platinum: number };
 
-  const points: PricePoint[] = [];
-  let price = base;
+export function generateMockPrices(range: RangeKey): Point[] {
+  const hours = HOURS_BY_RANGE[range];
+  const now = Date.now();
+
+  let gold = 2050;
+  let silver = 24.5;
+  let platinum = 950;
+
+  const data: Point[] = [];
 
   for (let i = hours; i >= 0; i--) {
-    price += (Math.random() - 0.5) * base * 0.002;
-    points.push({
-      t: Date.now() - i * 60 * 60 * 1000,
-      price: Number(price.toFixed(2)),
+    gold += (Math.random() - 0.5) * 8;
+    silver += (Math.random() - 0.5) * 0.25;
+    platinum += (Math.random() - 0.5) * 6;
+
+    data.push({
+      t: now - i * 60 * 60 * 1000,
+      gold: Number(gold.toFixed(2)),
+      silver: Number(silver.toFixed(2)),
+      platinum: Number(platinum.toFixed(2)),
     });
   }
 
-  return points;
+  return data;
 }
