@@ -13,6 +13,7 @@ import {
 } from "recharts"
 
 type RangeKey = "24h" | "7d" | "30d"
+type Mode = "price" | "pct"
 
 type PricePoint = {
   t: number
@@ -42,6 +43,7 @@ export default function ChartsPage() {
   const [prices, setPrices] = useState<Record<string, PricePoint[]>>({})
   const [triggers, setTriggers] = useState<TriggerPoint[]>([])
   const [range, setRange] = useState<RangeKey>("24h")
+  const [mode, setMode] = useState<Mode>("price")
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -70,37 +72,68 @@ export default function ChartsPage() {
     [triggers, cutoff]
   )
 
+  const normalizedPrices = useMemo(() => {
+    if (mode === "price") return filteredPrices
+
+    const out: Record<string, any[]> = {}
+    for (const [metal, pts] of Object.entries(filteredPrices)) {
+      if (pts.length === 0) continue
+      const base = pts[0].price || 1
+      out[metal] = pts.map((p) => ({
+        t: p.t,
+        pct: ((p.price - base) / base) * 100,
+        price: p.price,
+      }))
+    }
+    return out
+  }, [filteredPrices, mode])
+
   const lastPrices = useMemo(() => {
     const out: Record<string, number> = {}
     for (const [metal, pts] of Object.entries(filteredPrices)) {
-      if (pts.length > 0) {
-        out[metal] = pts[pts.length - 1].price
-      }
+      if (pts.length > 0) out[metal] = pts[pts.length - 1].price
     }
     return out
   }, [filteredPrices])
 
-  if (loading) {
-    return <div className="p-6">Loading charts…</div>
-  }
+  if (loading) return <div className="p-6">Loading charts…</div>
 
   return (
     <div className="p-6 space-y-8">
-      {/* RANGE SELECTOR */}
-      <div className="flex gap-2">
+      {/* CONTROLS */}
+      <div className="flex flex-wrap gap-3 items-center">
+        {/* RANGE */}
         {(["24h", "7d", "30d"] as RangeKey[]).map((r) => (
           <button
             key={r}
             onClick={() => setRange(r)}
             className={`px-3 py-1 rounded border text-sm ${
-              range === r
-                ? "bg-black text-white"
-                : "bg-white text-black"
+              range === r ? "bg-black text-white" : "bg-white"
             }`}
           >
             {r}
           </button>
         ))}
+
+        {/* MODE */}
+        <div className="ml-4 flex gap-2">
+          <button
+            onClick={() => setMode("price")}
+            className={`px-3 py-1 rounded border text-sm ${
+              mode === "price" ? "bg-black text-white" : "bg-white"
+            }`}
+          >
+            Price $
+          </button>
+          <button
+            onClick={() => setMode("pct")}
+            className={`px-3 py-1 rounded border text-sm ${
+              mode === "pct" ? "bg-black text-white" : "bg-white"
+            }`}
+          >
+            % Change
+          </button>
+        </div>
       </div>
 
       {/* LEGEND */}
@@ -123,9 +156,8 @@ export default function ChartsPage() {
       </div>
 
       {/* CHARTS */}
-      {Object.entries(filteredPrices).map(([metal, points]) => {
-        if (points.length === 0) return null
-
+      {Object.entries(normalizedPrices).map(([metal, points]) => {
+        if (!points || points.length === 0) return null
         const metalTriggers = filteredTriggers.filter(
           (t) => t.metal === metal
         )
@@ -133,7 +165,7 @@ export default function ChartsPage() {
         return (
           <div key={metal}>
             <h2 className="mb-2 font-bold capitalize">
-              {metal} ({range})
+              {metal} ({range}) — {mode === "price" ? "Price" : "% Change"}
             </h2>
 
             <LineChart width={800} height={300} data={points}>
@@ -143,28 +175,32 @@ export default function ChartsPage() {
                   new Date(t).toLocaleTimeString()
                 }
               />
-              <YAxis />
+              <YAxis
+                tickFormatter={(v) =>
+                  mode === "pct" ? `${v.toFixed(1)}%` : `$${v}`
+                }
+              />
               <Tooltip
+                formatter={(v: any) =>
+                  mode === "pct"
+                    ? `${v.toFixed(2)}%`
+                    : `$${Number(v).toFixed(2)}`
+                }
                 labelFormatter={(t) =>
                   new Date(Number(t)).toLocaleString()
                 }
               />
 
-              {/* PRICE LINE */}
               <Line
                 type="monotone"
-                dataKey="price"
+                dataKey={mode === "price" ? "price" : "pct"}
                 stroke={COLORS[metal] || "#000"}
                 strokeWidth={2}
                 dot={false}
                 isAnimationActive={false}
               />
 
-              {/* ALERT DOTS */}
-              <Scatter
-                data={metalTriggers}
-                fill="#dc2626"
-              />
+              <Scatter data={metalTriggers} fill="#dc2626" />
             </LineChart>
           </div>
         )
