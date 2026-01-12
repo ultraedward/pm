@@ -1,5 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
+const Line = dynamic(
+  () => import("react-chartjs-2").then((m) => m.Line),
+  { ssr: false }
+);
+
 import {
   Chart as ChartJS,
   LineElement,
@@ -9,7 +16,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 
 ChartJS.register(
@@ -20,12 +26,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-type Point = {
-  timestamp?: string;
-  t?: number;
-  price?: number;
-};
 
 type Props = {
   data: unknown;
@@ -38,19 +38,18 @@ export default function MetalChart({ data, metal }: Props) {
         .filter(
           (d: any) =>
             d &&
-            typeof d === "object" &&
             typeof d.price === "number" &&
-            (typeof d.timestamp === "string" || typeof d.t === "number")
+            typeof d.timestamp === "string"
         )
         .map((d: any) => ({
-          x: d.t ?? new Date(d.timestamp).getTime(),
+          x: new Date(d.timestamp),
           y: d.price,
         }))
     : [];
 
   if (safe.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-muted-foreground border rounded">
+      <div className="h-64 flex items-center justify-center border rounded text-muted-foreground">
         No data
       </div>
     );
@@ -66,7 +65,6 @@ export default function MetalChart({ data, metal }: Props) {
               data: safe,
               borderWidth: 2,
               pointRadius: 0,
-              tension: 0.3,
             },
           ],
         }}
@@ -75,13 +73,8 @@ export default function MetalChart({ data, metal }: Props) {
           maintainAspectRatio: false,
           parsing: false,
           scales: {
-            x: {
-              type: "time",
-              display: false,
-            },
-            y: {
-              beginAtZero: false,
-            },
+            x: { type: "time", display: false },
+            y: { beginAtZero: false },
           },
           plugins: {
             legend: { display: false },
