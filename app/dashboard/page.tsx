@@ -5,10 +5,15 @@ const MetalChart = dynamic(
   { ssr: false }
 );
 
-async function fetchHistory() {
+const TimeRangeSelector = dynamic(
+  () => import("@/app/features/dashboard/TimeRangeSelector"),
+  { ssr: false }
+);
+
+async function fetchHistory(hours: number) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=24`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=${hours}`,
       { cache: "no-store" }
     );
     const json = await res.json();
@@ -30,14 +35,20 @@ async function fetchCurrent() {
   }
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { hours?: string };
+}) {
+  const hours = Number(searchParams.hours ?? 24);
+  const safeHours = hours === 168 || hours === 720 ? hours : 24;
+
   const [current, history] = await Promise.all([
     fetchCurrent(),
-    fetchHistory(),
+    fetchHistory(safeHours),
   ]);
 
   const grouped: Record<string, any[]> = {};
-
   history.forEach((p: any) => {
     if (!p || typeof p.price !== "number" || !p.metal) return;
     grouped[p.metal] ??= [];
@@ -46,7 +57,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="p-6 space-y-8">
-      <header>
+      <header className="space-y-2">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
           Source: {current?.source ?? "mock"} • Updated:{" "}
@@ -54,6 +65,15 @@ export default async function DashboardPage() {
             ? new Date(current.updatedAt).toLocaleString()
             : "N/A"}
         </p>
+
+        <TimeRangeSelector
+          value={safeHours as any}
+          onChange={(v) => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("hours", String(v));
+            window.location.href = url.toString();
+          }}
+        />
       </header>
 
       {Object.entries(grouped).map(([metal, data]) => (
