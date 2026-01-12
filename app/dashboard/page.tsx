@@ -1,20 +1,33 @@
-import MetalChart from "@/app/features/charts/MetalChart";
+import dynamic from "next/dynamic";
+
+const MetalChart = dynamic(
+  () => import("@/app/features/charts/MetalChart"),
+  { ssr: false }
+);
 
 async function fetchHistory() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=24`,
-    { cache: "no-store" }
-  );
-  const json = await res.json();
-  return Array.isArray(json) ? json : [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=24`,
+      { cache: "no-store" }
+    );
+    const json = await res.json();
+    return Array.isArray(json) ? json : [];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchCurrent() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/current`,
-    { cache: "no-store" }
-  );
-  return await res.json();
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/current`,
+      { cache: "no-store" }
+    );
+    return await res.json();
+  } catch {
+    return {};
+  }
 }
 
 export default async function DashboardPage() {
@@ -24,6 +37,7 @@ export default async function DashboardPage() {
   ]);
 
   const grouped: Record<string, any[]> = {};
+
   history.forEach((p: any) => {
     if (!p || typeof p.price !== "number" || !p.metal) return;
     grouped[p.metal] ??= [];
