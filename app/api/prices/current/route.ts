@@ -1,8 +1,20 @@
-// app/api/prices/current/route.ts
 import { NextResponse } from "next/server";
-import { getCurrentPrices } from "@/app/lib/priceSource";
+import { prisma } from "@/app/lib/prisma";
 
 export async function GET() {
-  const data = await getCurrentPrices();
-  return NextResponse.json(data);
+  const rows = await prisma.price.findMany({
+    orderBy: { timestamp: "desc" },
+    take: 20,
+  });
+
+  const latest: Record<string, number> = {};
+  for (const r of rows) {
+    if (!(r.metal in latest)) latest[r.metal] = r.price;
+  }
+
+  return NextResponse.json({
+    source: "db",
+    prices: latest,
+    updatedAt: rows[0]?.timestamp ?? null,
+  });
 }
