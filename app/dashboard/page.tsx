@@ -1,12 +1,7 @@
 import dynamic from "next/dynamic";
 
-const MetalChart = dynamic(
-  () => import("@/app/features/charts/MetalChart"),
-  { ssr: false }
-);
-
-const TimeRangeSelector = dynamic(
-  () => import("@/app/features/dashboard/TimeRangeSelector"),
+const DashboardClient = dynamic(
+  () => import("@/app/features/dashboard/DashboardClient"),
   { ssr: false }
 );
 
@@ -56,32 +51,10 @@ export default async function DashboardPage({
   });
 
   return (
-    <main className="p-6 space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Source: {current?.source ?? "mock"} • Updated:{" "}
-          {current?.updatedAt
-            ? new Date(current.updatedAt).toLocaleString()
-            : "N/A"}
-        </p>
-
-        <TimeRangeSelector
-          value={safeHours as any}
-          onChange={(v) => {
-            const url = new URL(window.location.href);
-            url.searchParams.set("hours", String(v));
-            window.location.href = url.toString();
-          }}
-        />
-      </header>
-
-      {Object.entries(grouped).map(([metal, data]) => (
-        <section key={metal} className="space-y-2">
-          <h2 className="text-lg font-semibold capitalize">{metal}</h2>
-          <MetalChart metal={metal} data={data} />
-        </section>
-      ))}
-    </main>
+    <DashboardClient
+      current={current}
+      grouped={grouped}
+      hours={safeHours}
+    />
   );
 }
