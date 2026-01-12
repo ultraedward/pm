@@ -1,5 +1,5 @@
 // app/lib/priceSource.ts
-import prisma from "@/app/lib/prisma";
+import { prisma } from "@/app/lib/prisma";
 
 export type Metal = "gold" | "silver" | "platinum" | "palladium";
 
@@ -11,9 +11,8 @@ export type PricePoint = {
 
 const USE_MOCK = process.env.NEXT_PUBLIC_PRICE_MODE !== "LIVE";
 
-/**
- * MOCK DATA
- */
+/* ---------------- MOCK DATA ---------------- */
+
 function mockCurrentPrices(): Record<Metal, number> {
   return {
     gold: 2050,
@@ -43,9 +42,8 @@ function mockHistory(hours = 24): PricePoint[] {
   return data;
 }
 
-/**
- * PUBLIC API
- */
+/* ---------------- PUBLIC API ---------------- */
+
 export async function getCurrentPrices() {
   if (USE_MOCK) {
     return {
