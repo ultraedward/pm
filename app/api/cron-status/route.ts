@@ -1,16 +1,10 @@
-// app/api/cron-status/route.ts
-// FULL SHEET — COPY / PASTE ENTIRE FILE
-
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-export const runtime = "nodejs";
 
 export async function GET() {
-  const runs = await prisma.cronRun.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 10,
+  return NextResponse.json({
+    cron: "ingest-prices",
+    schedule: "daily",
+    status: "configured",
+    timestamp: new Date().toISOString(),
   });
-
-  return NextResponse.json({ ok: true, runs });
 }
