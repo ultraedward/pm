@@ -1,28 +1,37 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-function generateMockPrices(range: "24h" | "7d" | "30d") {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+
+  const metal = searchParams.get("metal") ?? "gold";
+  const range = searchParams.get("range") ?? "24h";
+
   const now = Date.now();
 
-  const points =
-    range === "7d" ? 7 * 24 :
-    range === "30d" ? 30 * 24 :
-    24;
+  const since =
+    range === "7d"
+      ? new Date(now - 7 * 24 * 60 * 60 * 1000)
+      : range === "30d"
+      ? new Date(now - 30 * 24 * 60 * 60 * 1000)
+      : new Date(now - 24 * 60 * 60 * 1000);
 
-  let price = 2000;
-
-  return Array.from({ length: points }).map((_, i) => {
-    price += (Math.random() - 0.5) * 10;
-
-    return {
-      t: now - (points - i) * 60 * 60 * 1000,
-      price: Number(price.toFixed(2)),
-    };
+  const prices = await prisma.price.findMany({
+    where: {
+      metal,
+      timestamp: { gte: since },
+    },
+    orderBy: { timestamp: "asc" },
+    select: {
+      timestamp: true,
+      price: true,
+    },
   });
-}
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const range = (searchParams.get("range") as "24h" | "7d" | "30d") ?? "24h";
-
-  return NextResponse.json(generateMockPrices(range));
+  return NextResponse.json(
+    prices.map(p => ({
+      t: p.timestamp.getTime(),
+      price: p.price,
+    }))
+  );
 }

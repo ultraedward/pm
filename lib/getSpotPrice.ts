@@ -1,5 +1,11 @@
-export async function getSpotPrice(_metal: string): Promise<number> {
-  // Spot price cache temporarily disabled
-  // Return 0 so callers don't crash
-  return 0;
+import { prisma } from "@/lib/prisma";
+
+export async function getSpotPrice(metal: string): Promise<number | null> {
+  const latest = await prisma.price.findFirst({
+    where: { metal },
+    orderBy: { timestamp: "desc" },
+    select: { price: true },
+  });
+
+  return latest?.price ?? null;
 }
