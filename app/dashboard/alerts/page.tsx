@@ -42,6 +42,11 @@ export default function AlertsPage() {
     setLoading(false);
   }
 
+  async function remove(id: string) {
+    await fetch(`/api/alerts?id=${id}`, { method: "DELETE" });
+    loadAlerts();
+  }
+
   return (
     <div className="space-y-6 max-w-md">
       <h1 className="text-xl font-bold">Create Alert</h1>
@@ -77,10 +82,13 @@ export default function AlertsPage() {
       <div>
         <h2 className="font-semibold">Your Alerts</h2>
 
-        <ul className="space-y-1">
+        <ul className="space-y-2">
           {alerts.map((a) => (
-            <li key={a.id}>
-              {a.metal} {a.direction} {a.targetPrice}
+            <li key={a.id} className="flex justify-between gap-2">
+              <span>
+                {a.metal} {a.direction} {a.targetPrice}
+              </span>
+              <button onClick={() => remove(a.id)}>❌</button>
             </li>
           ))}
         </ul>
