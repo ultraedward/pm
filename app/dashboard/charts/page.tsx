@@ -15,22 +15,14 @@ export default function ChartsPage() {
   const [metal, setMetal] = useState("gold");
   const [range, setRange] = useState<Range>("24h");
   const [prices, setPrices] = useState<Point[]>([]);
-  const [alerts, setAlerts] = useState<Point[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
 
-    Promise.all([
-      fetch(`/api/charts/prices?metal=${metal}&range=${range}`).then((r) =>
-        r.json()
-      ),
-      fetch(`/api/charts/alerts?metal=${metal}`).then((r) => r.json()),
-    ])
-      .then(([priceData, alertData]) => {
-        setPrices(priceData);
-        setAlerts(alertData);
-      })
+    fetch(`/api/charts/prices?metal=${metal}&range=${range}`)
+      .then((r) => r.json())
+      .then(setPrices)
       .finally(() => setLoading(false));
   }, [metal, range]);
 
@@ -67,7 +59,7 @@ export default function ChartsPage() {
           Loading…
         </div>
       ) : (
-        <PriceChart data={prices} alerts={alerts} />
+        <PriceChart data={prices} />
       )}
     </div>
   );
