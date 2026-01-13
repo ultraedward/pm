@@ -7,5 +7,5 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== "production") {
-  (globalThis as any).prisma = prisma;
+  globalThis.prisma = prisma;
 }
