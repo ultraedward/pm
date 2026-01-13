@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const range = searchParams.get("range") ?? "24h";
 
   if (!metal) {
-    return NextResponse.json({ prices: [], alerts: [] });
+    return NextResponse.json([]);
   }
 
   const now = Date.now();
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       ? new Date(now - 30 * 24 * 60 * 60 * 1000)
       : new Date(now - 24 * 60 * 60 * 1000);
 
-  const prices = await prisma.spotPriceCache.findMany({
+  const prices = await prisma.spotPrice.findMany({
     where: {
       metal,
       createdAt: { gte: since },
@@ -30,19 +30,10 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const alerts = await prisma.alert.findMany({
-    where: { metal },
-    select: {
-      price: true,
-      direction: true,
-    },
-  });
-
-  return NextResponse.json({
-    prices: prices.map(p => ({
+  return NextResponse.json(
+    prices.map(p => ({
       t: p.createdAt.getTime(),
       price: p.price,
-    })),
-    alerts,
-  });
+    }))
+  );
 }
