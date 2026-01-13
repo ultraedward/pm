@@ -15,3 +15,29 @@ model Price {
 
   @@index([metal, timestamp])
 }
+
+model Alert {
+  id          String   @id @default(cuid())
+  metal       String
+  targetPrice Float
+  direction   AlertDirection
+  createdAt   DateTime @default(now())
+
+  triggers    AlertTrigger[]
+}
+
+model AlertTrigger {
+  id        String   @id @default(cuid())
+  alertId  String
+  price    Float
+  triggeredAt DateTime @default(now())
+
+  alert     Alert @relation(fields: [alertId], references: [id])
+
+  @@index([alertId, triggeredAt])
+}
+
+enum AlertDirection {
+  ABOVE
+  BELOW
+}
