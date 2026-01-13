@@ -8,32 +8,64 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useEffect, useState } from "react";
 
-type Props = {
-  data: any[];
+export type Range = "24h" | "7d" | "30d";
+
+type PricePoint = {
+  t: number;
+  price: number;
 };
 
-export default function PriceChart({ data }: Props) {
+type Props = {
+  metal: string;
+  range: Range;
+};
+
+export default function PriceChart({ metal, range }: Props) {
+  const [data, setData] = useState<PricePoint[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/charts/prices?metal=${metal}&range=${range}`)
+      .then(r => r.json())
+      .then(res => {
+        // defensive: always force array
+        setData(Array.isArray(res) ? res : []);
+      });
+  }, [metal, range]);
+
+  if (!data.length) {
+    return (
+      <div className="h-[320px] flex items-center justify-center text-gray-400">
+        No data
+      </div>
+    );
+  }
+
   return (
-    <div style={{ width: "100%", height: 400 }}>
-      <ResponsiveContainer>
+    <div className="h-[320px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <XAxis
             dataKey="t"
-            tickFormatter={(v) =>
-              new Date(v).toLocaleTimeString([], {
+            tickFormatter={t =>
+              new Date(t).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })
             }
           />
-          <YAxis />
+          <YAxis domain={["auto", "auto"]} />
           <Tooltip
-            labelFormatter={(v) => new Date(v).toLocaleString()}
+            labelFormatter={l => new Date(Number(l)).toLocaleString()}
           />
-          <Line type="monotone" dataKey="gold" stroke="#FFD700" dot={false} />
-          <Line type="monotone" dataKey="silver" stroke="#C0C0C0" dot={false} />
-          <Line type="monotone" dataKey="platinum" stroke="#8FAADC" dot={false} />
+          <Line
+            type="monotone"
+            dataKey="price"
+            stroke="#000"
+            strokeWidth={2}
+            dot={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
