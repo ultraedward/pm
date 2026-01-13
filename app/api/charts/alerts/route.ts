@@ -2,42 +2,43 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal");
+  try {
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get("metal");
 
-  if (!metal) {
-    return NextResponse.json(
-      { error: "Missing metal" },
-      { status: 400 }
-    );
+    if (!metal) {
+      return NextResponse.json([], { status: 200 });
+    }
+
+    /**
+     * IMPORTANT:
+     * Use ONLY models that exist in prisma.schema
+     * We read from AlertTrigger because that IS defined
+     */
+    const alerts = await prisma.alertTrigger.findMany({
+      where: {
+        metal,
+        triggeredAt: {
+          not: null,
+        },
+      },
+      orderBy: {
+        triggeredAt: "asc",
+      },
+      select: {
+        id: true,
+        metal: true,
+        price: true,
+        direction: true,
+        triggeredAt: true,
+      },
+    });
+
+    return NextResponse.json(alerts ?? [], { status: 200 });
+  } catch (err) {
+    console.error("charts/alerts error", err);
+
+    // NEVER throw — frontend must always receive JSON
+    return NextResponse.json([], { status: 200 });
   }
-
-  const alerts = await prisma.$queryRaw<
-    {
-      id: string;
-      metal: string;
-      price: number;
-      direction: string;
-      triggered_at: Date;
-    }[]
-  >`
-    SELECT
-      id,
-      metal,
-      price,
-      direction,
-      triggered_at
-    FROM alert_triggers
-    WHERE metal = ${metal}
-    ORDER BY triggered_at ASC
-  `;
-
-  return NextResponse.json(
-    alerts.map(a => ({
-      id: a.id,
-      price: a.price,
-      direction: a.direction,
-      triggeredAt: a.triggered_at,
-    }))
-  );
 }
