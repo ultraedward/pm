@@ -7,7 +7,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Scatter,
 } from "recharts";
 
 type Point = {
@@ -17,10 +16,9 @@ type Point = {
 
 type Props = {
   data: Point[];
-  alerts?: Point[];
 };
 
-export default function PriceChart({ data, alerts = [] }: Props) {
+export default function PriceChart({ data }: Props) {
   return (
     <div style={{ width: "100%", height: 360 }}>
       <ResponsiveContainer>
@@ -38,23 +36,12 @@ export default function PriceChart({ data, alerts = [] }: Props) {
           <Tooltip
             labelFormatter={(t) => new Date(t).toLocaleString()}
           />
-
-          {/* Price line */}
           <Line
             type="monotone"
             dataKey="price"
             strokeWidth={2}
             dot={false}
           />
-
-          {/* Alert dots */}
-          {alerts.length > 0 && (
-            <Scatter
-              data={alerts}
-              fill="red"
-              shape="circle"
-            />
-          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
