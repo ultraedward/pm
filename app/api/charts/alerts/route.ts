@@ -12,12 +12,14 @@ export async function GET(req: Request) {
     );
   }
 
-  const alerts = await prisma.alert.findMany({
+  const alerts = await prisma.alertTrigger.findMany({
     where: { metal },
+    orderBy: { triggeredAt: "asc" },
     select: {
       id: true,
       price: true,
       direction: true,
+      triggeredAt: true,
     },
   });
 
