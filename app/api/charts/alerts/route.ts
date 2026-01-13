@@ -12,16 +12,32 @@ export async function GET(req: Request) {
     );
   }
 
-  const alerts = await prisma.alertTrigger.findMany({
-    where: { metal },
-    orderBy: { triggeredAt: "asc" },
-    select: {
-      id: true,
-      price: true,
-      direction: true,
-      triggeredAt: true,
-    },
-  });
+  const alerts = await prisma.$queryRaw<
+    {
+      id: string;
+      metal: string;
+      price: number;
+      direction: string;
+      triggered_at: Date;
+    }[]
+  >`
+    SELECT
+      id,
+      metal,
+      price,
+      direction,
+      triggered_at
+    FROM alert_triggers
+    WHERE metal = ${metal}
+    ORDER BY triggered_at ASC
+  `;
 
-  return NextResponse.json(alerts);
+  return NextResponse.json(
+    alerts.map(a => ({
+      id: a.id,
+      price: a.price,
+      direction: a.direction,
+      triggeredAt: a.triggered_at,
+    }))
+  );
 }
