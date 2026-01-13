@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  ResponsiveContainer,
   LineChart,
   Line,
   XAxis,
   YAxis,
   Tooltip,
+  ResponsiveContainer,
+  Scatter,
 } from "recharts";
 
 type Point = {
@@ -16,20 +17,13 @@ type Point = {
 
 type Props = {
   data: Point[];
+  alerts?: Point[];
 };
 
-export default function PriceChart({ data }: Props) {
-  if (!data.length) {
-    return (
-      <div style={{ height: 320 }} className="flex items-center justify-center">
-        No data
-      </div>
-    );
-  }
-
+export default function PriceChart({ data, alerts = [] }: Props) {
   return (
-    <div style={{ height: 360 }}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div style={{ width: "100%", height: 360 }}>
+      <ResponsiveContainer>
         <LineChart data={data}>
           <XAxis
             dataKey="t"
@@ -43,15 +37,24 @@ export default function PriceChart({ data }: Props) {
           <YAxis domain={["auto", "auto"]} />
           <Tooltip
             labelFormatter={(t) => new Date(t).toLocaleString()}
-            formatter={(v: number) => [`$${v.toFixed(2)}`, "Price"]}
           />
+
+          {/* Price line */}
           <Line
             type="monotone"
             dataKey="price"
-            stroke="#22c55e"
             strokeWidth={2}
             dot={false}
           />
+
+          {/* Alert dots */}
+          {alerts.length > 0 && (
+            <Scatter
+              data={alerts}
+              fill="red"
+              shape="circle"
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
