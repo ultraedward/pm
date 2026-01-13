@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
 import { useEffect, useState } from "react";
 
@@ -17,24 +18,35 @@ type PricePoint = {
   price: number;
 };
 
+type AlertLine = {
+  price: number;
+  direction: "above" | "below";
+};
+
+type ApiResponse = {
+  prices: PricePoint[];
+  alerts: AlertLine[];
+};
+
 type Props = {
   metal: string;
   range: Range;
 };
 
 export default function PriceChart({ metal, range }: Props) {
-  const [data, setData] = useState<PricePoint[]>([]);
+  const [prices, setPrices] = useState<PricePoint[]>([]);
+  const [alerts, setAlerts] = useState<AlertLine[]>([]);
 
   useEffect(() => {
     fetch(`/api/charts/prices?metal=${metal}&range=${range}`)
       .then(r => r.json())
-      .then(res => {
-        // defensive: always force array
-        setData(Array.isArray(res) ? res : []);
+      .then((res: ApiResponse) => {
+        setPrices(Array.isArray(res.prices) ? res.prices : []);
+        setAlerts(Array.isArray(res.alerts) ? res.alerts : []);
       });
   }, [metal, range]);
 
-  if (!data.length) {
+  if (!prices.length) {
     return (
       <div className="h-[320px] flex items-center justify-center text-gray-400">
         No data
@@ -45,7 +57,7 @@ export default function PriceChart({ metal, range }: Props) {
   return (
     <div className="h-[320px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
+        <LineChart data={prices}>
           <XAxis
             dataKey="t"
             tickFormatter={t =>
@@ -59,6 +71,17 @@ export default function PriceChart({ metal, range }: Props) {
           <Tooltip
             labelFormatter={l => new Date(Number(l)).toLocaleString()}
           />
+
+          {alerts.map((a, i) => (
+            <ReferenceLine
+              key={i}
+              y={a.price}
+              stroke={a.direction === "above" ? "green" : "red"}
+              strokeDasharray="4 4"
+              ifOverflow="extendDomain"
+            />
+          ))}
+
           <Line
             type="monotone"
             dataKey="price"
