@@ -11,8 +11,12 @@ export async function GET() {
   }
 
   const alerts = await prisma.alert.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
+    where: {
+      userId: session.user.id,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
     select: {
       id: true,
       metal: true,
@@ -32,7 +36,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { metal, direction, targetPrice } = await req.json()
+  const body = await req.json()
+  const { metal, direction, targetPrice } = body
 
   const alert = await prisma.alert.create({
     data: {
