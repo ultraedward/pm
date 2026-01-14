@@ -2,16 +2,29 @@ import { prisma } from "@/lib/prisma";
 
 async function main() {
   const firstUser = await prisma.user.findFirst();
-  if (!firstUser) return;
+
+  if (!firstUser) {
+    console.log("No users found. Skipping backfill.");
+    return;
+  }
 
   await prisma.alert.updateMany({
-    where: { userId: null },
-    data: { userId: firstUser.id },
+    where: {
+      userId: { equals: null },
+    },
+    data: {
+      userId: firstUser.id,
+    },
   });
 
-  console.log("Backfilled alerts");
+  console.log("Alert userId backfill complete.");
 }
 
 main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
