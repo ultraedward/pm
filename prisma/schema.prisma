@@ -14,28 +14,32 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  accounts Account[]
-  sessions Session[]
-  alerts   Alert[]
+  isPro         Boolean   @default(false)
+
+  accounts      Account[]
+  sessions      Session[]
+  alerts        Alert[]
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -44,7 +48,9 @@ model Session {
   userId       String
   expires      DateTime
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -65,15 +71,17 @@ model Price {
 }
 
 model Alert {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   userId      String
   metal       String
   targetPrice Float
   direction   AlertDirection
-  createdAt   DateTime @default(now())
+  createdAt   DateTime       @default(now())
 
-  user     User           @relation(fields: [userId], references: [id])
-  triggers AlertTrigger[]
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  triggers    AlertTrigger[]
+
+  @@index([userId, createdAt])
 }
 
 model AlertTrigger {
@@ -82,7 +90,7 @@ model AlertTrigger {
   price       Float
   triggeredAt DateTime @default(now())
 
-  alert Alert @relation(fields: [alertId], references: [id])
+  alert       Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
 
   @@index([alertId, triggeredAt])
 }
