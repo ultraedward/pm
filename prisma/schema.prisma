@@ -8,18 +8,58 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?  @unique
   emailVerified DateTime?
   image         String?
 
+  alerts        Alert[]
   accounts      Account[]
   sessions      Session[]
-  alerts        Alert[]
-
-  createdAt     DateTime  @default(now())
 }
+
+model Price {
+  id        String   @id @default(cuid())
+  metal     String
+  price     Float
+  timestamp DateTime @default(now())
+
+  @@index([metal, timestamp])
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  metal       String
+  targetPrice Float
+  direction   AlertDirection
+  createdAt   DateTime @default(now())
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  triggers    AlertTrigger[]
+
+  @@index([userId])
+}
+
+model AlertTrigger {
+  id          String   @id @default(cuid())
+  alertId     String
+  price       Float
+  triggeredAt DateTime @default(now())
+
+  alert       Alert @relation(fields: [alertId], references: [id])
+
+  @@index([alertId, triggeredAt])
+}
+
+enum AlertDirection {
+  ABOVE
+  BELOW
+}
+
+/* === NextAuth tables === */
 
 model Account {
   id                String  @id @default(cuid())
@@ -55,42 +95,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model Price {
-  id        String   @id @default(cuid())
-  metal     String
-  price     Float
-  timestamp DateTime @default(now())
-
-  @@index([metal, timestamp])
-}
-
-model Alert {
-  id          String   @id @default(cuid())
-  metal       String
-  targetPrice Float
-  direction   AlertDirection
-  createdAt   DateTime @default(now())
-
-  userId      String
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  triggers    AlertTrigger[]
-}
-
-model AlertTrigger {
-  id          String   @id @default(cuid())
-  alertId     String
-  price       Float
-  triggeredAt DateTime @default(now())
-
-  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-
-  @@index([alertId, triggeredAt])
-}
-
-enum AlertDirection {
-  ABOVE
-  BELOW
 }
