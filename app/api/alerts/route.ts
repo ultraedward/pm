@@ -3,15 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-/**
- * GET /api/alerts
- * Used by dashboard alerts page
- */
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // 🔒 AUTH GUARD (JSON, not redirect)
+  if (!session || !session.user?.id) {
+    return NextResponse.json([], { status: 200 });
   }
 
   const alerts = await prisma.alert.findMany({
@@ -24,8 +21,8 @@ export async function GET() {
     select: {
       id: true,
       metal: true,
-      targetPrice: true,
       direction: true,
+      targetPrice: true,
       createdAt: true,
     },
   });
@@ -33,30 +30,21 @@ export async function GET() {
   return NextResponse.json(alerts);
 }
 
-/**
- * POST /api/alerts
- * Create new alert
- */
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
-  const { metal, targetPrice, direction } = body;
-
-  if (!metal || !targetPrice || !direction) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
-  }
 
   const alert = await prisma.alert.create({
     data: {
-      metal,
-      targetPrice,
-      direction,
       userId: session.user.id,
+      metal: body.metal,
+      direction: body.direction,
+      targetPrice: body.targetPrice,
     },
   });
 
