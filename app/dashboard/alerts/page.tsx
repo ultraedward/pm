@@ -5,19 +5,18 @@ import { useEffect, useState } from "react"
 type Alert = {
   id: string
   metal: string
-  targetPrice: number
   direction: "ABOVE" | "BELOW"
+  targetPrice: number
 }
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [metal, setMetal] = useState("gold")
-  const [targetPrice, setTargetPrice] = useState("")
   const [direction, setDirection] = useState<"ABOVE" | "BELOW">("ABOVE")
+  const [targetPrice, setTargetPrice] = useState("")
 
   async function loadAlerts() {
     const res = await fetch("/api/alerts")
-    if (!res.ok) return
     const data = await res.json()
     setAlerts(Array.isArray(data) ? data : [])
   }
@@ -26,9 +25,12 @@ export default function AlertsPage() {
     await fetch("/api/alerts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ metal, targetPrice, direction }),
+      body: JSON.stringify({
+        metal,
+        direction,
+        targetPrice: Number(targetPrice),
+      }),
     })
-
     setTargetPrice("")
     loadAlerts()
   }
@@ -43,16 +45,11 @@ export default function AlertsPage() {
   }, [])
 
   return (
-    <div className="p-6 max-w-xl">
-      <h1 className="text-2xl font-bold mb-4">Alerts</h1>
+    <div className="p-6 max-w-xl mx-auto space-y-6">
+      <h1 className="text-xl font-semibold">Price Alerts</h1>
 
-      {/* Create */}
-      <div className="flex gap-2 mb-6">
-        <select
-          value={metal}
-          onChange={(e) => setMetal(e.target.value)}
-          className="border px-2 py-1"
-        >
+      <div className="flex gap-2">
+        <select value={metal} onChange={e => setMetal(e.target.value)}>
           <option value="gold">Gold</option>
           <option value="silver">Silver</option>
           <option value="platinum">Platinum</option>
@@ -61,36 +58,26 @@ export default function AlertsPage() {
 
         <select
           value={direction}
-          onChange={(e) => setDirection(e.target.value as any)}
-          className="border px-2 py-1"
+          onChange={e => setDirection(e.target.value as any)}
         >
           <option value="ABOVE">Above</option>
           <option value="BELOW">Below</option>
         </select>
 
         <input
-          placeholder="Price"
           value={targetPrice}
-          onChange={(e) => setTargetPrice(e.target.value)}
-          className="border px-2 py-1 w-24"
+          onChange={e => setTargetPrice(e.target.value)}
+          placeholder="Target price"
         />
 
-        <button
-          onClick={createAlert}
-          className="border px-3 py-1 bg-white"
-        >
-          Add
-        </button>
+        <button onClick={createAlert}>Add</button>
       </div>
 
-      {/* List */}
-      {alerts.length === 0 && <p>No alerts yet</p>}
-
       <ul className="space-y-2">
-        {alerts.map((a) => (
+        {alerts.map(a => (
           <li
             key={a.id}
-            className="flex justify-between items-center border p-2"
+            className="flex justify-between border p-2 rounded"
           >
             <span>
               {a.metal} {a.direction} {a.targetPrice}

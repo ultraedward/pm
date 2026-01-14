@@ -7,7 +7,7 @@ export async function GET() {
   const session = await getServerSession(authOptions)
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json([], { status: 200 })
   }
 
   const alerts = await prisma.alert.findMany({
@@ -20,7 +20,6 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
-
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
@@ -28,16 +27,12 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { metal, targetPrice, direction } = body
 
-  if (!metal || !targetPrice || !direction) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
-  }
-
   const alert = await prisma.alert.create({
     data: {
-      metal,
-      targetPrice: Number(targetPrice),
-      direction,
       userId: session.user.id,
+      metal,
+      targetPrice,
+      direction,
     },
   })
 
