@@ -16,7 +16,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "html-to-image": "^1.11.11",
     "next": "14.2.33",
-    "next-auth": "^4.24.7",
+    "next-auth": "^4.24.13",
     "nodemailer": "^7.0.12",
     "react": "^18.3.0",
     "react-chartjs-2": "^5.3.1",
