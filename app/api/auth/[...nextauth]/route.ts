@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "next-auth/adapters";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 const handler = NextAuth({
@@ -21,10 +21,6 @@ const handler = NextAuth({
       }
       return session;
     },
-  },
-  pages: {
-    signIn: "/api/auth/signin",
-    error: "/api/auth/signin",
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
