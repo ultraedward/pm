@@ -7,23 +7,12 @@ export async function GET() {
   const session = await getServerSession(authOptions)
 
   if (!session?.user?.id) {
-    return NextResponse.json([], { status: 200 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const alerts = await prisma.alert.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      metal: true,
-      direction: true,
-      targetPrice: true,
-      createdAt: true,
-    },
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
   })
 
   return NextResponse.json(alerts)
@@ -37,13 +26,17 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json()
-  const { metal, direction, targetPrice } = body
+  const { metal, targetPrice, direction } = body
+
+  if (!metal || !targetPrice || !direction) {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
+  }
 
   const alert = await prisma.alert.create({
     data: {
       metal,
+      targetPrice: Number(targetPrice),
       direction,
-      targetPrice,
       userId: session.user.id,
     },
   })
