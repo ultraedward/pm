@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
+  output: "standalone",
+  webpack(config) {
+    config.resolve.alias["@/app/dashboard_disabled"] = false;
+    return config;
   },
 };
 
