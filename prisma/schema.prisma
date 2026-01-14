@@ -59,7 +59,7 @@ enum AlertDirection {
   BELOW
 }
 
-/* === NextAuth tables === */
+// NextAuth tables (Prisma requires // comments only)
 
 model Account {
   id                String  @id @default(cuid())
