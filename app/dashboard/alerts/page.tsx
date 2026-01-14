@@ -11,78 +11,56 @@ type Alert = {
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<Alert[]>([])
-  const [metal, setMetal] = useState("gold")
-  const [direction, setDirection] = useState<"ABOVE" | "BELOW">("ABOVE")
-  const [targetPrice, setTargetPrice] = useState("")
-
-  async function loadAlerts() {
-    const res = await fetch("/api/alerts")
-    const data = await res.json()
-    setAlerts(Array.isArray(data) ? data : [])
-  }
-
-  async function createAlert() {
-    await fetch("/api/alerts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        metal,
-        direction,
-        targetPrice: Number(targetPrice),
-      }),
-    })
-    setTargetPrice("")
-    loadAlerts()
-  }
-
-  async function deleteAlert(id: string) {
-    await fetch(`/api/alerts/${id}`, { method: "DELETE" })
-    loadAlerts()
-  }
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    async function loadAlerts() {
+      try {
+        const res = await fetch("/api/alerts")
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`)
+        }
+
+        const data = await res.json()
+
+        // 🔒 HARD GUARANTEE ARRAY
+        setAlerts(Array.isArray(data) ? data : [])
+      } catch (e) {
+        setError("Failed to load alerts")
+        setAlerts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
     loadAlerts()
   }, [])
 
+  async function deleteAlert(id: string) {
+    await fetch(`/api/alerts/${id}`, { method: "DELETE" })
+    setAlerts(prev => prev.filter(a => a.id !== id))
+  }
+
+  if (loading) return <div>Loading alerts…</div>
+  if (error) return <div>{error}</div>
+
   return (
-    <div className="p-6 max-w-xl mx-auto space-y-6">
-      <h1 className="text-xl font-semibold">Price Alerts</h1>
+    <div>
+      <h1 className="text-xl font-bold mb-4">Your Alerts</h1>
 
-      <div className="flex gap-2">
-        <select value={metal} onChange={e => setMetal(e.target.value)}>
-          <option value="gold">Gold</option>
-          <option value="silver">Silver</option>
-          <option value="platinum">Platinum</option>
-          <option value="palladium">Palladium</option>
-        </select>
-
-        <select
-          value={direction}
-          onChange={e => setDirection(e.target.value as any)}
-        >
-          <option value="ABOVE">Above</option>
-          <option value="BELOW">Below</option>
-        </select>
-
-        <input
-          value={targetPrice}
-          onChange={e => setTargetPrice(e.target.value)}
-          placeholder="Target price"
-        />
-
-        <button onClick={createAlert}>Add</button>
-      </div>
+      {alerts.length === 0 && <div>No alerts yet.</div>}
 
       <ul className="space-y-2">
-        {alerts.map(a => (
+        {alerts.map(alert => (
           <li
-            key={a.id}
-            className="flex justify-between border p-2 rounded"
+            key={alert.id}
+            className="flex justify-between gap-2 border p-2 rounded"
           >
             <span>
-              {a.metal} {a.direction} {a.targetPrice}
+              {alert.metal} {alert.direction} {alert.targetPrice}
             </span>
-            <button onClick={() => deleteAlert(a.id)}>❌</button>
+            <button onClick={() => deleteAlert(alert.id)}>❌</button>
           </li>
         ))}
       </ul>
