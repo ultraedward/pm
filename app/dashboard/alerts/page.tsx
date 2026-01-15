@@ -1,69 +1,92 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-type Alert = {
-  id: string
-  metal: string
-  direction: "ABOVE" | "BELOW"
-  targetPrice: number
-}
+type AlertRunSummary = {
+  ok: boolean;
+  ranAt?: string;
+  alertsConsidered?: number;
+  eligibleAlerts?: number;
+  triggered?: number;
+  skipped?: {
+    dueToCooldown: number;
+    dueToMissingPrice: number;
+  };
+};
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<Alert[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<any>(null);
+  const [runResult, setRunResult] = useState<AlertRunSummary | null>(null);
+  const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    async function loadAlerts() {
-      try {
-        const res = await fetch("/api/alerts")
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`)
-        }
+    fetch("/api/alerts/status")
+      .then((r) => r.json())
+      .then(setStatus)
+      .catch(() => {});
+  }, []);
 
-        const data = await res.json()
+  async function runAlerts() {
+    setRunning(true);
+    setRunResult(null);
 
-        // 🔒 HARD GUARANTEE ARRAY
-        setAlerts(Array.isArray(data) ? data : [])
-      } catch (e) {
-        setError("Failed to load alerts")
-        setAlerts([])
-      } finally {
-        setLoading(false)
-      }
-    }
+    const res = await fetch("/api/alerts/run", { method: "POST" });
+    const json = await res.json();
 
-    loadAlerts()
-  }, [])
-
-  async function deleteAlert(id: string) {
-    await fetch(`/api/alerts/${id}`, { method: "DELETE" })
-    setAlerts(prev => prev.filter(a => a.id !== id))
+    setRunResult(json);
+    setRunning(false);
   }
 
-  if (loading) return <div>Loading alerts…</div>
-  if (error) return <div>{error}</div>
-
   return (
-    <div>
-      <h1 className="text-xl font-bold mb-4">Your Alerts</h1>
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <h1 className="text-2xl font-bold">Alerts</h1>
 
-      {alerts.length === 0 && <div>No alerts yet.</div>}
+      <div className="rounded-xl border bg-white p-5 shadow-sm">
+        <h2 className="font-semibold mb-2">System Status</h2>
 
-      <ul className="space-y-2">
-        {alerts.map(alert => (
-          <li
-            key={alert.id}
-            className="flex justify-between gap-2 border p-2 rounded"
-          >
-            <span>
-              {alert.metal} {alert.direction} {alert.targetPrice}
-            </span>
-            <button onClick={() => deleteAlert(alert.id)}>❌</button>
-          </li>
-        ))}
-      </ul>
+        {!status ? (
+          <p className="text-sm text-gray-500">Loading…</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className="text-gray-500">Total Alerts</div>
+              <div className="font-medium">{status.totalAlerts}</div>
+            </div>
+
+            <div>
+              <div className="text-gray-500">Total Triggers</div>
+              <div className="font-medium">{status.totalTriggers}</div>
+            </div>
+
+            <div className="col-span-2">
+              <div className="text-gray-500">Last Triggered</div>
+              <div className="font-medium">
+                {status.lastTriggeredAt
+                  ? new Date(status.lastTriggeredAt).toLocaleString()
+                  : "Never"}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-xl border bg-white p-5 shadow-sm">
+        <h2 className="font-semibold mb-3">Run Alerts Now</h2>
+
+        <button
+          onClick={runAlerts}
+          disabled={running}
+          className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-50"
+        >
+          {running ? "Running…" : "Run Alert Engine"}
+        </button>
+
+        {runResult && (
+          <pre className="mt-4 text-xs bg-gray-50 border rounded-lg p-3 overflow-auto">
+{JSON.stringify(runResult, null, 2)}
+          </pre>
+        )}
+      </div>
     </div>
-  )
+  );
 }
