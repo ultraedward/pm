@@ -1,10 +1,7 @@
 // app/api/alerts/run/route.ts
-// FULL SHEET — COPY / PASTE ENTIRE FILE
+// FULL FILE — COPY / PASTE
 
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-
-import { authOptions } from "@/lib/auth";
 import { runAlertEngine } from "@/lib/alerts/engine";
 
 export const dynamic = "force-dynamic";
@@ -17,34 +14,39 @@ function isAuthorizedBySecret(req: Request) {
   return header === secret || qp === secret;
 }
 
+function isSameOrigin(req: Request) {
+  const origin = req.headers.get("origin");
+  const host = req.headers.get("host");
+  if (!origin || !host) return false;
+  return origin.includes(host);
+}
+
 /**
- * GET /api/alerts/run
+ * GET / POST /api/alerts/run
  *
- * Intended for:
- * - Vercel Cron / external cron (send x-alert-run-secret)
- * - Manual debugging (requires being signed in)
+ * Allowed:
+ * - Cron (x-alert-run-secret)
+ * - Same-origin UI calls (manual run button)
  */
 export async function GET(req: Request) {
-  // 1) Allow cron secret
+  // 1) Cron / secret
   if (isAuthorizedBySecret(req)) {
     const result = await runAlertEngine("cron");
     return NextResponse.json(result, { status: result.ok ? 200 : 500 });
   }
 
-  // 2) Signed-in manual run
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  // 2) Same-origin manual run
+  if (isSameOrigin(req)) {
+    const result = await runAlertEngine("manual");
+    return NextResponse.json(result, { status: result.ok ? 200 : 500 });
   }
 
-  const result = await runAlertEngine("manual");
-  return NextResponse.json(result, { status: result.ok ? 200 : 500 });
+  return NextResponse.json(
+    { ok: false, error: "Unauthorized" },
+    { status: 401 }
+  );
 }
 
-/**
- * POST /api/alerts/run
- * Same behavior as GET (useful for internal calls)
- */
 export async function POST(req: Request) {
   return GET(req);
 }
