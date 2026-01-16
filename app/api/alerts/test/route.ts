@@ -9,52 +9,63 @@ import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Creates a test alert that is guaranteed to trigger
- * for the currently logged-in user.
- */
 export async function POST() {
-  const session = await getServerSession(authOptions);
+  try {
+    // 1) Get session (may throw)
+    const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { ok: false, error: "Not signed in" },
+        { status: 401 }
+      );
+    }
+
+    // 2) Get latest price
+    const latest = await prisma.price.findFirst({
+      orderBy: { timestamp: "desc" },
+    });
+
+    if (!latest) {
+      return NextResponse.json(
+        { ok: false, error: "No price data available" },
+        { status: 400 }
+      );
+    }
+
+    // 3) Create guaranteed-trigger alert
+    const alert = await prisma.alert.create({
+      data: {
+        userId: session.user.id,
+        metal: latest.metal,
+        direction: "ABOVE",
+        targetPrice: latest.price - 1,
+      },
+    });
+
+    // 4) Run engine
+    const run = await runAlertEngine("manual");
+
+    return NextResponse.json({
+      ok: true,
+      createdAlert: {
+        id: alert.id,
+        metal: alert.metal,
+        targetPrice: alert.targetPrice,
+      },
+      engineResult: run,
+    });
+  } catch (err: any) {
+    // 🔴 THIS IS THE KEY PART
+    console.error("[alerts/test] failed", err);
+
     return NextResponse.json(
-      { ok: false, error: "Not signed in" },
-      { status: 401 }
+      {
+        ok: false,
+        error: "Internal server error",
+        detail: err?.message ?? "Unknown error",
+      },
+      { status: 500 }
     );
   }
-
-  // 1) Get latest price
-  const latest = await prisma.price.findFirst({
-    orderBy: { timestamp: "desc" },
-  });
-
-  if (!latest) {
-    return NextResponse.json(
-      { ok: false, error: "No price data available" },
-      { status: 400 }
-    );
-  }
-
-  // 2) Create alert guaranteed to trigger
-  const alert = await prisma.alert.create({
-    data: {
-      userId: session.user.id,
-      metal: latest.metal,
-      direction: "ABOVE",
-      targetPrice: latest.price - 1,
-    },
-  });
-
-  // 3) Run engine immediately
-  const run = await runAlertEngine("manual");
-
-  return NextResponse.json({
-    ok: true,
-    createdAlert: {
-      id: alert.id,
-      metal: alert.metal,
-      targetPrice: alert.targetPrice,
-    },
-    engineResult: run,
-  });
 }
