@@ -8,19 +8,26 @@ export default function AlertsPage() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    fetch("/api/alerts/status")
+    // ✅ RELATIVE URL — REQUIRED
+    fetch("/api/alerts/status", { credentials: "same-origin" })
       .then((r) => r.json())
       .then(setStatus)
-      .catch(() => {});
+      .catch((e) => {
+        console.error("Status fetch failed", e);
+      });
   }, []);
 
   async function runAlerts() {
     setRunning(true);
     setRunResult(null);
 
-    const res = await fetch("/api/alerts/run", { method: "POST" });
-    const json = await res.json();
+    // ✅ RELATIVE URL — REQUIRED
+    const res = await fetch("/api/alerts/run", {
+      method: "POST",
+      credentials: "same-origin",
+    });
 
+    const json = await res.json();
     setRunResult(json);
     setRunning(false);
   }
@@ -29,9 +36,13 @@ export default function AlertsPage() {
     setRunning(true);
     setRunResult(null);
 
-    const res = await fetch("/api/alerts/test", { method: "POST" });
-    const json = await res.json();
+    // ✅ RELATIVE URL — REQUIRED
+    const res = await fetch("/api/alerts/test", {
+      method: "POST",
+      credentials: "same-origin",
+    });
 
+    const json = await res.json();
     setRunResult(json);
     setRunning(false);
   }
@@ -40,7 +51,6 @@ export default function AlertsPage() {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Alerts</h1>
 
-      {/* STATUS */}
       <div className="rounded-xl border bg-white p-5 shadow-sm">
         <h2 className="font-semibold mb-2">System Status</h2>
 
@@ -70,7 +80,6 @@ export default function AlertsPage() {
         )}
       </div>
 
-      {/* ACTIONS */}
       <div className="rounded-xl border bg-white p-5 shadow-sm space-y-3">
         <h2 className="font-semibold">Actions</h2>
 
