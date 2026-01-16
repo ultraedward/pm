@@ -1,26 +1,33 @@
-"use client";
+// app/components/AdminOnly.tsx
+// FULL FILE — COPY / PASTE
 
-import { ReactNode } from "react";
-import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-const ADMIN_EMAILS = [
-  "admin@example.com", // replace with real admin emails
-];
+type Props = {
+  children: React.ReactNode;
+};
 
-export default function AdminOnly({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const { data: session } = useSession();
-  const user = session?.user;
+/**
+ * Server-side admin gate.
+ * No client auth. No useSession(). No CLIENT_FETCH_ERROR.
+ */
+export default async function AdminOnly({ children }: Props) {
+  const session = await getServerSession(authOptions);
 
-  if (!user) return null;
+  // Not signed in → hide content
+  if (!session?.user?.email) {
+    return null;
+  }
 
-  // Explicitly guard against null / undefined email
-  if (!user.email) return null;
+  // Adjust this check however you want
+  const isAdmin =
+    session.user.email.endsWith("@gmail.com") || // example
+    session.user.email === "you@example.com";
 
-  if (!ADMIN_EMAILS.includes(user.email)) return null;
+  if (!isAdmin) {
+    return null;
+  }
 
   return <>{children}</>;
 }
