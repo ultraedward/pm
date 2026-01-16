@@ -1,16 +1,15 @@
-"use client";
-
-import { signIn } from "next-auth/react";
+// app/signin/page.tsx
+// FULL FILE — COPY / PASTE
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <button
-        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-        className="rounded bg-black px-6 py-3 text-white"
+    <div className="min-h-screen flex items-center justify-center">
+      <a
+        href="/api/auth/signin"
+        className="px-4 py-2 rounded-lg bg-black text-white"
       >
         Sign in with Google
-      </button>
+      </a>
     </div>
   );
 }
