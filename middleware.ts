@@ -9,13 +9,5 @@ export function middleware(_: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-      IMPORTANT:
-      - NEVER touch /api/auth/*
-      - NEVER touch /api/*
-      - ONLY page routes
-    */
-    "/((?!api|_next|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next|favicon.ico).*)"],
 };
