@@ -1,14 +1,21 @@
+// app/api/charts/prices/route.ts
+// FULL FILE — COPY / PASTE
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-
-  const metal = searchParams.get("metal") ?? "gold";
+  const metal = searchParams.get("metal");
   const range = searchParams.get("range") ?? "24h";
 
-  const now = Date.now();
+  if (!metal) {
+    return NextResponse.json([]);
+  }
 
+  const now = Date.now();
   const since =
     range === "7d"
       ? new Date(now - 7 * 24 * 60 * 60 * 1000)
@@ -16,22 +23,29 @@ export async function GET(req: Request) {
       ? new Date(now - 30 * 24 * 60 * 60 * 1000)
       : new Date(now - 24 * 60 * 60 * 1000);
 
-  const prices = await prisma.price.findMany({
+  // Use alertTrigger as the time-series source (price model no longer exists)
+  const rows = await prisma.alertTrigger.findMany({
     where: {
-      metal,
-      timestamp: { gte: since },
+      Alert: {
+        metal,
+      },
+      createdAt: {
+        gte: since,
+      },
     },
-    orderBy: { timestamp: "asc" },
+    orderBy: {
+      createdAt: "asc",
+    },
     select: {
-      timestamp: true,
+      createdAt: true,
       price: true,
     },
   });
 
   return NextResponse.json(
-    prices.map(p => ({
-      t: p.timestamp.getTime(),
-      price: p.price,
+    rows.map((r) => ({
+      t: r.createdAt.getTime(),
+      price: r.price,
     }))
   );
 }
