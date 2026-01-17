@@ -1,5 +1,10 @@
+// app/api/prices/history/route.ts
+// FULL FILE — COPY / PASTE
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -7,12 +12,35 @@ export async function GET(req: Request) {
 
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 
-  const rows = await prisma.price.findMany({
+  // Use alertTrigger as historical price source
+  const rows = await prisma.alertTrigger.findMany({
     where: {
-      timestamp: { gte: since },
+      createdAt: { gte: since },
     },
-    orderBy: { timestamp: "asc" },
+    orderBy: {
+      createdAt: "asc",
+    },
+    select: {
+      createdAt: true,
+      price: true,
+      Alert: {
+        select: {
+          metal: true,
+        },
+      },
+    },
   });
 
-  return NextResponse.json(rows);
+  const grouped: Record<string, { t: number; price: number }[]> = {};
+
+  for (const r of rows) {
+    const metal = r.Alert.metal;
+    if (!grouped[metal]) grouped[metal] = [];
+    grouped[metal].push({
+      t: r.createdAt.getTime(),
+      price: r.price,
+    });
+  }
+
+  return NextResponse.json(grouped);
 }
