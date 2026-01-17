@@ -10,40 +10,36 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
   createdAt DateTime @default(now())
 
   alerts    Alert[]
 }
 
 model Alert {
-  id          String   @id @default(cuid())
-  userId      String
-  metal       String
-  direction   String
-  targetPrice Float
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId   String
+  metal     String
+  condition String
+  threshold Float
+  createdAt DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id])
-  triggers    AlertTrigger[]
-
-  @@index([userId])
-  @@index([metal])
+  user      User          @relation(fields: [userId], references: [id])
+  triggers  AlertTrigger[]
 }
 
 model AlertTrigger {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   alertId     String
-  price       Float
-  triggeredAt DateTime @default(now())
+  price       Float?
+  triggeredAt DateTime?   // ✅ MUST be nullable
+  createdAt   DateTime    @default(now())
 
-  alert       Alert    @relation(fields: [alertId], references: [id])
+  alert       Alert       @relation(fields: [alertId], references: [id])
 
   @@index([alertId])
-  @@index([triggeredAt])
 }
 
-model Price {
+model PriceHistory {
   id        String   @id @default(cuid())
   metal     String
   price     Float
