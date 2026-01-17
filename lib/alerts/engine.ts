@@ -1,14 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-type TriggerResult = {
-  triggerId: string;
-  metal: string;
-  price: number;
-  threshold: number;
-  condition: "above" | "below";
-};
-
-export async function runAlertEngine(): Promise<TriggerResult[]> {
+export async function runAlertEngine(latestPrices: Record<string, number>) {
   const triggers = await prisma.alertTrigger.findMany({
     where: {
       triggeredAt: null,
@@ -17,49 +9,34 @@ export async function runAlertEngine(): Promise<TriggerResult[]> {
       alert: {
         select: {
           metal: true,
-          condition: true,
-          threshold: true,
+          direction: true,
+          targetPrice: true,
         },
       },
     },
   });
 
-  const results: TriggerResult[] = [];
-
   for (const trigger of triggers) {
-    const { metal, condition, threshold } = trigger.alert;
+    const { metal, direction, targetPrice } = trigger.alert;
 
-    const latestPrice = await prisma.priceHistory.findFirst({
-      where: { metal },
-      orderBy: { timestamp: "desc" },
-      select: { price: true },
-    });
+    if (targetPrice == null) continue;
 
-    if (!latestPrice) continue;
+    const currentPrice = latestPrices[metal];
+    if (currentPrice == null) continue;
 
-    const hit =
-      condition === "above"
-        ? latestPrice.price >= threshold
-        : latestPrice.price <= threshold;
+    const shouldTrigger =
+      direction === "above"
+        ? currentPrice >= targetPrice
+        : currentPrice <= targetPrice;
 
-    if (!hit) continue;
+    if (!shouldTrigger) continue;
 
     await prisma.alertTrigger.update({
       where: { id: trigger.id },
       data: {
         triggeredAt: new Date(),
-        price: latestPrice.price,
+        price: currentPrice,
       },
     });
-
-    results.push({
-      triggerId: trigger.id,
-      metal,
-      price: latestPrice.price,
-      threshold,
-      condition,
-    });
   }
-
-  return results;
 }
