@@ -1,20 +1,41 @@
+// app/api/prices/current/route.ts
+// FULL FILE — COPY / PASTE
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
-  const rows = await prisma.price.findMany({
-    orderBy: { timestamp: "desc" },
-    take: 20,
+  // Use alertTrigger as the source of latest prices (price model removed)
+
+  const rows = await prisma.alertTrigger.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 50,
+    select: {
+      createdAt: true,
+      price: true,
+      Alert: {
+        select: {
+          metal: true,
+        },
+      },
+    },
   });
 
-  const latest: Record<string, number> = {};
+  const latestByMetal: Record<string, { t: number; price: number }> = {};
+
   for (const r of rows) {
-    if (!(r.metal in latest)) latest[r.metal] = r.price;
+    const metal = r.Alert.metal;
+    if (!latestByMetal[metal]) {
+      latestByMetal[metal] = {
+        t: r.createdAt.getTime(),
+        price: r.price,
+      };
+    }
   }
 
-  return NextResponse.json({
-    source: "db",
-    prices: latest,
-    updatedAt: rows[0]?.timestamp ?? null,
-  });
+  return NextResponse.json(latestByMetal);
 }
