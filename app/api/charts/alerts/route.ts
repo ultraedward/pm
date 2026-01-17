@@ -2,40 +2,40 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const metal = searchParams.get("metal");
+  const { searchParams } = new URL(req.url);
+  const metal = searchParams.get("metal");
 
-    const triggers = await prisma.alertTrigger.findMany({
-      where: metal
-        ? {
-            alert: {
-              metal,
-            },
-          }
-        : undefined,
-      orderBy: {
-        triggeredAt: "asc",
+  if (!metal) {
+    return NextResponse.json({ error: "metal required" }, { status: 400 });
+  }
+
+  const triggers = await prisma.alertTrigger.findMany({
+    where: {
+      alert: {
+        metal,
       },
-      select: {
-        triggeredAt: true,
-        price: true,
-        alert: {
-          select: {
-            metal: true,
-            direction: true,
-            targetPrice: true,
-          },
+      triggeredAt: {
+        not: null,
+      },
+    },
+    orderBy: {
+      triggeredAt: "asc",
+    },
+    select: {
+      triggeredAt: true,
+      price: true,
+      alert: {
+        select: {
+          metal: true,
         },
       },
-    });
+    },
+  });
 
-    return NextResponse.json({ ok: true, triggers });
-  } catch (err) {
-    console.error("charts/alerts error:", err);
-    return NextResponse.json(
-      { ok: false, error: "Failed to load alert chart data" },
-      { status: 500 }
-    );
-  }
+  const series = triggers.map((t) => ({
+    t: t.triggeredAt!.getTime(),
+    price: t.price,
+  }));
+
+  return NextResponse.json(series);
 }
