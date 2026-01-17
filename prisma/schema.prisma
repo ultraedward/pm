@@ -7,34 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  alerts    Alert[]
+}
+
 model Alert {
-  id           String         @id @default(cuid())
-  metal        String
-  condition    String
-  targetPrice  Float
-  active       Boolean        @default(true)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  AlertTrigger AlertTrigger[]
+  id          String   @id @default(cuid())
+  userId      String
+  metal       String
+  direction   String
+  targetPrice Float
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  triggers    AlertTrigger[]
+
+  @@index([userId])
+  @@index([metal])
 }
 
 model AlertTrigger {
-  id        String   @id @default(cuid())
-  alertId   String
-  price     Float
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  alertId     String
+  price       Float
+  triggeredAt DateTime @default(now())
 
-  Alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  alert       Alert    @relation(fields: [alertId], references: [id])
+
+  @@index([alertId])
+  @@index([triggeredAt])
 }
 
-/// SINGLETON SYSTEM STATUS ROW
-/// Tracks alert engine health & activity
-model AlertSystemStatus {
-  id              Int       @id @default(1)
-  lastRunAt       DateTime?
-  lastTriggeredAt DateTime?
-  lastError       String?
-  totalRuns       Int       @default(0)
-  totalTriggers   Int       @default(0)
-  updatedAt       DateTime  @updatedAt
+model Price {
+  id        String   @id @default(cuid())
+  metal     String
+  price     Float
+  timestamp DateTime @default(now())
+
+  @@index([metal, timestamp])
 }
