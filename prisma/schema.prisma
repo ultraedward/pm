@@ -16,25 +16,29 @@ model User {
 }
 
 model Alert {
-  id        String   @id @default(cuid())
-  userId   String
-  metal     String
-  condition String
-  threshold Float
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  metal        String
 
-  user      User          @relation(fields: [userId], references: [id])
-  triggers  AlertTrigger[]
+  // 🔔 alert logic
+  direction    String    // "above" | "below"
+  targetPrice  Float
+
+  createdAt    DateTime  @default(now())
+
+  user         User          @relation(fields: [userId], references: [id])
+  triggers     AlertTrigger[]
 }
 
 model AlertTrigger {
   id          String     @id @default(cuid())
   alertId     String
-  price       Float?
-  triggeredAt DateTime?   // ✅ MUST be nullable
-  createdAt   DateTime    @default(now())
 
-  alert       Alert       @relation(fields: [alertId], references: [id])
+  price       Float?
+  triggeredAt DateTime?  // nullable = not triggered yet
+  createdAt   DateTime   @default(now())
+
+  alert       Alert      @relation(fields: [alertId], references: [id])
 
   @@index([alertId])
 }
