@@ -1,56 +1,21 @@
+// app/api/cron/ingest-prices/route.ts
+// FULL FILE — COPY / PASTE
+
 import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
-type Metal = "gold" | "silver" | "platinum" | "palladium";
-const METALS: Metal[] = ["gold", "silver", "platinum", "palladium"];
+export const dynamic = "force-dynamic";
 
-function mockPrices(): Record<Metal, number> {
-  return {
-    gold: 2050,
-    silver: 25.4,
-    platinum: 920,
-    palladium: 980,
-  };
-}
-
+/**
+ * This cron previously ingested into a removed `price` model.
+ * It is now a no-op health check to keep the cron endpoint valid.
+ */
 export async function GET() {
-  const prices = mockPrices();
+  const alertCount = await prisma.alert.count();
 
-  // check if we already have history
-  const count = await prisma.price.count();
-
-  const now = Date.now();
-
-  // SEED 24 HOURS (hourly) IF EMPTY
-  if (count === 0) {
-    for (let h = 24; h >= 0; h--) {
-      const t = new Date(now - h * 60 * 60 * 1000);
-
-      for (const metal of METALS) {
-        await prisma.price.create({
-          data: {
-            metal,
-            price:
-              prices[metal] *
-              (1 + (Math.random() - 0.5) * 0.02),
-            timestamp: t,
-          },
-        });
-      }
-    }
-  } else {
-    // normal ingest
-    const t = new Date();
-    for (const metal of METALS) {
-      await prisma.price.create({
-        data: {
-          metal,
-          price: prices[metal],
-          timestamp: t,
-        },
-      });
-    }
-  }
-
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    alertCount,
+    ranAt: new Date().toISOString(),
+  });
 }
