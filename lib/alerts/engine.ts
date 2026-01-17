@@ -11,9 +11,7 @@ type TriggerResult = {
 export async function runAlertEngine(): Promise<TriggerResult[]> {
   const triggers = await prisma.alertTrigger.findMany({
     where: {
-      triggeredAt: {
-        equals: null,
-      },
+      triggeredAt: null,
     },
     include: {
       alert: {
