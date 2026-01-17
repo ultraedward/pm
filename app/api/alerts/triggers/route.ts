@@ -1,43 +1,28 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const metal = searchParams.get("metal");
-
-    const rows = await prisma.alertTrigger.findMany({
-      where: metal
-        ? {
-            alert: {
-              metal,
-            },
-          }
-        : undefined,
-      orderBy: {
-        triggeredAt: "desc",
-      },
-      select: {
-        id: true,
-        triggeredAt: true,
-        price: true,
-        alert: {
-          select: {
-            id: true,
-            metal: true,
-            direction: true,
-            targetPrice: true,
-          },
+export async function GET() {
+  const triggers = await prisma.alertTrigger.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      alert: {
+        select: {
+          id: true,
+          metal: true,
         },
       },
-    });
+    },
+  });
 
-    return NextResponse.json({ ok: true, rows });
-  } catch (err) {
-    console.error("alerts/triggers error:", err);
-    return NextResponse.json(
-      { ok: false, error: "Failed to fetch alert triggers" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    triggers.map((t) => ({
+      id: t.id,
+      metal: t.alert.metal,
+      triggeredAt: t.triggeredAt,
+      price: t.price,
+      createdAt: t.createdAt,
+    }))
+  );
 }
