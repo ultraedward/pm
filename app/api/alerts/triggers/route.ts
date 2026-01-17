@@ -1,29 +1,38 @@
-// app/api/alerts/triggers/route.ts
-// FULL FILE — COPY / PASTE
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal");
+  try {
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get("metal");
 
-  const rows = await prisma.alertTrigger.findMany({
-    where: {
-      ...(metal
+    const rows = await prisma.alertTrigger.findMany({
+      where: metal
         ? {
-            Alert: {
-              metal,
-            },
+            metal,
           }
-        : {}),
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+        : undefined,
+      orderBy: {
+        triggeredAt: "desc",
+      },
+      select: {
+        id: true,
+        metal: true,
+        condition: true,
+        threshold: true,
+        triggeredAt: true,
+      },
+    });
 
-  return NextResponse.json(rows);
+    return NextResponse.json({
+      ok: true,
+      rows,
+    });
+  } catch (err) {
+    console.error("alerts/triggers error:", err);
+    return NextResponse.json(
+      { ok: false, error: "Failed to fetch alert triggers" },
+      { status: 500 }
+    );
+  }
 }
