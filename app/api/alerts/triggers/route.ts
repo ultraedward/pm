@@ -9,7 +9,9 @@ export async function GET(req: Request) {
     const rows = await prisma.alertTrigger.findMany({
       where: metal
         ? {
-            metal,
+            alert: {
+              metal,
+            },
           }
         : undefined,
       orderBy: {
@@ -17,10 +19,14 @@ export async function GET(req: Request) {
       },
       select: {
         id: true,
-        metal: true,
-        condition: true,
-        threshold: true,
         triggeredAt: true,
+        alert: {
+          select: {
+            metal: true,
+            condition: true,
+            threshold: true,
+          },
+        },
       },
     });
 
