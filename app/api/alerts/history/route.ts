@@ -1,29 +1,40 @@
-// app/api/alerts/history/route.ts
-// FULL FILE — COPY / PASTE
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal");
+  try {
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get("metal");
 
-  const rows = await prisma.alertTrigger.findMany({
-    where: {
-      ...(metal
-        ? {
-            Alert: {
-              metal,
-            },
-          }
-        : {}),
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+    const rows = await prisma.alertTrigger.findMany({
+      where: {
+        ...(metal
+          ? {
+              alert: {
+                metal: metal,
+              },
+            }
+          : {}),
+      },
+      include: {
+        alert: true,
+      },
+      orderBy: {
+        triggeredAt: "desc",
+      },
+      take: 100,
+    });
 
-  return NextResponse.json(rows);
+    return NextResponse.json({
+      ok: true,
+      count: rows.length,
+      rows,
+    });
+  } catch (err) {
+    console.error("alerts/history error:", err);
+    return NextResponse.json(
+      { ok: false, error: "Failed to fetch alert history" },
+      { status: 500 }
+    );
+  }
 }
