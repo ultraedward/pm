@@ -23,7 +23,6 @@ export async function GET(req: Request) {
         alert: {
           select: {
             metal: true,
-            condition: true,
             threshold: true,
           },
         },
