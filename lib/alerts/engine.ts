@@ -12,7 +12,7 @@ export async function runAlertEngine(
       alert: {
         select: {
           metal: true,
-          threshold: true,
+          targetPrice: true,
         },
       },
     },
@@ -24,9 +24,7 @@ export async function runAlertEngine(
     const spot = await getSpotPrice(trigger.alert.metal);
     if (spot === null) continue;
 
-    const shouldTrigger = spot >= trigger.alert.threshold;
-
-    if (!shouldTrigger) continue;
+    if (spot < trigger.alert.targetPrice) continue;
 
     const updated = await prisma.alertTrigger.update({
       where: { id: trigger.id },
