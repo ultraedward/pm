@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function getSpotPrice(
   metal: string
 ): Promise<number | null> {
-  const latest = await prisma.price.findFirst({
+  const latest = await prisma.priceHistory.findFirst({
     where: { metal },
     orderBy: { timestamp: "desc" },
     select: { price: true },
