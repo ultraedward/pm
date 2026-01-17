@@ -1,33 +1,41 @@
-// app/api/charts/alerts/route.ts
-// FULL FILE — COPY / PASTE
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal");
+  try {
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get("metal");
 
-  if (!metal) {
-    return NextResponse.json([], { status: 200 });
-  }
-
-  const triggers = await prisma.alertTrigger.findMany({
-    where: {
-      Alert: {
-        metal,
+    const triggers = await prisma.alertTrigger.findMany({
+      where: metal
+        ? {
+            alert: {
+              metal,
+            },
+          }
+        : undefined,
+      orderBy: {
+        triggeredAt: "asc",
       },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-    select: {
-      createdAt: true,
-      price: true,
-    },
-  });
+      select: {
+        triggeredAt: true,
+        price: true,
+        alert: {
+          select: {
+            metal: true,
+            direction: true,
+            targetPrice: true,
+          },
+        },
+      },
+    });
 
-  return NextResponse.json(triggers);
+    return NextResponse.json({ ok: true, triggers });
+  } catch (err) {
+    console.error("charts/alerts error:", err);
+    return NextResponse.json(
+      { ok: false, error: "Failed to load alert chart data" },
+      { status: 500 }
+    );
+  }
 }
