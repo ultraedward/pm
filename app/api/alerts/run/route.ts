@@ -1,23 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { runAlertEngine } from "@/lib/alerts/engine";
 
-function isAuthorizedBySecret(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret");
-  return secret === process.env.CRON_SECRET;
-}
+export async function POST() {
+  const latestPrices: Record<string, number> = {};
 
-export async function POST(req: NextRequest) {
-  if (!isAuthorizedBySecret(req)) {
-    return NextResponse.json(
-      { ok: false, error: "Unauthorized" },
-      { status: 401 }
-    );
+  const rows = await prisma.alertTrigger.findMany({
+    where: {
+      price: { not: null },
+    },
+    orderBy: {
+      triggeredAt: "desc",
+    },
+    include: {
+      alert: {
+        select: {
+          metal: true,
+        },
+      },
+    },
+  });
+
+  for (const row of rows) {
+    const metal = row.alert.metal;
+    if (latestPrices[metal] === undefined && row.price != null) {
+      latestPrices[metal] = row.price;
+    }
   }
 
-  const result = await runAlertEngine();
+  await runAlertEngine(latestPrices);
 
-  return NextResponse.json(
-    { ok: true, result },
-    { status: 200 }
-  );
+  return NextResponse.json({ ok: true });
 }
