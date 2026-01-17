@@ -1,52 +1,66 @@
-// lib/alerts/engine.ts
-// FULL FILE — COPY / PASTE EVERYTHING
-
 import { prisma } from "@/lib/prisma";
 
-type CheckResult = {
-  alertId: string;
+type TriggerResult = {
+  triggerId: string;
   metal: string;
   price: number;
+  threshold: number;
+  condition: "above" | "below";
 };
 
-export async function runAlertEngine(): Promise<CheckResult[]> {
-  /**
-   * We no longer have a `price` table.
-   * AlertTrigger is the single source of truth for historical prices.
-   * We read the most recent trigger per metal.
-   */
-
-  const rows = await prisma.alertTrigger.findMany({
-    orderBy: {
-      createdAt: "desc",
+export async function runAlertEngine(): Promise<TriggerResult[]> {
+  const triggers = await prisma.alertTrigger.findMany({
+    where: {
+      triggeredAt: null,
     },
-    take: 100,
-    select: {
-      price: true,
-      Alert: {
+    include: {
+      alert: {
         select: {
           id: true,
           metal: true,
+          condition: true,
+          threshold: true,
         },
       },
     },
   });
 
-  // Deduplicate by metal (latest per metal)
-  const seen = new Set<string>();
-  const latest: CheckResult[] = [];
+  const results: TriggerResult[] = [];
 
-  for (const r of rows) {
-    const metal = r.Alert.metal;
-    if (seen.has(metal)) continue;
-    seen.add(metal);
+  for (const trigger of triggers) {
+    const { metal, condition, threshold } = trigger.alert;
 
-    latest.push({
-      alertId: r.Alert.id,
+    const latestPrice = await prisma.priceHistory.findFirst({
+      where: { metal },
+      orderBy: { timestamp: "desc" },
+      select: { price: true },
+    });
+
+    if (!latestPrice) continue;
+
+    const hit =
+      condition === "above"
+        ? latestPrice.price >= threshold
+        : latestPrice.price <= threshold;
+
+    if (!hit) continue;
+
+    await prisma.alertTrigger.update({
+      where: { id: trigger.id },
+      data: {
+        triggeredAt: new Date(),
+        price: latestPrice.price,
+      },
+    });
+
+    results.push({
+      triggerId: trigger.id,
       metal,
-      price: r.price,
+      price: latestPrice.price,
+      threshold,
+      condition,
     });
   }
 
-  return latest;
+  return results;
 }
