@@ -20,19 +20,19 @@ export async function GET(req: Request) {
       select: {
         id: true,
         triggeredAt: true,
+        price: true,
         alert: {
           select: {
+            id: true,
             metal: true,
-            threshold: true,
+            direction: true,
+            targetPrice: true,
           },
         },
       },
     });
 
-    return NextResponse.json({
-      ok: true,
-      rows,
-    });
+    return NextResponse.json({ ok: true, rows });
   } catch (err) {
     console.error("alerts/triggers error:", err);
     return NextResponse.json(
