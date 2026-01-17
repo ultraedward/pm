@@ -1,51 +1,46 @@
-// app/api/charts/prices/route.ts
-// FULL FILE — COPY / PASTE
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal");
-  const range = searchParams.get("range") ?? "24h";
+  try {
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get("metal");
 
-  if (!metal) {
-    return NextResponse.json([]);
+    if (!metal) {
+      return NextResponse.json(
+        { ok: false, error: "metal is required" },
+        { status: 400 }
+      );
+    }
+
+    const rows = await prisma.alertTrigger.findMany({
+      where: {
+        alert: {
+          metal,
+        },
+      },
+      orderBy: {
+        triggeredAt: "asc",
+      },
+      select: {
+        triggeredAt: true,
+        price: true,
+        alert: {
+          select: {
+            metal: true,
+            direction: true,
+            targetPrice: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({ ok: true, rows });
+  } catch (err) {
+    console.error("charts/prices error:", err);
+    return NextResponse.json(
+      { ok: false, error: "Failed to load price chart data" },
+      { status: 500 }
+    );
   }
-
-  const now = Date.now();
-  const since =
-    range === "7d"
-      ? new Date(now - 7 * 24 * 60 * 60 * 1000)
-      : range === "30d"
-      ? new Date(now - 30 * 24 * 60 * 60 * 1000)
-      : new Date(now - 24 * 60 * 60 * 1000);
-
-  // Use alertTrigger as the time-series source (price model no longer exists)
-  const rows = await prisma.alertTrigger.findMany({
-    where: {
-      Alert: {
-        metal,
-      },
-      createdAt: {
-        gte: since,
-      },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-    select: {
-      createdAt: true,
-      price: true,
-    },
-  });
-
-  return NextResponse.json(
-    rows.map((r) => ({
-      t: r.createdAt.getTime(),
-      price: r.price,
-    }))
-  );
 }
