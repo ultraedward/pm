@@ -1,9 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { getSpotPrice } from "@/lib/getSpotPrice";
 
-export async function runAlertEngine(
-  now: Date = new Date()
-) {
+export async function runAlertEngine(now: Date) {
   const triggers = await prisma.alertTrigger.findMany({
     where: {
       triggeredAt: null,
@@ -11,34 +8,46 @@ export async function runAlertEngine(
     include: {
       alert: {
         select: {
+          id: true,
           metal: true,
-          targetPrice: true,
         },
       },
     },
+    take: 100,
   });
 
-  const results = [];
+  let fired = 0;
 
   for (const trigger of triggers) {
-    const spot = await getSpotPrice(trigger.alert.metal);
-    if (spot === null) continue;
-
-    if (spot < trigger.alert.targetPrice) continue;
-
-    const updated = await prisma.alertTrigger.update({
-      where: { id: trigger.id },
-      data: {
-        triggeredAt: now,
-        price: spot,
+    const latest = await prisma.priceHistory.findFirst({
+      where: {
+        metal: trigger.alert.metal,
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+      select: {
+        price: true,
       },
     });
 
-    results.push(updated);
+    if (!latest?.price) continue;
+
+    // 🔥 PLACEHOLDER LOGIC
+    // Replace later when alert rules are finalized
+    await prisma.alertTrigger.update({
+      where: { id: trigger.id },
+      data: {
+        triggeredAt: now,
+        price: latest.price,
+      },
+    });
+
+    fired++;
   }
 
   return {
     checked: triggers.length,
-    triggered: results.length,
+    fired,
   };
 }
