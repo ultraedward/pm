@@ -12,7 +12,7 @@ export async function runAlertEngine(): Promise<TriggerResult[]> {
   const triggers = await prisma.alertTrigger.findMany({
     where: {
       triggeredAt: {
-        isSet: false,
+        equals: null,
       },
     },
     include: {
