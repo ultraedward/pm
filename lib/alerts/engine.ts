@@ -3,9 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function runAlertEngine() {
-  const alerts = await prisma.alert.findMany({
-    where: { active: true },
-  });
+  const alerts = await prisma.alert.findMany();
 
   for (const alert of alerts) {
     const latest = await prisma.priceHistory.findFirst({
