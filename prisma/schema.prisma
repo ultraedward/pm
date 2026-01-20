@@ -5,42 +5,35 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
-
   alerts    Alert[]
 }
 
 model Alert {
-  id           String   @id @default(cuid())
-  userId       String
-  metal        String
-
-  // 🔔 alert logic
-  direction    String    // "above" | "below"
-  targetPrice  Float
-
-  createdAt    DateTime  @default(now())
-
-  user         User          @relation(fields: [userId], references: [id])
-  triggers     AlertTrigger[]
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id])
+  metal       String
+  direction   String
+  targetPrice Float
+  createdAt   DateTime       @default(now())
+  triggers    AlertTrigger[]
 }
 
 model AlertTrigger {
-  id          String     @id @default(cuid())
+  id          String   @id @default(cuid())
   alertId     String
-
-  price       Float?
-  triggeredAt DateTime?  // nullable = not triggered yet
-  createdAt   DateTime   @default(now())
-
-  alert       Alert      @relation(fields: [alertId], references: [id])
-
-  @@index([alertId])
+  alert       Alert    @relation(fields: [alertId], references: [id])
+  price       Float
+  triggeredAt DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime @default(now())
 }
 
 model PriceHistory {
@@ -48,6 +41,4 @@ model PriceHistory {
   metal     String
   price     Float
   timestamp DateTime @default(now())
-
-  @@index([metal, timestamp])
 }
