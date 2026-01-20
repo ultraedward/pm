@@ -1,22 +1,13 @@
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from '@prisma/client';
 
-export async function getSpotPrice(
-  metal: string
-): Promise<number | null> {
-  const row = await prisma.alertTrigger.findFirst({
-    where: {
-      alert: {
-        metal,
-      },
-      price: { not: null },
-    },
-    orderBy: {
-      triggeredAt: "desc",
-    },
-    select: {
-      price: true,
-    },
+const prisma = new PrismaClient();
+
+export async function getSpotPrice(metal: string): Promise<number | null> {
+  const latest = await prisma.priceHistory.findFirst({
+    where: { metal },
+    orderBy: { timestamp: 'desc' },
+    select: { price: true }
   });
 
-  return row?.price ?? null;
+  return latest?.price ?? null;
 }

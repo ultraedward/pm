@@ -1,53 +1,47 @@
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from '@prisma/client';
 
-export async function runAlertEngine(now: Date) {
-  const triggers = await prisma.alertTrigger.findMany({
-    where: {
-      triggeredAt: null,
-    },
-    include: {
-      alert: {
-        select: {
-          id: true,
-          metal: true,
-        },
-      },
-    },
-    take: 100,
-  });
+const prisma = new PrismaClient();
+
+export async function runAlertEngine() {
+  const alerts = await prisma.alert.findMany();
 
   let fired = 0;
 
-  for (const trigger of triggers) {
+  for (const alert of alerts) {
     const latest = await prisma.priceHistory.findFirst({
-      where: {
-        metal: trigger.alert.metal,
-      },
-      orderBy: {
-        timestamp: "desc",
-      },
-      select: {
-        price: true,
-      },
+      where: { metal: alert.metal },
+      orderBy: { createdAt: 'desc' }
     });
 
-    if (!latest?.price) continue;
+    if (!latest) continue;
 
-    // 🔥 PLACEHOLDER LOGIC
-    // Replace later when alert rules are finalized
-    await prisma.alertTrigger.update({
-      where: { id: trigger.id },
+    const hit =
+      (alert.direction === 'above' && latest.price >= alert.targetPrice) ||
+      (alert.direction === 'below' && latest.price <= alert.targetPrice);
+
+    if (!hit) continue;
+
+    const alreadyTriggered = await prisma.alertTrigger.findFirst({
+      where: { alertId: alert.id }
+    });
+
+    if (alreadyTriggered) continue;
+
+    await prisma.alertTrigger.create({
       data: {
-        triggeredAt: now,
+        alertId: alert.id,
         price: latest.price,
-      },
+        triggeredAt: new Date()
+        });
+
+        await (await import('./notify')).notifyTrigger(trigger.id);
+
+        await prisma.alertTrigger.update({
+      }
     });
 
     fired++;
   }
 
-  return {
-    checked: triggers.length,
-    fired,
-  };
+  return { checked: alerts.length, fired };
 }
