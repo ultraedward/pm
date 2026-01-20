@@ -8,7 +8,7 @@ export async function runAlertEngine() {
   for (const alert of alerts) {
     const latest = await prisma.priceHistory.findFirst({
       where: { metal: alert.metal },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { timestamp: 'desc' },
     });
 
     if (!latest) continue;
