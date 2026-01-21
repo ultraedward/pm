@@ -1,12 +1,11 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+export const dynamic = 'force-dynamic';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   const triggers = await prisma.alertTrigger.findMany({
-    orderBy: { triggeredAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   });
 
-  return NextResponse.json(triggers);
+  return Response.json(triggers);
 }
