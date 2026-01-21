@@ -1,43 +1,41 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-export async function GET(
-  req: Request,
-  { params }: { params: { metal: string } }
-) {
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: NextRequest) {
   try {
-    const metal = params.metal;
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get('metal');
 
     if (!metal) {
       return NextResponse.json(
-        { error: "Metal is required" },
+        { ok: false, error: 'Missing metal parameter' },
         { status: 400 }
       );
     }
 
-    const rows = await prisma.alertTrigger.findMany({
-      where: {
-        alert: {
-          metal: metal,
+    const alerts = await prisma.alert.findMany({
+      where: { metal },
+      include: {
+        triggers: {
+          orderBy: { createdAt: 'desc' },
         },
       },
-      include: {
-        alert: true,
-      },
-      orderBy: {
-        triggeredAt: "desc",
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json({
       ok: true,
-      count: rows.length,
-      rows,
+      metal,
+      count: alerts.length,
+      alerts,
     });
   } catch (err) {
-    console.error("alerts/by-metal error:", err);
+    console.error('alerts/by-metal error:', err);
     return NextResponse.json(
-      { ok: false, error: "Failed to fetch alerts by metal" },
+      { ok: false, error: 'Failed to fetch alerts by metal' },
       { status: 500 }
     );
   }
