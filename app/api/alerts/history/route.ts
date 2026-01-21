@@ -1,40 +1,18 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const metal = searchParams.get("metal");
+import { prisma } from '@/lib/prisma';
 
-    const rows = await prisma.alertTrigger.findMany({
-      where: {
-        ...(metal
-          ? {
-              alert: {
-                metal: metal,
-              },
-            }
-          : {}),
-      },
-      include: {
-        alert: true,
-      },
-      orderBy: {
-        triggeredAt: "desc",
-      },
-      take: 100,
-    });
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const metal = searchParams.get('metal');
 
-    return NextResponse.json({
-      ok: true,
-      count: rows.length,
-      rows,
-    });
-  } catch (err) {
-    console.error("alerts/history error:", err);
-    return NextResponse.json(
-      { ok: false, error: "Failed to fetch alert history" },
-      { status: 500 }
-    );
-  }
+  const where = metal ? { metal } : {};
+
+  const history = await prisma.priceHistory.findMany({
+    where,
+    orderBy: { timestamp: 'desc' },
+    take: 100,
+  });
+
+  return Response.json({ ok: true, history });
 }
