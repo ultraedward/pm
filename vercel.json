@@ -1,12 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ingest-prices",
-      "schedule": "0 */1 * * *"
-    },
-    {
-      "path": "/api/cron/run-alerts",
-      "schedule": "*/5 * * * *"
+      "path": "/api/alerts/run",
+      "schedule": "0 9 * * *"
     }
   ]
 }
