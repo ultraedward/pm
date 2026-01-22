@@ -30,12 +30,13 @@ model AlertTrigger {
   id          String   @id @default(cuid())
   alertId     String
   alert       Alert    @relation(fields: [alertId], references: [id])
+
   price       Float
   triggeredAt DateTime?
   deliveredAt DateTime?
   createdAt   DateTime @default(now())
 
-  @@unique([alertId, price, triggeredAt])
+  @@unique([alertId, price], name: "alert_price_dedupe")
 }
 
 model PriceHistory {
