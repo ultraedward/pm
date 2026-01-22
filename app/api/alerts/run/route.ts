@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function POST() {
   const started = Date.now();
 
-  const result = await runWithAdvisoryLock(
+  const lockResult = await runWithAdvisoryLock(
     prisma,
     'cron:alerts-run',
     async () => {
@@ -16,10 +16,25 @@ export async function POST() {
     }
   );
 
+  // 🔒 Another instance is running — exit cleanly
+  if (!lockResult.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'LOCKED',
+        ranAt: new Date().toISOString(),
+        ms: Date.now() - started,
+      },
+      { status: 409 }
+    );
+  }
+
+  const { checked, fired } = lockResult.result;
+
   return NextResponse.json({
     ok: true,
-    checkedAlerts: result.checked,
-    newTriggers: result.fired,
+    checkedAlerts: checked,
+    newTriggers: fired,
     ranAt: new Date().toISOString(),
     ms: Date.now() - started,
   });
