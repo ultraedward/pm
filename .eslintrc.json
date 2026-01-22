@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Property[key.name='not'] Literal[value=null]",
+        "message": "❌ Do not use `{ not: null }` with Prisma. Use `{ not: undefined }`."
+      }
+    ]
+  }
+}
