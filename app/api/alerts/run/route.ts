@@ -10,10 +10,10 @@ export async function POST() {
 
   const result = await runWithAdvisoryLock(
     prisma,
+    'cron:alerts-run',
     async () => {
       return await runAlertEngine();
-    },
-    'cron:alerts-run'
+    }
   );
 
   return NextResponse.json({
