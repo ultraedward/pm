@@ -16,15 +16,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const result = await prisma.alertTrigger.updateMany({
-    where: {
-      triggeredAt: { not: null },
-      deliveredAt: null,
-    },
-    data: {
-      deliveredAt: new Date(),
-    },
-  });
+const result = await prisma.alertTrigger.updateMany({
+  where: {
+    triggeredAt: { not: undefined },
+    deliveredAt: null,
+  },
+  data: {
+    deliveredAt: new Date(),
+  },
+});
 
   return NextResponse.json({ ok: true, backfilled: result.count });
 }
