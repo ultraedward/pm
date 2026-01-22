@@ -1,18 +1,20 @@
-export const dynamic = 'force-dynamic';
-
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
   const metal = searchParams.get('metal');
 
   const where = metal ? { metal } : {};
 
-  const history = await prisma.priceHistory.findMany({
+  const history = await prisma.price.findMany({
     where,
     orderBy: { timestamp: 'desc' },
     take: 100,
   });
 
-  return Response.json({ ok: true, history });
+  return NextResponse.json({
+    ok: true,
+    history,
+  });
 }
