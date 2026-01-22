@@ -1,33 +1,31 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET() {
   const alerts = await prisma.alert.findMany({
-    orderBy: { createdAt: 'desc' },
     include: {
       triggers: {
         orderBy: { triggeredAt: 'desc' },
-        take: 1,
       },
     },
+    orderBy: { createdAt: 'desc' },
   });
 
-  return NextResponse.json({
-    ok: true,
-    count: alerts.length,
-    alerts: alerts.map((a) => ({
+  return NextResponse.json(
+    alerts.map(a => ({
       id: a.id,
       metal: a.metal,
       direction: a.direction,
-      targetPrice: a.targetPrice,
+      target: a.target,        // ✅ correct field
       active: a.active,
-      fireOnce: a.fireOnce,
-      cooldownMinutes: a.cooldownMinutes,
-      lastTriggeredAt: a.lastTriggeredAt,
-      lastTrigger: a.triggers[0] ?? null,
       createdAt: a.createdAt,
-    })),
-  });
+      triggers: a.triggers.map(t => ({
+        id: t.id,
+        price: t.price,
+        triggeredAt: t.triggeredAt,
+        deliveredAt: t.deliveredAt,
+        createdAt: t.createdAt,
+      })),
+    }))
+  );
 }
