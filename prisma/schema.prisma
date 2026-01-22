@@ -3,54 +3,29 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  alerts    Alert[]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Alert {
-  id              String         @id @default(cuid())
-  userId          String
-  user            User           @relation(fields: [userId], references: [id])
+  id        String         @id @default(cuid())
+  metal     String
+  target    Float
+  direction String
+  createdAt DateTime       @default(now())
 
-  metal           String
-  direction       String          // "above" | "below"
-  targetPrice     Float
-
-  // ✅ lifecycle controls
-  active          Boolean         @default(true)
-  lastTriggeredAt DateTime?
-  cooldownMinutes Int             @default(0)
-  fireOnce        Boolean         @default(false)
-
-  createdAt       DateTime        @default(now())
-  triggers        AlertTrigger[]
+  triggers  AlertTrigger[]
 }
 
 model AlertTrigger {
   id          String   @id @default(cuid())
   alertId     String
-  alert       Alert    @relation(fields: [alertId], references: [id])
-
   price       Float
   triggeredAt DateTime
   deliveredAt DateTime?
   createdAt   DateTime @default(now())
 
-  // ✅ dedupe: one trigger per (alertId + triggeredAt)
-  @@unique([alertId, triggeredAt])
-}
+  alert Alert @relation(fields: [alertId], references: [id])
 
-model PriceHistory {
-  id        String   @id @default(cuid())
-  metal     String
-  price     Float
-  timestamp DateTime @default(now())
+  @@unique([alertId, price])
 }
