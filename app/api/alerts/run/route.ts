@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
 import { runAlertEngine } from '@/lib/alerts/engine';
 
@@ -7,8 +6,8 @@ export async function POST() {
   const started = Date.now();
 
   const locked = await runWithAdvisoryLock(
-    prisma,
     'cron:alerts-run',
+    30_000,
     async () => {
       return await runAlertEngine();
     }
