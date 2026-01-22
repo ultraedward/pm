@@ -16,27 +16,36 @@ model User {
 }
 
 model Alert {
-  id          String         @id @default(cuid())
-  userId      String
-  user        User           @relation(fields: [userId], references: [id])
-  metal       String
-  direction   String
-  targetPrice Float
-  createdAt   DateTime       @default(now())
-  triggers    AlertTrigger[]
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+
+  metal           String
+  direction       String          // "above" | "below"
+  targetPrice     Float
+
+  // ✅ lifecycle controls
+  active          Boolean         @default(true)
+  lastTriggeredAt DateTime?
+  cooldownMinutes Int             @default(0)
+  fireOnce        Boolean         @default(false)
+
+  createdAt       DateTime        @default(now())
+  triggers        AlertTrigger[]
 }
 
 model AlertTrigger {
   id          String   @id @default(cuid())
   alertId     String
   alert       Alert    @relation(fields: [alertId], references: [id])
+
   price       Float
   triggeredAt DateTime
   deliveredAt DateTime?
   createdAt   DateTime @default(now())
 
-  @@unique([alertId, price])
-  @@index([alertId, triggeredAt])
+  // ✅ dedupe: one trigger per (alertId + triggeredAt)
+  @@unique([alertId, triggeredAt])
 }
 
 model PriceHistory {
@@ -44,6 +53,4 @@ model PriceHistory {
   metal     String
   price     Float
   timestamp DateTime @default(now())
-
-  @@index([metal, timestamp])
 }
