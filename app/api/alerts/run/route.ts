@@ -3,12 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
 import { runAlertEngine } from '@/lib/alerts/engine';
 
-export const dynamic = 'force-dynamic';
-
 export async function POST() {
   const started = Date.now();
 
-  const lockResult = await runWithAdvisoryLock(
+  const locked = await runWithAdvisoryLock(
     prisma,
     'cron:alerts-run',
     async () => {
@@ -16,25 +14,17 @@ export async function POST() {
     }
   );
 
-  // 🔒 Another instance is running — exit cleanly
-  if (!lockResult.ok) {
+  if (!locked.ok) {
     return NextResponse.json(
-      {
-        ok: false,
-        error: 'LOCKED',
-        ranAt: new Date().toISOString(),
-        ms: Date.now() - started,
-      },
+      { ok: false, error: 'LOCKED' },
       { status: 409 }
     );
   }
 
-  const { checked, fired } = lockResult.result;
-
   return NextResponse.json({
     ok: true,
-    checkedAlerts: checked,
-    newTriggers: fired,
+    checkedAlerts: locked.result.checked,
+    newTriggers: locked.result.fired,
     ranAt: new Date().toISOString(),
     ms: Date.now() - started,
   });
