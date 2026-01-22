@@ -1,74 +1,45 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
+import { runAlertEngine } from '@/lib/alerts/engine';
+
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+function isAuthorized(req: Request) {
+  // If you set CRON_SECRET in Vercel env, enforce it.
+  // If it's not set, allow (so you can keep testing).
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return true;
 
-const prisma = new PrismaClient();
+  const auth = req.headers.get('authorization') || '';
+  return auth === `Bearer ${secret}`;
+}
 
-/**
- * Cron: checks alerts against latest prices
- * - Deduplicates triggers
- * - Marks deliveredAt immediately
- * - Safe to run repeatedly
- */
-export async function POST() {
-  try {
-    // 1️⃣ Load active alerts
-    const alerts = await prisma.alert.findMany({
-      include: {
-        triggers: true,
-      },
-    });
+export async function POST(req: Request) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
 
-    let triggeredCount = 0;
+  const lock = await runWithAdvisoryLock(prisma, 'cron:check-alerts', async () => {
+    const started = Date.now();
+    const result = await runAlertEngine();
 
-    for (const alert of alerts) {
-      // 2️⃣ Get latest price for metal
-      const latest = await prisma.priceHistory.findFirst({
-        where: { metal: alert.metal },
-        orderBy: { timestamp: 'desc' },
-      });
-
-      if (!latest) continue;
-
-      const shouldTrigger =
-        alert.direction === 'above'
-          ? latest.price >= alert.targetPrice
-          : latest.price <= alert.targetPrice;
-
-      if (!shouldTrigger) continue;
-
-      // 3️⃣ Deduplication check
-      const alreadyTriggered = alert.triggers.some(
-        (t) => t.price === latest.price
-      );
-
-      if (alreadyTriggered) continue;
-
-      // 4️⃣ Create trigger + mark delivered
-      await prisma.alertTrigger.create({
-        data: {
-          alertId: alert.id,
-          price: latest.price,
-          triggeredAt: new Date(),
-          deliveredAt: new Date(), // webhook/email later
-        },
-      });
-
-      triggeredCount++;
-    }
-
-    return NextResponse.json({
+    return {
       ok: true,
-      checkedAlerts: alerts.length,
-      newTriggers: triggeredCount,
+      checkedAlerts: result.checkedAlerts ?? result.checked ?? 0,
+      newTriggers: result.newTriggers ?? result.triggersCreated ?? 0,
       ranAt: new Date().toISOString(),
-    });
-  } catch (err) {
-    console.error('check-alerts cron error:', err);
+      ms: Date.now() - started,
+    };
+  });
+
+  if (!lock.ok) {
     return NextResponse.json(
-      { ok: false, error: 'Cron failed' },
-      { status: 500 }
+      { ok: true, skipped: true, reason: 'locked', ranAt: new Date().toISOString() },
+      { status: 200 }
     );
   }
+
+  return NextResponse.json(lock.result, { status: 200 });
 }
