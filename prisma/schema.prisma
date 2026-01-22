@@ -44,8 +44,3 @@ model PriceHistory {
   price     Float
   timestamp DateTime @default(now())
 }
-
-model JobLock {
-  id        String   @id
-  lockedAt  DateTime
-}
