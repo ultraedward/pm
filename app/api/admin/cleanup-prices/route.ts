@@ -1,34 +1,49 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
-  const auth = req.headers.get('authorization');
+const prisma = new PrismaClient();
 
-  if (auth !== `Bearer ${process.env.ADMIN_SECRET}`) {
-    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-  }
+export async function POST(req: NextRequest) {
+  const authHeader =
+    req.headers.get('authorization') ||
+    req.headers.get('Authorization');
 
-  try {
-    const result = await prisma.priceHistory.deleteMany({
-      where: {
-        OR: [
-          { price: { lt: 1 } },
-          { price: { gt: 20000 } },
-        ],
-      },
-    });
-
-    return NextResponse.json({
-      ok: true,
-      deleted: result.count,
-    });
-  } catch (err) {
-    console.error('cleanup error', err);
+  if (!process.env.ADMIN_SECRET) {
     return NextResponse.json(
-      { ok: false, error: 'Cleanup failed' },
+      { ok: false, error: 'ADMIN_SECRET not configured on server' },
       { status: 500 }
     );
   }
+
+  if (!authHeader) {
+    return NextResponse.json(
+      { ok: false, error: 'Missing Authorization header' },
+      { status: 401 }
+    );
+  }
+
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+  if (token !== process.env.ADMIN_SECRET) {
+    return NextResponse.json(
+      { ok: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
+  const result = await prisma.priceHistory.deleteMany({
+    where: {
+      OR: [
+        { price: { lt: 1 } },
+        { price: { gt: 10000 } },
+      ],
+    },
+  });
+
+  return NextResponse.json({
+    ok: true,
+    deleted: result.count,
+  });
 }
