@@ -2,30 +2,28 @@ import { NextResponse } from 'next/server';
 import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
 import { runAlertEngine } from '@/lib/alerts/engine';
 
-export const dynamic = 'force-dynamic';
-
 export async function POST() {
   const started = Date.now();
 
-  const lock = await runWithAdvisoryLock('cron:check-alerts', async () => {
-    return await runAlertEngine();
-  });
+  const locked = await runWithAdvisoryLock(
+    'cron:check-alerts',
+    30_000,
+    async () => {
+      return await runAlertEngine();
+    }
+  );
 
-  if (!lock.ran) {
-    return NextResponse.json({
-      ok: true,
-      skipped: true,
-      reason: 'Lock not acquired',
-      ranAt: new Date().toISOString(),
-      ms: Date.now() - started,
-    });
+  if (!locked.ok) {
+    return NextResponse.json(
+      { ok: false, error: 'LOCKED' },
+      { status: 409 }
+    );
   }
 
-  const result = lock.result!;
   return NextResponse.json({
     ok: true,
-    checkedAlerts: result.checked,
-    newTriggers: result.fired,
+    checkedAlerts: locked.result.checked,
+    newTriggers: locked.result.fired,
     ranAt: new Date().toISOString(),
     ms: Date.now() - started,
   });
