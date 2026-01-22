@@ -16,8 +16,8 @@ export async function POST() {
 
       return {
         ok: true,
-        checkedAlerts: result.checkedAlerts ?? 0,
-        newTriggers: result.newTriggers ?? 0,
+        checkedAlerts: result.checked,
+        newTriggers: result.fired,
         ranAt: new Date().toISOString(),
         ms: Date.now() - started,
       };
