@@ -35,7 +35,7 @@ model AlertTrigger {
   deliveredAt DateTime?
   createdAt   DateTime @default(now())
 
-  @@unique([alertId, price])
+  @@unique([alertId, price, triggeredAt])
 }
 
 model PriceHistory {
@@ -43,4 +43,9 @@ model PriceHistory {
   metal     String
   price     Float
   timestamp DateTime @default(now())
+}
+
+model JobLock {
+  id        String   @id
+  lockedAt DateTime
 }
