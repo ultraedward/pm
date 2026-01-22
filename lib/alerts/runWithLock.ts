@@ -1,38 +1,38 @@
-import type { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-// FNV-1a 64-bit -> stable bigint key for Postgres advisory locks
-function fnv1a64(input: string): bigint {
-  let hash = 0xcbf29ce484222325n;
-  const prime = 0x100000001b3n;
+// Two-key advisory lock (int32,int32) derived from a string name.
+function hash32(input: string): number {
+  // FNV-1a 32-bit
+  let h = 0x811c9dc5;
   for (let i = 0; i < input.length; i++) {
-    hash ^= BigInt(input.charCodeAt(i));
-    hash = (hash * prime) & 0xffffffffffffffffn;
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
   }
-  // advisory locks accept signed bigint; keep it positive-ish
-  return hash >= 0x8000000000000000n ? hash - 0x10000000000000000n : hash;
+  // Convert to signed int32
+  return h | 0;
 }
 
 export async function runWithAdvisoryLock<T>(
-  prisma: PrismaClient,
   lockName: string,
   fn: () => Promise<T>
-): Promise<{ ok: true; result: T } | { ok: false; error: 'LOCKED' }> {
-  const key = fnv1a64(lockName);
+): Promise<{ ran: boolean; result?: T }> {
+  const key1 = hash32(lockName);
+  const key2 = hash32(lockName + ':v1');
 
+  // pg_try_advisory_lock(int,int) returns boolean
   const rows = await prisma.$queryRaw<Array<{ locked: boolean }>>`
-    SELECT pg_try_advisory_lock(${key}) AS locked
+    SELECT pg_try_advisory_lock(${key1}, ${key2}) AS locked
   `;
 
   const locked = rows?.[0]?.locked === true;
-  if (!locked) return { ok: false, error: 'LOCKED' };
+  if (!locked) return { ran: false };
 
   try {
     const result = await fn();
-    return { ok: true, result };
+    return { ran: true, result };
   } finally {
-    // always attempt to unlock
     await prisma.$queryRaw`
-      SELECT pg_advisory_unlock(${key})
+      SELECT pg_advisory_unlock(${key1}, ${key2})
     `;
   }
 }
