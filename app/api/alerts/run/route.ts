@@ -1,5 +1,6 @@
+cat > app/api/alerts/run/route.ts <<'EOF'
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
 import { runAlertEngine } from '@/lib/alerts/engine';
 
@@ -7,7 +8,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST() {
-  const lock = await runWithAdvisoryLock(prisma, 'alerts:run', async () => {
+  const locked = await runWithAdvisoryLock(prisma, 'alerts:run', async () => {
     const started = Date.now();
     const result = await runAlertEngine();
 
@@ -20,9 +21,13 @@ export async function POST() {
     };
   });
 
-  if (!lock.ok) {
-    return NextResponse.json({ ok: true, skipped: true, reason: 'locked' }, { status: 200 });
+  if (!locked.ok) {
+    return NextResponse.json(
+      { ok: true, skipped: true, reason: 'locked' },
+      { status: 200 }
+    );
   }
 
-  return NextResponse.json(lock.result, { status: 200 });
+  return NextResponse.json(locked.result, { status: 200 });
 }
+EOF
