@@ -31,10 +31,11 @@ model AlertTrigger {
   alertId     String
   alert       Alert    @relation(fields: [alertId], references: [id])
   price       Float
-  triggeredAt DateTime        // REQUIRED
-  deliveredAt DateTime?       // OPTIONAL
+  triggeredAt DateTime
+  deliveredAt DateTime?
   createdAt   DateTime @default(now())
 
+  @@unique([alertId, price])
   @@index([alertId, triggeredAt])
 }
 
