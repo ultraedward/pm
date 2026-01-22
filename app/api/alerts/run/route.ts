@@ -1,13 +1,11 @@
-export const dynamic = 'force-dynamic';
-
-import { runAlertEngine } from '@/lib/alerts/engine';
+import { runAlertEngineWithLock } from '@/lib/alerts/runWithLock';
 
 export async function POST() {
   try {
-    await runAlertEngine();
-    return Response.json({ ok: true });
-  } catch (e: any) {
-    console.error('alerts/run error', e);
-    return Response.json({ ok: false, error: e.message }, { status: 500 });
+    const result = await runAlertEngineWithLock();
+    return Response.json(result);
+  } catch (err) {
+    console.error('alert engine failed', err);
+    return Response.json({ ok: false }, { status: 500 });
   }
 }
