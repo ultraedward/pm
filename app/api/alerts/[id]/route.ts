@@ -1,40 +1,59 @@
-// app/api/alerts/[id]/route.ts
-// FULL FILE — COPY / PASTE
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+export const dynamic = 'force-dynamic';
 
-export const dynamic = "force-dynamic";
+type PatchBody = {
+  active?: boolean;
+  cooldownMinutes?: number;
+  fireOnce?: boolean;
+};
 
-/**
- * DELETE an alert by ID
- * Server-auth protected (admin access)
- */
-export async function DELETE(
-  _req: Request,
+export async function GET(
+  _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    await prisma.alert.delete({
-      where: {
-        id: params.id,
+  const alert = await prisma.alert.findUnique({
+    where: { id: params.id },
+    include: {
+      triggers: {
+        orderBy: { triggeredAt: 'desc' },
+        take: 5,
       },
-    });
+    },
+  });
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("[alerts/delete]", err);
+  if (!alert) {
     return NextResponse.json(
-      { error: "Alert not found" },
+      { ok: false, error: 'Alert not found' },
       { status: 404 }
     );
   }
+
+  return NextResponse.json({ ok: true, alert });
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const body = (await req.json()) as PatchBody;
+
+  const updated = await prisma.alert.update({
+    where: { id: params.id },
+    data: {
+      ...(typeof body.active === 'boolean' && { active: body.active }),
+      ...(typeof body.cooldownMinutes === 'number' && {
+        cooldownMinutes: body.cooldownMinutes,
+      }),
+      ...(typeof body.fireOnce === 'boolean' && {
+        fireOnce: body.fireOnce,
+      }),
+    },
+  });
+
+  return NextResponse.json({
+    ok: true,
+    alert: updated,
+  });
 }
