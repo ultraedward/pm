@@ -1,27 +1,38 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
-
-export async function insertPrice(metal: string, price: number) {
-  // Hard safety rails
-  if (!metal || typeof metal !== 'string') {
-    throw new Error('Invalid metal');
-  }
-
-  if (typeof price !== 'number' || Number.isNaN(price)) {
-    throw new Error('Invalid price');
-  }
-
-  // Absolute sanity bounds
-  if (price < 1 || price > 10000) {
-    return { skipped: true, reason: 'price out of bounds' };
-  }
-
-  return prisma.priceHistory.create({
-    data: {
+/**
+ * Inserts a price snapshot into the system.
+ * Prices are stored as AlertTriggers so alerts and spot prices
+ * share a single source of truth.
+ */
+export async function insertPrice(
+  metal: string,
+  price: number
+): Promise<void> {
+  // Find all active alerts for this metal
+  const alerts = await prisma.alert.findMany({
+    where: {
       metal,
-      price,
-      timestamp: new Date(),
+      active: true,
+    },
+    select: {
+      id: true,
     },
   });
+
+  // No alerts → no reason to store price
+  if (alerts.length === 0) return;
+
+  // Insert one trigger per alert (deduped by unique constraint)
+  await prisma.$transaction(
+    alerts.map((alert) =>
+      prisma.alertTrigger.create({
+        data: {
+          alertId: alert.id,
+          price,
+          triggeredAt: new Date(),
+        },
+      })
+    )
+  );
 }
