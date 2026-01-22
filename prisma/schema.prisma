@@ -29,14 +29,13 @@ model Alert {
 model AlertTrigger {
   id          String   @id @default(cuid())
   alertId     String
+  alert       Alert    @relation(fields: [alertId], references: [id])
   price       Float
-  triggeredAt DateTime
-  deliveredAt DateTime?
+  triggeredAt DateTime        // REQUIRED
+  deliveredAt DateTime?       // OPTIONAL
   createdAt   DateTime @default(now())
 
-  alert Alert @relation(fields: [alertId], references: [id])
-
-  @@unique([alertId, price])
+  @@index([alertId, triggeredAt])
 }
 
 model PriceHistory {
@@ -44,9 +43,6 @@ model PriceHistory {
   metal     String
   price     Float
   timestamp DateTime @default(now())
-}
 
-model JobLock {
-  id        String   @id
-  lockedAt DateTime
+  @@index([metal, timestamp])
 }
