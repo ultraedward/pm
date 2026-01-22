@@ -1,24 +1,37 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 export async function GET() {
   try {
-    const latest = await prisma.priceHistory.findMany({
-      orderBy: { timestamp: 'desc' },
-      take: 1,
+    const latest = await prisma.alertTrigger.findMany({
+      orderBy: { triggeredAt: 'desc' },
+      take: 10,
+      include: {
+        alert: {
+          select: {
+            metal: true,
+          },
+        },
+      },
     });
+
+    const byMetal: Record<string, number> = {};
+
+    for (const t of latest) {
+      if (!byMetal[t.alert.metal]) {
+        byMetal[t.alert.metal] = t.price;
+      }
+    }
 
     return NextResponse.json({
       ok: true,
-      price: latest[0] ?? null,
+      prices: byMetal,
+      at: new Date().toISOString(),
     });
-  } catch (error) {
-    console.error('prices/latest error:', error);
+  } catch (err) {
+    console.error(err);
     return NextResponse.json(
-      { ok: false, error: 'Failed to fetch latest price' },
+      { ok: false, error: 'FAILED_TO_LOAD_PRICES' },
       { status: 500 }
     );
   }
