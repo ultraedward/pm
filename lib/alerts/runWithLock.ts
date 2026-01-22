@@ -1,38 +1,28 @@
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@prisma/client';
 
-// Two-key advisory lock (int32,int32) derived from a string name.
-function hash32(input: string): number {
-  // FNV-1a 32-bit
-  let h = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  // Convert to signed int32
-  return h | 0;
-}
+type LockResult<T> =
+  | { ok: true; result: T }
+  | { ok: false; error: 'LOCKED' };
 
 export async function runWithAdvisoryLock<T>(
-  lockName: string,
+  prisma: PrismaClient,
+  lockKey: string,
   fn: () => Promise<T>
-): Promise<{ ran: boolean; result?: T }> {
-  const key1 = hash32(lockName);
-  const key2 = hash32(lockName + ':v1');
+): Promise<LockResult<T>> {
+  const [{ locked }] = await prisma.$queryRaw<
+    { locked: boolean }[]
+  >`SELECT pg_try_advisory_lock(hashtext(${lockKey})) AS locked`;
 
-  // pg_try_advisory_lock(int,int) returns boolean
-  const rows = await prisma.$queryRaw<Array<{ locked: boolean }>>`
-    SELECT pg_try_advisory_lock(${key1}, ${key2}) AS locked
-  `;
-
-  const locked = rows?.[0]?.locked === true;
-  if (!locked) return { ran: false };
+  if (!locked) {
+    return { ok: false, error: 'LOCKED' };
+  }
 
   try {
     const result = await fn();
-    return { ran: true, result };
+    return { ok: true, result };
   } finally {
-    await prisma.$queryRaw`
-      SELECT pg_advisory_unlock(${key1}, ${key2})
+    await prisma.$executeRaw`
+      SELECT pg_advisory_unlock(hashtext(${lockKey}))
     `;
   }
 }
