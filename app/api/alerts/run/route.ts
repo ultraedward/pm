@@ -4,24 +4,17 @@ import { runAlertEngine } from '@/lib/alerts/engine';
 
 export const dynamic = 'force-dynamic';
 
-async function run() {
+export async function POST() {
   const started = Date.now();
 
-  const lock = await runWithAdvisoryLock('cron:alerts-run', async () => {
-    return await runAlertEngine();
-  });
+  const result = await runWithAdvisoryLock(
+    'cron:alerts-run',
+    30_000, // 30s lock timeout
+    async () => {
+      return await runAlertEngine();
+    }
+  );
 
-  if (!lock.ran) {
-    return NextResponse.json({
-      ok: true,
-      skipped: true,
-      reason: 'Lock not acquired',
-      ranAt: new Date().toISOString(),
-      ms: Date.now() - started,
-    });
-  }
-
-  const result = lock.result!;
   return NextResponse.json({
     ok: true,
     checkedAlerts: result.checked,
@@ -29,12 +22,4 @@ async function run() {
     ranAt: new Date().toISOString(),
     ms: Date.now() - started,
   });
-}
-
-export async function GET() {
-  return run();
-}
-
-export async function POST() {
-  return run();
 }
