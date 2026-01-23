@@ -1,35 +1,43 @@
 import Stripe from "stripe"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-})
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
-export async function POST() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json()
+    const { priceId } = body
+
+    if (!priceId) {
+      return NextResponse.json(
+        { error: "Missing priceId" },
+        { status: 400 }
+      )
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
+    })
+
+    return NextResponse.json({ url: session.url })
+  } catch (err) {
+    console.error("Stripe checkout error:", err)
+
+    return NextResponse.json(
+      { error: "Unable to create checkout session" },
+      { status: 500 }
+    )
   }
-
-  const checkout = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    payment_method_types: ["card"],
-    line_items: [
-      {
-        price: process.env.STRIPE_PRICE_ID!,
-        quantity: 1,
-      },
-    ],
-    success_url: `${process.env.NEXTAUTH_URL}/dashboard?success=1`,
-    cancel_url: `${process.env.NEXTAUTH_URL}/dashboard?canceled=1`,
-    customer_creation: "always",
-    metadata: {
-      userId: session.user.id, // 🔥 THIS IS CRITICAL
-    },
-  })
-
-  return NextResponse.json({ url: checkout.url })
 }
