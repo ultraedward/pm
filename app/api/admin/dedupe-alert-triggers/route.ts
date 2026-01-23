@@ -1,29 +1,35 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
 
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
+/**
+ * Deduplicates AlertTrigger rows by (alertId, price, triggeredAt)
+ * keeping the earliest created row.
+ *
+ * Admin-only maintenance endpoint.
+ */
 export async function POST() {
-  const triggers = await prisma.alertTrigger.findMany({
-    orderBy: { createdAt: 'asc' },
-  });
+  try {
+    const result = await prisma.$executeRawUnsafe(`
+      DELETE FROM "AlertTrigger" a
+      USING "AlertTrigger" b
+      WHERE a.id > b.id
+        AND a."alertId" = b."alertId"
+        AND a.price = b.price
+        AND a."triggeredAt" = b."triggeredAt"
+    `)
 
-  const seen = new Set<string>();
-  let deleted = 0;
-
-  for (const t of triggers) {
-    const key = `${t.alertId}:${t.price}`;
-
-    if (seen.has(key)) {
-      await prisma.alertTrigger.delete({ where: { id: t.id } });
-      deleted++;
-    } else {
-      seen.add(key);
-    }
+    return NextResponse.json({
+      ok: true,
+      deleted: result,
+    })
+  } catch (err) {
+    console.error("dedupe-alert-triggers error", err)
+    return NextResponse.json(
+      { ok: false, error: "Dedupe failed" },
+      { status: 500 }
+    )
   }
-
-  return NextResponse.json({
-    ok: true,
-    deleted,
-  });
 }
