@@ -32,6 +32,9 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
+      /* ───────────────────────────────
+         Checkout completed
+      ─────────────────────────────── */
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session
 
@@ -45,11 +48,14 @@ export async function POST(req: Request) {
         break
       }
 
+      /* ───────────────────────────────
+         Subscription lifecycle
+      ─────────────────────────────── */
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription
-        const raw = sub as any // Stripe runtime fields not fully typed
+        const raw = sub as any
 
         console.log(`🔔 ${event.type}`, {
           id: sub.id,
@@ -67,14 +73,18 @@ export async function POST(req: Request) {
         break
       }
 
+      /* ───────────────────────────────
+         Invoice events
+      ─────────────────────────────── */
       case "invoice.paid":
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice
+        const raw = invoice as any
 
         console.log(`💳 ${event.type}`, {
           id: invoice.id,
           customer: invoice.customer,
-          subscription: invoice.subscription,
+          subscription: raw.subscription ?? null,
           status: invoice.status,
           hosted_invoice_url: invoice.hosted_invoice_url,
         })
@@ -88,7 +98,7 @@ export async function POST(req: Request) {
       }
     }
   } catch (err) {
-    // Do NOT throw — Stripe retries can DDOS you during deploys
+    // Never throw from webhooks — Stripe retries aggressively
     console.error("⚠️ Stripe webhook handler error:", err)
   }
 
