@@ -7,36 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-
-  alerts Alert[]
-}
-
 model Alert {
   id        String   @id @default(cuid())
-  userId    String
   metal     String
   target    Float
   direction String
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  user     User           @relation(fields: [userId], references: [id])
-  triggers AlertTrigger[]
+  triggers  AlertTrigger[]
 }
 
 model AlertTrigger {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   alertId     String
   price       Float
   triggeredAt DateTime
   deliveredAt DateTime?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
   alert Alert @relation(fields: [alertId], references: [id])
 
   @@unique([alertId, price])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  metal     String
+  price     Float
+  timestamp DateTime @default(now())
+
+  @@index([metal, timestamp])
 }
