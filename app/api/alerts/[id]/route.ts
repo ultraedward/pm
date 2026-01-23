@@ -1,59 +1,80 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
-
-type PatchBody = {
-  active?: boolean;
-  cooldownMinutes?: number;
-  fireOnce?: boolean;
-};
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET(
-  _req: NextRequest,
+  _req: Request,
   { params }: { params: { id: string } }
 ) {
-  const alert = await prisma.alert.findUnique({
-    where: { id: params.id },
-    include: {
-      triggers: {
-        orderBy: { triggeredAt: 'desc' },
-        take: 5,
-      },
-    },
-  });
+  const alertId = params.id;
 
-  if (!alert) {
+  try {
+    // Fetch alert via raw SQL (no Prisma model dependency)
+    const alerts = await prisma.$queryRaw<
+      Array<{
+        id: string;
+        userId: string;
+        metal: string;
+        target: number;
+        direction: string;
+        active: boolean;
+        createdAt: Date;
+      }>
+    >`
+      SELECT
+        id,
+        "userId",
+        metal,
+        target,
+        direction,
+        active,
+        "createdAt"
+      FROM "Alert"
+      WHERE id = ${alertId}
+      LIMIT 1
+    `;
+
+    if (alerts.length === 0) {
+      return NextResponse.json(
+        { error: "Alert not found" },
+        { status: 404 }
+      );
+    }
+
+    const alert = alerts[0];
+
+    // Fetch triggers separately
+    const triggers = await prisma.$queryRaw<
+      Array<{
+        id: string;
+        price: number;
+        triggeredAt: Date;
+        deliveredAt: Date | null;
+        createdAt: Date;
+      }>
+    >`
+      SELECT
+        id,
+        price,
+        "triggeredAt",
+        "deliveredAt",
+        "createdAt"
+      FROM "AlertTrigger"
+      WHERE "alertId" = ${alertId}
+      ORDER BY "createdAt" DESC
+    `;
+
+    return NextResponse.json({
+      ...alert,
+      triggers,
+    });
+  } catch (error) {
+    console.error("GET /api/alerts/[id] failed:", error);
     return NextResponse.json(
-      { ok: false, error: 'Alert not found' },
-      { status: 404 }
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ ok: true, alert });
-}
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const body = (await req.json()) as PatchBody;
-
-  const updated = await prisma.alert.update({
-    where: { id: params.id },
-    data: {
-      ...(typeof body.active === 'boolean' && { active: body.active }),
-      ...(typeof body.cooldownMinutes === 'number' && {
-        cooldownMinutes: body.cooldownMinutes,
-      }),
-      ...(typeof body.fireOnce === 'boolean' && {
-        fireOnce: body.fireOnce,
-      }),
-    },
-  });
-
-  return NextResponse.json({
-    ok: true,
-    alert: updated,
-  });
 }
