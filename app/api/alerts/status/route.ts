@@ -1,25 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * Returns high-level alert system status
+ */
 export async function GET() {
   try {
-    const lastTrigger = await prisma.alertTrigger.findFirst({
-      orderBy: {
-        triggeredAt: "desc",
-      },
-      select: {
-        triggeredAt: true,
-      },
-    });
+    const rows = await prisma.$queryRaw<
+      Array<{
+        triggeredAt: Date | null;
+      }>
+    >`
+      SELECT
+        MAX("triggeredAt") AS "triggeredAt"
+      FROM "AlertTrigger"
+    `;
 
     return NextResponse.json({
       ok: true,
-      lastTriggeredAt: lastTrigger?.triggeredAt ?? null,
+      lastTriggerAt: rows[0]?.triggeredAt ?? null,
     });
   } catch (err) {
-    console.error("alerts/status error:", err);
+    console.error("alerts status error", err);
     return NextResponse.json(
-      { ok: false, error: "Failed to fetch alert status" },
+      { ok: false, error: "Internal server error" },
       { status: 500 }
     );
   }
