@@ -1,27 +1,28 @@
-// app/api/stripe/portal/route.ts
-// FULL SHEET — COPY / PASTE ENTIRE FILE
-// Stripe portal disabled until Stripe fields are added to User model
+import { NextResponse } from "next/server"
+import { stripe } from "@/lib/stripe"
 
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
-export const runtime = "nodejs";
+export async function POST(req: Request) {
+  try {
+    const body = await req.json()
+    const { customerId } = body
 
-export async function POST() {
-  const session = await getServerSession(authOptions);
+    if (!customerId) {
+      return NextResponse.json({ error: "Missing customerId" }, { status: 400 })
+    }
 
-  if (!session?.user?.email) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL}/billing`
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    })
+
+    return NextResponse.json({ url: session.url })
+  } catch (err) {
+    console.error("Stripe billing portal error:", err)
+    return NextResponse.json({ error: "Unable to create portal session" }, { status: 500 })
   }
-
-  return NextResponse.json(
-    {
-      error: "Stripe billing is not enabled yet",
-    },
-    { status: 501 }
-  );
 }
