@@ -7,35 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Alert {
+model User {
   id        String   @id @default(cuid())
-  metal     String
-  target    Float
-  direction String
-  active    Boolean  @default(true)
+  email     String   @unique
   createdAt DateTime @default(now())
 
-  triggers  AlertTrigger[]
+  subscriptions Subscription[]
 }
 
-model AlertTrigger {
-  id          String   @id @default(cuid())
-  alertId     String
-  price       Float
-  triggeredAt DateTime
-  deliveredAt DateTime?
-  createdAt   DateTime @default(now())
+model Subscription {
+  id                    String   @id @default(cuid())
+  stripeSubscriptionId  String   @unique
+  stripeCustomerId      String
+  userId                String?
+  status                String
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean  @default(false)
+  priceId               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  alert Alert @relation(fields: [alertId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
-  @@unique([alertId, price])
-}
-
-model PriceHistory {
-  id        String   @id @default(cuid())
-  metal     String
-  price     Float
-  timestamp DateTime @default(now())
-
-  @@index([metal, timestamp])
+  @@index([stripeCustomerId])
+  @@index([status])
 }
