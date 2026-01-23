@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export async function GET(
   const alertId = params.id;
 
   try {
-    // Fetch alert via raw SQL (no Prisma model dependency)
+    // Fetch alert via raw SQL (no Prisma delegate usage)
     const alerts = await prisma.$queryRaw<
       Array<{
         id: string;
