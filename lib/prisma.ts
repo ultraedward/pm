@@ -14,4 +14,6 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
+// ✅ support BOTH import styles
+export { prisma };
 export default prisma;
