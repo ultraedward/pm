@@ -4,28 +4,24 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const rows = await prisma.$queryRaw<
-      { metal: string; price: number; timestamp: Date }[]
+      {
+        metal: string;
+        price: number;
+        timestamp: Date;
+      }[]
     >`
       SELECT metal, price, timestamp
-      FROM "Price"
+      FROM price_history
       ORDER BY timestamp ASC
       LIMIT 500
     `;
 
-    return NextResponse.json({
-      ok: true,
-      prices: rows ?? [],
-    });
+    // ALWAYS return an array
+    return NextResponse.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
-    console.error("GET /api/prices error:", err);
+    console.error("[api/prices] failed", err);
 
-    // 🔒 ALWAYS RETURN ARRAY SHAPE
-    return NextResponse.json(
-      {
-        ok: false,
-        prices: [],
-      },
-      { status: 200 }
-    );
+    // NEVER return an object — UI expects array
+    return NextResponse.json([]);
   }
 }

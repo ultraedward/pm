@@ -8,28 +8,26 @@ export async function GET() {
         id: string;
         metal: string;
         targetPrice: number;
-        active: boolean;
+        direction: "above" | "below";
         createdAt: Date;
       }[]
     >`
-      SELECT id, metal, "targetPrice", active, "createdAt"
-      FROM "Alert"
-      ORDER BY "createdAt" DESC
+      SELECT
+        id,
+        metal,
+        target_price AS "targetPrice",
+        direction,
+        created_at AS "createdAt"
+      FROM alerts
+      ORDER BY created_at DESC
     `;
 
-    return NextResponse.json({
-      ok: true,
-      alerts: rows ?? [],
-    });
+    // ALWAYS return an array
+    return NextResponse.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
-    console.error("GET /api/alerts error:", err);
+    console.error("[api/alerts] failed", err);
 
-    return NextResponse.json(
-      {
-        ok: false,
-        alerts: [],
-      },
-      { status: 200 }
-    );
+    // NEVER break the UI
+    return NextResponse.json([]);
   }
 }
