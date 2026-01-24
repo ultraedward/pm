@@ -4,11 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const rows = await prisma.$queryRaw<
-      {
-        metal: string;
-        price: number;
-        timestamp: Date;
-      }[]
+      { metal: string; price: number; timestamp: Date }[]
     >`
       SELECT metal, price, timestamp
       FROM "Price"
@@ -18,14 +14,18 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      prices: rows,
+      prices: rows ?? [],
     });
   } catch (err) {
-    console.error("GET /api/prices failed:", err);
+    console.error("GET /api/prices error:", err);
 
+    // 🔒 ALWAYS RETURN ARRAY SHAPE
     return NextResponse.json(
-      { ok: false, error: "Failed to load prices" },
-      { status: 500 }
+      {
+        ok: false,
+        prices: [],
+      },
+      { status: 200 }
     );
   }
 }

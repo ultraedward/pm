@@ -3,41 +3,33 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const alerts = await prisma.$queryRaw<
+    const rows = await prisma.$queryRaw<
       {
         id: string;
         metal: string;
-        price: number;
-        direction: string;
+        targetPrice: number;
         active: boolean;
         createdAt: Date;
       }[]
     >`
-      SELECT
-        id,
-        metal,
-        price,
-        direction,
-        active,
-        "createdAt"
+      SELECT id, metal, "targetPrice", active, "createdAt"
       FROM "Alert"
       ORDER BY "createdAt" DESC
     `;
 
     return NextResponse.json({
       ok: true,
-      alerts: alerts ?? [],
+      alerts: rows ?? [],
     });
   } catch (err) {
-    console.error("API /alerts error:", err);
+    console.error("GET /api/alerts error:", err);
 
     return NextResponse.json(
       {
         ok: false,
         alerts: [],
-        error: "Failed to load alerts",
       },
-      { status: 500 }
+      { status: 200 }
     );
   }
 }

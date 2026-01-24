@@ -1,60 +1,46 @@
-import dynamic from "next/dynamic";
+"use client";
 
-const DashboardClient = dynamic(
-  () => import("@/app/features/dashboard/DashboardClient"),
-  { ssr: false }
-);
+import { useEffect, useState } from "react";
 
-async function fetchHistory(hours: number) {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/history?hours=${hours}`,
-      { cache: "no-store" }
-    );
-    const json = await res.json();
-    return Array.isArray(json) ? json : [];
-  } catch {
-    return [];
-  }
-}
+type PriceRow = {
+  metal: string;
+  price: number;
+  timestamp: string;
+};
 
-async function fetchCurrent() {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/prices/current`,
-      { cache: "no-store" }
-    );
-    return await res.json();
-  } catch {
-    return {};
-  }
-}
+export default function DashboardPage() {
+  const [prices, setPrices] = useState<PriceRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { hours?: string };
-}) {
-  const hours = Number(searchParams.hours ?? 24);
-  const safeHours = hours === 168 || hours === 720 ? hours : 24;
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/prices");
+        const json = await res.json();
 
-  const [current, history] = await Promise.all([
-    fetchCurrent(),
-    fetchHistory(safeHours),
-  ]);
+        // 🔒 ABSOLUTE GUARD
+        setPrices(Array.isArray(json.prices) ? json.prices : []);
+      } catch {
+        setPrices([]);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const grouped: Record<string, any[]> = {};
-  history.forEach((p: any) => {
-    if (!p || typeof p.price !== "number" || !p.metal) return;
-    grouped[p.metal] ??= [];
-    grouped[p.metal].push(p);
-  });
+    load();
+  }, []);
+
+  if (loading) return <div>Loading…</div>;
 
   return (
-    <DashboardClient
-      current={current}
-      grouped={grouped}
-      hours={safeHours}
-    />
+    <div>
+      <h1>Prices</h1>
+
+      {prices.slice(0, 10).map((p, i) => (
+        <div key={i}>
+          {p.metal}: ${p.price}
+        </div>
+      ))}
+    </div>
   );
 }
