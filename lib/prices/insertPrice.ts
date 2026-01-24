@@ -1,38 +1,38 @@
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 /**
- * Inserts a price snapshot into the system.
- * Prices are stored as AlertTriggers so alerts and spot prices
- * share a single source of truth.
+ * Inserts a spot price for a given metal.
+ * 
+ * IMPORTANT:
+ * - This function ONLY writes price data.
+ * - Alert evaluation is handled elsewhere (alerts engine / cron).
+ * - Do NOT add alert logic back into this file.
  */
 export async function insertPrice(
   metal: string,
-  price: number
+  price: number,
+  source: string
 ): Promise<void> {
-  // Find all active alerts for this metal
-  const alerts = await prisma.alert.findMany({
-    where: {
+  if (!metal || typeof price !== "number") {
+    throw new Error("insertPrice: invalid arguments");
+  }
+
+  await prisma.$executeRaw`
+    INSERT INTO "Price" (
       metal,
-      active: true,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  // No alerts → no reason to store price
-  if (alerts.length === 0) return;
-
-  // Insert one trigger per alert (deduped by unique constraint)
-  await prisma.$transaction(
-    alerts.map((alert) =>
-      prisma.alertTrigger.create({
-        data: {
-          alertId: alert.id,
-          price,
-          triggeredAt: new Date(),
-        },
-      })
+      price,
+      source,
+      timestamp,
+      createdAt
     )
-  );
+    VALUES (
+      ${metal},
+      ${price},
+      ${source},
+      NOW(),
+      NOW()
+    )
+  `;
 }
