@@ -1,30 +1,33 @@
-import { NextResponse } from 'next/server';
-import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
-import { runAlertEngine } from '@/lib/alerts/engine';
+import { NextResponse } from "next/server";
+import { runAlertEngine } from "@/lib/alerts/engine";
 
-export async function POST() {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET() {
   const started = Date.now();
 
-  const locked = await runWithAdvisoryLock(
-    'cron:check-alerts',
-    30_000,
-    async () => {
-      return await runAlertEngine();
-    }
-  );
+  try {
+    const result = await runAlertEngine();
 
-  if (!locked.ok) {
+    return NextResponse.json({
+      ok: true,
+      checkedAlerts: result.checkedAlerts,
+      newTriggers: result.triggered,
+      ranAt: new Date().toISOString(),
+      ms: Date.now() - started,
+    });
+  } catch (err) {
+    console.error("Cron alert check failed", err);
+
     return NextResponse.json(
-      { ok: false, error: 'LOCKED' },
-      { status: 409 }
+      {
+        ok: false,
+        error: "cron alert check failed",
+        ranAt: new Date().toISOString(),
+        ms: Date.now() - started,
+      },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    ok: true,
-    checkedAlerts: locked.result.checked,
-    newTriggers: locked.result.fired,
-    ranAt: new Date().toISOString(),
-    ms: Date.now() - started,
-  });
 }
