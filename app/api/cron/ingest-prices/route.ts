@@ -1,21 +1,39 @@
-// app/api/cron/ingest-prices/route.ts
-// FULL FILE — COPY / PASTE
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * This cron previously ingested into a removed `price` model.
- * It is now a no-op health check to keep the cron endpoint valid.
+ * Cron health check for price ingestion.
+ * Does NOT rely on removed Prisma delegates.
  */
 export async function GET() {
-  const alertCount = await prisma.alert.count();
+  try {
+    // Simple DB sanity checks using raw SQL
+    const [{ count: priceCount }] = await prisma.$queryRaw<
+      Array<{ count: number }>
+    >`
+      SELECT COUNT(*)::int AS count FROM "PriceHistory"
+    `;
 
-  return NextResponse.json({
-    ok: true,
-    alertCount,
-    ranAt: new Date().toISOString(),
-  });
+    const [{ count: triggerCount }] = await prisma.$queryRaw<
+      Array<{ count: number }>
+    >`
+      SELECT COUNT(*)::int AS count FROM "AlertTrigger"
+    `;
+
+    return NextResponse.json({
+      ok: true,
+      priceCount,
+      triggerCount,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("cron ingest-prices error", err);
+    return NextResponse.json(
+      { ok: false, error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
