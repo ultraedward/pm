@@ -1,53 +1,60 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * Returns historical prices for a given metal since a timestamp.
+ * Query params:
+ *  - metal (string, required)
+ *  - since (ms timestamp, optional)
+ */
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const metal = searchParams.get("metal");
-  const sinceParam = searchParams.get("since");
+  try {
+    const { searchParams } = new URL(req.url);
+    const metal = searchParams.get("metal");
+    const sinceParam = searchParams.get("since");
 
-  if (!metal || !sinceParam) {
-    return NextResponse.json({ error: "Missing params" }, { status: 400 });
-  }
+    if (!metal) {
+      return NextResponse.json(
+        { ok: false, error: "metal is required" },
+        { status: 400 }
+      );
+    }
 
-  const since = new Date(Number(sinceParam));
+    const since = sinceParam
+      ? new Date(Number(sinceParam))
+      : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30); // default: 30 days
 
-  const rows = await prisma.alertTrigger.findMany({
-    where: {
-      alert: {
-        metal,
-      },
-      triggeredAt: {
-        gte: since,
-      },
-    },
-    orderBy: {
-      triggeredAt: "asc",
-    },
-    select: {
-      triggeredAt: true,
-      price: true,
-      alert: {
-        select: {
-          metal: true,
-        },
-      },
-    },
-  });
+    const rows = await prisma.$queryRaw<
+      Array<{
+        price: number;
+        timestamp: Date;
+      }>
+    >`
+      SELECT
+        price,
+        timestamp
+      FROM "PriceHistory"
+      WHERE metal = ${metal}
+        AND timestamp >= ${since}
+      ORDER BY timestamp ASC
+    `;
 
-  const series: Record<string, { t: number; price: number | null }[]> = {};
-
-  for (const row of rows) {
-    if (!row.triggeredAt) continue; // ✅ FIX: guard null
-
-    const metal = row.alert.metal;
-    if (!series[metal]) series[metal] = [];
-
-    series[metal].push({
-      t: row.triggeredAt.getTime(),
-      price: row.price,
+    return NextResponse.json({
+      ok: true,
+      metal,
+      points: rows.map((r) => ({
+        t: r.timestamp.getTime(),
+        price: r.price,
+      })),
     });
+  } catch (err) {
+    console.error("prices/history error", err);
+    return NextResponse.json(
+      { ok: false, error: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(series);
 }
