@@ -5,26 +5,33 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const started = Date.now();
-
   try {
-    // Minimal DB round-trip
-    await prisma.$queryRaw`SELECT 1`;
+    const [
+      alertCount,
+      triggerCount,
+      priceCount,
+    ] = await Promise.all([
+      prisma.alert.count(),
+      prisma.alertTrigger.count(),
+      prisma.priceHistory.count(),
+    ]);
 
     return NextResponse.json({
       ok: true,
-      db: "connected",
-      uptimeMs: Date.now() - started,
+      counts: {
+        alerts: alertCount,
+        alertTriggers: triggerCount,
+        priceHistory: priceCount,
+      },
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    console.error("[HEALTH] database error", err);
+    console.error("[HEALTH DEEP] error", err);
 
     return NextResponse.json(
       {
         ok: false,
-        db: "error",
-        uptimeMs: Date.now() - started,
+        error: "schema-or-db-failure",
         timestamp: new Date().toISOString(),
       },
       { status: 500 }
