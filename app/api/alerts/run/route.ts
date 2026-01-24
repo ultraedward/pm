@@ -1,30 +1,33 @@
-import { NextResponse } from 'next/server';
-import { runWithAdvisoryLock } from '@/lib/alerts/runWithLock';
-import { runAlertEngine } from '@/lib/alerts/engine';
+import { NextResponse } from "next/server";
+import { runAlertEngine } from "@/lib/alerts/engine";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST() {
   const started = Date.now();
 
-  const locked = await runWithAdvisoryLock(
-    'cron:alerts-run',
-    30_000,
-    async () => {
-      return await runAlertEngine();
-    }
-  );
+  try {
+    const result = await runAlertEngine();
 
-  if (!locked.ok) {
+    return NextResponse.json({
+      ok: true,
+      checkedAlerts: result.checkedAlerts,
+      newTriggers: result.triggered,
+      ranAt: new Date().toISOString(),
+      ms: Date.now() - started,
+    });
+  } catch (err) {
+    console.error("Alert engine failed", err);
+
     return NextResponse.json(
-      { ok: false, error: 'LOCKED' },
-      { status: 409 }
+      {
+        ok: false,
+        error: "alert engine failed",
+        ranAt: new Date().toISOString(),
+        ms: Date.now() - started,
+      },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    ok: true,
-    checkedAlerts: locked.result.checked,
-    newTriggers: locked.result.fired,
-    ranAt: new Date().toISOString(),
-    ms: Date.now() - started,
-  });
 }
