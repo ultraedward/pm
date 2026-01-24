@@ -3,25 +3,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const rows = await prisma.$queryRaw<
-      {
-        metal: string;
-        price: number;
-        timestamp: Date;
-      }[]
-    >`
-      SELECT metal, price, timestamp
-      FROM price_history
-      ORDER BY timestamp ASC
-      LIMIT 500
-    `;
+    const prices = await prisma.priceHistory.findMany({
+      orderBy: { timestamp: "asc" },
+      take: 500,
+    });
 
-    // ALWAYS return an array
-    return NextResponse.json(Array.isArray(rows) ? rows : []);
+    return NextResponse.json(prices);
   } catch (err) {
-    console.error("[api/prices] failed", err);
-
-    // NEVER return an object — UI expects array
-    return NextResponse.json([]);
+    console.error("GET /api/prices failed:", err);
+    return NextResponse.json([], { status: 500 });
   }
 }
