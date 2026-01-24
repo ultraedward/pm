@@ -3,21 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const [
-      alertTriggerCount,
-      priceHistoryCount,
-    ] = await Promise.all([
-      prisma.alertTrigger.count(),
-      prisma.priceHistory.count(),
-    ]);
+    // Simple DB connectivity check — does NOT depend on models
+    await prisma.$queryRaw`SELECT 1`;
 
     return NextResponse.json({
       status: "ok",
       timestamp: new Date().toISOString(),
-      db: {
-        alertTriggers: alertTriggerCount,
-        priceHistory: priceHistoryCount,
-      },
+      db: "connected",
     });
   } catch (err) {
     console.error("[health/deep] failed", err);
@@ -25,7 +17,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "error",
-        error: "Health check failed",
+        error: "Database connection failed",
       },
       { status: 500 }
     );
