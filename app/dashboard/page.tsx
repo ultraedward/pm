@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { safeFetchArray } from "@/lib/safeFetch";
 
 type PriceRow = {
@@ -12,51 +9,34 @@ type PriceRow = {
 type AlertRow = {
   id: string;
   metal: string;
-  targetPrice: number;
+  price: number;
+  triggeredAt: string;
 };
 
 export default function DashboardPage() {
-  const [prices, setPrices] = useState<PriceRow[]>([]);
-  const [alerts, setAlerts] = useState<AlertRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  async function load() {
+    const [prices, alerts] = await Promise.all([
+      safeFetchArray<PriceRow>("/api/prices"),
+      safeFetchArray<AlertRow>("/api/alerts"),
+    ]);
 
-  useEffect(() => {
-    async function load() {
-      const [p, a] = await Promise.all([
-        safeFetchArray<PriceRow>("/api/prices", "prices"),
-        safeFetchArray<AlertRow>("/api/alerts", "alerts"),
-      ]);
-
-      setPrices(p);
-      setAlerts(a);
-      setLoading(false);
-    }
-
-    load();
-  }, []);
-
-  if (loading) return <div>Loading…</div>;
+    return { prices, alerts };
+  }
 
   return (
-    <div className="space-y-6">
-      <section>
-        <h2 className="text-xl font-bold">Prices</h2>
-        {prices.slice(0, 10).map((p, i) => (
-          <div key={i}>
-            {p.metal}: ${p.price}
-          </div>
-        ))}
-      </section>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-semibold">Dashboard</h1>
 
-      <section>
-        <h2 className="text-xl font-bold">Alerts</h2>
-        {alerts.length === 0 && <div>No alerts</div>}
-        {alerts.map(a => (
-          <div key={a.id}>
-            {a.metal} → ${a.targetPrice}
-          </div>
-        ))}
-      </section>
+      <pre className="bg-neutral-900 text-neutral-100 p-4 rounded">
+        {JSON.stringify(
+          {
+            pricesCount: "loaded server-side",
+            alertsCount: "loaded server-side",
+          },
+          null,
+          2
+        )}
+      </pre>
     </div>
   );
 }
