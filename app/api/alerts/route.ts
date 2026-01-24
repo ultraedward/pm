@@ -3,9 +3,26 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const alerts = await prisma.alert.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    const alerts = await prisma.$queryRaw<
+      {
+        id: string;
+        metal: string;
+        price: number;
+        direction: string;
+        active: boolean;
+        createdAt: Date;
+      }[]
+    >`
+      SELECT
+        id,
+        metal,
+        price,
+        direction,
+        active,
+        "createdAt"
+      FROM "Alert"
+      ORDER BY "createdAt" DESC
+    `;
 
     return NextResponse.json({
       ok: true,
