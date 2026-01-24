@@ -1,11 +1,16 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
+/**
+ * Marks an alert trigger as delivered.
+ * Uses raw SQL because alertTrigger is not a Prisma model.
+ */
 export async function notifyTrigger(triggerId: string) {
-  await prisma.alertTrigger.update({
-    where: { id: triggerId },
-    data: { deliveredAt: new Date() }
-  });
-
-  console.log('NOTIFIED:', triggerId);
+  await prisma.$executeRawUnsafe(
+    `
+    UPDATE "AlertTrigger"
+    SET "deliveredAt" = NOW()
+    WHERE id = $1
+    `,
+    triggerId
+  );
 }
