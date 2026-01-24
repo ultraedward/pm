@@ -1,46 +1,36 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-/**
- * Returns historical price data for charts.
- * Uses raw SQL to avoid removed Prisma delegates.
- */
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const metal = searchParams.get("metal"); // optional
-    const daysParam = searchParams.get("days");
-    const days = daysParam ? Number(daysParam) : 30;
+    const metal = searchParams.get("metal");
+    const range = searchParams.get("range") ?? "24h";
 
-    const since = new Date();
-    since.setDate(since.getDate() - days);
+    const hours =
+      range === "7d" ? 168 :
+      range === "30d" ? 720 :
+      24;
 
     const rows = await prisma.$queryRaw<
-      Array<{
-        timestamp: Date;
+      {
         metal: string;
         price: number;
-      }>
+        timestamp: Date;
+      }[]
     >`
-      SELECT
-        "timestamp",
-        metal,
-        price
-      FROM "PriceHistory"
-      WHERE "timestamp" >= ${since}
-      ${metal ? prisma.$queryRaw`AND metal = ${metal}` : prisma.$queryRaw``}
-      ORDER BY "timestamp" ASC
+      SELECT metal, price, timestamp
+      FROM price_history
+      WHERE (${metal} IS NULL OR metal = ${metal})
+        AND timestamp >= NOW() - INTERVAL '${hours} hours'
+      ORDER BY timestamp ASC
     `;
 
-    return NextResponse.json(rows);
+    return NextResponse.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
-    console.error("charts prices error", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error("[api/charts/prices] failed", err);
+
+    // 🚨 ABSOLUTE RULE: charts endpoints ALWAYS return arrays
+    return NextResponse.json([]);
   }
 }
