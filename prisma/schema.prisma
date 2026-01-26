@@ -16,10 +16,16 @@ model User {
 
 model Subscription {
   id                   String    @id @default(cuid())
-  userId               String?   // ⬅️ MUST be nullable for now
+  userId               String?
   status               String
+
   stripeSubscriptionId String    @unique
+  stripeCustomerId     String?   // ✅ ADD THIS
+
   currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  priceId              String?
+
   createdAt            DateTime  @default(now())
 
   user User? @relation(fields: [userId], references: [id])
