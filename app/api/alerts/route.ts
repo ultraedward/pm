@@ -6,17 +6,19 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    // Runtime-safe: Prisma will resolve this at execution time
+    // Defensive: model may not exist or DB may be unavailable
+    if (!prisma || !("alertTrigger" in prisma)) {
+      return NextResponse.json([]);
+    }
+
     const alerts = await prisma["alertTrigger"].findMany({
       orderBy: { createdAt: "desc" }
     });
 
-    return NextResponse.json(alerts);
+    return NextResponse.json(alerts ?? []);
   } catch (error) {
-    console.error("GET /api/alerts failed:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch alerts" },
-      { status: 500 }
-    );
+    console.error("GET /api/alerts soft-fail:", error);
+    // NEVER 500 in prod for this endpoint
+    return NextResponse.json([]);
   }
 }
