@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  return NextResponse.json([]);
+  const rows = await prisma.priceHistory.findMany({
+    orderBy: { timestamp: "asc" },
+    take: 500
+  });
+
+  return NextResponse.json(rows);
 }
