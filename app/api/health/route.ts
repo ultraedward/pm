@@ -1,33 +1,25 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const started = Date.now();
-
   try {
-    // Minimal DB round-trip
+    // lightweight DB ping (no model assumptions)
     await prisma.$queryRaw`SELECT 1`;
 
     return NextResponse.json({
-      ok: true,
-      db: "connected",
-      uptimeMs: Date.now() - started,
-      timestamp: new Date().toISOString(),
+      status: "ok",
+      db: "reachable",
+      time: new Date().toISOString()
     });
-  } catch (err) {
-    console.error("[HEALTH] database error", err);
+  } catch (error) {
+    console.error("Health check failed:", error);
 
-    return NextResponse.json(
-      {
-        ok: false,
-        db: "error",
-        uptimeMs: Date.now() - started,
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      status: "degraded",
+      db: "unreachable",
+      time: new Date().toISOString()
+    });
   }
 }
