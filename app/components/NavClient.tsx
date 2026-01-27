@@ -3,26 +3,32 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/charts", label: "Charts" },
-  { href: "/dashboard/alerts", label: "Alerts" },
+type NavLink = {
+  label: string;
+  href: string;
+};
+
+const links: NavLink[] = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Prices", href: "/dashboard/prices" },
+  { label: "Alerts", href: "/dashboard/alerts" },
+  { label: "Charts", href: "/dashboard/charts" },
 ];
 
 export default function NavClient() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-4 p-4 border-b">
-      {LINKS.map((link) => (
+    <nav className="flex gap-4">
+      {links.map((link) => (
         <Link
           key={link.href}
           href={link.href}
-          className={`${
+          className={
             pathname === link.href
               ? "font-semibold underline"
-              : "text-gray-600"
-          }`}
+              : "text-muted-foreground hover:text-foreground"
+          }
         >
           {link.label}
         </Link>
