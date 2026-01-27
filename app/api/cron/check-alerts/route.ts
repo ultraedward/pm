@@ -1,30 +1,46 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
+import { withCronLock } from "@/lib/cronLock";
 
 export const dynamic = "force-dynamic";
 
+const LOCK_ID = 900002; // unique & stable (document this)
+
 export async function GET() {
-  const LOCK = "cron:check-alerts";
-
-  const acquired = await acquireCronLock(LOCK, 5 * 60 * 1000);
-  if (!acquired) {
-    return NextResponse.json({ skipped: true, reason: "locked" });
-  }
-
-  try {
+  const { ran } = await withCronLock(LOCK_ID, async () => {
     const alerts = await prisma.alert.findMany({
-      where: { active: true },
+      where: {
+        active: true,
+      },
     });
 
-    // placeholder processing
-    console.log(`Checked ${alerts.length} alerts`);
+    for (const alert of alerts) {
+      const latest = await prisma.priceHistory.findFirst({
+        where: { metalId: alert.metalId },
+        orderBy: { createdAt: "desc" },
+      });
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "failed" }, { status: 500 });
-  } finally {
-    await releaseCronLock(LOCK);
-  }
+      if (!latest) continue;
+
+      const triggered =
+        alert.direction === "above"
+          ? latest.price >= alert.targetPrice
+          : latest.price <= alert.targetPrice;
+
+      if (!triggered) continue;
+
+      await prisma.alert.update({
+        where: { id: alert.id },
+        data: {
+          triggeredAt: new Date(),
+        },
+      });
+    }
+  });
+
+  return NextResponse.json({
+    ok: true,
+    ran,
+    message: ran ? "Alerts checked" : "Skipped (lock held)",
+  });
 }
