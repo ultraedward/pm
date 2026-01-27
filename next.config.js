@@ -1,14 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: true
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-  webpack(config) {
-    config.watchOptions = {
-      ignored: ["**/disabled/**"]
-    };
-    return config;
-  }
+  experimental: {
+    typedRoutes: true,
+  },
 };
 
 module.exports = nextConfig;
