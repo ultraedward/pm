@@ -1,12 +1,15 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export const runtime = "nodejs";
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+
+const prisma = new PrismaClient();
 
 export async function GET() {
   const rows = await prisma.priceHistory.findMany({
     orderBy: { timestamp: "asc" },
-    take: 500
+    take: 500,
   });
 
   return NextResponse.json(rows);
