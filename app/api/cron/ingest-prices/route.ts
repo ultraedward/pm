@@ -1,31 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
+import { withCronLock } from "@/lib/cronLock";
 
 export const dynamic = "force-dynamic";
 
+const LOCK_ID = 900001; // any stable int (document it)
+
 export async function GET() {
-  const LOCK = "cron:ingest-prices";
+  const { ran } = await withCronLock(LOCK_ID, async () => {
+    // ---- CRON LOGIC START ----
 
-  const acquired = await acquireCronLock(LOCK, 10 * 60 * 1000);
-  if (!acquired) {
-    return NextResponse.json({ skipped: true, reason: "locked" });
-  }
+    const metals = await prisma.metal.findMany();
 
-  try {
-    // Example insert (replace with real ingest)
-    await prisma.priceHistory.create({
-      data: {
-        metal: "gold",
-        price: Math.random() * 3000,
-      },
-    });
+    for (const metal of metals) {
+      const price = Math.random() * 100 + 1000; // replace with real feed
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "failed" }, { status: 500 });
-  } finally {
-    await releaseCronLock(LOCK);
-  }
+      await prisma.priceHistory.create({
+        data: {
+          metalId: metal.id,
+          price,
+        },
+      });
+    }
+
+    // ---- CRON LOGIC END ----
+  });
+
+  return NextResponse.json({
+    ok: true,
+    ran,
+    message: ran ? "Cron executed" : "Skipped (lock held)",
+  });
 }
