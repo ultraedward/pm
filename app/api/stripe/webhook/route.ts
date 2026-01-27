@@ -33,6 +33,12 @@ export async function POST(req: NextRequest) {
       event.type === "customer.subscription.updated"
     ) {
       const sub = event.data.object as Stripe.Subscription;
+      const raw = sub as any;
+
+      const currentPeriodEnd =
+        typeof raw.current_period_end === "number"
+          ? new Date(raw.current_period_end * 1000)
+          : null;
 
       await prisma.subscription.upsert({
         where: {
@@ -41,18 +47,14 @@ export async function POST(req: NextRequest) {
         update: {
           status: sub.status,
           cancelAtPeriodEnd: sub.cancel_at_period_end,
-          currentPeriodEnd: sub.current_period_end
-            ? new Date(sub.current_period_end * 1000)
-            : null,
+          currentPeriodEnd,
         },
         create: {
           stripeSubscriptionId: sub.id,
           stripeCustomerId: String(sub.customer),
           status: sub.status,
           cancelAtPeriodEnd: sub.cancel_at_period_end,
-          currentPeriodEnd: sub.current_period_end
-            ? new Date(sub.current_period_end * 1000)
-            : null,
+          currentPeriodEnd,
         },
       });
     }
