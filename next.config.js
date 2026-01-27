@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  output: "standalone", // 🚫 NOT "export"
   experimental: {
-    typedRoutes: false, // ⬅️ TURN THIS OFF
+    typedRoutes: true,
   },
 };
 
