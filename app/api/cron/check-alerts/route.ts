@@ -11,11 +11,13 @@ export async function GET() {
     const alerts = await prisma.alert.findMany({
       where: {
         active: true,
-        triggered: false,
       },
     });
 
     for (const alert of alerts) {
+      // Skip already-triggered alerts defensively
+      if ((alert as any).triggered === true) continue;
+
       const latest = await prisma.priceHistory.findFirst({
         where: {
           metal: alert.metal,
