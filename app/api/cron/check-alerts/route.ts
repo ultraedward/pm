@@ -17,7 +17,7 @@ export async function GET() {
     for (const alert of alerts) {
       const latest = await prisma.priceHistory.findFirst({
         where: {
-          metal: alert.metal, // ✅ STRING MATCH — THIS IS THE KEY FIX
+          metal: alert.metal, // string match (correct)
         },
         orderBy: {
           createdAt: "desc",
@@ -28,8 +28,8 @@ export async function GET() {
 
       const shouldTrigger =
         alert.direction === "above"
-          ? latest.price >= alert.targetPrice
-          : latest.price <= alert.targetPrice;
+          ? latest.price >= alert.target
+          : latest.price <= alert.target;
 
       if (!shouldTrigger) continue;
 
