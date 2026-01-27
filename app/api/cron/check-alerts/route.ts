@@ -3,17 +3,9 @@ import prisma from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-/**
- * Logic:
- * - Get latest price per metal
- * - Find active alerts for that metal
- * - If condition met, create AlertTrigger
- * - Deactivate alert (one-shot)
- */
 export async function GET() {
   try {
-    // Get latest price per metal
-    const latestByMetal = await prisma.$queryRaw<
+    const latest = await prisma.$queryRaw<
       { metal: string; price: number }[]
     >`
       SELECT DISTINCT ON (metal)
@@ -23,7 +15,7 @@ export async function GET() {
       ORDER BY metal, timestamp DESC
     `;
 
-    for (const { metal, price } of latestByMetal) {
+    for (const { metal, price } of latest) {
       const alerts = await prisma.alert.findMany({
         where: { metal, active: true },
       });
@@ -35,7 +27,6 @@ export async function GET() {
 
         if (!hit) continue;
 
-        // Record trigger
         await prisma.alertTrigger.create({
           data: {
             alertId: alert.id,
@@ -43,7 +34,6 @@ export async function GET() {
           },
         });
 
-        // Disable alert (one-shot)
         await prisma.alert.update({
           where: { id: alert.id },
           data: { active: false },
@@ -53,7 +43,7 @@ export async function GET() {
 
     return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error("check-alerts failed", e);
+    console.error(e);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

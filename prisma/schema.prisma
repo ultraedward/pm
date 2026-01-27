@@ -12,30 +12,49 @@ model User {
   email         String         @unique
   createdAt     DateTime       @default(now())
   subscriptions Subscription[]
+  alerts        Alert[]
 }
 
 model Subscription {
-  id                   String    @id @default(cuid())
-  userId               String?
-  status               String
-
-  stripeSubscriptionId String    @unique
-  stripeCustomerId     String?   // ✅ ADD THIS
-
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean   @default(false)
-  priceId              String?
-
-  createdAt            DateTime  @default(now())
-
-  user User? @relation(fields: [userId], references: [id])
+  id                     String   @id @default(cuid())
+  userId                 String?
+  user                   User?    @relation(fields: [userId], references: [id])
+  stripeSubscriptionId   String?   @unique
+  stripeCustomerId       String?
+  status                 String
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean   @default(false)
+  priceId                String?
+  createdAt              DateTime  @default(now())
 }
 
 model PriceHistory {
   id        String   @id @default(cuid())
   metal     String
-  price     Decimal  @db.Decimal(12, 4)
+  price     Decimal
   timestamp DateTime @default(now())
 
   @@index([metal, timestamp])
+}
+
+model Alert {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  metal     String
+  direction String        // "above" | "below"
+  target    Decimal
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  triggers  AlertTrigger[]
+}
+
+model AlertTrigger {
+  id         String   @id @default(cuid())
+  alertId    String
+  alert      Alert    @relation(fields: [alertId], references: [id])
+  price      Decimal
+  triggeredAt DateTime @default(now())
+
+  @@index([alertId])
 }
