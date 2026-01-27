@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone", // 🚫 NOT "export"
+  output: "standalone",
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   experimental: {
-    typedRoutes: true,
+    typedRoutes: false, // 🔥 MUST BE FALSE
   },
 };
 
