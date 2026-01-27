@@ -4,7 +4,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    typedRoutes: true,
+    typedRoutes: false, // ⬅️ TURN THIS OFF
   },
 };
 
