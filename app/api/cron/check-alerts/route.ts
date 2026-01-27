@@ -11,13 +11,14 @@ export async function GET() {
     const alerts = await prisma.alert.findMany({
       where: {
         active: true,
+        triggered: false,
       },
     });
 
     for (const alert of alerts) {
       const latest = await prisma.priceHistory.findFirst({
         where: {
-          metal: alert.metal, // string match (correct)
+          metal: alert.metal,
         },
         orderBy: {
           createdAt: "desc",
@@ -36,7 +37,7 @@ export async function GET() {
       await prisma.alert.update({
         where: { id: alert.id },
         data: {
-          triggeredAt: new Date(),
+          triggered: true,
         },
       });
     }
