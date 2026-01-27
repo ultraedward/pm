@@ -12,16 +12,13 @@ export async function GET() {
       where: {
         active: true,
       },
-      include: {
-        metal: true,
-      },
     });
 
     for (const alert of alerts) {
       const latest = await prisma.priceHistory.findFirst({
         where: {
           metal: {
-            id: alert.metal.id,
+            id: alert.metalId,
           },
         },
         orderBy: {
