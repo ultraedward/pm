@@ -8,53 +8,40 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  createdAt     DateTime       @default(now())
-  subscriptions Subscription[]
-  alerts        Alert[]
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }
 
 model Subscription {
   id                     String   @id @default(cuid())
-  userId                 String?
-  user                   User?    @relation(fields: [userId], references: [id])
-  stripeSubscriptionId   String?   @unique
+  stripeSubscriptionId   String?  @unique
   stripeCustomerId       String?
   status                 String
   currentPeriodEnd       DateTime?
-  cancelAtPeriodEnd      Boolean   @default(false)
-  priceId                String?
-  createdAt              DateTime  @default(now())
+  cancelAtPeriodEnd      Boolean  @default(false)
+  userId                 String?
+  createdAt              DateTime @default(now())
 }
 
 model PriceHistory {
   id        String   @id @default(cuid())
   metal     String
-  price     Decimal
-  timestamp DateTime @default(now())
-
-  @@index([metal, timestamp])
+  price     Float
+  createdAt DateTime @default(now())
 }
 
 model Alert {
-  id        String        @id @default(cuid())
-  userId    String
-  user      User          @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid())
   metal     String
-  direction String        // "above" | "below"
-  target    Decimal
-  active    Boolean       @default(true)
-  createdAt DateTime      @default(now())
-  triggers  AlertTrigger[]
+  target    Float
+  direction String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
-model AlertTrigger {
-  id         String   @id @default(cuid())
-  alertId    String
-  alert      Alert    @relation(fields: [alertId], references: [id])
-  price      Decimal
-  triggeredAt DateTime @default(now())
-
-  @@index([alertId])
+model CronLock {
+  name       String   @id
+  lockedAt   DateTime
+  expiresAt  DateTime
 }
