@@ -4,7 +4,7 @@ import { withCronLock } from "@/lib/cronLock";
 
 export const dynamic = "force-dynamic";
 
-const LOCK_ID = 900002; // alerts cron lock
+const LOCK_ID = 900002;
 
 export async function GET() {
   const { ran } = await withCronLock(LOCK_ID, async () => {
@@ -17,7 +17,9 @@ export async function GET() {
     for (const alert of alerts) {
       const latest = await prisma.priceHistory.findFirst({
         where: {
-          metalId: alert.metalId,
+          metal: {
+            id: alert.metalId,
+          },
         },
         orderBy: {
           createdAt: "desc",
