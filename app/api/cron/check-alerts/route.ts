@@ -17,9 +17,7 @@ export async function GET() {
     for (const alert of alerts) {
       const latest = await prisma.priceHistory.findFirst({
         where: {
-          metal: {
-            id: alert.metalId,
-          },
+          metal: alert.metal, // ✅ STRING MATCH — THIS IS THE KEY FIX
         },
         orderBy: {
           createdAt: "desc",
