@@ -1,16 +1,23 @@
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const rows = await prisma.priceHistory.findMany({
-    orderBy: { timestamp: "asc" },
-    take: 500,
-  });
+  try {
+    const rows = await prisma.priceHistory.findMany({
+      orderBy: {
+        createdAt: "asc",
+      },
+      take: 500,
+    });
 
-  return NextResponse.json(rows);
+    return NextResponse.json(rows);
+  } catch (err) {
+    console.error("[prices/history]", err);
+    return NextResponse.json(
+      { error: "Failed to fetch price history" },
+      { status: 500 }
+    );
+  }
 }
