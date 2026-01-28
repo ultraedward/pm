@@ -1,4 +1,4 @@
-export function ensureArray<T>(value: unknown): T[] {
-  if (Array.isArray(value)) return value;
-  return [];
+export function ensureArray<T>(value: T | T[] | null | undefined): T[] {
+  if (value === null || value === undefined) return [];
+  return Array.isArray(value) ? value : [value];
 }
