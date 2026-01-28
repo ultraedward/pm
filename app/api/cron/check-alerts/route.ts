@@ -1,27 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { withCronLock } from "@/lib/cronLock";
+import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
 
 export const dynamic = "force-dynamic";
 
-const LOCK_ID = 900002;
-
 export async function GET() {
-  const { ran } = await withCronLock(LOCK_ID, async () => {
+  const lockName = "check-alerts";
+
+  const acquired = await acquireCronLock(lockName);
+  if (!acquired) {
+    return NextResponse.json({ skipped: true });
+  }
+
+  try {
     const alerts = await prisma.alert.findMany({
-      where: {
-        active: true,
-      },
+      where: { active: true },
     });
 
     for (const alert of alerts) {
       const latest = await prisma.priceHistory.findFirst({
-        where: {
-          metal: alert.metal,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        where: { metal: alert.metal },
+        orderBy: { createdAt: "desc" },
       });
 
       if (!latest) continue;
@@ -33,19 +32,18 @@ export async function GET() {
 
       if (!shouldTrigger) continue;
 
-      // ✅ Deactivate alert after firing
       await prisma.alert.update({
         where: { id: alert.id },
         data: {
           active: false,
         },
       });
-    }
-  });
 
-  return NextResponse.json({
-    ok: true,
-    ran,
-    message: ran ? "Alerts checked" : "Skipped (lock held)",
-  });
+      // hook email / push / webhook here
+    }
+
+    return NextResponse.json({ success: true });
+  } finally {
+    await releaseCronLock(lockName);
+  }
 }
