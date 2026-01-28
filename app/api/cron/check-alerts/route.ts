@@ -15,9 +15,6 @@ export async function GET() {
     });
 
     for (const alert of alerts) {
-      // Skip already-triggered alerts defensively
-      if ((alert as any).triggered === true) continue;
-
       const latest = await prisma.priceHistory.findFirst({
         where: {
           metal: alert.metal,
@@ -36,10 +33,11 @@ export async function GET() {
 
       if (!shouldTrigger) continue;
 
+      // ✅ Deactivate alert after firing
       await prisma.alert.update({
         where: { id: alert.id },
         data: {
-          triggered: true,
+          active: false,
         },
       });
     }
