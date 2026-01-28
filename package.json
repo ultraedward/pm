@@ -22,6 +22,10 @@
   },
   "devDependencies": {
     "prisma": "^5.22.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.3.3",
+
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@types/node": "^20.11.30"
   }
 }
