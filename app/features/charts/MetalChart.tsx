@@ -1,36 +1,54 @@
 "use client";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import dynamic from "next/dynamic";
 
-type Point = {
-  time: string;
-  price: number;
+export type Point = {
+  x: number | string;
+  y: number;
 };
 
-export default function MetalChart({ data }: { data: Point[] }) {
+const Line = dynamic(
+  () => import("react-chartjs-2").then((m) => m.Line),
+  { ssr: false }
+);
+
+type Props = {
+  metal: string;
+  data: Point[];
+};
+
+export default function MetalChart({ metal, data }: Props) {
+  if (!data?.length) {
+    return (
+      <div className="text-sm text-gray-500">
+        No data available for {metal}
+      </div>
+    );
+  }
+
   return (
-    <div style={{ width: "100%", height: 320 }}>
-      <ResponsiveContainer>
-        <LineChart data={data}>
-          <XAxis dataKey="time" />
-          <YAxis domain={["auto", "auto"]} />
-          <Tooltip />
-          <Line
-            type="monotone"
-            dataKey="price"
-            stroke="#f59e0b"
-            strokeWidth={2}
-            dot={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+    <Line
+      data={{
+        labels: data.map((p) => p.x),
+        datasets: [
+          {
+            label: metal.toUpperCase(),
+            data: data.map((p) => p.y),
+            borderWidth: 2,
+            tension: 0.3,
+          },
+        ],
+      }}
+      options={{
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { display: true },
+          y: { display: true },
+        },
+      }}
+    />
   );
 }
