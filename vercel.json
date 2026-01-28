@@ -1,9 +1,12 @@
 {
-  "buildCommand": "npm run vercel-build",
   "crons": [
     {
-      "path": "/api/cron/move-prices",
-      "schedule": "*/10 * * * *"
+      "path": "/api/cron/ingest-prices",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/check-alerts",
+      "schedule": "5 9 * * *"
     }
   ]
 }
