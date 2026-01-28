@@ -4,31 +4,29 @@ import { withCronLock } from "@/lib/cronLock";
 
 export const dynamic = "force-dynamic";
 
-const LOCK_ID = 900001; // any stable int (document it)
+const LOCK_ID = 900001;
+
+// ✅ Source of truth for supported metals
+const METALS = ["gold", "silver", "platinum", "palladium"];
 
 export async function GET() {
   const { ran } = await withCronLock(LOCK_ID, async () => {
-    // ---- CRON LOGIC START ----
-
-    const metals = await prisma.metal.findMany();
-
-    for (const metal of metals) {
-      const price = Math.random() * 100 + 1000; // replace with real feed
+    for (const metal of METALS) {
+      // TODO: replace with real price feed
+      const price = Math.random() * 100 + 1000;
 
       await prisma.priceHistory.create({
         data: {
-          metalId: metal.id,
+          metal,
           price,
         },
       });
     }
-
-    // ---- CRON LOGIC END ----
   });
 
   return NextResponse.json({
     ok: true,
     ran,
-    message: ran ? "Cron executed" : "Skipped (lock held)",
+    message: ran ? "Prices ingested" : "Skipped (lock held)",
   });
 }
