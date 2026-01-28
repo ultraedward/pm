@@ -1,19 +1,29 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { withCronLock } from "@/lib/cronLock";
+import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
 
 export const dynamic = "force-dynamic";
 
-const LOCK_ID = 900001;
-
-// ✅ Source of truth for supported metals
 const METALS = ["gold", "silver", "platinum", "palladium"];
 
 export async function GET() {
-  const { ran } = await withCronLock(LOCK_ID, async () => {
+  const lockName = "ingest-prices";
+
+  const acquired = await acquireCronLock(lockName);
+  if (!acquired) {
+    return NextResponse.json({ skipped: true });
+  }
+
+  try {
     for (const metal of METALS) {
-      // TODO: replace with real price feed
-      const price = Math.random() * 100 + 1000;
+      const price =
+        metal === "gold"
+          ? 2000 + Math.random() * 50
+          : metal === "silver"
+          ? 25 + Math.random()
+          : metal === "platinum"
+          ? 900 + Math.random() * 10
+          : 950 + Math.random() * 10;
 
       await prisma.priceHistory.create({
         data: {
@@ -22,11 +32,9 @@ export async function GET() {
         },
       });
     }
-  });
 
-  return NextResponse.json({
-    ok: true,
-    ran,
-    message: ran ? "Prices ingested" : "Skipped (lock held)",
-  });
+    return NextResponse.json({ success: true });
+  } finally {
+    await releaseCronLock(lockName);
+  }
 }

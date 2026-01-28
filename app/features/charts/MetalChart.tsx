@@ -1,73 +1,36 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const Line = dynamic(
-  () => import("react-chartjs-2").then((m) => m.Line),
-  { ssr: false }
-);
-
 import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LinearScale,
-  TimeScale,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
   Tooltip,
-} from "chart.js";
-import "chartjs-adapter-date-fns";
+  ResponsiveContainer,
+} from "recharts";
 
-ChartJS.register(
-  LineElement,
-  PointElement,
-  LinearScale,
-  TimeScale,
-  Tooltip
-);
+type Point = {
+  time: string;
+  price: number;
+};
 
-export default function MetalChart({
-  data,
-  metal,
-}: {
-  data: any[];
-  metal: string;
-}) {
-  if (!Array.isArray(data) || data.length < 2) {
-    return (
-      <div className="h-64 flex items-center justify-center text-muted-foreground border rounded">
-        Waiting for data…
-      </div>
-    );
-  }
-
-  const points = data.map((p) => ({
-    x: new Date(p.timestamp),
-    y: p.price,
-  }));
-
+export default function MetalChart({ data }: { data: Point[] }) {
   return (
-    <div className="h-64 border rounded p-2">
-      <Line
-        data={{
-          datasets: [
-            {
-              label: metal,
-              data: points,
-              borderWidth: 2,
-              pointRadius: 0,
-            },
-          ],
-        }}
-        options={{
-          responsive: true,
-          maintainAspectRatio: false,
-          parsing: false,
-          scales: {
-            x: { type: "time", display: false },
-          },
-          plugins: { legend: { display: false } },
-        }}
-      />
+    <div style={{ width: "100%", height: 320 }}>
+      <ResponsiveContainer>
+        <LineChart data={data}>
+          <XAxis dataKey="time" />
+          <YAxis domain={["auto", "auto"]} />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="price"
+            stroke="#f59e0b"
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }

@@ -1,25 +1,45 @@
 import { prisma } from "@/lib/prisma";
 
-/**
- * Runs a function under a global Postgres advisory lock.
- * If the lock is already held, the function will NOT execute.
- */
-export async function withCronLock<T>(
-  lockId: number,
-  fn: () => Promise<T>
-): Promise<{ ran: boolean; result?: T }> {
-  const rows = await prisma.$queryRaw<
-    { acquired: boolean }[]
-  >`SELECT pg_try_advisory_lock(${lockId}) AS acquired`;
+const LOCK_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-  if (!rows[0]?.acquired) {
-    return { ran: false };
-  }
+export async function acquireCronLock(name: string): Promise<boolean> {
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + LOCK_TTL_MS);
 
   try {
-    const result = await fn();
-    return { ran: true, result };
-  } finally {
-    await prisma.$queryRaw`SELECT pg_advisory_unlock(${lockId})`;
+    await prisma.cronLock.create({
+      data: {
+        name,
+        lockedAt: now,
+        expiresAt,
+      },
+    });
+    return true;
+  } catch {
+    const existing = await prisma.cronLock.findUnique({ where: { name } });
+
+    if (!existing || existing.expiresAt < now) {
+      await prisma.cronLock.upsert({
+        where: { name },
+        update: {
+          lockedAt: now,
+          expiresAt,
+        },
+        create: {
+          name,
+          lockedAt: now,
+          expiresAt,
+        },
+      });
+      return true;
+    }
+
+    return false;
   }
+}
+
+export async function releaseCronLock(name: string) {
+  await prisma.cronLock.deleteMany({
+    where: { name },
+  });
 }

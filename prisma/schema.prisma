@@ -14,14 +14,14 @@ model User {
 }
 
 model Subscription {
-  id                     String   @id @default(cuid())
-  stripeSubscriptionId   String?  @unique
-  stripeCustomerId       String?
-  status                 String
-  currentPeriodEnd       DateTime?
-  cancelAtPeriodEnd      Boolean  @default(false)
-  userId                 String?
-  createdAt              DateTime @default(now())
+  id                   String   @id @default(cuid())
+  stripeSubscriptionId String?  @unique
+  stripeCustomerId     String?
+  status               String
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean  @default(false)
+  userId               String?
+  createdAt            DateTime @default(now())
 }
 
 model PriceHistory {
@@ -41,7 +41,7 @@ model Alert {
 }
 
 model CronLock {
-  name       String   @id
-  lockedAt   DateTime
-  expiresAt  DateTime
+  name      String   @id
+  lockedAt  DateTime
+  expiresAt DateTime
 }
