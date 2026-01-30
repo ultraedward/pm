@@ -1,29 +1,22 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
 import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
 
-export const dynamic = "force-dynamic";
+const prisma = new PrismaClient();
 
 const METALS = ["gold", "silver", "platinum", "palladium"];
 
 export async function GET() {
-  const lockName = "ingest-prices";
+  const LOCK_NAME = "cron:ingest-prices";
 
-  const acquired = await acquireCronLock(lockName);
-  if (!acquired) {
-    return NextResponse.json({ skipped: true });
+  const hasLock = await acquireCronLock(LOCK_NAME, 60);
+  if (!hasLock) {
+    return NextResponse.json({ skipped: "lock-active" });
   }
 
   try {
     for (const metal of METALS) {
-      const price =
-        metal === "gold"
-          ? 2000 + Math.random() * 50
-          : metal === "silver"
-          ? 25 + Math.random()
-          : metal === "platinum"
-          ? 900 + Math.random() * 10
-          : 950 + Math.random() * 10;
+      const price = Math.random() * 100 + 1000; // replace with real feed
 
       await prisma.priceHistory.create({
         data: {
@@ -33,8 +26,11 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("INGEST ERROR", err);
+    return NextResponse.json({ error: "failed" }, { status: 500 });
   } finally {
-    await releaseCronLock(lockName);
+    await releaseCronLock(LOCK_NAME);
   }
 }

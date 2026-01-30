@@ -1,10 +1,17 @@
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
 
-const LOCK_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const prisma = new PrismaClient();
 
-export async function acquireCronLock(name: string): Promise<boolean> {
+/**
+ * Attempt to acquire a cron lock.
+ * Returns true if lock acquired, false if already locked.
+ */
+export async function acquireCronLock(
+  name: string,
+  ttlSeconds = 60
+): Promise<boolean> {
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + LOCK_TTL_MS);
+  const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
 
   try {
     await prisma.cronLock.create({
@@ -14,23 +21,24 @@ export async function acquireCronLock(name: string): Promise<boolean> {
         expiresAt,
       },
     });
+
     return true;
-  } catch {
+  } catch (err: any) {
+    // Lock already exists → check expiration
     const existing = await prisma.cronLock.findUnique({ where: { name } });
 
-    if (!existing || existing.expiresAt < now) {
-      await prisma.cronLock.upsert({
+    if (!existing) return false;
+
+    if (existing.expiresAt < now) {
+      // Lock expired → steal it
+      await prisma.cronLock.update({
         where: { name },
-        update: {
-          lockedAt: now,
-          expiresAt,
-        },
-        create: {
-          name,
+        data: {
           lockedAt: now,
           expiresAt,
         },
       });
+
       return true;
     }
 
@@ -38,8 +46,13 @@ export async function acquireCronLock(name: string): Promise<boolean> {
   }
 }
 
+/**
+ * Release cron lock (best effort).
+ */
 export async function releaseCronLock(name: string) {
-  await prisma.cronLock.deleteMany({
-    where: { name },
-  });
+  try {
+    await prisma.cronLock.delete({ where: { name } });
+  } catch {
+    // no-op (lock may already be gone)
+  }
 }
