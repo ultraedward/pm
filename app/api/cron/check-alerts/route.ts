@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
 import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
 
-export const dynamic = "force-dynamic";
+const prisma = new PrismaClient();
 
 export async function GET() {
-  const lockName = "check-alerts";
+  const LOCK_NAME = "cron:check-alerts";
 
-  const acquired = await acquireCronLock(lockName);
-  if (!acquired) {
-    return NextResponse.json({ skipped: true });
+  const hasLock = await acquireCronLock(LOCK_NAME, 60);
+  if (!hasLock) {
+    return NextResponse.json({ skipped: "lock-active" });
   }
 
   try {
@@ -34,16 +34,17 @@ export async function GET() {
 
       await prisma.alert.update({
         where: { id: alert.id },
-        data: {
-          active: false,
-        },
+        data: { active: false },
       });
 
-      // hook email / push / webhook here
+      // Optional: insert alert trigger history here
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("ALERT ERROR", err);
+    return NextResponse.json({ error: "failed" }, { status: 500 });
   } finally {
-    await releaseCronLock(lockName);
+    await releaseCronLock(LOCK_NAME);
   }
 }

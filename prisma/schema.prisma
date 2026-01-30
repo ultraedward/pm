@@ -1,47 +1,50 @@
-generator client {
-  provider = "prisma-client-js"
-}
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+const prisma = new PrismaClient();
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-}
+export async function GET() {
+  const LOCK_NAME = "cron:check-alerts";
 
-model Subscription {
-  id                   String   @id @default(cuid())
-  stripeSubscriptionId String?  @unique
-  stripeCustomerId     String?
-  status               String
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean  @default(false)
-  userId               String?
-  createdAt            DateTime @default(now())
-}
+  const hasLock = await acquireCronLock(LOCK_NAME, 60);
+  if (!hasLock) {
+    return NextResponse.json({ skipped: "lock-active" });
+  }
 
-model PriceHistory {
-  id        String   @id @default(cuid())
-  metal     String
-  price     Float
-  createdAt DateTime @default(now())
-}
+  try {
+    const alerts = await prisma.alert.findMany({
+      where: { active: true },
+    });
 
-model Alert {
-  id        String   @id @default(cuid())
-  metal     String
-  target    Float
-  direction String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-}
+    for (const alert of alerts) {
+      const latest = await prisma.priceHistory.findFirst({
+        where: { metal: alert.metal },
+        orderBy: { createdAt: "desc" },
+      });
 
-model CronLock {
-  name      String   @id
-  lockedAt  DateTime
-  expiresAt DateTime
+      if (!latest) continue;
+
+      const shouldTrigger =
+        alert.direction === "above"
+          ? latest.price >= alert.target
+          : latest.price <= alert.target;
+
+      if (!shouldTrigger) continue;
+
+      await prisma.alert.update({
+        where: { id: alert.id },
+        data: { active: false },
+      });
+
+      // Optional: insert alert trigger history here
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("ALERT ERROR", err);
+    return NextResponse.json({ error: "failed" }, { status: 500 });
+  } finally {
+    await releaseCronLock(LOCK_NAME);
+  }
 }
