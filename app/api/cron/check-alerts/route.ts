@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
 
-const prisma = new PrismaClient();
+const CRON_NAME = "check-alerts";
 
 export async function GET() {
-  const LOCK_NAME = "cron:check-alerts";
-
-  const hasLock = await acquireCronLock(LOCK_NAME, 60);
-  if (!hasLock) {
-    return NextResponse.json({ skipped: "lock-active" });
+  const locked = await acquireCronLock(CRON_NAME);
+  if (!locked) {
+    return NextResponse.json({ skipped: "lock-held" });
   }
 
   try {
@@ -32,19 +30,53 @@ export async function GET() {
 
       if (!shouldTrigger) continue;
 
-      await prisma.alert.update({
-        where: { id: alert.id },
-        data: { active: false },
+      // HARD GUARANTEE: trigger once
+      const alreadyTriggered = await prisma.alertTrigger.findFirst({
+        where: { alertId: alert.id },
       });
 
-      // Optional: insert alert trigger history here
+      if (alreadyTriggered) continue;
+
+      await prisma.$transaction([
+        prisma.alertTrigger.create({
+          data: {
+            alertId: alert.id,
+            metal: alert.metal,
+            price: latest.price,
+          },
+        }),
+        prisma.alert.update({
+          where: { id: alert.id },
+          data: { active: false },
+        }),
+      ]);
     }
 
+    await prisma.cronHealth.upsert({
+      where: { name: CRON_NAME },
+      update: { lastRunAt: new Date(), lastStatus: "success", lastError: null },
+      create: { name: CRON_NAME, lastRunAt: new Date(), lastStatus: "success" },
+    });
+
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("ALERT ERROR", err);
-    return NextResponse.json({ error: "failed" }, { status: 500 });
+  } catch (err: any) {
+    await prisma.cronHealth.upsert({
+      where: { name: CRON_NAME },
+      update: {
+        lastRunAt: new Date(),
+        lastStatus: "error",
+        lastError: err.message,
+      },
+      create: {
+        name: CRON_NAME,
+        lastRunAt: new Date(),
+        lastStatus: "error",
+        lastError: err.message,
+      },
+    });
+
+    return NextResponse.json({ error: err.message }, { status: 500 });
   } finally {
-    await releaseCronLock(LOCK_NAME);
+    await releaseCronLock(CRON_NAME);
   }
 }
