@@ -48,3 +48,8 @@ export async function GET() {
     await releaseCronLock(LOCK_NAME);
   }
 }
+
+model SystemConfig {
+  key   String @id
+  value String
+}
