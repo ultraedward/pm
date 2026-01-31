@@ -1,69 +1,60 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
-import { sendAlertEmail } from "@/lib/email";
+import { sendRawEmail } from "@/lib/emailProvider";
 
 export const dynamic = "force-dynamic";
 
-const MAX_ATTEMPTS = 5;
-
-function backoffSeconds(attempt: number) {
-  return Math.pow(2, attempt) * 60; // 1m, 2m, 4m, 8m, 16m
-}
+const CRON_NAME = "retry-emails";
+const LOCK_TTL_SECONDS = 60;
+const MAX_RETRIES = 5;
 
 export async function GET() {
-  const enabled = await prisma.systemConfig.findUnique({
-    where: { key: "CRON_ENABLED" },
-  });
-
-  if (enabled?.value === "false") {
-    return NextResponse.json({ skipped: "cron-disabled" });
-  }
-
-  const LOCK = "cron:retry-emails";
-  const hasLock = await acquireCronLock(LOCK, 120);
+  const hasLock = await acquireCronLock(CRON_NAME, LOCK_TTL_SECONDS);
   if (!hasLock) {
-    return NextResponse.json({ skipped: "lock-active" });
+    return NextResponse.json({ ok: true, skipped: "lock-active" });
   }
 
   try {
-    const now = new Date();
-
-    const failed = await prisma.emailLog.findMany({
+    const failedEmails = await prisma.emailLog.findMany({
       where: {
         status: "failed",
-        attempt: { lt: MAX_ATTEMPTS },
+        retries: { lt: MAX_RETRIES },
       },
-      orderBy: { createdAt: "asc" },
       take: 10,
     });
 
-    let retried = 0;
-
-    for (const email of failed) {
-      const last = email.lastAttempt ?? email.createdAt;
-      const wait = backoffSeconds(email.attempt);
-      const nextTry = new Date(last.getTime() + wait * 1000);
-
-      if (now < nextTry) continue;
-
+    for (const email of failedEmails) {
       try {
-        await sendAlertEmail({
+        await sendRawEmail({
+          to: email.to,
           subject: email.subject,
-          body: email.body,
-          emailLogId: email.id,
+          html: email.body,
         });
-        retried++;
-      } catch {
-        // failure already recorded
+
+        await prisma.emailLog.update({
+          where: { id: email.id },
+          data: {
+            status: "sent",
+            sentAt: new Date(),
+          },
+        });
+      } catch (err) {
+        await prisma.emailLog.update({
+          where: { id: email.id },
+          data: {
+            retries: { increment: 1 },
+            lastError: String(err),
+          },
+        });
       }
     }
 
-    return NextResponse.json({ retried });
-  } catch (err) {
-    console.error("RETRY EMAIL ERROR", err);
-    return NextResponse.json({ error: "failed" }, { status: 500 });
+    return NextResponse.json({
+      ok: true,
+      retried: failedEmails.length,
+    });
   } finally {
-    await releaseCronLock(LOCK);
+    await releaseCronLock(CRON_NAME);
   }
 }

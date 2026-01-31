@@ -2,19 +2,15 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
-export async function sendEmail({
-  to,
-  subject,
-  body,
-}: {
+export async function sendRawEmail(args: {
   to: string;
   subject: string;
-  body: string;
+  html: string;
 }) {
-  return resend.emails.send({
-    from: "Alerts <alerts@yourdomain.com>",
-    to,
-    subject,
-    html: body,
+  await resend.emails.send({
+    from: "alerts@yourdomain.com",
+    to: args.to,
+    subject: args.subject,
+    html: args.html,
   });
 }
