@@ -1,92 +1,72 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useProStatus } from "@/lib/useProStatus";
+import { UpgradeButton } from "@/components/UpgradeButton";
 
-type AlertRunSummary = {
-  ok: boolean;
-  ranAt?: string;
-  alertsConsidered?: number;
-  eligibleAlerts?: number;
-  triggered?: number;
-  skipped?: {
-    dueToCooldown: number;
-    dueToMissingPrice: number;
-  };
+type Alert = {
+  id: string;
+  metal: string;
+  target: number;
+  direction: "above" | "below";
+  active: boolean;
 };
 
 export default function AlertsPage() {
-  const [status, setStatus] = useState<any>(null);
-  const [runResult, setRunResult] = useState<AlertRunSummary | null>(null);
-  const [running, setRunning] = useState(false);
+  const { pro, loading } = useProStatus();
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/alerts/status")
-      .then((r) => r.json())
-      .then(setStatus)
-      .catch(() => {});
+    fetch("/api/alerts")
+      .then((res) => res.json())
+      .then(setAlerts)
+      .catch(() => setError("Failed to load alerts"));
   }, []);
 
-  async function runAlerts() {
-    setRunning(true);
-    setRunResult(null);
-
-    const res = await fetch("/api/alerts/run", { method: "POST" });
-    const json = await res.json();
-
-    setRunResult(json);
-    setRunning(false);
-  }
+  if (loading) return null;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Alerts</h1>
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">Price Alerts</h1>
 
-      <div className="rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold mb-2">System Status</h2>
+      {!pro && (
+        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
+          <p className="mb-2 font-medium text-amber-900">
+            🔒 Alerts are paused on the free plan
+          </p>
+          <p className="mb-3 text-sm text-amber-800">
+            Upgrade to Pro to receive real-time email alerts when prices hit
+            your targets.
+          </p>
+          <UpgradeButton />
+        </div>
+      )}
 
-        {!status ? (
-          <p className="text-sm text-gray-500">Loading…</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 text-sm">
+      {error && <p className="text-red-500">{error}</p>}
+
+      {alerts.length === 0 && (
+        <p className="text-gray-500">No alerts yet.</p>
+      )}
+
+      <ul className="space-y-3">
+        {alerts.map((alert) => (
+          <li
+            key={alert.id}
+            className="rounded border p-3 flex justify-between items-center"
+          >
             <div>
-              <div className="text-gray-500">Total Alerts</div>
-              <div className="font-medium">{status.totalAlerts}</div>
+              <p className="font-medium">
+                {alert.metal.toUpperCase()} {alert.direction} $
+                {alert.target.toFixed(2)}
+              </p>
+              <p className="text-sm text-gray-500">
+                Status: {alert.active ? "Active" : "Inactive"}
+              </p>
             </div>
-
-            <div>
-              <div className="text-gray-500">Total Triggers</div>
-              <div className="font-medium">{status.totalTriggers}</div>
-            </div>
-
-            <div className="col-span-2">
-              <div className="text-gray-500">Last Triggered</div>
-              <div className="font-medium">
-                {status.lastTriggeredAt
-                  ? new Date(status.lastTriggeredAt).toLocaleString()
-                  : "Never"}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="rounded-xl border bg-white p-5 shadow-sm">
-        <h2 className="font-semibold mb-3">Run Alerts Now</h2>
-
-        <button
-          onClick={runAlerts}
-          disabled={running}
-          className="px-4 py-2 rounded-lg bg-black text-white disabled:opacity-50"
-        >
-          {running ? "Running…" : "Run Alert Engine"}
-        </button>
-
-        {runResult && (
-          <pre className="mt-4 text-xs bg-gray-50 border rounded-lg p-3 overflow-auto">
-{JSON.stringify(runResult, null, 2)}
-          </pre>
-        )}
-      </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
