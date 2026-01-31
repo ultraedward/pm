@@ -16,7 +16,6 @@ export async function sendAlertEmail({
   target,
   direction,
 }: SendAlertEmailArgs) {
-  // Fetch alert + user email
   const alert = await prisma.alert.findUnique({
     where: { id: alertId },
     include: { user: true },
@@ -37,17 +36,18 @@ Current price: ${price}
 — Precious Metals Tracker
 `.trim();
 
-  // 1️⃣ Queue email in DB
+  // 1️⃣ Create EmailLog (schema-aligned)
   const emailLog = await prisma.emailLog.create({
     data: {
       alertId,
       to: alert.user.email,
       subject,
       status: "queued",
+      attempts: 0,
     },
   });
 
-  // 2️⃣ Attempt send immediately
+  // 2️⃣ Attempt send
   try {
     await sendRawEmail({
       to: alert.user.email,
@@ -62,12 +62,12 @@ Current price: ${price}
         sentAt: new Date(),
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     await prisma.emailLog.update({
       where: { id: emailLog.id },
       data: {
         status: "failed",
-        lastError: err?.message ?? "send failed",
+        attempts: { increment: 1 },
       },
     });
 
