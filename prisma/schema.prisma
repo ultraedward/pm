@@ -11,6 +11,8 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
+
+  alerts Alert[]
 }
 
 model Subscription {
@@ -29,21 +31,29 @@ model PriceHistory {
   metal     String
   price     Float
   createdAt DateTime @default(now())
+
+  @@index([metal, createdAt])
 }
 
 model Alert {
   id        String   @id @default(cuid())
+  userId    String
   metal     String
   target    Float
   direction String
   active    Boolean  @default(true)
 
-  // Email routing (safe to be nullable so existing alerts don't break migration)
+  // Optional override; otherwise falls back to user.email
   email     String?
 
   createdAt DateTime @default(now())
 
-  triggers  AlertTrigger[]
+  user     User           @relation(fields: [userId], references: [id])
+  triggers AlertTrigger[]
+  emails   EmailLog[]
+
+  @@index([userId])
+  @@index([metal])
 }
 
 model AlertTrigger {
@@ -55,22 +65,31 @@ model AlertTrigger {
   price       Float
   triggeredAt DateTime @default(now())
 
-  // Used to prevent duplicate triggers for the same alert + same price point
-  // (idempotency for cron retries)
+  // Prevent duplicate triggers during retries
   fingerprint String @unique
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@index([alertId])
 }
 
 model EmailLog {
-  id          String   @id @default(cuid())
-  to          String
-  subject     String
-  provider    String   @default("resend")
-  providerId  String?
-  status      String   @default("queued") // queued | sent | failed
-  error       String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  alertId    String
+  to         String
+  subject    String
+  provider   String   @default("resend")
+  providerId String?
+  status     String   @default("queued") // queued | sent | failed
+  attempts   Int      @default(0)
+  lastError  String?
+  createdAt  DateTime @default(now())
+  sentAt     DateTime?
+
+  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@index([alertId])
+  @@index([status])
 }
 
 model CronLock {
@@ -83,18 +102,4 @@ model CronControl {
   id          Int      @id @default(1)
   cronEnabled Boolean  @default(true)
   updatedAt   DateTime @updatedAt
-}
-
-model EmailLog {
-  id          String   @id @default(cuid())
-  alertId     String
-  to          String
-  subject     String
-  status      String   // sent | failed
-  attempts    Int      @default(0)
-  lastError   String?
-  createdAt   DateTime @default(now())
-  sentAt      DateTime?
-
-  @@index([alertId])
 }
