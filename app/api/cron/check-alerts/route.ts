@@ -6,12 +6,11 @@ import { sendAlertEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
-const CRON_NAME = "check-alerts";
 const LOCK_TTL_SECONDS = 60;
 
 export async function GET() {
-  // 🔥 GLOBAL KILL SWITCH
-  const enabled = await isCronEnabled(CRON_NAME);
+  // 🔥 GLOBAL CRON KILL SWITCH
+  const enabled = await isCronEnabled();
   if (!enabled) {
     return NextResponse.json({
       ok: true,
@@ -21,7 +20,7 @@ export async function GET() {
   }
 
   // 🔒 DISTRIBUTED LOCK
-  const hasLock = await acquireCronLock(CRON_NAME, LOCK_TTL_SECONDS);
+  const hasLock = await acquireCronLock("check-alerts", LOCK_TTL_SECONDS);
   if (!hasLock) {
     return NextResponse.json({
       ok: true,
@@ -76,6 +75,6 @@ export async function GET() {
       { status: 500 }
     );
   } finally {
-    await releaseCronLock(CRON_NAME);
+    await releaseCronLock("check-alerts");
   }
 }
