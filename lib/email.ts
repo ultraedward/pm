@@ -1,60 +1,49 @@
-import { Resend } from "resend";
-import { prisma } from "./prisma";
+import { prisma } from "@/lib/prisma";
+import { queueEmail } from "@/lib/emailQueue";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+type SendAlertEmailArgs = {
+  alertId: string;
+  metal: string;
+  price: number;
+  target: number;
+  direction: string;
+};
 
-const MAX_ATTEMPTS = 3;
-
-export async function sendAlertEmail(
-  alertId: string,
-  to: string,
-  subject: string,
-  html: string
-) {
-  const log = await prisma.emailLog.create({
-    data: {
-      alertId,
-      to,
-      subject,
-      status: "pending",
-    },
+export async function sendAlertEmail({
+  alertId,
+  metal,
+  price,
+  target,
+  direction,
+}: SendAlertEmailArgs) {
+  const alert = await prisma.alert.findUnique({
+    where: { id: alertId },
+    include: { user: true },
   });
 
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    try {
-      await resend.emails.send({
-        from: "Alerts <alerts@yourdomain.com>",
-        to,
-        subject,
-        html,
-      });
+  if (!alert?.user?.email) return;
 
-      await prisma.emailLog.update({
-        where: { id: log.id },
-        data: {
-          status: "sent",
-          attempts: attempt,
-          sentAt: new Date(),
-        },
-      });
+  const subject = `🚨 ${metal.toUpperCase()} alert triggered`;
+  const html = `
+    <h2>${metal.toUpperCase()} price alert</h2>
+    <p>
+      Current price: <strong>${price}</strong><br/>
+      Target: <strong>${target}</strong><br/>
+      Direction: <strong>${direction}</strong>
+    </p>
+  `;
 
-      return { ok: true };
-    } catch (err: any) {
-      const delay = attempt * attempt * 1000;
-      await new Promise((r) => setTimeout(r, delay));
+  await queueEmail({
+    to: alert.user.email,
+    subject,
+    html,
+  });
 
-      await prisma.emailLog.update({
-        where: { id: log.id },
-        data: {
-          status: "failed",
-          attempts: attempt,
-          lastError: err.message ?? "unknown",
-        },
-      });
-
-      if (attempt === MAX_ATTEMPTS) {
-        throw err;
-      }
-    }
-  }
+  await prisma.emailLog.create({
+    data: {
+      alertId,
+      email: alert.user.email,
+      status: "queued",
+    },
+  });
 }
