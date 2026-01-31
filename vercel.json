@@ -7,6 +7,19 @@
     {
       "path": "/api/cron/check-alerts",
       "schedule": "5 9 * * *"
+    },
+    {
+      "path": "/api/cron/retry-emails",
+      "schedule": "15 9 * * *"
+    }
+  ]
+}
+
+{
+  "crons": [
+    {
+      "path": "/api/cron/process-emails",
+      "schedule": "*/10 * * * *"
     }
   ]
 }

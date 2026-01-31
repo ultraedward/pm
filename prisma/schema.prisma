@@ -37,15 +37,40 @@ model Alert {
   target    Float
   direction String
   active    Boolean  @default(true)
+
+  // Email routing (safe to be nullable so existing alerts don't break migration)
+  email     String?
+
   createdAt DateTime @default(now())
+
+  triggers  AlertTrigger[]
 }
 
 model AlertTrigger {
-  id        String   @id @default(cuid())
-  alertId  String
-  metal     String
-  price     Float
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  alertId     String
+  metal       String
+  target      Float
+  direction   String
+  price       Float
+  triggeredAt DateTime @default(now())
+
+  // Used to prevent duplicate triggers for the same alert + same price point
+  // (idempotency for cron retries)
+  fingerprint String @unique
+
+  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+}
+
+model EmailLog {
+  id          String   @id @default(cuid())
+  to          String
+  subject     String
+  provider    String   @default("resend")
+  providerId  String?
+  status      String   @default("queued") // queued | sent | failed
+  error       String?
+  createdAt   DateTime @default(now())
 }
 
 model CronLock {
@@ -54,7 +79,22 @@ model CronLock {
   expiresAt DateTime
 }
 
-model SystemConfig {
-  key   String @id
-  value String
+model CronControl {
+  id          Int      @id @default(1)
+  cronEnabled Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model EmailLog {
+  id          String   @id @default(cuid())
+  alertId     String
+  to          String
+  subject     String
+  status      String   // sent | failed
+  attempts    Int      @default(0)
+  lastError   String?
+  createdAt   DateTime @default(now())
+  sentAt      DateTime?
+
+  @@index([alertId])
 }
