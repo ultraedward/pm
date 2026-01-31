@@ -1,28 +1,29 @@
-import { Alert } from "@prisma/client";
+import { AlertTrigger } from "@prisma/client";
 
-export function canTriggerAlert(alert: Alert, now = new Date()): boolean {
-  if (!alert.lastTriggeredAt) return true;
+type Frequency =
+  | "once"
+  | "once_per_hour"
+  | "once_per_day";
 
-  const last = alert.lastTriggeredAt.getTime();
+export function canTriggerAlert(
+  frequency: Frequency,
+  lastTrigger: AlertTrigger | null,
+  now: Date = new Date()
+): boolean {
+  if (!lastTrigger) return true;
+
+  const last = lastTrigger.triggeredAt.getTime();
   const current = now.getTime();
 
-  switch (alert.frequency) {
+  switch (frequency) {
     case "once":
       return false;
 
-    case "once_per_day": {
-      const lastDay = new Date(last).toDateString();
-      const today = new Date(current).toDateString();
-      return lastDay !== today;
-    }
+    case "once_per_hour":
+      return current - last >= 60 * 60 * 1000;
 
-    case "once_per_hour": {
-      const diffMs = current - last;
-      return diffMs >= 60 * 60 * 1000;
-    }
-
-    case "trailing_stop":
-      return true;
+    case "once_per_day":
+      return current - last >= 24 * 60 * 60 * 1000;
 
     default:
       return true;
