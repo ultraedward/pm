@@ -1,80 +1,51 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
-import { isCronEnabled } from "@/lib/cronGuard";
-import { sendAlertEmail } from "@/lib/email";
+import { isProUser } from "@/lib/isProUser";
 
-export const dynamic = "force-dynamic";
+for (const alert of alerts) {
+  const pro = await isProUser(alert.userId);
 
-const LOCK_TTL_SECONDS = 60;
-
-export async function GET() {
-  // 🔥 GLOBAL CRON KILL SWITCH
-  const enabled = await isCronEnabled();
-  if (!enabled) {
-    return NextResponse.json({
-      ok: true,
-      ran: false,
-      skipped: "cron-disabled",
-    });
+  if (!pro) {
+    // Skip silently — no spam, no logs
+    continue;
   }
 
-  // 🔒 DISTRIBUTED LOCK
-  const hasLock = await acquireCronLock("check-alerts", LOCK_TTL_SECONDS);
-  if (!hasLock) {
-    return NextResponse.json({
-      ok: true,
-      ran: false,
-      skipped: "lock-active",
-    });
-  }
+  const latest = await prisma.priceHistory.findFirst({
+    where: { metal: alert.metal },
+    orderBy: { createdAt: "desc" },
+  });
 
-  try {
-    const alerts = await prisma.alert.findMany({
-      where: { active: true },
-    });
+  if (!latest) continue;
 
-    for (const alert of alerts) {
-      const latest = await prisma.priceHistory.findFirst({
-        where: { metal: alert.metal },
-        orderBy: { createdAt: "desc" },
-      });
+  const shouldTrigger =
+    alert.direction === "above"
+      ? latest.price >= alert.target
+      : latest.price <= alert.target;
 
-      if (!latest) continue;
+  if (!shouldTrigger) continue;
 
-      const shouldTrigger =
-        alert.direction === "above"
-          ? latest.price >= alert.target
-          : latest.price <= alert.target;
+  // SEND EMAIL
+  await sendAlertEmail({
+    to: alert.email!,
+    metal: alert.metal,
+    price: latest.price,
+    target: alert.target,
+    direction: alert.direction as "above" | "below",
+  });
 
-      if (!shouldTrigger) continue;
+  // LOG TRIGGER
+  await prisma.alertTrigger.create({
+    data: {
+      alertId: alert.id,
+      metal: alert.metal,
+      target: alert.target,
+      direction: alert.direction,
+      price: latest.price,
+      fingerprint: `${alert.id}-${latest.price}`,
+    },
+  });
 
-      await prisma.alert.update({
-        where: { id: alert.id },
-        data: { active: false },
-      });
-
-      await sendAlertEmail({
-        alertId: alert.id,
-        metal: alert.metal,
-        price: latest.price,
-        target: alert.target,
-        direction: alert.direction,
-      });
-    }
-
-    return NextResponse.json({
-      ok: true,
-      ran: true,
-      message: "Alerts checked",
-    });
-  } catch (err) {
-    console.error("CHECK ALERTS ERROR", err);
-    return NextResponse.json(
-      { ok: false, error: "failed" },
-      { status: 500 }
-    );
-  } finally {
-    await releaseCronLock("check-alerts");
-  }
+  // DEACTIVATE
+  await prisma.alert.update({
+    where: { id: alert.id },
+    data: { active: false },
+  });
 }
