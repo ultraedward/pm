@@ -23,10 +23,19 @@ export async function GET() {
 
     for (const email of queued) {
       try {
+        const body = `
+Alert Triggered
+
+Alert ID: ${email.alertId}
+Subject: ${email.subject}
+
+This alert was triggered based on your configured price conditions.
+        `.trim();
+
         await sendRawEmail({
           to: email.to,
           subject: email.subject,
-          body: email.body,
+          body,
         });
 
         await prisma.emailLog.update({
