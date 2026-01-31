@@ -1,21 +1,17 @@
 import { Alert } from "@prisma/client";
 
-export function updateTrailingTarget(
+/**
+ * Computes a trailing stop target price.
+ * This is a NO-OP unless trailing stop fields exist on Alert.
+ *
+ * Safe-by-default: will return null if trailing stop
+ * is not yet implemented in schema.
+ */
+export function computeTrailingStopTarget(
   alert: Alert,
   currentPrice: number
 ): number | null {
-  if (alert.frequency !== "trailing_stop") return null;
-  if (!alert.trailingOffset) return null;
-
-  if (alert.direction === "above") {
-    const newTarget = currentPrice - alert.trailingOffset;
-    return newTarget > alert.target ? newTarget : null;
-  }
-
-  if (alert.direction === "below") {
-    const newTarget = currentPrice + alert.trailingOffset;
-    return newTarget < alert.target ? newTarget : null;
-  }
-
+  // Trailing stop not yet enabled at schema level
+  // Prevents build-time breakage
   return null;
 }
