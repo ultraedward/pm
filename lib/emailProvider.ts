@@ -1,24 +1,26 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export type RawEmailArgs = {
   to: string;
   subject: string;
-  html: string;
+  body: string;
 };
 
-export async function sendEmail({ to, subject, html }: RawEmailArgs) {
-  const res = await resend.emails.send({
+export async function sendRawEmail({
+  to,
+  subject,
+  body,
+}: RawEmailArgs) {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
+
+  return resend.emails.send({
     from: "Alerts <alerts@yourdomain.com>",
     to,
     subject,
-    html,
+    html: body,
   });
-
-  if (res.error) {
-    throw new Error(res.error.message);
-  }
-
-  return res.data;
 }
