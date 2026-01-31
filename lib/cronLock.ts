@@ -1,6 +1,9 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
-export async function acquireCronLock(name: string, ttlSeconds = 300) {
+export async function acquireCronLock(
+  name: string,
+  ttlSeconds: number
+): Promise<boolean> {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
 
@@ -15,14 +18,20 @@ export async function acquireCronLock(name: string, ttlSeconds = 300) {
     return true;
   } catch {
     const existing = await prisma.cronLock.findUnique({ where: { name } });
-    if (!existing || existing.expiresAt < now) {
-      await prisma.cronLock.upsert({
+
+    if (!existing) return false;
+
+    if (existing.expiresAt < now) {
+      await prisma.cronLock.update({
         where: { name },
-        update: { lockedAt: now, expiresAt },
-        create: { name, lockedAt: now, expiresAt },
+        data: {
+          lockedAt: now,
+          expiresAt,
+        },
       });
       return true;
     }
+
     return false;
   }
 }

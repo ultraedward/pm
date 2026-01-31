@@ -1,82 +1,60 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
+import { Resend } from "resend";
+import { prisma } from "./prisma";
 
-const CRON_NAME = "check-alerts";
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
-export async function GET() {
-  const locked = await acquireCronLock(CRON_NAME);
-  if (!locked) {
-    return NextResponse.json({ skipped: "lock-held" });
-  }
+const MAX_ATTEMPTS = 3;
 
-  try {
-    const alerts = await prisma.alert.findMany({
-      where: { active: true },
-    });
+export async function sendAlertEmail(
+  alertId: string,
+  to: string,
+  subject: string,
+  html: string
+) {
+  const log = await prisma.emailLog.create({
+    data: {
+      alertId,
+      to,
+      subject,
+      status: "pending",
+    },
+  });
 
-    for (const alert of alerts) {
-      const latest = await prisma.priceHistory.findFirst({
-        where: { metal: alert.metal },
-        orderBy: { createdAt: "desc" },
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      await resend.emails.send({
+        from: "Alerts <alerts@yourdomain.com>",
+        to,
+        subject,
+        html,
       });
 
-      if (!latest) continue;
-
-      const shouldTrigger =
-        alert.direction === "above"
-          ? latest.price >= alert.target
-          : latest.price <= alert.target;
-
-      if (!shouldTrigger) continue;
-
-      // HARD GUARANTEE: trigger once
-      const alreadyTriggered = await prisma.alertTrigger.findFirst({
-        where: { alertId: alert.id },
+      await prisma.emailLog.update({
+        where: { id: log.id },
+        data: {
+          status: "sent",
+          attempts: attempt,
+          sentAt: new Date(),
+        },
       });
 
-      if (alreadyTriggered) continue;
+      return { ok: true };
+    } catch (err: any) {
+      const delay = attempt * attempt * 1000;
+      await new Promise((r) => setTimeout(r, delay));
 
-      await prisma.$transaction([
-        prisma.alertTrigger.create({
-          data: {
-            alertId: alert.id,
-            metal: alert.metal,
-            price: latest.price,
-          },
-        }),
-        prisma.alert.update({
-          where: { id: alert.id },
-          data: { active: false },
-        }),
-      ]);
+      await prisma.emailLog.update({
+        where: { id: log.id },
+        data: {
+          status: "failed",
+          attempts: attempt,
+          lastError: err.message ?? "unknown",
+        },
+      });
+
+      if (attempt === MAX_ATTEMPTS) {
+        throw err;
+      }
     }
-
-    await prisma.cronHealth.upsert({
-      where: { name: CRON_NAME },
-      update: { lastRunAt: new Date(), lastStatus: "success", lastError: null },
-      create: { name: CRON_NAME, lastRunAt: new Date(), lastStatus: "success" },
-    });
-
-    return NextResponse.json({ ok: true });
-  } catch (err: any) {
-    await prisma.cronHealth.upsert({
-      where: { name: CRON_NAME },
-      update: {
-        lastRunAt: new Date(),
-        lastStatus: "error",
-        lastError: err.message,
-      },
-      create: {
-        name: CRON_NAME,
-        lastRunAt: new Date(),
-        lastStatus: "error",
-        lastError: err.message,
-      },
-    });
-
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  } finally {
-    await releaseCronLock(CRON_NAME);
   }
 }
