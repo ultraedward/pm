@@ -42,10 +42,7 @@ model Alert {
   target    Float
   direction String
   active    Boolean  @default(true)
-
-  // Optional override; otherwise falls back to user.email
   email     String?
-
   createdAt DateTime @default(now())
 
   user     User           @relation(fields: [userId], references: [id])
@@ -63,10 +60,8 @@ model AlertTrigger {
   target      Float
   direction   String
   price       Float
+  fingerprint String   @unique
   triggeredAt DateTime @default(now())
-
-  // Prevent duplicate triggers during retries
-  fingerprint String @unique
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
 
@@ -74,22 +69,19 @@ model AlertTrigger {
 }
 
 model EmailLog {
-  id         String   @id @default(cuid())
-  alertId    String
-  to         String
-  subject    String
-  provider   String   @default("resend")
-  providerId String?
-  status     String   @default("queued") // queued | sent | failed
-  attempts   Int      @default(0)
-  lastError  String?
-  createdAt  DateTime @default(now())
-  sentAt     DateTime?
+  id        String   @id @default(cuid())
+  alertId   String
+  to        String
+  subject   String
+  status    String   @default("queued") // queued | sent | failed
+  attempts  Int      @default(0)
+  error     String?
+  createdAt DateTime @default(now())
+  sentAt    DateTime?
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
 
   @@index([alertId])
-  @@index([status])
 }
 
 model CronLock {
