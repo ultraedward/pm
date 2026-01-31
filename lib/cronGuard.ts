@@ -1,10 +1,10 @@
-import { prisma } from "./prisma";
+import { prisma } from "@/lib/prisma";
 
-export async function cronIsEnabled(): Promise<boolean> {
+export async function isCronEnabled(name: string): Promise<boolean> {
   const row = await prisma.cronControl.findUnique({
-    where: { id: 1 },
+    where: { name },
   });
 
-  // default to SAFE (disabled) if row missing
-  return row?.cronEnabled ?? false;
+  if (!row) return true;
+  return row.enabled;
 }

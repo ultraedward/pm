@@ -1,21 +1,18 @@
-import { prisma } from "./prisma";
+import { prisma } from "@/lib/prisma";
 
-export async function queueEmail({
-  to,
-  subject,
-  body,
-}: {
+export type QueuedEmail = {
   to: string;
   subject: string;
-  body: string;
-}) {
-  await prisma.emailDelivery.create({
+  html: string;
+};
+
+export async function queueEmail(email: QueuedEmail) {
+  await prisma.emailQueue.create({
     data: {
-      to,
-      subject,
-      body,
-      status: "pending",
-      nextAttemptAt: new Date(),
+      to: email.to,
+      subject: email.subject,
+      html: email.html,
+      status: "queued",
     },
   });
 }
