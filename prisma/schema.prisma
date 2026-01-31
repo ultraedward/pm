@@ -95,3 +95,15 @@ model CronControl {
   cronEnabled Boolean  @default(true)
   updatedAt   DateTime @updatedAt
 }
+
+model CronRun {
+  id          String   @id @default(cuid())
+  name        String
+  status      String   // running | success | failed | skipped
+  message     String?
+  startedAt   DateTime @default(now())
+  finishedAt  DateTime?
+  durationMs  Int?
+
+  @@index([name, startedAt])
+}
