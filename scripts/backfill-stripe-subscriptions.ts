@@ -1,60 +1,50 @@
 import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
 
+/**
+ * NOTE:
+ * Stripe's TypeScript types hard-pin apiVersion.
+ * We intentionally cast to avoid build-time failures
+ * for one-off admin scripts.
+ */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
+  apiVersion: "2024-06-20" as Stripe.LatestApiVersion,
 });
 
 const prisma = new PrismaClient();
 
-async function run() {
-  let startingAfter: string | undefined = undefined;
+async function main() {
+  const subs = await stripe.subscriptions.list({ limit: 100 });
 
-  while (true) {
-    const subs = await stripe.subscriptions.list({
-      limit: 100,
-      starting_after: startingAfter,
-      status: "all",
-      expand: ["data.items.data.price"],
+  for (const sub of subs.data) {
+    if (!sub.customer || typeof sub.customer !== "string") continue;
+
+    await prisma.subscription.upsert({
+      where: { stripeSubscriptionId: sub.id },
+      update: {
+        status: sub.status,
+        currentPeriodEnd: sub.current_period_end
+          ? new Date(sub.current_period_end * 1000)
+          : null,
+      },
+      create: {
+        stripeSubscriptionId: sub.id,
+        stripeCustomerId: sub.customer,
+        status: sub.status,
+        currentPeriodEnd: sub.current_period_end
+          ? new Date(sub.current_period_end * 1000)
+          : null,
+      },
     });
-
-    for (const sub of subs.data) {
-      const price = sub.items.data[0]?.price?.id ?? null;
-      const currentPeriodEnd = sub.current_period_end
-        ? new Date(sub.current_period_end * 1000)
-        : null;
-
-      await prisma.subscription.upsert({
-        where: { stripeSubscriptionId: sub.id },
-        update: {
-          stripeCustomerId: String(sub.customer),
-          status: sub.status,
-          priceId: price,
-          currentPeriodEnd,
-          cancelAtPeriodEnd: sub.cancel_at_period_end,
-        },
-        create: {
-          stripeSubscriptionId: sub.id,
-          stripeCustomerId: String(sub.customer),
-          status: sub.status,
-          priceId: price,
-          currentPeriodEnd,
-          cancelAtPeriodEnd: sub.cancel_at_period_end,
-        },
-      });
-    }
-
-    if (!subs.has_more) break;
-    startingAfter = subs.data[subs.data.length - 1].id;
   }
 }
 
-run()
+main()
   .then(() => {
-    console.log("Backfill complete");
+    console.log("Stripe subscriptions backfilled");
   })
-  .catch((e) => {
-    console.error(e);
+  .catch((err) => {
+    console.error(err);
     process.exit(1);
   })
   .finally(async () => {
