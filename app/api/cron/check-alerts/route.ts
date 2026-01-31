@@ -10,15 +10,11 @@ const LOCK_NAME = "cron:check-alerts";
 
 export async function GET() {
   const hasLock = await acquireCronLock(LOCK_NAME, 120);
-
   if (!hasLock) {
-    return NextResponse.json({
-      skipped: "lock-active",
-    });
+    return NextResponse.json({ skipped: "lock-active" });
   }
 
   try {
-    // ✅ FETCH ALERTS (this was missing)
     const alerts = await prisma.alert.findMany({
       where: { active: true },
       orderBy: { createdAt: "asc" },
@@ -28,7 +24,6 @@ export async function GET() {
     let skippedNonPro = 0;
 
     for (const alert of alerts) {
-      // 🔒 PRO GATING
       const pro = await isProUser(alert.userId);
       if (!pro) {
         skippedNonPro++;
@@ -49,16 +44,14 @@ export async function GET() {
 
       if (!shouldTrigger) continue;
 
-      // 📧 SEND EMAIL
       await sendAlertEmail({
-        to: alert.email!,
+        alertId: alert.id,
         metal: alert.metal,
         price: latest.price,
         target: alert.target,
         direction: alert.direction as "above" | "below",
       });
 
-      // 🔕 DEACTIVATE ALERT
       await prisma.alert.update({
         where: { id: alert.id },
         data: { active: false },
@@ -75,10 +68,7 @@ export async function GET() {
     });
   } catch (err) {
     console.error("CHECK ALERTS ERROR", err);
-    return NextResponse.json(
-      { error: "failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "failed" }, { status: 500 });
   } finally {
     await releaseCronLock(LOCK_NAME);
   }
