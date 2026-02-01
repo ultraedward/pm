@@ -3,16 +3,25 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-const CRON_SECRET = process.env.CRON_SECRET!;
-
-// GoldPrice API endpoint (example — keep yours if different)
-const PRICE_API_URL =
-  "https://data-asg.goldprice.org/dbXRates/USD";
-
 export async function GET(req: Request) {
   // 🔐 AUTH
-  const auth = req.headers.get("authorization");
-  if (!auth || auth !== `Bearer ${CRON_SECRET}`) {
+  const authHeader = req.headers.get("authorization");
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
+
+  if (!process.env.CRON_SECRET) {
+    console.error("❌ CRON_SECRET is not set in environment");
+    return NextResponse.json(
+      { ok: false, error: "server_misconfigured" },
+      { status: 500 }
+    );
+  }
+
+  if (!authHeader || authHeader !== expected) {
+    console.warn("❌ Unauthorized cron call", {
+      authHeader,
+      expected,
+    });
+
     return NextResponse.json(
       { ok: false, error: "unauthorized" },
       { status: 401 }
@@ -20,10 +29,10 @@ export async function GET(req: Request) {
   }
 
   try {
-    // 🌐 FETCH PRICES
-    const res = await fetch(PRICE_API_URL, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      "https://data-asg.goldprice.org/dbXRates/USD",
+      { cache: "no-store" }
+    );
 
     if (!res.ok) {
       throw new Error("price_fetch_failed");
@@ -31,11 +40,6 @@ export async function GET(req: Request) {
 
     const json = await res.json();
 
-    if (!json?.items || !Array.isArray(json.items)) {
-      throw new Error("invalid_price_payload");
-    }
-
-    // 🧠 METAL SYMBOL MAP (THIS WAS THE BUG)
     const METAL_MAP: Record<string, string> = {
       gold: "XAU",
       silver: "XAG",
@@ -46,38 +50,25 @@ export async function GET(req: Request) {
     let inserted = 0;
 
     for (const [metal, symbol] of Object.entries(METAL_MAP)) {
-      const item = json.items.find(
+      const item = json.items?.find(
         (i: any) => i.curr === "USD" && i.metal === symbol
       );
 
-      if (!item) {
-        console.warn("⚠️ Missing price for", metal);
-        continue;
-      }
+      if (!item) continue;
 
       const price = Number(item.price);
-
-      if (!price || Number.isNaN(price)) {
-        console.warn("⚠️ Invalid price for", metal);
-        continue;
-      }
+      if (!price || Number.isNaN(price)) continue;
 
       await prisma.priceHistory.create({
-        data: {
-          metal,
-          price,
-        },
+        data: { metal, price },
       });
 
       inserted++;
     }
 
-    return NextResponse.json({
-      ok: true,
-      inserted,
-    });
+    return NextResponse.json({ ok: true, inserted });
   } catch (err) {
-    console.error("INGEST PRICES ERROR", err);
+    console.error("INGEST ERROR", err);
     return NextResponse.json(
       { ok: false, error: "ingest_failed" },
       { status: 500 }
