@@ -1,36 +1,77 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { acquireCronLock, releaseCronLock } from "@/lib/cronLock";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
 
-const METALS = ["gold", "silver", "platinum", "palladium"];
+const METALS = ["gold", "silver", "platinum", "palladium"] as const;
 
-export async function GET() {
-  const LOCK_NAME = "cron:ingest-prices";
+// 🔐 Simple cron auth
+function assertAuthorized(req: Request) {
+  const auth = req.headers.get("authorization");
+  const secret = process.env.CRON_SECRET;
 
-  const hasLock = await acquireCronLock(LOCK_NAME, 60);
-  if (!hasLock) {
-    return NextResponse.json({ skipped: "lock-active" });
+  if (!secret || auth !== `Bearer ${secret}`) {
+    return false;
+  }
+  return true;
+}
+
+export async function GET(req: Request) {
+  if (!assertAuthorized(req)) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
   try {
-    for (const metal of METALS) {
-      const price = Math.random() * 100 + 1000; // replace with real feed
+    // 🔥 EXTERNAL PRICE SOURCE (replace if you want later)
+    const res = await fetch("https://api.metals.dev/v1/latest?currency=USD", {
+      headers: {
+        Authorization: `Bearer ${process.env.METALS_API_KEY}`,
+      },
+      cache: "no-store",
+    });
 
-      await prisma.priceHistory.create({
-        data: {
-          metal,
-          price,
-        },
-      });
+    if (!res.ok) {
+      throw new Error(`Price API failed: ${res.status}`);
     }
 
-    return NextResponse.json({ ok: true });
+    const json = await res.json();
+
+    if (!json?.rates) {
+      throw new Error("Invalid price payload");
+    }
+
+    const inserts = [];
+
+    for (const metal of METALS) {
+      const price = json.rates[metal];
+
+      if (typeof price !== "number") {
+        console.warn(`Skipping ${metal}, invalid price`);
+        continue;
+      }
+
+      inserts.push(
+        prisma.priceHistory.create({
+          data: {
+            metal,
+            price,
+          },
+        })
+      );
+    }
+
+    const results = await Promise.all(inserts);
+
+    return NextResponse.json({
+      ok: true,
+      inserted: results.length,
+      metals: results.map(r => r.metal),
+    });
   } catch (err) {
-    console.error("INGEST ERROR", err);
-    return NextResponse.json({ error: "failed" }, { status: 500 });
-  } finally {
-    await releaseCronLock(LOCK_NAME);
+    console.error("INGEST PRICES ERROR", err);
+    return NextResponse.json(
+      { ok: false, error: "ingest_failed" },
+      { status: 500 }
+    );
   }
 }
