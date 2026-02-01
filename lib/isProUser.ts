@@ -4,9 +4,9 @@ export async function isProUser(userId: string): Promise<boolean> {
   const sub = await prisma.subscription.findFirst({
     where: {
       userId,
-      status: "active",
+      status: { in: ["active", "trialing"] },
     },
   });
 
-  return !!sub;
+  return Boolean(sub);
 }

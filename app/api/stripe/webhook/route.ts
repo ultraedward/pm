@@ -1,68 +1,71 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature");
-
-  if (!sig) {
-    return NextResponse.json({ error: "Missing signature" }, { status: 400 });
-  }
+  const body = await req.text();
 
   let event: Stripe.Event;
 
   try {
-    const body = await req.text();
     event = stripe.webhooks.constructEvent(
       body,
-      sig,
+      sig!,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (err) {
-    console.error("[stripe webhook] signature error", err);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  } catch (err: any) {
+    console.error("Webhook signature error:", err.message);
+    return new NextResponse("Invalid signature", { status: 400 });
   }
 
   try {
-    if (
-      event.type === "customer.subscription.created" ||
-      event.type === "customer.subscription.updated"
-    ) {
-      const sub = event.data.object as Stripe.Subscription;
-      const raw = sub as any;
+    // ✅ Checkout completed
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
 
-      const currentPeriodEnd =
-        typeof raw.current_period_end === "number"
-          ? new Date(raw.current_period_end * 1000)
-          : null;
+      const userId = session.metadata?.userId;
+      if (!userId) throw new Error("Missing userId metadata");
 
       await prisma.subscription.upsert({
         where: {
-          stripeSubscriptionId: sub.id,
+          stripeSubscriptionId: session.subscription as string,
         },
         update: {
-          status: sub.status,
-          cancelAtPeriodEnd: sub.cancel_at_period_end,
-          currentPeriodEnd,
+          status: "active",
         },
         create: {
-          stripeSubscriptionId: sub.id,
-          stripeCustomerId: String(sub.customer),
-          status: sub.status,
-          cancelAtPeriodEnd: sub.cancel_at_period_end,
-          currentPeriodEnd,
+          userId,
+          stripeSubscriptionId: session.subscription as string,
+          stripeCustomerId: session.customer as string,
+          status: "active",
         },
       });
     }
 
+    // ✅ Recurring invoice paid
+    if (event.type === "invoice.paid") {
+      const invoice = event.data.object as Stripe.Invoice;
+
+      await prisma.subscription.updateMany({
+        where: {
+          stripeSubscriptionId: invoice.subscription as string,
+        },
+        data: {
+          status: "active",
+          currentPeriodEnd: new Date(invoice.period_end * 1000),
+        },
+      });
+    }
+
+    // ❌ Subscription canceled
     if (event.type === "customer.subscription.deleted") {
       const sub = event.data.object as Stripe.Subscription;
 
-      await prisma.subscription.update({
+      await prisma.subscription.updateMany({
         where: {
           stripeSubscriptionId: sub.id,
         },
@@ -74,10 +77,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ received: true });
   } catch (err) {
-    console.error("[stripe webhook] handler error", err);
-    return NextResponse.json(
-      { error: "Webhook handler failed" },
-      { status: 500 }
-    );
+    console.error("Webhook handler failed:", err);
+    return new NextResponse("Webhook error", { status: 500 });
   }
 }
