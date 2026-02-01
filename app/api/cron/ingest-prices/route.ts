@@ -3,52 +3,69 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const CRON_SECRET = process.env.CRON_SECRET!;
+
+// GoldPrice API endpoint (example — keep yours if different)
+const PRICE_API_URL =
+  "https://data-asg.goldprice.org/dbXRates/USD";
+
 export async function GET(req: Request) {
+  // 🔐 AUTH
+  const auth = req.headers.get("authorization");
+  if (!auth || auth !== `Bearer ${CRON_SECRET}`) {
+    return NextResponse.json(
+      { ok: false, error: "unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
-    const auth = req.headers.get("authorization");
-    if (!auth?.startsWith("Bearer ")) {
-      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
-    }
-
-    const token = auth.replace("Bearer ", "");
-    if (token !== process.env.CRON_SECRET) {
-      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
-    }
-
-    console.log("✅ CRON AUTH OK");
-
-    const res = await fetch("https://data-asg.goldprice.org/dbXRates/USD", {
+    // 🌐 FETCH PRICES
+    const res = await fetch(PRICE_API_URL, {
       cache: "no-store",
     });
 
-    console.log("🌐 FETCH STATUS:", res.status);
-
-    const json = await res.json();
-    console.log("🌐 RAW RESPONSE:", JSON.stringify(json));
-
-    if (!json?.items?.length) {
-      throw new Error("No price items returned");
+    if (!res.ok) {
+      throw new Error("price_fetch_failed");
     }
 
-    const metals = ["gold", "silver", "platinum", "palladium"] as const;
+    const json = await res.json();
+
+    if (!json?.items || !Array.isArray(json.items)) {
+      throw new Error("invalid_price_payload");
+    }
+
+    // 🧠 METAL SYMBOL MAP (THIS WAS THE BUG)
+    const METAL_MAP: Record<string, string> = {
+      gold: "XAU",
+      silver: "XAG",
+      platinum: "XPT",
+      palladium: "XPD",
+    };
+
     let inserted = 0;
 
-    for (const metal of metals) {
-      const item = json.items.find((i: any) =>
-        i.curr === "USD" && i.metal?.toLowerCase() === metal
+    for (const [metal, symbol] of Object.entries(METAL_MAP)) {
+      const item = json.items.find(
+        (i: any) => i.curr === "USD" && i.metal === symbol
       );
 
       if (!item) {
-        console.warn("⚠️ Missing metal:", metal);
+        console.warn("⚠️ Missing price for", metal);
         continue;
       }
 
-      console.log("💰 INSERTING", metal, item.xauPrice ?? item.price);
+      const price = Number(item.price);
+
+      if (!price || Number.isNaN(price)) {
+        console.warn("⚠️ Invalid price for", metal);
+        continue;
+      }
 
       await prisma.priceHistory.create({
         data: {
           metal,
-          price: Number(item.xauPrice ?? item.price),
+          price,
         },
       });
 
@@ -59,10 +76,10 @@ export async function GET(req: Request) {
       ok: true,
       inserted,
     });
-  } catch (err: any) {
-    console.error("❌ INGEST ERROR:", err?.message || err);
+  } catch (err) {
+    console.error("INGEST PRICES ERROR", err);
     return NextResponse.json(
-      { ok: false, error: "ingest_failed", detail: err?.message },
+      { ok: false, error: "ingest_failed" },
       { status: 500 }
     );
   }
