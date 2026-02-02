@@ -1,66 +1,52 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireDevAuth } from "@/lib/devAuth";
 import { sendAlertEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * DEV ONLY
+ * Simulates an alert trigger and sends a real email
+ */
 export async function GET(req: Request) {
-  // 🔐 DEV AUTH
-  const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.DEV_SECRET}`) {
+  if (!requireDevAuth(req)) {
     return NextResponse.json(
       { ok: false, error: "unauthorized" },
       { status: 401 }
     );
   }
 
-  try {
-    // 1️⃣ Find an active alert
-    const alert = await prisma.alert.findFirst({
-      where: { active: true },
-    });
+  const alert = await prisma.alert.findFirst({
+    where: { active: true },
+    include: { user: true },
+  });
 
-    if (!alert) {
-      return NextResponse.json(
-        { ok: false, error: "no_active_alerts" },
-        { status: 400 }
-      );
-    }
-
-    // 2️⃣ Get latest price
-    const latest = await prisma.priceHistory.findFirst({
-      where: { metal: alert.metal },
-      orderBy: { createdAt: "desc" },
-    });
-
-    if (!latest) {
-      return NextResponse.json(
-        { ok: false, error: "no_price_data" },
-        { status: 400 }
-      );
-    }
-
-    // 3️⃣ Send email (✅ CORRECT CONTRACT)
-    await sendAlertEmail({
-      alertId: alert.id,
-      metal: alert.metal,
-      price: latest.price,
-      target: alert.target,
-      direction: alert.direction as "above" | "below",
-    });
-
+  if (!alert) {
     return NextResponse.json({
-      ok: true,
-      simulated: true,
-      alertId: alert.id,
-      metal: alert.metal,
-      price: latest.price,
+      ok: false,
+      error: "no_alerts_found",
     });
-  } catch (err: any) {
-    console.error("SIMULATE TRIGGER ERROR", err);
-    return NextResponse.json(
-      { ok: false, error: err.message },
-      { status: 500 }
-    );
   }
+
+  const fakePrice =
+    alert.direction === "above"
+      ? alert.target + 1
+      : alert.target - 1;
+
+  // ✅ Correct call signature
+  await sendAlertEmail({
+    alertId: alert.id,
+    metal: alert.metal,
+    price: fakePrice,
+    target: alert.target,
+    direction: alert.direction as "above" | "below",
+  });
+
+  return NextResponse.json({
+    ok: true,
+    simulated: true,
+    alertId: alert.id,
+    sentTo: alert.user.email,
+  });
 }
