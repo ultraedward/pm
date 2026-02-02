@@ -1,27 +1,22 @@
-// app/api/cron/ingest-prices/route.ts
-
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const CRON_SECRET = process.env.CRON_SECRET!;
 const METALS_API_URL = process.env.METALS_API_URL!;
 const METALS_API_KEY = process.env.METALS_API_KEY!;
-const CRON_SECRET = process.env.CRON_SECRET!;
 
-// We store metals internally as simple names
-// Upstream API wants a *comma-separated string*
-const METAL_SYMBOLS = "XAUUSD,XAGUSD,XPTUSD,XPDUSD";
-
-const SYMBOL_TO_METAL: Record<string, string> = {
-  XAUUSD: "gold",
-  XAGUSD: "silver",
-  XPTUSD: "platinum",
-  XPDUSD: "palladium",
+// Metals API uses plain symbols (USD is implicit)
+const METAL_MAP: Record<string, string> = {
+  XAU: "gold",
+  XAG: "silver",
+  XPT: "platinum",
+  XPD: "palladium",
 };
 
 export async function GET(req: Request) {
-  // 🔐 AUTH
+  // 🔐 Auth
   const auth = req.headers.get("authorization");
   if (auth !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json(
@@ -31,12 +26,10 @@ export async function GET(req: Request) {
   }
 
   try {
-    // ✅ Build URL exactly as API expects
     const url = new URL(METALS_API_URL);
-
     url.searchParams.set("access_key", METALS_API_KEY);
-    url.searchParams.set("symbols", METAL_SYMBOLS);
-    url.searchParams.set("currencies", "USD");
+    url.searchParams.set("symbols", Object.keys(METAL_MAP).join(","));
+    url.searchParams.set("base", "USD");
 
     const res = await fetch(url.toString(), {
       method: "GET",
@@ -44,29 +37,11 @@ export async function GET(req: Request) {
       cache: "no-store",
     });
 
-    const text = await res.text();
+    const json = await res.json();
 
-    if (!res.ok) {
-      console.error("❌ METALS API ERROR", {
-        status: res.status,
-        body: text,
-        url: url.toString(),
-      });
-
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "ingest_failed",
-          upstreamStatus: res.status,
-          upstreamBody: text,
-        },
-        { status: 500 }
-      );
-    }
-
-    const json = JSON.parse(text);
-
+    // 🚨 EXPOSE REAL UPSTREAM ERROR
     if (!json.success) {
+      console.error("❌ METALS API ERROR", json);
       return NextResponse.json(
         {
           ok: false,
@@ -77,12 +52,17 @@ export async function GET(req: Request) {
       );
     }
 
+    if (!json.rates) {
+      return NextResponse.json(
+        { ok: false, error: "missing_rates" },
+        { status: 500 }
+      );
+    }
+
     let inserted = 0;
 
-    // Expected shape:
-    // json.rates = { XAUUSD: 2050.12, ... }
-    for (const [symbol, price] of Object.entries(json.rates ?? {})) {
-      const metal = SYMBOL_TO_METAL[symbol];
+    for (const [symbol, price] of Object.entries(json.rates)) {
+      const metal = METAL_MAP[symbol];
       if (!metal) continue;
 
       const numericPrice = Number(price);
