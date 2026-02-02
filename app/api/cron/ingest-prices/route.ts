@@ -5,52 +5,42 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-const METALS_API_URL = process.env.METALS_API_URL;
-const METALS_API_KEY = process.env.METALS_API_KEY;
-const CRON_SECRET = process.env.CRON_SECRET;
+const METALS_API_URL = process.env.METALS_API_URL!;
+const METALS_API_KEY = process.env.METALS_API_KEY!;
+const CRON_SECRET = process.env.CRON_SECRET!;
 
-const METAL_MAP: Record<string, string> = {
-  gold: "XAU",
-  silver: "XAG",
-  platinum: "XPT",
-  palladium: "XPD",
+// We store metals internally as simple names
+// Upstream API wants a *comma-separated string*
+const METAL_SYMBOLS = "XAUUSD,XAGUSD,XPTUSD,XPDUSD";
+
+const SYMBOL_TO_METAL: Record<string, string> = {
+  XAUUSD: "gold",
+  XAGUSD: "silver",
+  XPTUSD: "platinum",
+  XPDUSD: "palladium",
 };
 
 export async function GET(req: Request) {
   // 🔐 AUTH
   const auth = req.headers.get("authorization");
-  if (!CRON_SECRET || auth !== `Bearer ${CRON_SECRET}`) {
+  if (auth !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json(
       { ok: false, error: "unauthorized" },
       { status: 401 }
     );
   }
 
-  // 🔴 HARD FAIL if env missing
-  if (!METALS_API_URL) {
-    return NextResponse.json(
-      { ok: false, error: "missing_env", var: "METALS_API_URL" },
-      { status: 500 }
-    );
-  }
-
   try {
+    // ✅ Build URL exactly as API expects
     const url = new URL(METALS_API_URL);
 
-    // If your provider expects an API key, uncomment ONE of these
-    if (METALS_API_KEY) {
-      // Option A: query param
-      url.searchParams.set("api_key", METALS_API_KEY);
-
-      // Option B: header (comment out Option A if this is required instead)
-      // headers: { Authorization: `Bearer ${METALS_API_KEY}` }
-    }
+    url.searchParams.set("access_key", METALS_API_KEY);
+    url.searchParams.set("symbols", METAL_SYMBOLS);
+    url.searchParams.set("currencies", "USD");
 
     const res = await fetch(url.toString(), {
       method: "GET",
-      headers: {
-        "Accept": "application/json",
-      },
+      headers: { Accept: "application/json" },
       cache: "no-store",
     });
 
@@ -76,39 +66,42 @@ export async function GET(req: Request) {
 
     const json = JSON.parse(text);
 
+    if (!json.success) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "upstream_error",
+          details: json.error,
+        },
+        { status: 500 }
+      );
+    }
+
     let inserted = 0;
 
-    for (const [metal, symbol] of Object.entries(METAL_MAP)) {
-      const item =
-        json.items?.find(
-          (i: any) => i.curr === "USD" && i.metal === symbol
-        ) ??
-        json.data?.[`${symbol}USD`] ??
-        null;
+    // Expected shape:
+    // json.rates = { XAUUSD: 2050.12, ... }
+    for (const [symbol, price] of Object.entries(json.rates ?? {})) {
+      const metal = SYMBOL_TO_METAL[symbol];
+      if (!metal) continue;
 
-      if (!item) {
-        console.warn("⚠️ Missing metal:", metal);
-        continue;
-      }
-
-      const price = Number(item.price ?? item.value ?? item.rate);
-
-      if (!price || Number.isNaN(price)) {
-        console.warn("⚠️ Invalid price for", metal, item);
-        continue;
-      }
+      const numericPrice = Number(price);
+      if (!numericPrice || Number.isNaN(numericPrice)) continue;
 
       await prisma.priceHistory.create({
         data: {
           metal,
-          price,
+          price: numericPrice,
         },
       });
 
       inserted++;
     }
 
-    return NextResponse.json({ ok: true, inserted });
+    return NextResponse.json({
+      ok: true,
+      inserted,
+    });
   } catch (err: any) {
     console.error("💥 INGEST CRASH", err);
     return NextResponse.json(
