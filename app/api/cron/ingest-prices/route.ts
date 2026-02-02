@@ -11,7 +11,10 @@ const METAL_MAP: Record<string, string> = {
 };
 
 function unauthorized() {
-  return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  return NextResponse.json(
+    { ok: false, error: "unauthorized" },
+    { status: 401 }
+  );
 }
 
 export async function GET(req: Request) {
@@ -23,22 +26,36 @@ export async function GET(req: Request) {
     return unauthorized();
   }
 
+  // 🚨 HARD ENV CHECK (THIS WAS MISSING)
+  if (!process.env.METALS_API_URL) {
+    console.error("❌ METALS_API_URL is not set");
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "missing_env",
+        message: "METALS_API_URL is not defined",
+      },
+      { status: 500 }
+    );
+  }
+
   try {
-    // 🌐 FETCH UPSTREAM PRICES
-    const res = await fetch(process.env.METALS_API_URL!, {
+    // 🌐 FETCH UPSTREAM
+    const res = await fetch(process.env.METALS_API_URL, {
       cache: "no-store",
     });
 
     if (!res.ok) {
-      throw new Error(`Upstream failed: ${res.status}`);
+      throw new Error(`Upstream HTTP ${res.status}`);
     }
 
     const json = await res.json();
 
-    // 🚨 HARD LOG — DO NOT REMOVE
-    console.log("🔎 RAW METALS RESPONSE", JSON.stringify(json, null, 2));
+    // 🔍 LOG RAW RESPONSE (KEEP THIS)
+    console.log("🔎 RAW METALS RESPONSE");
+    console.log(JSON.stringify(json, null, 2));
 
-    if (!json?.items || !Array.isArray(json.items)) {
+    if (!json || !Array.isArray(json.items)) {
       throw new Error("Invalid upstream payload: missing items[]");
     }
 
@@ -47,8 +64,8 @@ export async function GET(req: Request) {
     for (const [metal, symbol] of Object.entries(METAL_MAP)) {
       const item = json.items.find(
         (i: any) =>
-          i.curr === "USD" &&
-          (i.metal === symbol || i.symbol === symbol)
+          i?.curr === "USD" &&
+          (i?.metal === symbol || i?.symbol === symbol)
       );
 
       if (!item) {
@@ -67,10 +84,7 @@ export async function GET(req: Request) {
       }
 
       await prisma.priceHistory.create({
-        data: {
-          metal,
-          price,
-        },
+        data: { metal, price },
       });
 
       inserted++;
@@ -83,7 +97,11 @@ export async function GET(req: Request) {
   } catch (err: any) {
     console.error("❌ INGEST FAILED", err);
     return NextResponse.json(
-      { ok: false, error: "ingest_failed", message: err.message },
+      {
+        ok: false,
+        error: "ingest_failed",
+        message: err.message,
+      },
       { status: 500 }
     );
   }
