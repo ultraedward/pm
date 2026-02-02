@@ -1,15 +1,13 @@
-import { NextRequest } from "next/server";
-
 /**
  * Verifies Authorization header for cron endpoints.
  *
- * Expected header:
- *   Authorization: Bearer <CRON_SECRET>
+ * Works with both:
+ * - Request (App Router route handlers)
+ * - NextRequest (middleware / edge)
  */
-export function requireCronAuth(req: NextRequest): {
-  ok: boolean;
-  error?: string;
-} {
+export function requireCronAuth(
+  req: Request
+): { ok: boolean; error?: string } {
   const authHeader = req.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
