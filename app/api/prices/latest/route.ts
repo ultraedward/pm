@@ -3,21 +3,32 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  try {
-    const rows = await prisma.priceHistory.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 4,
-    });
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const metal = searchParams.get("metal");
 
-    return NextResponse.json(rows);
-  } catch (err) {
-    console.error("[prices/latest]", err);
+  if (!metal) {
     return NextResponse.json(
-      { error: "Failed to fetch latest prices" },
-      { status: 500 }
+      { error: "metal_required" },
+      { status: 400 }
     );
   }
+
+  const latest = await prisma.priceHistory.findFirst({
+    where: {
+      metal,
+      price: {
+        gt: 10, // 🔒 ignore garbage rows
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (!latest) {
+    return NextResponse.json([]);
+  }
+
+  return NextResponse.json(latest);
 }
