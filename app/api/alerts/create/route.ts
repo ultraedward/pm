@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const BOOTSTRAP_EMAIL = process.env.BOOTSTRAP_USER_EMAIL || "admin@local.dev";
+
 export async function POST(req: Request) {
   if (process.env.ALERTS_ENABLED !== "true") {
     return NextResponse.json(
@@ -19,14 +21,14 @@ export async function POST(req: Request) {
     );
   }
 
-  // ⚠️ TEMP: attach to first user until auth is finalized
-  const user = await prisma.user.findFirst();
-  if (!user) {
-    return NextResponse.json(
-      { ok: false, error: "no_user" },
-      { status: 500 }
-    );
-  }
+  // ✅ Ensure a user ALWAYS exists
+  const user = await prisma.user.upsert({
+    where: { email: BOOTSTRAP_EMAIL },
+    update: {},
+    create: {
+      email: BOOTSTRAP_EMAIL,
+    },
+  });
 
   const alert = await prisma.alert.create({
     data: {
