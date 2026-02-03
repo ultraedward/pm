@@ -1,83 +1,55 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-/**
- * Returns alert trigger history.
- * Optional query param: ?metal=gold
- */
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const metal = searchParams.get("metal");
+    const session = await getServerSession(authOptions);
 
-    if (metal) {
-      const rows = await prisma.$queryRaw<
-        Array<{
-          triggerId: string;
-          alertId: string;
-          metal: string;
-          direction: string;
-          price: number;
-          triggeredAt: Date;
-          deliveredAt: Date | null;
-          createdAt: Date;
-        }>
-      >`
-        SELECT
-          t.id            AS "triggerId",
-          a.id            AS "alertId",
-          a.metal         AS "metal",
-          a.direction     AS "direction",
-          t.price         AS "price",
-          t."triggeredAt" AS "triggeredAt",
-          t."deliveredAt" AS "deliveredAt",
-          t."createdAt"   AS "createdAt"
-        FROM "AlertTrigger" t
-        INNER JOIN "Alert" a
-          ON a.id = t."alertId"
-        WHERE a.metal = ${metal}
-        ORDER BY t."triggeredAt" DESC
-      `;
-
-      return NextResponse.json({ history: rows });
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { ok: false, error: "unauthorized" },
+        { status: 401 }
+      );
     }
 
-    // No metal filter
-    const rows = await prisma.$queryRaw<
-      Array<{
-        triggerId: string;
-        alertId: string;
-        metal: string;
-        direction: string;
-        price: number;
-        triggeredAt: Date;
-        deliveredAt: Date | null;
-        createdAt: Date;
-      }>
-    >`
-      SELECT
-        t.id            AS "triggerId",
-        a.id            AS "alertId",
-        a.metal         AS "metal",
-        a.direction     AS "direction",
-        t.price         AS "price",
-        t."triggeredAt" AS "triggeredAt",
-        t."deliveredAt" AS "deliveredAt",
-        t."createdAt"   AS "createdAt"
-      FROM "AlertTrigger" t
-      INNER JOIN "Alert" a
-        ON a.id = t."alertId"
-      ORDER BY t."triggeredAt" DESC
-    `;
+    const alerts = await prisma.alert.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+    });
 
-    return NextResponse.json({ history: rows });
+    const alertIds = alerts.map((a) => a.id);
+
+    const triggers = await prisma.alertTrigger.findMany({
+      where: { alertId: { in: alertIds } },
+      orderBy: { triggeredAt: "desc" },
+    });
+
+    const emails = await prisma.emailLog.findMany({
+      where: { alertId: { in: alertIds } },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const history = alerts.map((alert) => ({
+      id: alert.id,
+      metal: alert.metal,
+      target: alert.target,
+      direction: alert.direction,
+      active: alert.active,
+      createdAt: alert.createdAt,
+      triggers: triggers.filter((t) => t.alertId === alert.id),
+      emails: emails.filter((e) => e.alertId === alert.id),
+    }));
+
+    return NextResponse.json({
+      ok: true,
+      alerts: history,
+    });
   } catch (err) {
-    console.error("alerts/history error", err);
+    console.error("ALERT HISTORY ERROR", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { ok: false, error: "internal_error" },
       { status: 500 }
     );
   }
