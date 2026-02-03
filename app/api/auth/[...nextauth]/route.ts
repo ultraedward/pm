@@ -1,11 +1,5 @@
-// app/api/auth/[...nextauth]/route.ts
-// FULL FILE — COPY / PASTE (FINAL)
-
 import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
-
-// 🔴 REQUIRED: NextAuth + Prisma MUST run on Node
-export const runtime = "nodejs";
+import { authOptions } from "@/lib/authOptions";
 
 const handler = NextAuth(authOptions);
 
