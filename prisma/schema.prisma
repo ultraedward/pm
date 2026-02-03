@@ -16,14 +16,14 @@ model User {
 }
 
 model Subscription {
-  id                   String   @id @default(cuid())
-  stripeSubscriptionId String?  @unique
+  id                   String    @id @default(cuid())
+  stripeSubscriptionId String?   @unique
   stripeCustomerId     String?
   status               String
   currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean  @default(false)
+  cancelAtPeriodEnd    Boolean   @default(false)
   userId               String?
-  createdAt            DateTime @default(now())
+  createdAt            DateTime  @default(now())
 }
 
 model PriceHistory {
@@ -36,24 +36,21 @@ model PriceHistory {
 }
 
 model Alert {
-  id               String   @id @default(cuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid())
+  userId    String
+  metal     String
+  target    Float
+  direction String
+  active    Boolean  @default(true)
+  email     String?
+  createdAt DateTime @default(now())
 
-  metal             String
-  target            Float
-  direction         String
-  active            Boolean  @default(true)
+  user     User           @relation(fields: [userId], references: [id])
+  triggers AlertTrigger[]
+  emails   EmailLog[]
 
-  // NEW
-  cooldownHours     Int      @default(24)
-  lastTriggeredAt   DateTime?
-  lastTriggeredPrice Float?
-
-  email             String?
-  createdAt         DateTime @default(now())
-
-  @@index([metal, active])
+  @@index([userId])
+  @@index([metal])
 }
 
 model AlertTrigger {
@@ -72,14 +69,14 @@ model AlertTrigger {
 }
 
 model EmailLog {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   alertId   String
   to        String
   subject   String
-  status    String   @default("queued") // queued | sent | failed
-  attempts  Int      @default(0)
+  status    String    @default("queued")
+  attempts  Int       @default(0)
   error     String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   sentAt    DateTime?
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
@@ -97,16 +94,4 @@ model CronControl {
   id          Int      @id @default(1)
   cronEnabled Boolean  @default(true)
   updatedAt   DateTime @updatedAt
-}
-
-model CronRun {
-  id          String   @id @default(cuid())
-  name        String
-  status      String   // running | success | failed | skipped
-  message     String?
-  startedAt   DateTime @default(now())
-  finishedAt  DateTime?
-  durationMs  Int?
-
-  @@index([name, startedAt])
 }
