@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // 1️⃣ Auth guard
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -14,40 +15,47 @@ export async function GET() {
       );
     }
 
-    const alerts = await prisma.alert.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
+    // 2️⃣ Fetch alert trigger history
+    const history = await prisma.alertTrigger.findMany({
+      where: {
+        alert: {
+          userId: session.user.id,
+        },
+      },
+      orderBy: {
+        triggeredAt: "desc",
+      },
+      take: 50,
+      include: {
+        alert: {
+          select: {
+            metal: true,
+            target: true,
+            direction: true,
+          },
+        },
+      },
     });
 
-    const alertIds = alerts.map((a) => a.id);
-
-    const triggers = await prisma.alertTrigger.findMany({
-      where: { alertId: { in: alertIds } },
-      orderBy: { triggeredAt: "desc" },
-    });
-
-    const emails = await prisma.emailLog.findMany({
-      where: { alertId: { in: alertIds } },
-      orderBy: { createdAt: "desc" },
-    });
-
-    const history = alerts.map((alert) => ({
-      id: alert.id,
-      metal: alert.metal,
-      target: alert.target,
-      direction: alert.direction,
-      active: alert.active,
-      createdAt: alert.createdAt,
-      triggers: triggers.filter((t) => t.alertId === alert.id),
-      emails: emails.filter((e) => e.alertId === alert.id),
+    // 3️⃣ Serialize safely
+    const result = history.map((h) => ({
+      id: h.id,
+      alertId: h.alertId,
+      metal: h.metal,
+      price: h.price,
+      target: h.target,
+      direction: h.direction,
+      triggeredAt: h.triggeredAt.toISOString(),
     }));
 
     return NextResponse.json({
       ok: true,
-      alerts: history,
+      count: result.length,
+      history: result,
     });
   } catch (err) {
     console.error("ALERT HISTORY ERROR", err);
+
     return NextResponse.json(
       { ok: false, error: "internal_error" },
       { status: 500 }
