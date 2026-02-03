@@ -36,21 +36,24 @@ model PriceHistory {
 }
 
 model Alert {
-  id        String   @id @default(cuid())
-  userId    String
-  metal     String
-  target    Float
-  direction String
-  active    Boolean  @default(true)
-  email     String?
-  createdAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
 
-  user     User           @relation(fields: [userId], references: [id])
-  triggers AlertTrigger[]
-  emails   EmailLog[]
+  metal             String
+  target            Float
+  direction         String
+  active            Boolean  @default(true)
 
-  @@index([userId])
-  @@index([metal])
+  // NEW
+  cooldownHours     Int      @default(24)
+  lastTriggeredAt   DateTime?
+  lastTriggeredPrice Float?
+
+  email             String?
+  createdAt         DateTime @default(now())
+
+  @@index([metal, active])
 }
 
 model AlertTrigger {
