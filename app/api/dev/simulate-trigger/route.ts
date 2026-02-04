@@ -1,52 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireDevAuth } from "@/lib/devAuth";
-import { sendAlertEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email"; // ✅ FIXED IMPORT
 
-export const dynamic = "force-dynamic";
-
-/**
- * DEV ONLY
- * Simulates an alert trigger and sends a real email
- */
-export async function GET(req: Request) {
-  if (!requireDevAuth(req)) {
-    return NextResponse.json(
-      { ok: false, error: "unauthorized" },
-      { status: 401 }
-    );
-  }
-
+export async function GET() {
   const alert = await prisma.alert.findFirst({
     where: { active: true },
-    include: { user: true },
+    orderBy: { createdAt: "desc" },
   });
 
   if (!alert) {
-    return NextResponse.json({
-      ok: false,
-      error: "no_alerts_found",
-    });
+    return NextResponse.json({ ok: false, error: "No alert found" });
   }
 
-  const fakePrice =
-    alert.direction === "above"
-      ? alert.target + 1
-      : alert.target - 1;
-
-  // ✅ Correct call signature
-  await sendAlertEmail({
-    alertId: alert.id,
-    metal: alert.metal,
-    price: fakePrice,
-    target: alert.target,
-    direction: alert.direction as "above" | "below",
+  await sendEmail({
+    to: "test@example.com",
+    subject: "Simulated Alert Trigger",
+    html: `
+      <h2>Simulated Alert</h2>
+      <p><b>Metal:</b> ${alert.metal}</p>
+      <p><b>Direction:</b> ${alert.direction}</p>
+      <p><b>Price:</b> ${alert.price}</p>
+    `,
   });
 
-  return NextResponse.json({
-    ok: true,
-    simulated: true,
-    alertId: alert.id,
-    sentTo: alert.user.email,
-  });
+  return NextResponse.json({ ok: true });
 }
