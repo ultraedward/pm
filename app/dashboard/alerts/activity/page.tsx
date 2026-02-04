@@ -2,28 +2,56 @@ export const dynamic = "force-dynamic";
 
 type AlertHistoryItem = {
   id: string;
-  metal: string;
-  target: number;
-  direction: "above" | "below";
-  sentTo: string;
-  status: string;
-  createdAt: string;
+  metal?: string | null;
+  target?: number | null;
+  direction?: "above" | "below" | null;
+  sentTo?: string | null;
+  status?: "sent" | "failed" | "skipped" | string | null;
+  createdAt?: string | null;
 };
 
 async function getHistory(): Promise<AlertHistoryItem[]> {
   const res = await fetch(
     `${process.env.NEXTAUTH_URL}/api/alerts/history`,
-    {
-      cache: "no-store",
-    }
+    { cache: "no-store" }
   );
 
-  if (!res.ok) {
-    return [];
-  }
+  if (!res.ok) return [];
 
   const data = await res.json();
-  return data.history ?? [];
+  return Array.isArray(data.history) ? data.history : [];
+}
+
+function StatusBadge({ status }: { status?: string | null }) {
+  const base =
+    "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium";
+
+  switch (status) {
+    case "sent":
+      return (
+        <span className={`${base} bg-emerald-500/10 text-emerald-400`}>
+          Sent
+        </span>
+      );
+    case "failed":
+      return (
+        <span className={`${base} bg-red-500/10 text-red-400`}>
+          Failed
+        </span>
+      );
+    case "skipped":
+      return (
+        <span className={`${base} bg-yellow-500/10 text-yellow-400`}>
+          Skipped
+        </span>
+      );
+    default:
+      return (
+        <span className={`${base} bg-neutral-700/40 text-neutral-300`}>
+          Unknown
+        </span>
+      );
+  }
 }
 
 export default async function AlertsActivityPage() {
@@ -56,15 +84,36 @@ export default async function AlertsActivityPage() {
                   key={h.id}
                   className="border-t border-neutral-800 hover:bg-neutral-900"
                 >
-                  <td className="px-4 py-3 capitalize">{h.metal}</td>
-                  <td className="px-4 py-3">
-                    {h.direction === "above" ? "Above" : "Below"}
+                  <td className="px-4 py-3 capitalize">
+                    {h.metal ?? "—"}
                   </td>
-                  <td className="px-4 py-3">${h.target.toLocaleString()}</td>
-                  <td className="px-4 py-3">{h.sentTo}</td>
-                  <td className="px-4 py-3 capitalize">{h.status}</td>
+
+                  <td className="px-4 py-3">
+                    {h.direction
+                      ? h.direction === "above"
+                        ? "Above"
+                        : "Below"
+                      : "—"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {typeof h.target === "number"
+                      ? `$${h.target.toLocaleString()}`
+                      : "—"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {h.sentTo ?? "—"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <StatusBadge status={h.status} />
+                  </td>
+
                   <td className="px-4 py-3 text-neutral-400">
-                    {new Date(h.createdAt).toLocaleString()}
+                    {h.createdAt
+                      ? new Date(h.createdAt).toLocaleString()
+                      : "—"}
                   </td>
                 </tr>
               ))}
