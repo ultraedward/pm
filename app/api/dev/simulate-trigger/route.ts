@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email"; // ✅ FIXED IMPORT
+import { sendEmail } from "@/lib/email";
+
+export const dynamic = "force-dynamic"; // 🚨 CRITICAL FIX
 
 export async function GET() {
   const alert = await prisma.alert.findFirst({
@@ -19,7 +21,6 @@ export async function GET() {
       <h2>Simulated Alert</h2>
       <p><b>Metal:</b> ${alert.metal}</p>
       <p><b>Direction:</b> ${alert.direction}</p>
-      <p><b>Price:</b> ${alert.price}</p>
     `,
   });
 
