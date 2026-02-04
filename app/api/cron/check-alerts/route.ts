@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCronAuth } from "@/lib/cronAuth";
 import { getLatestPrice } from "@/lib/getLatestPrice";
 import { isInCooldown } from "@/lib/alertCooldown";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   if (!requireCronAuth(req)) {
     return NextResponse.json(
       { ok: false, error: "unauthorized" },
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     where: { active: true },
     include: {
       triggers: {
-        orderBy: { createdAt: "desc" },
+        orderBy: { triggeredAt: "desc" },
         take: 1,
       },
     },
@@ -26,15 +26,17 @@ export async function GET(req: Request) {
 
   for (const alert of alerts) {
     const price = await getLatestPrice(alert.metal);
-    if (!price) continue;
+    if (price == null) continue;
+
+    const lastTrigger = alert.triggers[0] ?? null;
+
+    if (isInCooldown(alert, lastTrigger)) continue;
 
     const conditionMet =
       (alert.direction === "above" && price >= alert.price) ||
       (alert.direction === "below" && price <= alert.price);
 
     if (!conditionMet) continue;
-
-    if (isInCooldown(alert, alert.triggers[0])) continue;
 
     await prisma.alertTrigger.create({
       data: {
