@@ -1,73 +1,117 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PriceChart from "./PriceChart";
-import PriceHeader from "./PriceHeader";
 
-type Range = "24h" | "7d" | "30d";
-
-type Point = {
+type PricePoint = {
   t: number;
   price: number;
 };
 
+type ChartResponse = {
+  gold: PricePoint[];
+  silver: PricePoint[];
+  platinum: PricePoint[];
+  palladium: PricePoint[];
+};
+
+const RANGES = ["24h", "7d", "30d"] as const;
+
 export default function ChartsPage() {
-  const [metal, setMetal] = useState("gold");
-  const [range, setRange] = useState<Range>("24h");
-  const [prices, setPrices] = useState<Point[]>([]);
-  const [alerts, setAlerts] = useState<Point[]>([]);
+  const [range, setRange] = useState<(typeof RANGES)[number]>("24h");
+  const [data, setData] = useState<ChartResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
 
-    Promise.all([
-      fetch(`/api/charts/prices?metal=${metal}&range=${range}`).then((r) =>
-        r.json()
-      ),
-      fetch(`/api/charts/alerts?metal=${metal}`).then((r) => r.json()),
-    ])
-      .then(([priceData, alertData]) => {
-        setPrices(priceData);
-        setAlerts(alertData);
-      })
-      .finally(() => setLoading(false));
-  }, [metal, range]);
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`/api/charts/prices?range=${range}`, {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to load prices (${res.status})`);
+        }
+
+        const json = await res.json();
+
+        if (!cancelled) {
+          setData(json);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(err.message ?? "Unknown error");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [range]);
+
+  const hasAnyData =
+    data &&
+    Object.values(data).some((arr) => Array.isArray(arr) && arr.length > 0);
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
-        {["gold", "silver", "platinum", "palladium"].map((m) => (
-          <button
-            key={m}
-            onClick={() => setMetal(m)}
-            className={m === metal ? "font-bold" : ""}
-          >
-            {m}
-          </button>
-        ))}
-      </div>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-semibold">Price Charts</h1>
 
+      {/* Range selector */}
       <div className="flex gap-2">
-        {(["24h", "7d", "30d"] as Range[]).map((r) => (
+        {RANGES.map((r) => (
           <button
             key={r}
             onClick={() => setRange(r)}
-            className={r === range ? "font-bold" : ""}
+            className={`px-3 py-1 rounded text-sm border ${
+              r === range
+                ? "bg-white text-black"
+                : "text-gray-300 border-gray-600 hover:border-gray-400"
+            }`}
           >
             {r}
           </button>
         ))}
       </div>
 
-      <PriceHeader metal={metal} range={range} />
+      {/* Loading */}
+      {loading && (
+        <div className="text-gray-400">Loading price data…</div>
+      )}
 
-      {loading ? (
-        <div style={{ height: 360 }} className="flex items-center justify-center">
-          Loading…
+      {/* Error */}
+      {error && (
+        <div className="text-red-400">
+          Error loading prices: {error}
         </div>
-      ) : (
-        <PriceChart data={prices} alerts={alerts} />
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && data && !hasAnyData && (
+        <div className="rounded-lg border border-gray-700 p-6 text-gray-400">
+          <p className="text-lg font-medium">No price data yet</p>
+          <p className="mt-1 text-sm">
+            Prices will appear here once the daily ingestion runs.
+          </p>
+        </div>
+      )}
+
+      {/* Data preview (temporary, safe) */}
+      {!loading && data && hasAnyData && (
+        <pre className="bg-black border border-gray-700 rounded p-4 text-xs overflow-auto">
+          {JSON.stringify(data, null, 2)}
+        </pre>
       )}
     </div>
   );
