@@ -6,13 +6,15 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     return NextResponse.json({ history: [] });
   }
 
   const logs = await prisma.emailLog.findMany({
     where: {
-      to: session.user.email,
+      alert: {
+        userId: session.user.id,
+      },
     },
     include: {
       alert: true,
@@ -20,13 +22,12 @@ export async function GET() {
     orderBy: {
       createdAt: "desc",
     },
-    take: 50,
   });
 
   const history = logs.map((log) => ({
     id: log.id,
     metal: log.alert?.metal ?? null,
-    target: log.alert?.target ?? null, // ✅ FIXED
+    target: log.alert?.target ?? null,
     direction: log.alert?.direction ?? null,
     status: log.status,
     sentAt: log.createdAt,
