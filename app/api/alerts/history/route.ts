@@ -29,7 +29,7 @@ export async function GET() {
   const history = logs.map((log) => ({
     id: log.id,
     metal: log.alert?.metal ?? null,
-    target: log.alert?.price ?? null,
+    target: log.alert?.target ?? null, // ✅ FIXED
     direction: log.alert?.direction ?? null,
     sentTo: log.to,
     status: log.status,
