@@ -25,23 +25,24 @@ export async function GET(req: NextRequest) {
   let triggered = 0;
 
   for (const alert of alerts) {
-    const price = await getLatestPrice(alert.metal);
-    if (price == null) continue;
+    const latest = await getLatestPrice(alert.metal);
+    if (!latest) continue;
+
+    const currentPrice = latest.price;
 
     const lastTrigger = alert.triggers[0] ?? null;
-
     if (isInCooldown(alert, lastTrigger)) continue;
 
     const conditionMet =
-      (alert.direction === "above" && price >= alert.price) ||
-      (alert.direction === "below" && price <= alert.price);
+      (alert.direction === "above" && currentPrice >= alert.price) ||
+      (alert.direction === "below" && currentPrice <= alert.price);
 
     if (!conditionMet) continue;
 
     await prisma.alertTrigger.create({
       data: {
         alertId: alert.id,
-        price,
+        price: currentPrice,
         triggeredAt: new Date(),
       },
     });
