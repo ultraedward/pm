@@ -7,17 +7,20 @@ export async function GET() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return NextResponse.json({ history: [] });
+    return NextResponse.json(
+      { ok: false, error: "unauthorized" },
+      { status: 401 }
+    );
   }
 
-  const history = await prisma.emailLog.findMany({
+  const logs = await prisma.emailLog.findMany({
     where: {
       alert: {
         userId: session.user.id,
       },
     },
     orderBy: {
-      sentAt: "desc",
+      createdAt: "desc",
     },
     take: 50,
     select: {
@@ -25,10 +28,26 @@ export async function GET() {
       to: true,
       subject: true,
       status: true,
-      sentAt: true,
-      alertId: true,
+      createdAt: true,
+      alert: {
+        select: {
+          metal: true,
+          target: true,
+          direction: true,
+        },
+      },
     },
   });
 
-  return NextResponse.json({ history });
+  return NextResponse.json({
+    history: logs.map((l) => ({
+      id: l.id,
+      sentTo: l.to,
+      status: l.status,
+      createdAt: l.createdAt,
+      metal: l.alert.metal,
+      target: l.alert.target,
+      direction: l.alert.direction,
+    })),
+  });
 }
