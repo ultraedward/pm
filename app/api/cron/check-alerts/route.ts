@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCronAuth } from "@/lib/cronAuth";
-import {
-  ALERT_COOLDOWN_MS,
-  buildTriggerFingerprint,
-} from "@/lib/alertConfig";
-import { sendAlertEmail } from "@/lib/email";
+import { getLatestPrice } from "@/lib/getLatestPrice";
+import { isInCooldown } from "@/lib/alertCooldown";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   if (!requireCronAuth(req)) {
     return NextResponse.json(
       { ok: false, error: "unauthorized" },
@@ -19,81 +16,40 @@ export async function GET(req: NextRequest) {
     where: { active: true },
     include: {
       triggers: {
-        orderBy: { triggeredAt: "desc" },
+        orderBy: { createdAt: "desc" },
         take: 1,
       },
     },
   });
 
-  let alertsChecked = 0;
   let triggered = 0;
 
   for (const alert of alerts) {
-    alertsChecked++;
-
-    const latest = await prisma.priceHistory.findFirst({
-      where: { metal: alert.metal },
-      orderBy: { createdAt: "desc" },
-    });
-
-    if (!latest) continue;
-
-    const price = latest.price;
+    const price = await getLatestPrice(alert.metal);
+    if (!price) continue;
 
     const conditionMet =
-      (alert.direction === "above" && price >= alert.target) ||
-      (alert.direction === "below" && price <= alert.target);
+      (alert.direction === "above" && price >= alert.price) ||
+      (alert.direction === "below" && price <= alert.price);
 
     if (!conditionMet) continue;
 
-    // ⏱️ COOLDOWN CHECK
-    const lastTrigger = alert.triggers[0];
-    if (
-      lastTrigger &&
-      Date.now() - new Date(lastTrigger.triggeredAt).getTime() <
-        ALERT_COOLDOWN_MS
-    ) {
-      continue;
-    }
+    if (isInCooldown(alert, alert.triggers[0])) continue;
 
-    const fingerprint = buildTriggerFingerprint(alert.id, price);
-
-    try {
-      // 🧠 IDMPOTENT TRIGGER CREATE
-      const trigger = await prisma.alertTrigger.create({
-        data: {
-          alertId: alert.id,
-          metal: alert.metal,
-          target: alert.target,
-          direction: alert.direction,
-          price,
-          fingerprint,
-        },
-      });
-
-      // 📧 QUEUE EMAIL (ONLY AFTER TRIGGER)
-      await sendAlertEmail({
+    await prisma.alertTrigger.create({
+      data: {
         alertId: alert.id,
-        metal: alert.metal,
         price,
-        target: alert.target,
-        direction: alert.direction as "above" | "below",
-      });
+        triggeredAt: new Date(),
+      },
+    });
 
-      triggered++;
-    } catch (err: any) {
-      // Unique constraint = already triggered → safe ignore
-      if (err.code === "P2002") {
-        continue;
-      }
-
-      console.error("check-alerts error", err);
-    }
+    triggered++;
   }
 
   return NextResponse.json({
     ok: true,
-    alertsChecked,
+    alertsChecked: alerts.length,
     triggered,
   });
 }
