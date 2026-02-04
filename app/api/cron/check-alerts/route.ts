@@ -1,11 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendAlertEmail } from "@/lib/email";
 import { requireCronAuth } from "@/lib/cronAuth";
+import {
+  ALERT_COOLDOWN_MS,
+  buildTriggerFingerprint,
+} from "@/lib/alertConfig";
+import { sendAlertEmail } from "@/lib/email";
 
-export const dynamic = "force-dynamic";
-
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   if (!requireCronAuth(req)) {
     return NextResponse.json(
       { ok: false, error: "unauthorized" },
@@ -13,85 +15,85 @@ export async function GET(req: Request) {
     );
   }
 
-  try {
-    const alerts = await prisma.alert.findMany({
-      where: { active: true },
+  const alerts = await prisma.alert.findMany({
+    where: { active: true },
+    include: {
+      triggers: {
+        orderBy: { triggeredAt: "desc" },
+        take: 1,
+      },
+    },
+  });
+
+  let alertsChecked = 0;
+  let triggered = 0;
+
+  for (const alert of alerts) {
+    alertsChecked++;
+
+    const latest = await prisma.priceHistory.findFirst({
+      where: { metal: alert.metal },
+      orderBy: { createdAt: "desc" },
     });
 
-    let triggered = 0;
+    if (!latest) continue;
 
-    for (const alert of alerts) {
-      const latest = await prisma.priceHistory.findFirst({
-        where: { metal: alert.metal },
-        orderBy: { createdAt: "desc" },
-      });
+    const price = latest.price;
 
-      if (!latest) continue;
+    const conditionMet =
+      (alert.direction === "above" && price >= alert.target) ||
+      (alert.direction === "below" && price <= alert.target);
 
-      const shouldTrigger =
-        alert.direction === "above"
-          ? latest.price >= alert.target
-          : latest.price <= alert.target;
+    if (!conditionMet) continue;
 
-      if (!shouldTrigger) continue;
+    // ⏱️ COOLDOWN CHECK
+    const lastTrigger = alert.triggers[0];
+    if (
+      lastTrigger &&
+      Date.now() - new Date(lastTrigger.triggeredAt).getTime() <
+        ALERT_COOLDOWN_MS
+    ) {
+      continue;
+    }
 
-      const fingerprint = `${alert.id}:${latest.id}`;
+    const fingerprint = buildTriggerFingerprint(alert.id, price);
 
-      const exists = await prisma.alertTrigger.findUnique({
-        where: { fingerprint },
-      });
-      if (exists) continue;
-
-      // 1️⃣ Record trigger
-      await prisma.alertTrigger.create({
+    try {
+      // 🧠 IDMPOTENT TRIGGER CREATE
+      const trigger = await prisma.alertTrigger.create({
         data: {
           alertId: alert.id,
           metal: alert.metal,
           target: alert.target,
           direction: alert.direction,
-          price: latest.price,
+          price,
           fingerprint,
         },
       });
 
-      // 2️⃣ Email log
-      await prisma.emailLog.create({
-        data: {
-          alertId: alert.id,
-          to: alert.email ?? "",
-          subject: `🚨 ${alert.metal.toUpperCase()} Alert`,
-          status: "queued",
-        },
-      });
-
-      // 3️⃣ SEND EMAIL (✅ correct contract)
+      // 📧 QUEUE EMAIL (ONLY AFTER TRIGGER)
       await sendAlertEmail({
         alertId: alert.id,
         metal: alert.metal,
-        price: latest.price,
+        price,
         target: alert.target,
         direction: alert.direction as "above" | "below",
       });
 
-      // 4️⃣ Deactivate alert
-      await prisma.alert.update({
-        where: { id: alert.id },
-        data: { active: false },
-      });
-
       triggered++;
-    }
+    } catch (err: any) {
+      // Unique constraint = already triggered → safe ignore
+      if (err.code === "P2002") {
+        continue;
+      }
 
-    return NextResponse.json({
-      ok: true,
-      alertsChecked: alerts.length,
-      triggered,
-    });
-  } catch (err) {
-    console.error("CHECK ALERTS ERROR", err);
-    return NextResponse.json(
-      { ok: false, error: "failed" },
-      { status: 500 }
-    );
+      console.error("check-alerts error", err);
+    }
   }
+
+  return NextResponse.json({
+    ok: true,
+    alertsChecked,
+    triggered,
+  });
 }
