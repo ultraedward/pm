@@ -4,18 +4,16 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
-    // 1️⃣ Auth guard
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { ok: false, error: "unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    // 2️⃣ Fetch alert trigger history
     const history = await prisma.alertTrigger.findMany({
       where: {
         alert: {
@@ -25,39 +23,17 @@ export async function GET() {
       orderBy: {
         triggeredAt: "desc",
       },
-      take: 50,
+      take: 100,
       include: {
-        alert: {
-          select: {
-            metal: true,
-            target: true,
-            direction: true,
-          },
-        },
+        alert: true,
       },
     });
 
-    // 3️⃣ Serialize safely
-    const result = history.map((h) => ({
-      id: h.id,
-      alertId: h.alertId,
-      metal: h.metal,
-      price: h.price,
-      target: h.target,
-      direction: h.direction,
-      triggeredAt: h.triggeredAt.toISOString(),
-    }));
-
-    return NextResponse.json({
-      ok: true,
-      count: result.length,
-      history: result,
-    });
+    return NextResponse.json({ history });
   } catch (err) {
-    console.error("ALERT HISTORY ERROR", err);
-
+    console.error("alerts/history error:", err);
     return NextResponse.json(
-      { ok: false, error: "internal_error" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
