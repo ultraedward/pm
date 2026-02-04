@@ -1,70 +1,47 @@
-import { ReactNode } from "react";
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/authOptions";
+import { useUnreadAlerts } from "@/lib/useUnreadAlerts";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/api/auth/signin");
-  }
+  const unread = useUnreadAlerts();
 
   return (
-    <div className="min-h-screen flex bg-black text-white">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-gray-800 p-4 space-y-6">
-        <div className="text-xl font-semibold">
-          Precious Metals
-        </div>
+    <div className="flex min-h-screen">
+      <nav className="w-64 border-r border-gray-800 p-4 space-y-4">
+        <Link href="/dashboard" className="block">
+          Dashboard
+        </Link>
 
-        <nav className="flex flex-col space-y-2 text-sm">
-          <Link
-            href="/dashboard"
-            className="rounded px-3 py-2 hover:bg-gray-800"
-          >
-            Dashboard
-          </Link>
+        <Link href="/dashboard/alerts" className="block">
+          Alerts
+        </Link>
 
-          <Link
-            href="/dashboard/alerts"
-            className="rounded px-3 py-2 hover:bg-gray-800"
-          >
-            Alerts
-          </Link>
+        <Link
+          href="/dashboard/alerts/activity"
+          className="flex items-center gap-2"
+        >
+          <span>Activity</span>
 
-          <Link
-            href="/dashboard/alerts/activity"
-            className="rounded px-3 py-2 hover:bg-gray-800"
-          >
-            Alert Activity
-          </Link>
+          {unread !== null && unread > 0 && (
+            <span className="ml-auto bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+              {unread}
+            </span>
+          )}
+        </Link>
 
-          <Link
-            href="/dashboard/settings"
-            className="rounded px-3 py-2 hover:bg-gray-800"
-          >
-            Settings
-          </Link>
-        </nav>
+        <Link href="/dashboard/charts" className="block">
+          Charts
+        </Link>
 
-        <div className="pt-6 border-t border-gray-800 text-xs text-gray-400">
-          Signed in as
-          <div className="mt-1 text-white truncate">
-            {session.user?.email}
-          </div>
-        </div>
-      </aside>
+        <Link href="/dashboard/system" className="block">
+          System
+        </Link>
+      </nav>
 
-      {/* Main content */}
-      <main className="flex-1 p-6 overflow-auto">
-        {children}
-      </main>
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }
