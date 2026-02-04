@@ -1,33 +1,45 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-/**
- * Returns high-level alert system status
- */
 export async function GET() {
-  try {
-    const rows = await prisma.$queryRaw<
-      Array<{
-        triggeredAt: Date | null;
-      }>
-    >`
-      SELECT
-        MAX("triggeredAt") AS "triggeredAt"
-      FROM "AlertTrigger"
-    `;
+  const session = await getServerSession(authOptions);
 
-    return NextResponse.json({
-      ok: true,
-      lastTriggerAt: rows[0]?.triggeredAt ?? null,
-    });
-  } catch (err) {
-    console.error("alerts status error", err);
+  if (!session?.user?.id) {
     return NextResponse.json(
-      { ok: false, error: "Internal server error" },
-      { status: 500 }
+      { ok: false, error: "unauthorized" },
+      { status: 401 }
     );
   }
+
+  const alerts = await prisma.alert.findMany({
+    where: { userId: session.user.id },
+    include: {
+      triggers: {
+        orderBy: { triggeredAt: "desc" },
+        take: 1,
+      },
+      emails: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
+  });
+
+  const status = alerts.map((alert) => ({
+    id: alert.id,
+    metal: alert.metal,
+    target: alert.target,
+    direction: alert.direction,
+    active: alert.active,
+    lastTriggeredAt: alert.triggers[0]?.triggeredAt ?? null,
+    lastEmailAt: alert.emails[0]?.createdAt ?? null,
+    lastEmailStatus: alert.emails[0]?.status ?? null,
+  }));
+
+  return NextResponse.json({
+    ok: true,
+    alerts: status,
+  });
 }

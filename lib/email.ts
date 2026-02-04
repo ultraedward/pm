@@ -37,6 +37,7 @@ export async function sendAlertEmail({
       <p><b>Current Price:</b> $${price.toFixed(2)}</p>
       <p><b>Target:</b> $${target.toFixed(2)}</p>
       <p><b>Direction:</b> ${direction}</p>
+      <p><i>${new Date().toLocaleString()}</i></p>
     `,
   });
 }
