@@ -1,17 +1,15 @@
-import { prisma } from "@/lib/prisma";
+import { Alert, AlertTrigger } from "@prisma/client";
 
-const COOLDOWN_MINUTES = 30;
+const COOLDOWN_MINUTES = 60;
 
-export async function canTriggerAlert(alertId: string) {
-  const last = await prisma.alertTrigger.findFirst({
-    where: { alertId },
-    orderBy: { triggeredAt: "desc" },
-  });
+export function isInCooldown(
+  alert: Alert,
+  lastTrigger?: AlertTrigger | null
+): boolean {
+  if (!lastTrigger) return false;
 
-  if (!last) return true;
+  const cooldownMs = COOLDOWN_MINUTES * 60 * 1000;
+  const elapsed = Date.now() - new Date(lastTrigger.triggeredAt).getTime();
 
-  const elapsed =
-    Date.now() - new Date(last.triggeredAt).getTime();
-
-  return elapsed > COOLDOWN_MINUTES * 60 * 1000;
+  return elapsed < cooldownMs;
 }
