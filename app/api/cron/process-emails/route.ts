@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCronAuth } from "@/lib/cronAuth";
-import sendEmail from "@/lib/email"; // 👈 DEFAULT IMPORT
+import { sendEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   if (!requireCronAuth(req)) {
@@ -11,17 +11,15 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const pendingEmails = await prisma.emailLog.findMany({
+  const emails = await prisma.emailLog.findMany({
     where: { status: "pending" },
-    include: {
-      alert: true,
-    },
+    include: { alert: true },
     take: 25,
   });
 
   let sent = 0;
 
-  for (const email of pendingEmails) {
+  for (const email of emails) {
     if (!email.alert) continue;
 
     const alert = email.alert;
@@ -31,8 +29,8 @@ export async function GET(req: NextRequest) {
         <h2>Price Alert Triggered</h2>
         <p><b>Metal:</b> ${alert.metal.toUpperCase()}</p>
         <p><b>Direction:</b> ${alert.direction}</p>
-        <p><b>Target Price:</b> $${alert.price.toFixed(2)}</p>
-        <p style="opacity:0.7;">
+        <p><b>Target:</b> $${alert.price.toFixed(2)}</p>
+        <p style="opacity:.7">
           Triggered at ${email.createdAt.toISOString()}
         </p>
       </div>
@@ -61,7 +59,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    processed: pendingEmails.length,
+    processed: emails.length,
     sent,
   });
 }
