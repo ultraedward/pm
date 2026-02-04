@@ -1,39 +1,54 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
   try {
-    const history = await prisma.alertTrigger.findMany({
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: "unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "user_not_found" },
+        { status: 404 }
+      );
+    }
+
+    const history = await prisma.emailLog.findMany({
       where: {
-        alert: {
-          userId: session.user.id,
-        },
+        userId: user.id,
       },
       orderBy: {
-        triggeredAt: "desc",
+        createdAt: "desc",
       },
       take: 100,
-      include: {
-        alert: true,
+      select: {
+        id: true,
+        metal: true,
+        price: true,
+        target: true,
+        direction: true,
+        status: true,
+        createdAt: true,
       },
     });
 
-    return NextResponse.json({ history });
+    return NextResponse.json({ ok: true, history });
   } catch (err) {
-    console.error("alerts/history error:", err);
+    console.error("alerts/history error", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "internal_error" },
       { status: 500 }
     );
   }
