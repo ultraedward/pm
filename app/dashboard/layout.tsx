@@ -1,5 +1,3 @@
-import DashboardNav from "./DashboardNav";
-
 export const dynamic = "force-dynamic";
 
 export default function DashboardLayout({
@@ -9,8 +7,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      <DashboardNav />
-      <main className="flex-1 p-6">{children}</main>
+      {children}
     </div>
   );
 }

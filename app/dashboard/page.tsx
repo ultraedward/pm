@@ -1,3 +1,5 @@
+"use client";
+
 import { safeFetchArray } from "@/lib/safeFetch";
 
 type PriceRow = {
