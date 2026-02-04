@@ -37,51 +37,42 @@ model PriceHistory {
 
 model Alert {
   id        String   @id @default(cuid())
-  userId    String
   metal     String
-  target    Float
+  price     Float
   direction String
   active    Boolean  @default(true)
-  email     String?
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user     User           @relation(fields: [userId], references: [id])
-  triggers AlertTrigger[]
-  emails   EmailLog[]
-
-  @@index([userId])
-  @@index([metal])
+  // ✅ INVERSE RELATIONS (THIS FIXES YOUR ERROR)
+  triggers  AlertTrigger[]
+  emailLogs EmailLog[]
 }
 
 model AlertTrigger {
   id          String   @id @default(cuid())
   alertId     String
-  metal       String
-  target      Float
-  direction   String
   price       Float
-  fingerprint String   @unique
   triggeredAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-
-  @@index([alertId])
 }
 
 model EmailLog {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   alertId   String
   to        String
   subject   String
-  status    String    @default("queued")
-  attempts  Int       @default(0)
-  error     String?
-  createdAt DateTime  @default(now())
-  sentAt    DateTime?
+  status    String
+  attempts  Int      @default(1)
+  createdAt DateTime @default(now())
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-
-  @@index([alertId])
 }
 
 model CronLock {
