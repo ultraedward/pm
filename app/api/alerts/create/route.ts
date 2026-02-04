@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-const BOOTSTRAP_EMAIL = process.env.BOOTSTRAP_USER_EMAIL || "admin@local.dev";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
-  if (process.env.ALERTS_ENABLED !== "true") {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
     return NextResponse.json(
-      { ok: false, message: "Alerts temporarily disabled" },
-      { status: 403 }
+      { error: "Unauthorized" },
+      { status: 401 }
     );
   }
 
@@ -16,29 +18,20 @@ export async function POST(req: Request) {
 
   if (!metal || !target || !direction) {
     return NextResponse.json(
-      { ok: false, error: "missing_fields" },
+      { error: "Missing required fields" },
       { status: 400 }
     );
   }
 
-  // ✅ Ensure a user ALWAYS exists
-  const user = await prisma.user.upsert({
-    where: { email: BOOTSTRAP_EMAIL },
-    update: {},
-    create: {
-      email: BOOTSTRAP_EMAIL,
-    },
-  });
-
   const alert = await prisma.alert.create({
     data: {
-      userId: user.id,
+      userId: session.user.id,
       metal,
-      target: Number(target),
+      price: Number(target), // ✅ FIX: target → price
       direction,
       active: true,
     },
   });
 
-  return NextResponse.json({ ok: true, alert });
+  return NextResponse.json({ alert });
 }
