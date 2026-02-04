@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCronAuth } from "@/lib/cronAuth";
-import { sendEmail } from "@/lib/email";
+import sendEmail from "@/lib/email"; // 👈 DEFAULT IMPORT
 
 export async function GET(req: NextRequest) {
   if (!requireCronAuth(req)) {
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       });
 
       sent++;
-    } catch (err) {
+    } catch {
       await prisma.emailLog.update({
         where: { id: email.id },
         data: { status: "failed" },
