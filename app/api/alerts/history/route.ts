@@ -15,7 +15,9 @@ export async function GET() {
 
   const logs = await prisma.emailLog.findMany({
     where: {
-      userId: session.user.id,
+      alert: {
+        userId: session.user.id, // ✅ FIX
+      },
     },
     include: {
       alert: true,
@@ -29,7 +31,7 @@ export async function GET() {
   const history = logs.map((log) => ({
     id: log.id,
     metal: log.alert?.metal ?? null,
-    target: log.alert?.price ?? null, // ✅ FIXED
+    target: log.alert?.price ?? null, // alias
     direction: log.alert?.direction ?? null,
     status: log.status,
     sentAt: log.createdAt,
