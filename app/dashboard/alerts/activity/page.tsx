@@ -1,53 +1,77 @@
-"use client";
+export const dynamic = "force-dynamic";
 
-import { useEffect, useState } from "react";
-
-type ActivityItem = {
+type AlertHistoryItem = {
   id: string;
   metal: string;
-  price: number;
-  triggeredAt: string;
+  target: number;
+  direction: "above" | "below";
+  sentTo: string;
+  status: string;
+  createdAt: string;
 };
 
-export default function AlertActivityPage() {
-  const [items, setItems] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
+async function getHistory(): Promise<AlertHistoryItem[]> {
+  const res = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/alerts/history`,
+    {
+      cache: "no-store",
+    }
+  );
 
-  useEffect(() => {
-    fetch("/api/alerts/history", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => {
-        setItems(data.items ?? []);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return <div>Loading alert activity…</div>;
+  if (!res.ok) {
+    return [];
   }
 
+  const data = await res.json();
+  return data.history ?? [];
+}
+
+export default async function AlertsActivityPage() {
+  const history = await getHistory();
+
   return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4">Alert Activity</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold">Alert Activity</h1>
 
-      {items.length === 0 && <p>No alerts yet.</p>}
-
-      <ul className="space-y-2">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="border border-gray-800 rounded p-3"
-          >
-            <div>
-              <strong>{item.metal.toUpperCase()}</strong> triggered at{" "}
-              ${item.price.toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-400">
-              {new Date(item.triggeredAt).toLocaleString()}
-            </div>
-          </li>
-        ))}
-      </ul>
+      {history.length === 0 ? (
+        <div className="rounded-md border border-neutral-800 p-6 text-neutral-400">
+          No alerts have been triggered yet.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border border-neutral-800">
+          <table className="w-full text-sm">
+            <thead className="bg-neutral-900 text-neutral-400">
+              <tr>
+                <th className="px-4 py-3 text-left">Metal</th>
+                <th className="px-4 py-3 text-left">Condition</th>
+                <th className="px-4 py-3 text-left">Target</th>
+                <th className="px-4 py-3 text-left">Email</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((h) => (
+                <tr
+                  key={h.id}
+                  className="border-t border-neutral-800 hover:bg-neutral-900"
+                >
+                  <td className="px-4 py-3 capitalize">{h.metal}</td>
+                  <td className="px-4 py-3">
+                    {h.direction === "above" ? "Above" : "Below"}
+                  </td>
+                  <td className="px-4 py-3">${h.target.toLocaleString()}</td>
+                  <td className="px-4 py-3">{h.sentTo}</td>
+                  <td className="px-4 py-3 capitalize">{h.status}</td>
+                  <td className="px-4 py-3 text-neutral-400">
+                    {new Date(h.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
