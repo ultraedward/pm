@@ -1,3 +1,5 @@
+"use client";
+
 import { fetchJsonArray } from "@/lib/fetchJsonArray";
 
 type PriceRow = {
