@@ -1,14 +1,9 @@
-import { prisma } from "@/lib/prisma";
-
 /**
- * Global cron kill switch.
- * If the row does not exist, cron is ENABLED by default.
+ * TEMP STUB
+ * Cron control table does not exist.
+ * Always allow cron jobs to run.
  */
-export async function isCronEnabled(): Promise<boolean> {
-  const row = await prisma.cronControl.findUnique({
-    where: { id: 1 },
-  });
 
-  if (!row) return true;
-  return row.cronEnabled;
+export async function isCronEnabled(): Promise<boolean> {
+  return true;
 }
