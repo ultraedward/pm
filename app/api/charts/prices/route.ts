@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 function parseRange(range: string) {
-  const now = new Date();
+  const now = Date.now();
 
   switch (range) {
     case "24h":
-      return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      return new Date(now - 24 * 60 * 60 * 1000);
     case "7d":
-      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return new Date(now - 7 * 24 * 60 * 60 * 1000);
     case "30d":
-      return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      return new Date(now - 30 * 24 * 60 * 60 * 1000);
     default:
-      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return new Date(now - 7 * 24 * 60 * 60 * 1000);
   }
 }
 
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 
   const since = parseRange(range);
 
-  const prices = await prisma.spotPrice.findMany({
+  const prices = await prisma.spotPrices.findMany({
     where: {
       metal,
       createdAt: {
