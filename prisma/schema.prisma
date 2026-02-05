@@ -11,46 +11,25 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  alerts Alert[]
-}
-
-model Subscription {
-  id                   String    @id @default(cuid())
-  stripeSubscriptionId String?   @unique
-  stripeCustomerId     String?
-  status               String
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean   @default(false)
-  userId               String?
-  createdAt            DateTime  @default(now())
-}
-
-model PriceHistory {
-  id        String   @id @default(cuid())
-  metal     String
-  price     Float
-  createdAt DateTime @default(now())
-
-  @@index([metal, createdAt])
+  alerts    Alert[]
+  emailLogs EmailLog[]
 }
 
 model Alert {
   id        String   @id @default(cuid())
+  userId    String
   metal     String
   price     Float
   direction String
   active    Boolean  @default(true)
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // ✅ INVERSE RELATIONS (THIS FIXES YOUR ERROR)
-  triggers  AlertTrigger[]
-  emailLogs EmailLog[]
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  triggers AlertTrigger[]
+  emails   EmailLog[]
 }
 
 model AlertTrigger {
@@ -61,28 +40,25 @@ model AlertTrigger {
   createdAt   DateTime @default(now())
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@index([alertId])
 }
 
 model EmailLog {
   id        String   @id @default(cuid())
   alertId   String
+  userId    String
   to        String
   subject   String
+  html      String
   status    String
-  attempts  Int      @default(1)
+  attempts  Int      @default(0)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-}
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model CronLock {
-  name      String   @id
-  lockedAt  DateTime
-  expiresAt DateTime
-}
-
-model CronControl {
-  id          Int      @id @default(1)
-  cronEnabled Boolean  @default(true)
-  updatedAt   DateTime @updatedAt
+  @@index([alertId])
+  @@index([userId])
 }
