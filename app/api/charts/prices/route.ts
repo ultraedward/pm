@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 
   const since = parseRange(range);
 
-  const prices = await prisma.price.findMany({
+  const prices = await prisma.spotPrice.findMany({
     where: {
       metal,
       createdAt: {
