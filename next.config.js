@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // IMPORTANT: do NOT use output:"export" for this app
+  // because you rely on API routes + server runtime.
+  reactStrictMode: true,
 };
 
 module.exports = nextConfig;
