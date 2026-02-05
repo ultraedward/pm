@@ -1,12 +1,8 @@
-import { prisma } from "@/lib/prisma";
+/**
+ * TEMP STUB
+ * Subscription model not implemented yet.
+ */
 
-export async function isProUser(userId: string): Promise<boolean> {
-  const sub = await prisma.subscription.findFirst({
-    where: {
-      userId,
-      status: { in: ["active", "trialing"] },
-    },
-  });
-
-  return Boolean(sub);
+export async function isProUser(_userId: string): Promise<boolean> {
+  return false;
 }
