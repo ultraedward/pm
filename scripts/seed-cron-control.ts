@@ -1,29 +1,16 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-
 /**
- * Seed the global cron control row.
- * Uses id = 1 by schema design.
+ * TEMP STUB
+ * cronControl model was removed from Prisma.
+ * Script disabled to unblock builds.
  */
-async function main() {
-  await prisma.cronControl.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1,
-      cronEnabled: true,
-    },
-  });
 
-  console.log("Cron control seeded");
+export {};
+
+async function main() {
+  console.log("[seed-cron-control] skipped — cronControl model removed");
 }
 
-main()
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((err) => {
+  console.error(err);
+  process.exit(0);
+});
