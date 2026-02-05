@@ -1,23 +1,26 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ pro: false });
+  if (!session?.user) {
+    return NextResponse.json(
+      { ok: false, pro: false },
+      { status: 401 }
+    );
   }
 
-  const subscription = await prisma.subscription.findFirst({
-    where: {
-      userId: session.user.id,
-      status: "active",
-    },
-  });
+  // 🚨 TEMP STUB
+  // No Subscription model exists in Prisma.
+  // Treat all users as FREE for now.
 
   return NextResponse.json({
-    pro: Boolean(subscription),
+    ok: true,
+    pro: false,
+    source: "stub",
   });
 }
