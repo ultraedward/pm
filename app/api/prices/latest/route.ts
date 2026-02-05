@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -9,26 +8,18 @@ export async function GET(req: Request) {
 
   if (!metal) {
     return NextResponse.json(
-      { error: "metal_required" },
+      { error: "metal is required" },
       { status: 400 }
     );
   }
 
-  const latest = await prisma.priceHistory.findFirst({
-    where: {
-      metal,
-      price: {
-        gt: 10, // 🔒 ignore garbage rows
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
+  // 🚨 TEMPORARY STUB
+  // No Prisma-backed price history model exists.
+  // This endpoint must not touch Prisma until schema is finalized.
+
+  return NextResponse.json({
+    metal,
+    price: null,
+    timestamp: null,
   });
-
-  if (!latest) {
-    return NextResponse.json([]);
-  }
-
-  return NextResponse.json(latest);
 }
