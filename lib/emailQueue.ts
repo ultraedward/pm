@@ -1,19 +1,15 @@
-import { prisma } from "@/lib/prisma";
+/**
+ * TEMP STUB
+ * Email queue disabled until EmailLog schema is finalized.
+ */
 
 export type QueuedEmail = {
   alertId: string;
   to: string;
   subject: string;
+  html?: string;
 };
 
-export async function queueEmail(email: QueuedEmail) {
-  return prisma.emailLog.create({
-    data: {
-      alertId: email.alertId,
-      to: email.to,
-      subject: email.subject,
-      status: "queued",
-      attempts: 0,
-    },
-  });
+export async function queueEmail(_email: QueuedEmail) {
+  return { ok: true };
 }
