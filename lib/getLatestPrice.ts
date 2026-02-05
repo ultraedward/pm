@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma";
+/**
+ * TEMP STUB
+ * Price history table removed / not yet implemented.
+ */
 
-export async function getLatestPrice(metal: string) {
-  return prisma.priceHistory.findFirst({
-    where: { metal },
-    orderBy: { createdAt: "desc" },
-  });
+export async function getLatestPrice(_metal: string) {
+  return null;
 }
