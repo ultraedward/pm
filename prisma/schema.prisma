@@ -10,26 +10,24 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   alerts    Alert[]
-  emailLogs EmailLog[]
+  createdAt DateTime @default(now())
 }
 
 model Alert {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    String
   metal     String
   price     Float
   direction String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  active    Boolean        @default(true)
 
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  triggers AlertTrigger[]
-  emails   EmailLog[]
+  user      User           @relation(fields: [userId], references: [id])
+  triggers  AlertTrigger[]
+  emails    EmailLog[]
+
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 }
 
 model AlertTrigger {
@@ -37,28 +35,21 @@ model AlertTrigger {
   alertId     String
   price       Float
   triggeredAt DateTime @default(now())
-  createdAt   DateTime @default(now())
 
-  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-
-  @@index([alertId])
+  alert       Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
 }
 
 model EmailLog {
   id        String   @id @default(cuid())
   alertId   String
-  userId    String
   to        String
   subject   String
   html      String
   status    String
   attempts  Int      @default(0)
+
+  alert     Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([alertId])
-  @@index([userId])
 }
