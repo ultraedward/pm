@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaClient } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,20 +11,28 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // 🔥 force allow
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   session: {
-    strategy: "database",
+    strategy: "jwt", // 🔥 CRITICAL CHANGE
   },
   callbacks: {
-    async signIn({ user, account }) {
-      // 🔥 ABSOLUTE OVERRIDE — always allow sign-in
+    async signIn() {
       return true;
     },
-  },
-  pages: {
-    signIn: "/login",
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token?.id) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
 });
 
