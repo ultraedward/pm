@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 const prisma = new PrismaClient();
 
@@ -11,19 +11,20 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true, // 🔥 nuclear switch
+      allowDangerousEmailAccountLinking: true, // 🔥 force allow
     }),
   ],
   session: {
     strategy: "database",
   },
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-      }
-      return session;
+    async signIn({ user, account }) {
+      // 🔥 ABSOLUTE OVERRIDE — always allow sign-in
+      return true;
     },
+  },
+  pages: {
+    signIn: "/login",
   },
 });
 
