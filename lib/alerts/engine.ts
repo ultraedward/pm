@@ -1,87 +1,65 @@
 import { prisma } from "@/lib/prisma";
+import { queueEmail } from "@/lib/emailQueue";
 
-export type EngineResult = {
-  checkedAlerts: number;
-  triggered: number;
-};
+/**
+ * Evaluate and trigger a single alert (used by /alerts/run)
+ */
+export async function evaluateAlert(alertId: string, price: number) {
+  const alert = await prisma.alert.findUnique({
+    where: { id: alertId },
+    include: {
+      user: true,
+      triggers: {
+        orderBy: { triggeredAt: "desc" },
+        take: 1,
+      },
+    },
+  });
 
-type AlertRow = {
-  id: string;
-  metal: string;
-  direction: "above" | "below";
-  target: number;
-};
+  if (!alert || !alert.active) return { triggered: false };
 
-type PriceRow = {
-  metal: string;
-  price: number;
-};
+  const conditionMet =
+    (alert.direction === "above" && price >= alert.price) ||
+    (alert.direction === "below" && price <= alert.price);
 
-export async function runAlertEngine(): Promise<EngineResult> {
-  // 1️⃣ Load active alerts
-  const alerts = await prisma.$queryRaw<AlertRow[]>`
-    SELECT
-      id,
-      metal,
-      direction,
-      target
-    FROM "Alert"
-    WHERE active = true
-  `;
+  if (!conditionMet) return { triggered: false };
 
-  if (alerts.length === 0) {
-    return { checkedAlerts: 0, triggered: 0 };
-  }
+  await prisma.alertTrigger.create({
+    data: {
+      alertId: alert.id,
+      price,
+      triggeredAt: new Date(),
+    },
+  });
 
-  // 2️⃣ Load latest prices (one per metal)
-  const prices = await prisma.$queryRaw<PriceRow[]>`
-    SELECT DISTINCT ON (metal)
-      metal,
-      price
-    FROM "PriceHistory"
-    ORDER BY metal, timestamp DESC
-  `;
+  await queueEmail({
+    alertId: alert.id,
+    to: alert.user.email,
+    subject: `Alert triggered: ${alert.metal}`,
+    html: `
+      <h2>Price Alert Triggered</h2>
+      <p><b>Metal:</b> ${alert.metal}</p>
+      <p><b>Direction:</b> ${alert.direction}</p>
+      <p><b>Target Price:</b> ${alert.price}</p>
+      <p><b>Current Price:</b> ${price}</p>
+    `,
+  });
 
-  const priceMap = new Map(
-    prices.map(p => [p.metal, p.price])
-  );
+  return { triggered: true };
+}
 
-  let triggered = 0;
+/**
+ * Batch alert engine (cron)
+ */
+export async function runAlertEngine() {
+  const alerts = await prisma.alert.findMany({
+    where: { active: true },
+    include: {
+      user: true,
+    },
+  });
 
-  // 3️⃣ Evaluate alerts
   for (const alert of alerts) {
-    const currentPrice = priceMap.get(alert.metal);
-    if (currentPrice == null) continue;
-
-    const shouldTrigger =
-      alert.direction === "above"
-        ? currentPrice >= alert.target
-        : currentPrice <= alert.target;
-
-    if (!shouldTrigger) continue;
-
-    // 4️⃣ Record trigger (idempotent per alert+price snapshot)
-    await prisma.$executeRaw`
-      INSERT INTO "AlertTrigger" (
-        "alertId",
-        price,
-        "triggeredAt",
-        "createdAt"
-      )
-      VALUES (
-        ${alert.id},
-        ${currentPrice},
-        NOW(),
-        NOW()
-      )
-      ON CONFLICT DO NOTHING
-    `;
-
-    triggered++;
+    await evaluateAlert(alert.id, alert.price);
   }
-
-  return {
-    checkedAlerts: alerts.length,
-    triggered,
-  };
 }
