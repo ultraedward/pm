@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCronAuth } from "@/lib/cronAuth";
 import { sendEmail } from "@/lib/email";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   if (!requireCronAuth(req)) {
     return new NextResponse("unauthorized", { status: 401 });
   }
