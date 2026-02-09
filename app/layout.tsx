@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Nav } from "@/components/Nav";
 
 export default function RootLayout({
   children,
@@ -8,15 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-black text-white">
-        <nav className="p-4 space-x-4 border-b border-gray-700">
-          <a href="/prices" className="hover:underline">
-            Prices
-          </a>
-          <a href="/alerts" className="hover:underline">
-            Alerts
-          </a>
-        </nav>
-
+        <Nav />
         <main className="p-6">{children}</main>
       </body>
     </html>
