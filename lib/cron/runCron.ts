@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { fetchPrices } from "@/lib/prices/fetchPrices";
-import { evaluateAlert } from "@/lib/alerts/evaluateAlert";
+import { evaluateAlert, AlertDirection } from "@/lib/alerts/evaluateAlert";
 
 export async function runCronJob() {
   const cronRun = await prisma.cronRun.create({
@@ -27,10 +27,13 @@ export async function runCronJob() {
       });
 
       for (const alert of alerts) {
+        // 🔑 normalize direction ONCE
+        const direction = alert.direction as AlertDirection;
+
         const shouldTrigger = evaluateAlert(
           alert.price,
           p.price,
-          alert.direction
+          direction
         );
 
         if (!shouldTrigger) continue;
