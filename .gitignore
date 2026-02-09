@@ -12,6 +12,7 @@ out
 .env.local
 .env.production
 .env.development
+.env*
 
 # prisma
 prisma/dev.db
@@ -28,3 +29,4 @@ pnpm-debug.log*
 
 # vercel
 .vercel.env.prod
+.env*.local
