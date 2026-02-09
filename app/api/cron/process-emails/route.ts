@@ -1,3 +1,4 @@
+// app/api/cron/process-emails/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCronAuth } from "@/lib/cronAuth";
