@@ -1,12 +1,4 @@
-// app/layout.tsx
-
 import "./globals.css";
-import Providers from "./providers";
-
-export const metadata = {
-  title: "Precious Metals Tracker",
-  description: "Track precious metals and set price alerts",
-};
 
 export default function RootLayout({
   children,
@@ -15,8 +7,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <Providers>{children}</Providers>
+      <body className="min-h-screen bg-black text-white">
+        <nav className="p-4 space-x-4 border-b border-gray-700">
+          <a href="/prices" className="hover:underline">
+            Prices
+          </a>
+          <a href="/alerts" className="hover:underline">
+            Alerts
+          </a>
+        </nav>
+
+        <main className="p-6">{children}</main>
       </body>
     </html>
   );
