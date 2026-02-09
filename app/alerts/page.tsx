@@ -9,11 +9,20 @@ export default async function AlertsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Your Alerts</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Alerts</h1>
 
-      <Link href="/alerts/new" className="underline">
-        + Create Alert
-      </Link>
+        <Link href="/alerts/new" className="underline">
+          + Create alert
+        </Link>
+      </div>
+
+      <div className="rounded border border-gray-800 bg-gray-900 p-4 text-sm">
+        <strong>Free plan:</strong> Up to 3 alerts.
+        <span className="ml-2 text-gray-400">
+          Upgrade anytime for unlimited alerts.
+        </span>
+      </div>
 
       <AlertsTable alerts={alerts} />
     </div>

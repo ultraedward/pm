@@ -15,62 +15,85 @@ export function AlertsTable({ alerts }: { alerts: Alert[] }) {
       method: "POST",
       body: JSON.stringify({ alertId: id }),
     });
+
     window.location.reload();
   }
 
   async function deleteAlert(id: string) {
-    if (!confirm("Delete this alert?")) return;
+    const ok = confirm("Delete this alert?");
+    if (!ok) return;
 
     await fetch("/api/alerts/delete", {
       method: "POST",
       body: JSON.stringify({ alertId: id }),
     });
+
     window.location.reload();
   }
 
   if (alerts.length === 0) {
-    return <p className="text-gray-400">No alerts yet.</p>;
+    return (
+      <div className="rounded-lg border border-dashed border-gray-700 p-6 text-center">
+        <p className="text-lg font-medium">No alerts yet</p>
+        <p className="mt-1 text-sm text-gray-400">
+          Create an alert to get notified when prices move.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="border-b border-gray-700">
-          <th className="p-2 text-left">Metal</th>
-          <th className="p-2 text-left">Condition</th>
-          <th className="p-2 text-left">Status</th>
-          <th className="p-2 text-left">Last Triggered</th>
-          <th className="p-2"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {alerts.map(a => (
-          <tr key={a.id} className="border-b border-gray-800">
-            <td className="p-2 capitalize">{a.metal}</td>
-            <td className="p-2">
-              {a.direction} {a.price}
-            </td>
-            <td className="p-2">
-              <button className="underline" onClick={() => toggleAlert(a.id)}>
-                {a.active ? "Active" : "Paused"}
-              </button>
-            </td>
-            <td className="p-2">
-              {a.lastTriggeredAt
-                ? new Date(a.lastTriggeredAt).toLocaleString()
-                : "Never"}
-            </td>
-            <td className="p-2">
-              <button
-                onClick={() => deleteAlert(a.id)}
-                className="text-red-400 underline"
-              >
-                Delete
-              </button>
-            </td>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-sm">
+        <thead>
+          <tr className="border-b border-gray-800 text-left">
+            <th className="p-3">Metal</th>
+            <th className="p-3">Condition</th>
+            <th className="p-3">Status</th>
+            <th className="p-3">Last Triggered</th>
+            <th className="p-3 text-right">Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+
+        <tbody>
+          {alerts.map(alert => (
+            <tr
+              key={alert.id}
+              className="border-b border-gray-900 hover:bg-gray-900/40"
+            >
+              <td className="p-3 capitalize">{alert.metal}</td>
+
+              <td className="p-3">
+                {alert.direction} ${alert.price}
+              </td>
+
+              <td className="p-3">
+                <button
+                  onClick={() => toggleAlert(alert.id)}
+                  className="underline"
+                >
+                  {alert.active ? "Active" : "Paused"}
+                </button>
+              </td>
+
+              <td className="p-3 text-gray-400">
+                {alert.lastTriggeredAt
+                  ? new Date(alert.lastTriggeredAt).toLocaleString()
+                  : "Never"}
+              </td>
+
+              <td className="p-3 text-right">
+                <button
+                  onClick={() => deleteAlert(alert.id)}
+                  className="text-red-400 underline"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
