@@ -1,12 +1,17 @@
-type AlertDirection = "above" | "below"
+import { AlertDirection } from "@prisma/client";
 
 export function evaluateAlert(
-  alertPrice: number,
+  targetPrice: number,
   currentPrice: number,
   direction: AlertDirection
 ): boolean {
   if (direction === "above") {
-    return currentPrice >= alertPrice
+    return currentPrice >= targetPrice;
   }
-  return currentPrice <= alertPrice
+
+  if (direction === "below") {
+    return currentPrice <= targetPrice;
+  }
+
+  return false;
 }
