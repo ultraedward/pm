@@ -1,4 +1,4 @@
-import { AlertDirection } from "@prisma/client";
+export type AlertDirection = "above" | "below";
 
 export function evaluateAlert(
   targetPrice: number,
