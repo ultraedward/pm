@@ -1,10 +1,13 @@
-import AlertForm from "./AlertForm";
+import { requireUser } from "@/lib/requireUser";
+import { CreateAlertForm } from "@/components/CreateAlertForm";
 
-export default function NewAlertPage() {
+export default async function NewAlertPage() {
+  await requireUser();
+
   return (
-    <main className="max-w-xl mx-auto p-6 space-y-4">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold">Create Alert</h1>
-      <AlertForm />
-    </main>
+      <CreateAlertForm />
+    </div>
   );
 }

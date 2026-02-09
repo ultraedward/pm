@@ -1,36 +1,18 @@
-"use client";
+import Link from "next/link";
 
-import { useEffect, useState } from "react";
-import { ensureArray } from "@/lib/ensureArray";
-
-export default function DashboardPage() {
-  const [prices, setPrices] = useState<any>(null);
-  const [alerts, setAlerts] = useState<any>(null);
-
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/prices").then(r => r.json()).catch(() => null),
-      fetch("/api/alerts").then(r => r.json()).catch(() => null),
-    ]).then(([p, a]) => {
-      setPrices(p);
-      setAlerts(a);
-    });
-  }, []);
-
-  const safePrices = ensureArray(prices?.prices ?? prices);
-  const safeAlerts = ensureArray(alerts?.alerts ?? alerts);
-
+export default function HomePage() {
   return (
-    <div>
-      <h2>Prices</h2>
-      {safePrices.slice(0, 10).map((p, i) => (
-        <div key={i}>{JSON.stringify(p)}</div>
-      ))}
+    <div className="p-8 space-y-6">
+      <h1 className="text-3xl font-bold">Precious Metals Tracker</h1>
 
-      <h2>Alerts</h2>
-      {safeAlerts.map((a, i) => (
-        <div key={i}>{JSON.stringify(a)}</div>
-      ))}
+      <div className="space-x-6">
+        <Link href="/prices" className="underline">
+          Prices
+        </Link>
+        <Link href="/alerts" className="underline">
+          Alerts
+        </Link>
+      </div>
     </div>
   );
 }
