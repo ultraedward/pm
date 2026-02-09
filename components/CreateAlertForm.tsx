@@ -50,7 +50,7 @@ export function CreateAlertForm() {
       className="max-w-sm space-y-5 rounded-lg border border-gray-800 p-6"
     >
       <div>
-        <label className="block text-sm font-medium mb-1">Metal</label>
+        <label className="mb-1 block text-sm font-medium">Metal</label>
         <select
           value={metal}
           onChange={e => setMetal(e.target.value)}
@@ -62,7 +62,7 @@ export function CreateAlertForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Condition</label>
+        <label className="mb-1 block text-sm font-medium">Condition</label>
         <select
           value={direction}
           onChange={e => setDirection(e.target.value)}
@@ -74,7 +74,7 @@ export function CreateAlertForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Target price</label>
+        <label className="mb-1 block text-sm font-medium">Target price</label>
         <input
           type="number"
           inputMode="decimal"
@@ -86,9 +86,7 @@ export function CreateAlertForm() {
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-red-400">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       <button
         type="submit"
