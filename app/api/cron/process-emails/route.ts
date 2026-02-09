@@ -32,7 +32,7 @@ export async function POST(req: Request) {
           attempts: email.attempts + 1,
         },
       });
-    } catch (err) {
+    } catch {
       await prisma.emailLog.update({
         where: { id: email.id },
         data: {
