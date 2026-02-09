@@ -8,16 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String?  @unique
-  name      String?
-  image     String?
+  id                String   @id @default(cuid())
+  email             String?  @unique
+  name              String?
+  image             String?
+  stripeCustomerId  String?
+  stripeSubscriptionId String?
+  stripePriceId     String?
+  subscriptionStatus String? // "active", "canceled", null
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  alerts   Alert[]
+  accounts  Account[]
+  sessions  Session[]
+  alerts    Alert[]
 }
 
 model Account {
