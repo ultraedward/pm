@@ -18,6 +18,8 @@ export async function getUserAlerts(userId: string) {
     price: alert.price,
     direction: alert.direction,
     active: alert.active,
-    lastTriggeredAt: alert.triggers[0]?.triggeredAt ?? null,
+    lastTriggeredAt: alert.triggers[0]?.triggeredAt
+      ? alert.triggers[0].triggeredAt.toISOString()
+      : null,
   }));
 }
