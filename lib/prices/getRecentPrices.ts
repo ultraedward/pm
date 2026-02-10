@@ -14,7 +14,7 @@ export async function getRecentPrices() {
   for (const p of prices) {
     grouped[p.metal as "gold" | "silver"].push({
       price: p.price,
-      time: new Date(p.timestamp ?? p.created ?? p.fetchedAt ?? Date.now()),
+      time: p.timestamp,
     });
   }
 
