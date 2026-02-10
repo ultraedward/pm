@@ -19,17 +19,10 @@ export const authOptions: NextAuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 
-  pages: {
-    signIn: "/api/auth/signin",
-  },
-
   callbacks: {
     async redirect({ url, baseUrl }) {
-      if (url === baseUrl || url === `${baseUrl}/`) {
-        return `${baseUrl}/alerts`;
-      }
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (url.startsWith(baseUrl)) return url;
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
       return `${baseUrl}/alerts`;
     },
   },
