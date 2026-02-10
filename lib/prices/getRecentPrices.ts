@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function getRecentPrices() {
   const prices = await prisma.price.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
     take: 50,
   });
 
@@ -14,7 +14,7 @@ export async function getRecentPrices() {
   for (const p of prices) {
     grouped[p.metal as "gold" | "silver"].push({
       price: p.price,
-      time: p.createdAt,
+      time: new Date(p.timestamp ?? p.created ?? p.fetchedAt ?? Date.now()),
     });
   }
 
