@@ -1,20 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ingest-prices",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/check-alerts",
-      "schedule": "5 9 * * *"
-    },
-    {
-      "path": "/api/cron/process-emails",
-      "schedule": "10 9 * * *"
-    },
-    {
-      "path": "/api/cron/retry-emails",
-      "schedule": "15 9 * * *"
+      "path": "/api/cron/run",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
