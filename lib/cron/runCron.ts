@@ -45,3 +45,4 @@ export async function runCronJob() {
   }
 
   return { ok: true };
+}
