@@ -3,18 +3,25 @@ import { requireUser } from "@/lib/requireUser";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
-  const user = await requireUser();
+  const sessionUser = await requireUser();
+
+  const user = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: {
+      subscriptionStatus: true,
+    },
+  });
 
   const [activeAlertsCount, totalAlertsCount] = await Promise.all([
     prisma.alert.count({
-      where: { userId: user.id, active: true },
+      where: { userId: sessionUser.id, active: true },
     }),
     prisma.alert.count({
-      where: { userId: user.id },
+      where: { userId: sessionUser.id },
     }),
   ]);
 
-  const isPro = user.subscriptionStatus === "active";
+  const isPro = user?.subscriptionStatus === "active";
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 p-6">
@@ -43,6 +50,7 @@ export default async function HomePage() {
           <p className="mt-2 text-3xl font-bold">
             {isPro ? "Pro" : "Free"}
           </p>
+
           {!isPro && (
             <Link
               href="/pricing"
