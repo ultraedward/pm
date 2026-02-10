@@ -8,7 +8,7 @@ type Alert = {
   price: number;
   direction: string;
   active: boolean;
-  lastTriggeredAt: Date | null;
+  lastTriggeredAt: string | null;
 };
 
 export function AlertsTable({ alerts }: { alerts: Alert[] }) {
@@ -39,57 +39,64 @@ export function AlertsTable({ alerts }: { alerts: Alert[] }) {
         </thead>
 
         <tbody className="divide-y divide-gray-800">
-          {alerts.map((alert) => (
-            <tr key={alert.id} className="bg-black hover:bg-gray-900">
-              <td className="px-4 py-3 capitalize font-medium">
-                {alert.metal}
-              </td>
+          {alerts.map((alert) => {
+            const lastTriggered = alert.lastTriggeredAt
+              ? new Date(alert.lastTriggeredAt).toLocaleString()
+              : "—";
 
-              <td className="px-4 py-3">
-                {alert.direction} ${alert.price.toLocaleString()}
-              </td>
+            return (
+              <tr
+                key={alert.id}
+                className="bg-black hover:bg-gray-900 transition"
+              >
+                <td className="px-4 py-3 capitalize font-medium">
+                  {alert.metal}
+                </td>
 
-              <td className="px-4 py-3">
-                {alert.active ? (
-                  <span className="rounded bg-green-600/20 px-2 py-1 text-xs text-green-400">
-                    Active
-                  </span>
-                ) : (
-                  <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-400">
-                    Paused
-                  </span>
-                )}
-              </td>
+                <td className="px-4 py-3">
+                  {alert.direction} ${alert.price.toLocaleString()}
+                </td>
 
-              <td className="px-4 py-3 text-gray-400">
-                {alert.lastTriggeredAt
-                  ? new Date(alert.lastTriggeredAt).toLocaleDateString()
-                  : "—"}
-              </td>
+                <td className="px-4 py-3">
+                  {alert.active ? (
+                    <span className="rounded bg-green-600/20 px-2 py-1 text-xs text-green-400">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-400">
+                      Paused
+                    </span>
+                  )}
+                </td>
 
-              <td className="px-4 py-3 text-right space-x-2">
-                <button
-                  disabled={isPending}
-                  onClick={() =>
-                    startTransition(() => toggleAlert(alert.id))
-                  }
-                  className="rounded border border-gray-700 px-2 py-1 text-xs hover:bg-gray-800"
-                >
-                  {alert.active ? "Pause" : "Resume"}
-                </button>
+                <td className="px-4 py-3 text-gray-400">
+                  {lastTriggered}
+                </td>
 
-                <button
-                  disabled={isPending}
-                  onClick={() =>
-                    startTransition(() => deleteAlert(alert.id))
-                  }
-                  className="rounded border border-red-800 px-2 py-1 text-xs text-red-400 hover:bg-red-900/20"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
+                <td className="px-4 py-3 text-right space-x-2">
+                  <button
+                    disabled={isPending}
+                    onClick={() =>
+                      startTransition(() => toggleAlert(alert.id))
+                    }
+                    className="rounded border border-gray-700 px-2 py-1 text-xs hover:bg-gray-800"
+                  >
+                    {alert.active ? "Pause" : "Resume"}
+                  </button>
+
+                  <button
+                    disabled={isPending}
+                    onClick={() =>
+                      startTransition(() => deleteAlert(alert.id))
+                    }
+                    className="rounded border border-red-800 px-2 py-1 text-xs text-red-400 hover:bg-red-900/20"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
