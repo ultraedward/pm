@@ -19,15 +19,6 @@ export const authOptions: NextAuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 
-  jwt: {
-    async encode() {
-      throw new Error("JWT disabled");
-    },
-    async decode() {
-      throw new Error("JWT disabled");
-    },
-  },
-
   callbacks: {
     async redirect({ url, baseUrl }) {
       if (url === baseUrl || url === `${baseUrl}/`) {
