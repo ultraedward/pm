@@ -1,6 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { fetchPrices } from "@/lib/prices/fetchPrices";
-import { evaluateAlert } from "@/lib/alerts/evaluateAlert";
+import {
+  evaluateAlert,
+  type AlertDirection,
+} from "@/lib/alerts/evaluateAlert";
+
+function normalizeDirection(value: string): AlertDirection | null {
+  if (value === "above" || value === "below") {
+    return value;
+  }
+  return null;
+}
 
 export async function runCronJob() {
   const prices = await fetchPrices();
@@ -14,10 +24,13 @@ export async function runCronJob() {
     });
 
     for (const alert of alerts) {
+      const direction = normalizeDirection(alert.direction);
+      if (!direction) continue;
+
       const shouldTrigger = evaluateAlert(
         alert.price,
         p.price,
-        alert.direction
+        direction
       );
 
       if (!shouldTrigger) continue;
@@ -31,7 +44,4 @@ export async function runCronJob() {
     }
   }
 
-  return {
-    ok: true,
-  };
-}
+  return { ok: true };
