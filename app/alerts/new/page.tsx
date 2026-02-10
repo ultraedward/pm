@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/requireUser";
 import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
-import Link from "next/link";
 import { CreateAlertForm } from "@/components/CreateAlertForm";
 
 export default async function NewAlertPage() {
@@ -9,22 +9,50 @@ export default async function NewAlertPage() {
 
   if (!allowed) {
     return (
-      <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-bold">Upgrade required</h1>
+      <div className="mx-auto max-w-xl space-y-6 p-6">
+        <h1 className="text-2xl font-bold">Alert limit reached</h1>
 
         <p className="text-gray-400">
-          Free users can create up to 3 alerts.
+          Free accounts can create up to <strong>3 alerts</strong>.
         </p>
 
-        <Link
-          href="/pricing"
-          className="inline-block rounded bg-white px-4 py-2 text-sm font-medium text-black hover:bg-gray-200"
-        >
-          Upgrade to Pro
-        </Link>
+        <div className="rounded border border-gray-800 bg-gray-900 p-4 text-sm">
+          Upgrade to Pro to unlock unlimited alerts and advanced features.
+        </div>
+
+        <div className="flex gap-4">
+          <Link
+            href="/pricing"
+            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Upgrade to Pro
+          </Link>
+
+          <Link
+            href="/alerts"
+            className="rounded border border-gray-700 px-4 py-2 text-sm hover:bg-gray-900"
+          >
+            Back to alerts
+          </Link>
+        </div>
       </div>
     );
   }
 
-  return <CreateAlertForm />;
+  return (
+    <div className="mx-auto max-w-xl space-y-6 p-6">
+      <div>
+        <h1 className="text-2xl font-bold">Create alert</h1>
+        <p className="mt-1 text-gray-400 text-sm">
+          Get notified when prices cross your target.
+        </p>
+      </div>
+
+      <CreateAlertForm />
+
+      <div className="text-sm text-gray-500">
+        Alerts check prices automatically and notify you when triggered.
+      </div>
+    </div>
+  );
 }
