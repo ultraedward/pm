@@ -7,12 +7,16 @@ import { openBillingPortal } from "@/lib/stripe/openBillingPortal";
 export default async function PricingPage() {
   const user = await requireUser();
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      subscriptionStatus: true,
+      stripeCustomerId: true,
+    },
   });
 
-  const isPro = subscription?.status === "active";
-  const hasStripeCustomer = Boolean(subscription?.stripeCustomerId);
+  const isPro = dbUser?.subscriptionStatus === "active";
+  const hasStripeCustomer = Boolean(dbUser?.stripeCustomerId);
 
   async function upgradeAction() {
     "use server";
