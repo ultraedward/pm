@@ -15,29 +15,17 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "database",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
   },
 
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // If NextAuth is trying to redirect to the homepage,
-      // instead send the user back to alerts
-      if (url === baseUrl || url === `${baseUrl}/`) {
-        return `${baseUrl}/alerts`;
-      }
-
-      // Allow relative callback URLs
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`;
-      }
-
-      // Allow same-origin absolute URLs
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-
-      // Fallback safety
       return `${baseUrl}/alerts`;
     },
   },
