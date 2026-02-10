@@ -1,4 +1,8 @@
-// lib/auth.ts (or wherever authOptions live)
+import type { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
 
@@ -15,15 +19,12 @@ export const authOptions: NextAuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 
-  cookies: {
-    sessionToken: {
-      name: "__Secure-next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: true,
-      },
+  jwt: {
+    async encode() {
+      throw new Error("JWT disabled");
+    },
+    async decode() {
+      throw new Error("JWT disabled");
     },
   },
 
@@ -38,12 +39,3 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
-
-jwt: {
-  async encode() {
-    throw new Error("JWT disabled");
-  },
-  async decode() {
-    throw new Error("JWT disabled");
-  },
-},
