@@ -7,13 +7,6 @@ export function middleware(_req: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-      Match all routes EXCEPT:
-      - Next.js internals
-      - static files
-      - auth routes
-      - api routes
-    */
-    "/((?!_next/static|_next/image|favicon.ico|api/auth|api).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/auth).*)",
   ],
 };
