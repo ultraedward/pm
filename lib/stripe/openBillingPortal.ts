@@ -1,24 +1,29 @@
-"use server";
-
-import { stripe } from "./stripe";
-import { requireUser } from "@/lib/requireUser";
+import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/requireUser";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2023-10-16",
+});
 
 export async function openBillingPortal() {
   const user = await requireUser();
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      stripeCustomerId: true,
+    },
   });
 
-  if (!subscription?.stripeCustomerId) {
-    throw new Error("No Stripe customer found");
+  if (!dbUser?.stripeCustomerId) {
+    throw new Error("No Stripe customer found for user");
   }
 
-  const session = await stripe.billingPortal.sessions.create({
-    customer: subscription.stripeCustomerId,
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: dbUser.stripeCustomerId,
     return_url: `${process.env.NEXTAUTH_URL}/pricing`,
   });
 
-  return session.url;
+  return portalSession.url;
 }
