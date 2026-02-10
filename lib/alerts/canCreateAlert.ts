@@ -1,20 +1,21 @@
 import { prisma } from "@/lib/prisma";
 
 export async function canCreateAlert(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      alerts: {
-        where: { active: true },
-      },
-    },
-  });
+  const [alertCount, user] = await Promise.all([
+    prisma.alert.count({
+      where: { userId },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionStatus: true },
+    }),
+  ]);
 
-  if (!user) return false;
+  const isPaid = user?.subscriptionStatus === "active";
 
-  const isPro = user.subscriptionStatus === "active";
-
-  if (isPro) return true;
-
-  return user.alerts.length < 3;
+  return {
+    allowed: isPaid || alertCount < 3,
+    alertCount,
+    isPaid,
+  };
 }
