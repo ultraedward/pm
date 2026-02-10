@@ -1,41 +1,40 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const logs = await prisma.emailLog.findMany({
+  const logs = await prisma.alertTrigger.findMany({
     where: {
       alert: {
-        userId: session.user.id, // ✅ FIX
+        user: {
+          email: session.user.email,
+        },
       },
     },
-    include: {
-      alert: true,
-    },
     orderBy: {
-      createdAt: "desc",
+      triggeredAt: "desc",
     },
-    take: 50,
+    take: 100,
+    select: {
+      id: true,
+      price: true,
+      triggeredAt: true,
+      alert: {
+        select: {
+          metal: true,
+          direction: true,
+          price: true,
+        },
+      },
+    },
   });
 
-  const history = logs.map((log) => ({
-    id: log.id,
-    metal: log.alert?.metal ?? null,
-    target: log.alert?.price ?? null, // alias
-    direction: log.alert?.direction ?? null,
-    status: log.status,
-    sentAt: log.createdAt,
-  }));
-
-  return NextResponse.json({ history });
+  return NextResponse.json(logs);
 }
