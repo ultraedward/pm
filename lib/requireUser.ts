@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/authOptions";
+import { prisma } from "@/lib/prisma";
 
 export async function requireUser() {
   const session = await getServerSession(authOptions);
@@ -9,5 +10,13 @@ export async function requireUser() {
     redirect("/api/auth/signin?callbackUrl=/alerts");
   }
 
-  return session.user;
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!user) {
+    redirect("/api/auth/signin");
+  }
+
+  return user; // ✅ includes id
 }
