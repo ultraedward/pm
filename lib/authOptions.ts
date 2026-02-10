@@ -1,8 +1,4 @@
-import type { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-
+// lib/auth.ts (or wherever authOptions live)
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
 
@@ -15,18 +11,39 @@ export const authOptions: NextAuthOptions = {
 
   session: {
     strategy: "database",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-
-  jwt: {
-    secret: process.env.NEXTAUTH_SECRET,
   },
 
   secret: process.env.NEXTAUTH_SECRET,
 
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
+  },
+
   callbacks: {
     async redirect({ url, baseUrl }) {
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        return `${baseUrl}/alerts`;
+      }
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (url.startsWith(baseUrl)) return url;
       return `${baseUrl}/alerts`;
     },
   },
 };
+
+jwt: {
+  async encode() {
+    throw new Error("JWT disabled");
+  },
+  async decode() {
+    throw new Error("JWT disabled");
+  },
+},
