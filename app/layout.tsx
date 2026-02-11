@@ -1,5 +1,10 @@
 import "./globals.css";
-import NavBar from "@/components/NavBar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Precious Metals Prices & Alerts",
+  description: "Track gold and silver prices. Set alerts. Move when it matters.",
+};
 
 export default function RootLayout({
   children,
@@ -7,10 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-black text-white">
-        <NavBar />
-        <main className="p-6">{children}</main>
+    <html lang="en" className="bg-black text-white">
+      <body className="min-h-screen bg-black text-white antialiased">
+        {children}
       </body>
     </html>
   );
