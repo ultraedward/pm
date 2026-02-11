@@ -1,3 +1,5 @@
+@import "./styles/ui.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,6 +25,8 @@ html,
 body {
   background-color: var(--bg);
   color: var(--text);
+  margin: 0;
+  padding: 0;
 }
 
 .panel {
@@ -36,8 +40,8 @@ body {
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 }
-@import "./styles/ui.css";
+
 /* Table polish */
 .table-striped tbody tr:nth-child(odd) {
-  background-color: #fafafa;
+  background-color: #111; /* dark-safe */
 }
