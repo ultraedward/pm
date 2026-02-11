@@ -1,35 +1,15 @@
-import Stripe from "stripe";
-import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe/client";
 import { requireUser } from "@/lib/requireUser";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
+import { prisma } from "@/lib/prisma";
 
 export async function createCheckoutSession() {
   const user = await requireUser();
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: {
-      email: true,
-      stripeCustomerId: true,
-    },
-  });
+  let customerId = user.stripeCustomerId;
 
-  if (!dbUser) {
-    throw new Error("User not found");
-  }
-
-  let customerId = dbUser.stripeCustomerId;
-
-  // Create Stripe customer if missing
   if (!customerId) {
     const customer = await stripe.customers.create({
-      email: dbUser.email ?? undefined,
-      metadata: {
-        userId: user.id,
-      },
+      email: user.email ?? undefined,
     });
 
     customerId = customer.id;
@@ -45,7 +25,7 @@ export async function createCheckoutSession() {
     customer: customerId,
     line_items: [
       {
-        price: process.env.STRIPE_PRO_PRICE_ID!,
+        price: process.env.STRIPE_PRICE_ID!,
         quantity: 1,
       },
     ],
@@ -53,9 +33,5 @@ export async function createCheckoutSession() {
     cancel_url: `${process.env.NEXTAUTH_URL}/pricing`,
   });
 
-  if (!session.url) {
-    throw new Error("Stripe checkout session missing URL");
-  }
-
-  return session.url;
+  return session.url!;
 }
