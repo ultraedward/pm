@@ -1,8 +1,4 @@
-@import "./styles/ui.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --bg: #000;
@@ -13,35 +9,8 @@
   --accent: #22c55e;
 }
 
-:root[data-theme="light"] {
-  --bg: #fafafa;
-  --panel: #ffffff;
-  --border: #e5e7eb;
-  --text: #000;
-  --muted: #6b7280;
-}
-
 html,
 body {
   background-color: var(--bg);
   color: var(--text);
-  margin: 0;
-  padding: 0;
-}
-
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-}
-
-.badge-green {
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-}
-
-/* Table polish */
-.table-striped tbody tr:nth-child(odd) {
-  background-color: #111; /* dark-safe */
 }
