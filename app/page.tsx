@@ -2,9 +2,18 @@ import Link from "next/link";
 import { getMetalHistory } from "@/lib/prices/getMetalHistory";
 import { Sparkline } from "@/components/Sparkline";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
-  const goldHistory = await getMetalHistory("gold");
-  const silverHistory = await getMetalHistory("silver");
+  let goldHistory = [];
+  let silverHistory = [];
+
+  try {
+    goldHistory = await getMetalHistory("gold");
+    silverHistory = await getMetalHistory("silver");
+  } catch (error) {
+    console.error("Metal history error:", error);
+  }
 
   const goldLatest =
     goldHistory.length > 0
@@ -27,7 +36,6 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 space-y-16">
-      {/* HERO */}
       <section className="space-y-6 text-center">
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
           Track metals.
@@ -57,9 +65,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* METALS CARDS */}
       <section className="grid md:grid-cols-2 gap-8">
-        {/* GOLD */}
         <div className="panel p-6 space-y-6">
           <div className="flex justify-between items-center">
             <div>
@@ -80,13 +86,14 @@ export default async function HomePage() {
             </span>
           </div>
 
-          <Sparkline
-            data={goldHistory}
-            isPositive={goldPositive}
-          />
+          {goldHistory.length > 0 && (
+            <Sparkline
+              data={goldHistory}
+              isPositive={goldPositive}
+            />
+          )}
         </div>
 
-        {/* SILVER */}
         <div className="panel p-6 space-y-6">
           <div className="flex justify-between items-center">
             <div>
@@ -107,10 +114,12 @@ export default async function HomePage() {
             </span>
           </div>
 
-          <Sparkline
-            data={silverHistory}
-            isPositive={silverPositive}
-          />
+          {silverHistory.length > 0 && (
+            <Sparkline
+              data={silverHistory}
+              isPositive={silverPositive}
+            />
+          )}
         </div>
       </section>
     </div>
