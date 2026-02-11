@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Sparkline } from "@/components/Sparkline";
 
 async function getPrices() {
-  // Replace with your real DB or API call
   return {
     gold: 2045.12,
     silver: 24.87,
@@ -15,15 +14,30 @@ function generateMockData(base: number) {
   }));
 }
 
+function calculateChange(data: { value: number }[]) {
+  const first = data[0].value;
+  const last = data[data.length - 1].value;
+  const change = last - first;
+  const percent = (change / first) * 100;
+
+  return {
+    change,
+    percent,
+    isPositive: change >= 0,
+  };
+}
+
 export default async function HomePage() {
   const prices = await getPrices();
 
   const goldData = generateMockData(prices.gold);
   const silverData = generateMockData(prices.silver);
 
+  const goldChange = calculateChange(goldData);
+  const silverChange = calculateChange(silverData);
+
   return (
     <div className="relative overflow-hidden">
-      {/* Background glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.06),transparent_40%)]" />
 
       <div className="relative mx-auto max-w-6xl px-8 py-24 space-y-24">
@@ -62,30 +76,62 @@ export default async function HomePage() {
           <div className="space-y-6">
             <div className="text-sm tracking-widest text-gray-500">GOLD</div>
 
-            <div className="text-5xl font-semibold">
-              ${prices.gold.toFixed(2)}
+            <div className="flex items-end gap-4">
+              <div className="text-5xl font-semibold">
+                ${prices.gold.toFixed(2)}
+              </div>
+
+              <div
+                className={`text-sm font-medium ${
+                  goldChange.isPositive
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {goldChange.isPositive ? "▲" : "▼"}{" "}
+                {goldChange.percent.toFixed(2)}%
+              </div>
             </div>
 
-            <div className="text-gray-500 text-sm">Latest market price</div>
+            <div className="text-gray-500 text-sm">24h change</div>
 
-            <Sparkline data={goldData} />
+            <Sparkline
+              data={goldData}
+              isPositive={goldChange.isPositive}
+            />
           </div>
 
           {/* SILVER */}
           <div className="space-y-6">
             <div className="text-sm tracking-widest text-gray-500">SILVER</div>
 
-            <div className="text-5xl font-semibold">
-              ${prices.silver.toFixed(2)}
+            <div className="flex items-end gap-4">
+              <div className="text-5xl font-semibold">
+                ${prices.silver.toFixed(2)}
+              </div>
+
+              <div
+                className={`text-sm font-medium ${
+                  silverChange.isPositive
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {silverChange.isPositive ? "▲" : "▼"}{" "}
+                {silverChange.percent.toFixed(2)}%
+              </div>
             </div>
 
-            <div className="text-gray-500 text-sm">Latest market price</div>
+            <div className="text-gray-500 text-sm">24h change</div>
 
-            <Sparkline data={silverData} />
+            <Sparkline
+              data={silverData}
+              isPositive={silverChange.isPositive}
+            />
           </div>
         </div>
 
-        {/* PLAN SECTION */}
+        {/* PLAN */}
         <div className="border-t border-gray-800 pt-12 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex gap-20">
             <div>
