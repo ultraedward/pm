@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/requireUser";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { stripe } from "@/lib/stripe/client";
 
 export async function POST() {
   const user = await requireUser();
