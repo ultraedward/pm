@@ -1,160 +1,118 @@
 import Link from "next/link";
+import { getMetalHistory } from "@/lib/prices/getMetalHistory";
 import { Sparkline } from "@/components/Sparkline";
 
-async function getPrices() {
-  return {
-    gold: 2045.12,
-    silver: 24.87,
-  };
-}
-
-function generateMockData(base: number) {
-  return Array.from({ length: 20 }).map((_, i) => ({
-    value: base + Math.sin(i / 2) * 5 + Math.random() * 2,
-  }));
-}
-
-function calculateChange(data: { value: number }[]) {
-  const first = data[0].value;
-  const last = data[data.length - 1].value;
-  const change = last - first;
-  const percent = (change / first) * 100;
-
-  return {
-    change,
-    percent,
-    isPositive: change >= 0,
-  };
-}
-
 export default async function HomePage() {
-  const prices = await getPrices();
+  const goldHistory = await getMetalHistory("gold");
+  const silverHistory = await getMetalHistory("silver");
 
-  const goldData = generateMockData(prices.gold);
-  const silverData = generateMockData(prices.silver);
+  const goldLatest =
+    goldHistory.length > 0
+      ? goldHistory[goldHistory.length - 1].value
+      : 0;
 
-  const goldChange = calculateChange(goldData);
-  const silverChange = calculateChange(silverData);
+  const silverLatest =
+    silverHistory.length > 0
+      ? silverHistory[silverHistory.length - 1].value
+      : 0;
+
+  const goldStart =
+    goldHistory.length > 0 ? goldHistory[0].value : 0;
+
+  const silverStart =
+    silverHistory.length > 0 ? silverHistory[0].value : 0;
+
+  const goldPositive = goldLatest >= goldStart;
+  const silverPositive = silverLatest >= silverStart;
 
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.06),transparent_40%)]" />
+    <div className="mx-auto max-w-6xl px-6 py-16 space-y-16">
+      {/* HERO */}
+      <section className="space-y-6 text-center">
+        <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+          Track metals.
+          <br />
+          Move when it matters.
+        </h1>
 
-      <div className="relative mx-auto max-w-6xl px-8 py-24 space-y-24">
-        {/* HERO */}
-        <div className="space-y-8 max-w-3xl">
-          <h1 className="text-6xl md:text-7xl font-bold leading-tight tracking-tight">
-            Precious Metals.
-            <br />
-            <span className="text-gray-400">Under Control.</span>
-          </h1>
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          Live gold and silver pricing. Intelligent alerts.
+          Clean execution.
+        </p>
 
-          <p className="text-lg text-gray-400 max-w-xl">
-            Track gold and silver prices in real time. Set alerts. Move when it matters.
-          </p>
-
-          <div className="flex gap-4">
-            <Link
-              href="/alerts/new"
-              className="rounded-full bg-white px-6 py-3 text-black font-medium hover:bg-gray-200 transition"
-            >
-              Create Alert
-            </Link>
-
-            <Link
-              href="/alerts"
-              className="rounded-full border border-gray-700 px-6 py-3 text-white hover:border-gray-500 transition"
-            >
-              View Alerts
-            </Link>
-          </div>
-        </div>
-
-        {/* PRICES */}
-        <div className="grid md:grid-cols-2 gap-16">
-          {/* GOLD */}
-          <div className="space-y-6">
-            <div className="text-sm tracking-widest text-gray-500">GOLD</div>
-
-            <div className="flex items-end gap-4">
-              <div className="text-5xl font-semibold">
-                ${prices.gold.toFixed(2)}
-              </div>
-
-              <div
-                className={`text-sm font-medium ${
-                  goldChange.isPositive
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                {goldChange.isPositive ? "▲" : "▼"}{" "}
-                {goldChange.percent.toFixed(2)}%
-              </div>
-            </div>
-
-            <div className="text-gray-500 text-sm">24h change</div>
-
-            <Sparkline
-              data={goldData}
-              isPositive={goldChange.isPositive}
-            />
-          </div>
-
-          {/* SILVER */}
-          <div className="space-y-6">
-            <div className="text-sm tracking-widest text-gray-500">SILVER</div>
-
-            <div className="flex items-end gap-4">
-              <div className="text-5xl font-semibold">
-                ${prices.silver.toFixed(2)}
-              </div>
-
-              <div
-                className={`text-sm font-medium ${
-                  silverChange.isPositive
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                {silverChange.isPositive ? "▲" : "▼"}{" "}
-                {silverChange.percent.toFixed(2)}%
-              </div>
-            </div>
-
-            <div className="text-gray-500 text-sm">24h change</div>
-
-            <Sparkline
-              data={silverData}
-              isPositive={silverChange.isPositive}
-            />
-          </div>
-        </div>
-
-        {/* PLAN */}
-        <div className="border-t border-gray-800 pt-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex gap-20">
-            <div>
-              <div className="text-sm text-gray-500 tracking-widest">PLAN</div>
-              <div className="text-3xl font-semibold">FREE</div>
-            </div>
-
-            <div>
-              <div className="text-sm text-gray-500 tracking-widest">
-                ACTIVE ALERTS
-              </div>
-              <div className="text-3xl font-semibold">0</div>
-            </div>
-          </div>
+        <div className="flex justify-center gap-4 pt-4">
+          <Link
+            href="/alerts"
+            className="rounded bg-white px-6 py-3 text-sm font-medium text-black hover:bg-gray-200 transition"
+          >
+            View Alerts
+          </Link>
 
           <Link
             href="/pricing"
-            className="rounded-full bg-white px-8 py-3 text-black font-medium hover:bg-gray-200 transition"
+            className="rounded border border-gray-700 px-6 py-3 text-sm text-gray-300 hover:bg-gray-800 transition"
           >
-            Upgrade to Pro
+            View Plans
           </Link>
         </div>
-      </div>
+      </section>
+
+      {/* METALS CARDS */}
+      <section className="grid md:grid-cols-2 gap-8">
+        {/* GOLD */}
+        <div className="panel p-6 space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-sm text-gray-400">Gold (XAU)</div>
+              <div className="text-3xl font-bold">
+                ${goldLatest.toFixed(2)}
+              </div>
+            </div>
+
+            <span
+              className={`text-sm font-medium ${
+                goldPositive
+                  ? "text-green-400"
+                  : "text-red-400"
+              }`}
+            >
+              {goldPositive ? "▲ Up" : "▼ Down"}
+            </span>
+          </div>
+
+          <Sparkline
+            data={goldHistory}
+            isPositive={goldPositive}
+          />
+        </div>
+
+        {/* SILVER */}
+        <div className="panel p-6 space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-sm text-gray-400">Silver (XAG)</div>
+              <div className="text-3xl font-bold">
+                ${silverLatest.toFixed(2)}
+              </div>
+            </div>
+
+            <span
+              className={`text-sm font-medium ${
+                silverPositive
+                  ? "text-green-400"
+                  : "text-red-400"
+              }`}
+            >
+              {silverPositive ? "▲ Up" : "▼ Down"}
+            </span>
+          </div>
+
+          <Sparkline
+            data={silverHistory}
+            isPositive={silverPositive}
+          />
+        </div>
+      </section>
     </div>
   );
 }
