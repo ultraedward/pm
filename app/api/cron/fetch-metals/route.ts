@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const runtime = "nodejs"; // required for Prisma on Vercel
+function shouldTrigger(
+  direction: string,
+  target: number,
+  current: number
+) {
+  if (direction === "above") return current >= target;
+  if (direction === "below") return current <= target;
+  return false;
+}
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -11,75 +19,72 @@ export async function GET(req: Request) {
   }
 
   try {
-    if (!process.env.METALS_API_KEY) {
-      throw new Error("Missing METALS_API_KEY");
-    }
+    // Fetch prices from Metals API
+    const res = await fetch(
+      `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`
+    );
 
-    const url = `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`;
-
-    const res = await fetch(url, {
-      method: "GET",
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Metals API failed: ${text}`);
-    }
+    if (!res.ok) throw new Error("Metals API failed");
 
     const data = await res.json();
-
-    console.log("Metals API response:", JSON.stringify(data, null, 2));
-
-    if (!data.success) {
-      throw new Error("Metals API returned success=false");
-    }
-
-    if (!data.rates?.XAU || !data.rates?.XAG) {
-      throw new Error("Missing XAU or XAG in response");
-    }
-
-    /**
-     * Metals API with base=USD returns:
-     * rates.XAU = how much 1 USD is worth in gold
-     * To get USD per ounce:
-     * price = 1 / rate
-     */
 
     const goldPrice = 1 / data.rates.XAU;
     const silverPrice = 1 / data.rates.XAG;
 
-    // Basic sanity guardrails
-    if (goldPrice < 1000 || goldPrice > 10000) {
-      throw new Error(`Gold price looks invalid: ${goldPrice}`);
-    }
-
-    if (silverPrice < 5 || silverPrice > 500) {
-      throw new Error(`Silver price looks invalid: ${silverPrice}`);
-    }
-
+    // Save prices
     await prisma.price.createMany({
       data: [
-        {
-          metal: "gold",
-          price: goldPrice,
-          source: "metals-api",
-        },
-        {
-          metal: "silver",
-          price: silverPrice,
-          source: "metals-api",
-        },
-      ],
+        { metal: "gold", price: goldPrice, source: "metals-api" },
+        { metal: "silver", price: silverPrice, source: "metals-api" }
+      ]
     });
 
-    return NextResponse.json({
-      success: true,
-      gold: goldPrice,
-      silver: silverPrice,
+    // Evaluate alerts
+    const activeAlerts = await prisma.alert.findMany({
+      where: { active: true }
     });
-  } catch (err: any) {
-    console.error("Cron failed:", err.message || err);
+
+    for (const alert of activeAlerts) {
+      const current =
+        alert.metal === "gold" ? goldPrice : silverPrice;
+
+      const triggered = shouldTrigger(
+        alert.direction,
+        alert.price,
+        current
+      );
+
+      if (!triggered) continue;
+
+      // Prevent duplicate firing in short window
+      if (alert.lastTriggeredAt) {
+        const hoursSinceLast =
+          (Date.now() - new Date(alert.lastTriggeredAt).getTime()) /
+          (1000 * 60 * 60);
+
+        if (hoursSinceLast < 6) continue;
+      }
+
+      // Create trigger record
+      await prisma.alertTrigger.create({
+        data: {
+          alertId: alert.id,
+          price: current
+        }
+      });
+
+      // Update alert
+      await prisma.alert.update({
+        where: { id: alert.id },
+        data: {
+          lastTriggeredAt: new Date()
+        }
+      });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Cron failed:", err);
     return new NextResponse("Cron failed", { status: 500 });
   }
 }
