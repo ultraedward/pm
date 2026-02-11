@@ -1,127 +1,181 @@
+import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import { getMetalHistory } from "@/lib/prices/getMetalHistory";
-import { Sparkline } from "@/components/Sparkline";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  let goldHistory = [];
-  let silverHistory = [];
+const prisma = new PrismaClient();
 
+async function getLatestPrice(metal: "gold" | "silver") {
   try {
-    goldHistory = await getMetalHistory("gold");
-    silverHistory = await getMetalHistory("silver");
-  } catch (error) {
-    console.error("Metal history error:", error);
+    const row = await prisma.price.findFirst({
+      where: { metal },
+      orderBy: { timestamp: "desc" },
+    });
+
+    return row?.price ?? 0;
+  } catch (err) {
+    console.error("Failed to fetch latest price:", err);
+    return 0;
   }
+}
 
-  const goldLatest =
-    goldHistory.length > 0
-      ? goldHistory[goldHistory.length - 1].value
-      : 0;
+async function getHistory(metal: "gold" | "silver") {
+  try {
+    return await prisma.price.findMany({
+      where: { metal },
+      orderBy: { timestamp: "asc" },
+      take: 24,
+    });
+  } catch (err) {
+    console.error("Failed to fetch metal history:", err);
+    return [];
+  }
+}
 
-  const silverLatest =
-    silverHistory.length > 0
-      ? silverHistory[silverHistory.length - 1].value
-      : 0;
+function Sparkline({ data }: { data: number[] }) {
+  if (!data.length) return null;
 
-  const goldStart =
-    goldHistory.length > 0 ? goldHistory[0].value : 0;
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
 
-  const silverStart =
-    silverHistory.length > 0 ? silverHistory[0].value : 0;
-
-  const goldPositive = goldLatest >= goldStart;
-  const silverPositive = silverLatest >= silverStart;
+  const points = data
+    .map((value, i) => {
+      const x = (i / (data.length - 1)) * 100;
+      const y = 100 - ((value - min) / range) * 100;
+      return `${x},${y}`;
+    })
+    .join(" ");
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16 space-y-16">
-      <section className="space-y-6 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-          Track metals.
-          <br />
-          Move when it matters.
-        </h1>
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="h-16 w-full"
+    >
+      <polyline
+        fill="none"
+        stroke="white"
+        strokeWidth="2"
+        points={points}
+      />
+    </svg>
+  );
+}
 
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Live gold and silver pricing. Intelligent alerts.
-          Clean execution.
-        </p>
+export default async function HomePage() {
+  const goldPrice = await getLatestPrice("gold");
+  const silverPrice = await getLatestPrice("silver");
 
-        <div className="flex justify-center gap-4 pt-4">
-          <Link
-            href="/alerts"
-            className="rounded bg-white px-6 py-3 text-sm font-medium text-black hover:bg-gray-200 transition"
-          >
-            View Alerts
-          </Link>
+  const goldHistoryRows = await getHistory("gold");
+  const silverHistoryRows = await getHistory("silver");
+
+  const goldHistory = goldHistoryRows.map((r) => r.price);
+  const silverHistory = silverHistoryRows.map((r) => r.price);
+
+  return (
+    <main className="min-h-screen bg-black text-white px-8 py-16">
+      <div className="max-w-6xl mx-auto">
+
+        {/* HERO */}
+        <section className="mb-20">
+          <h1 className="text-6xl font-bold tracking-tight mb-6">
+            Track metals.
+            <br />
+            <span className="text-gray-400">
+              Move when it matters.
+            </span>
+          </h1>
+
+          <p className="text-lg text-gray-400 max-w-xl mb-8">
+            Live gold and silver pricing. Intelligent alerts. Clean execution.
+          </p>
+
+          <div className="flex gap-4">
+            <Link
+              href="/alerts"
+              className="bg-white text-black px-6 py-3 rounded-full font-medium hover:opacity-90 transition"
+            >
+              View Alerts
+            </Link>
+
+            <Link
+              href="/pricing"
+              className="border border-gray-600 px-6 py-3 rounded-full hover:bg-gray-900 transition"
+            >
+              View Plans
+            </Link>
+          </div>
+        </section>
+
+        {/* METAL CARDS */}
+        <section className="grid md:grid-cols-2 gap-16 mb-16">
+          {/* GOLD */}
+          <div>
+            <div className="text-sm tracking-widest text-gray-500 mb-2">
+              Gold (XAU)
+            </div>
+
+            <div className="text-4xl font-bold mb-2">
+              ${goldPrice.toFixed(2)}
+            </div>
+
+            <div className="text-gray-500 text-sm mb-4">
+              Latest market price
+            </div>
+
+            <Sparkline data={goldHistory} />
+          </div>
+
+          {/* SILVER */}
+          <div>
+            <div className="text-sm tracking-widest text-gray-500 mb-2">
+              Silver (XAG)
+            </div>
+
+            <div className="text-4xl font-bold mb-2">
+              ${silverPrice.toFixed(2)}
+            </div>
+
+            <div className="text-gray-500 text-sm mb-4">
+              Latest market price
+            </div>
+
+            <Sparkline data={silverHistory} />
+          </div>
+        </section>
+
+        <hr className="border-gray-800 mb-12" />
+
+        {/* PLAN SUMMARY */}
+        <section className="flex justify-between items-center">
+          <div>
+            <div className="text-sm tracking-widest text-gray-500">
+              PLAN
+            </div>
+            <div className="text-2xl font-semibold">
+              FREE
+            </div>
+          </div>
+
+          <div>
+            <div className="text-sm tracking-widest text-gray-500">
+              ACTIVE ALERTS
+            </div>
+            <div className="text-2xl font-semibold">
+              0
+            </div>
+          </div>
 
           <Link
             href="/pricing"
-            className="rounded border border-gray-700 px-6 py-3 text-sm text-gray-300 hover:bg-gray-800 transition"
+            className="bg-white text-black px-6 py-3 rounded-full font-medium hover:opacity-90 transition"
           >
-            View Plans
+            Upgrade to Pro
           </Link>
-        </div>
-      </section>
+        </section>
 
-      <section className="grid md:grid-cols-2 gap-8">
-        <div className="panel p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="text-sm text-gray-400">Gold (XAU)</div>
-              <div className="text-3xl font-bold">
-                ${goldLatest.toFixed(2)}
-              </div>
-            </div>
-
-            <span
-              className={`text-sm font-medium ${
-                goldPositive
-                  ? "text-green-400"
-                  : "text-red-400"
-              }`}
-            >
-              {goldPositive ? "▲ Up" : "▼ Down"}
-            </span>
-          </div>
-
-          {goldHistory.length > 0 && (
-            <Sparkline
-              data={goldHistory}
-              isPositive={goldPositive}
-            />
-          )}
-        </div>
-
-        <div className="panel p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="text-sm text-gray-400">Silver (XAG)</div>
-              <div className="text-3xl font-bold">
-                ${silverLatest.toFixed(2)}
-              </div>
-            </div>
-
-            <span
-              className={`text-sm font-medium ${
-                silverPositive
-                  ? "text-green-400"
-                  : "text-red-400"
-              }`}
-            >
-              {silverPositive ? "▲ Up" : "▼ Down"}
-            </span>
-          </div>
-
-          {silverHistory.length > 0 && (
-            <Sparkline
-              data={silverHistory}
-              isPositive={silverPositive}
-            />
-          )}
-        </div>
-      </section>
-    </div>
+      </div>
+    </main>
   );
 }
