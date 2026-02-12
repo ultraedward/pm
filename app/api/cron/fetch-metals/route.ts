@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendAlertEmail } from "@/lib/email/sendAlertEmail";
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -9,7 +10,9 @@ export async function GET(req: Request) {
   }
 
   try {
-    // Fetch latest prices
+    // --------------------------------------------------
+    // 1️⃣ Fetch latest metal prices
+    // --------------------------------------------------
     const res = await fetch(
       `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`
     );
@@ -20,10 +23,13 @@ export async function GET(req: Request) {
 
     const data = await res.json();
 
+    // metals-api returns inverse rate (USD base)
     const goldPrice = 1 / data.rates.XAU;
     const silverPrice = 1 / data.rates.XAG;
 
-    // Insert price rows
+    // --------------------------------------------------
+    // 2️⃣ Store prices
+    // --------------------------------------------------
     await prisma.price.createMany({
       data: [
         { metal: "gold", price: goldPrice, source: "metals-api" },
@@ -31,39 +37,34 @@ export async function GET(req: Request) {
       ],
     });
 
-    // Calculate 24h percent change
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-    const [goldOld, silverOld] = await Promise.all([
-      prisma.price.findFirst({
+    // --------------------------------------------------
+    // 3️⃣ Calculate 24h percent change
+    // --------------------------------------------------
+    async function get24hPercent(metal: string, current: number) {
+      const first24h = await prisma.price.findFirst({
         where: {
-          metal: "gold",
-          timestamp: { lte: twentyFourHoursAgo },
+          metal,
+          timestamp: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          },
         },
-        orderBy: { timestamp: "desc" },
-      }),
-      prisma.price.findFirst({
-        where: {
-          metal: "silver",
-          timestamp: { lte: twentyFourHoursAgo },
-        },
-        orderBy: { timestamp: "desc" },
-      }),
-    ]);
+        orderBy: { timestamp: "asc" },
+      });
 
-    const gold24hPercent =
-      goldOld && goldOld.price
-        ? ((goldPrice - goldOld.price) / goldOld.price) * 100
-        : 0;
+      if (!first24h) return 0;
 
-    const silver24hPercent =
-      silverOld && silverOld.price
-        ? ((silverPrice - silverOld.price) / silverOld.price) * 100
-        : 0;
+      return ((current - first24h.price) / first24h.price) * 100;
+    }
 
-    // Evaluate alerts
+    const goldPercent = await get24hPercent("gold", goldPrice);
+    const silverPercent = await get24hPercent("silver", silverPrice);
+
+    // --------------------------------------------------
+    // 4️⃣ Evaluate alerts
+    // --------------------------------------------------
     const alerts = await prisma.alert.findMany({
       where: { active: true },
+      include: { user: true },
     });
 
     let triggeredCount = 0;
@@ -73,28 +74,43 @@ export async function GET(req: Request) {
         alert.metal === "gold" ? goldPrice : silverPrice;
 
       const currentPercent =
-        alert.metal === "gold" ? gold24hPercent : silver24hPercent;
+        alert.metal === "gold" ? goldPercent : silverPercent;
 
       let shouldTrigger = false;
 
-      // Absolute price alerts
+      // -------------------------------
+      // PRICE ALERT
+      // -------------------------------
       if (alert.type === "price" && alert.price !== null) {
-        if (alert.direction === "above" && currentPrice >= alert.price) {
+        if (
+          alert.direction === "above" &&
+          currentPrice >= alert.price
+        ) {
           shouldTrigger = true;
         }
-        if (alert.direction === "below" && currentPrice <= alert.price) {
+
+        if (
+          alert.direction === "below" &&
+          currentPrice <= alert.price
+        ) {
           shouldTrigger = true;
         }
       }
 
-      // Percent alerts
-      if (alert.type === "percent" && alert.percentValue !== null) {
+      // -------------------------------
+      // PERCENT ALERT
+      // -------------------------------
+      if (
+        alert.type === "percent" &&
+        alert.percentValue !== null
+      ) {
         if (
           alert.direction === "above" &&
           currentPercent >= alert.percentValue
         ) {
           shouldTrigger = true;
         }
+
         if (
           alert.direction === "below" &&
           currentPercent <= -alert.percentValue
@@ -103,7 +119,18 @@ export async function GET(req: Request) {
         }
       }
 
-      if (shouldTrigger) {
+      // -------------------------------
+      // Prevent re-trigger spam (1 per 6h)
+      // -------------------------------
+      const recentlyTriggered =
+        alert.lastTriggeredAt &&
+        Date.now() -
+          new Date(alert.lastTriggeredAt).getTime() <
+          6 * 60 * 60 * 1000;
+
+      if (shouldTrigger && !recentlyTriggered) {
+        triggeredCount++;
+
         await prisma.alertTrigger.create({
           data: {
             alertId: alert.id,
@@ -113,22 +140,30 @@ export async function GET(req: Request) {
 
         await prisma.alert.update({
           where: { id: alert.id },
-          data: {
-            active: false,
-            lastTriggeredAt: new Date(),
-          },
+          data: { lastTriggeredAt: new Date() },
         });
 
-        triggeredCount++;
+        if (alert.user.email) {
+          await sendAlertEmail({
+            to: alert.user.email,
+            metal: alert.metal,
+            direction: alert.direction,
+            currentPrice,
+            percentChange: currentPercent,
+          });
+        }
       }
     }
 
+    // --------------------------------------------------
+    // 5️⃣ Response
+    // --------------------------------------------------
     return NextResponse.json({
       success: true,
       gold: goldPrice,
       silver: silverPrice,
-      gold24hPercent,
-      silver24hPercent,
+      gold24hPercent: goldPercent,
+      silver24hPercent: silverPercent,
       alertsTriggered: triggeredCount,
     });
   } catch (err) {
