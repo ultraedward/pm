@@ -1,107 +1,95 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import {
-  LineChart,
-  Line,
   ResponsiveContainer,
-  Tooltip,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
+  Tooltip,
   CartesianGrid,
-  Area,
 } from "recharts";
+import { useState } from "react";
 
 type PricePoint = {
+  timestamp: string;
   price: number;
-  timestamp: Date;
 };
 
-type Props = {
-  goldHistory: PricePoint[];
-  silverHistory: PricePoint[];
+type MetalCardProps = {
+  name: "gold" | "silver";
+  label: string;
+  price: number;
+  percentChange: number;
+  history1D: PricePoint[];
+  history7D: PricePoint[];
+  history30D: PricePoint[];
 };
-
-type Range = "1D" | "7D" | "30D";
-
-function filterByRange(data: PricePoint[], range: Range) {
-  if (!data.length) return [];
-
-  const now = new Date();
-  const cutoff = new Date(now);
-
-  if (range === "1D") cutoff.setDate(now.getDate() - 1);
-  if (range === "7D") cutoff.setDate(now.getDate() - 7);
-  if (range === "30D") cutoff.setDate(now.getDate() - 30);
-
-  return data.filter((d) => new Date(d.timestamp) >= cutoff);
-}
 
 function MetalCard({
   name,
-  history,
-  range,
-  setRange,
-}: {
-  name: string;
-  history: PricePoint[];
-  range: Range;
-  setRange: (r: Range) => void;
-}) {
-  const filtered = useMemo(
-    () => filterByRange(history, range),
-    [history, range]
-  );
+  label,
+  price,
+  percentChange,
+  history1D,
+  history7D,
+  history30D,
+}: MetalCardProps) {
+  const [range, setRange] = useState<"1D" | "7D" | "30D">("1D");
 
-  const current =
-    filtered.length > 0
-      ? filtered[filtered.length - 1].price
-      : 0;
+  const history =
+    range === "1D"
+      ? history1D
+      : range === "7D"
+      ? history7D
+      : history30D;
 
-  const first =
-    filtered.length > 0 ? filtered[0].price : 0;
+  const isUp = percentChange >= 0;
 
-  const changePercent =
-    first !== 0 ? ((current - first) / first) * 100 : 0;
+  // 🎨 Distinct metal styling
+  const strokeColor =
+    name === "gold" ? "#d4af37" : "#cfd2d6";
 
-  const isUp = changePercent >= 0;
+  const glowColor =
+    name === "gold"
+      ? "rgba(212,175,55,0.25)"
+      : "rgba(207,210,214,0.25)";
 
   const gradientId = `${name}-gradient`;
 
   return (
-    <div className="panel p-6 space-y-6">
+    <div className="rounded-2xl border border-neutral-800 bg-black p-8 space-y-6 transition hover:border-neutral-700 hover:shadow-[0_0_40px_rgba(255,255,255,0.03)]">
+      
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-2xl font-semibold capitalize">
-            {name}
+          <h2 className="text-xl font-semibold capitalize">
+            {label}
           </h2>
 
-          <div className="text-3xl font-bold mt-2">
-            ${current.toLocaleString(undefined, {
-              maximumFractionDigits: 2,
-            })}
+          <div className="text-4xl font-bold mt-2 tracking-tight">
+            ${price.toLocaleString()}
           </div>
 
           <div
-            className={`text-sm font-medium mt-1 ${
-              isUp ? "text-green-400" : "text-red-400"
+            className={`mt-2 text-sm font-medium ${
+              isUp ? "text-green-500" : "text-red-500"
             }`}
           >
-            {isUp ? "▲" : "▼"} {changePercent.toFixed(2)}%
+            {isUp ? "▲" : "▼"} {percentChange.toFixed(2)}%
           </div>
         </div>
 
         {/* Range Toggle */}
-        <div className="flex gap-2 text-xs">
-          {(["1D", "7D", "30D"] as Range[]).map((r) => (
+        <div className="flex gap-2">
+          {["1D", "7D", "30D"].map((r) => (
             <button
               key={r}
-              onClick={() => setRange(r)}
-              className={`px-3 py-1 rounded-full border transition ${
+              onClick={() => setRange(r as any)}
+              className={`px-3 py-1 text-xs rounded-full border transition ${
                 range === r
-                  ? "bg-white text-black"
-                  : "border-gray-700 text-gray-400 hover:border-gray-500"
+                  ? "bg-white text-black border-white"
+                  : "border-neutral-700 text-neutral-400 hover:border-neutral-500"
               }`}
             >
               {r}
@@ -111,20 +99,25 @@ function MetalCard({
       </div>
 
       {/* Chart */}
-      <div className="h-44">
+      <div className="h-48 relative">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={filtered}>
-            {/* Gradient */}
+          <AreaChart data={history}>
             <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient
+                id={gradientId}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
                 <stop
                   offset="0%"
-                  stopColor={isUp ? "#22c55e" : "#ef4444"}
-                  stopOpacity={0.35}
+                  stopColor={strokeColor}
+                  stopOpacity={0.4}
                 />
                 <stop
                   offset="100%"
-                  stopColor={isUp ? "#22c55e" : "#ef4444"}
+                  stopColor={strokeColor}
                   stopOpacity={0}
                 />
               </linearGradient>
@@ -136,71 +129,94 @@ function MetalCard({
               vertical={false}
             />
 
-            <XAxis hide dataKey="timestamp" />
-            <YAxis hide domain={["auto", "auto"]} />
+            <XAxis
+              dataKey="timestamp"
+              tick={false}
+              axisLine={false}
+            />
+
+            <YAxis
+              domain={["auto", "auto"]}
+              tick={false}
+              axisLine={false}
+            />
 
             <Tooltip
               contentStyle={{
-                backgroundColor: "#0b0b0b",
-                border: "1px solid #1f1f1f",
-                borderRadius: "12px",
-                fontSize: "12px",
+                background: "#111",
+                border: "1px solid #333",
+                borderRadius: "8px",
               }}
-              formatter={(value: number) =>
-                `$${value.toFixed(2)}`
-              }
-              labelFormatter={() => ""}
-              cursor={{
-                stroke: "#6b7280",
-                strokeWidth: 1,
-                strokeDasharray: "4 4",
-              }}
+              labelStyle={{ color: "#999" }}
+              formatter={(value: number) => [
+                `$${value.toFixed(2)}`,
+                label,
+              ]}
             />
 
             <Area
               type="monotone"
               dataKey="price"
-              stroke="none"
-              fill={`url(#${gradientId})`}
-              isAnimationActive
-              animationDuration={600}
-            />
-
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke={isUp ? "#22c55e" : "#ef4444"}
+              stroke={strokeColor}
               strokeWidth={2}
+              fill={`url(#${gradientId})`}
               dot={false}
               isAnimationActive
-              animationDuration={600}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
+
+        {/* Subtle Metal Glow */}
+        <div
+          className="absolute inset-0 pointer-events-none rounded-2xl"
+          style={{
+            boxShadow: `0 0 60px ${glowColor}`,
+          }}
+        />
       </div>
     </div>
   );
 }
 
 export default function MetalDashboard({
-  goldHistory,
-  silverHistory,
-}: Props) {
-  const [range, setRange] = useState<Range>("1D");
-
+  gold,
+  silver,
+}: {
+  gold: {
+    price: number;
+    percentChange: number;
+    history1D: PricePoint[];
+    history7D: PricePoint[];
+    history30D: PricePoint[];
+  };
+  silver: {
+    price: number;
+    percentChange: number;
+    history1D: PricePoint[];
+    history7D: PricePoint[];
+    history30D: PricePoint[];
+  };
+}) {
   return (
-    <div className="grid md:grid-cols-2 gap-8">
+    <div className="grid md:grid-cols-2 gap-10">
       <MetalCard
         name="gold"
-        history={goldHistory}
-        range={range}
-        setRange={setRange}
+        label="Gold (XAU)"
+        price={gold.price}
+        percentChange={gold.percentChange}
+        history1D={gold.history1D}
+        history7D={gold.history7D}
+        history30D={gold.history30D}
       />
+
       <MetalCard
         name="silver"
-        history={silverHistory}
-        range={range}
-        setRange={setRange}
+        label="Silver (XAG)"
+        price={silver.price}
+        percentChange={silver.percentChange}
+        history1D={silver.history1D}
+        history7D={silver.history7D}
+        history30D={silver.history30D}
       />
     </div>
   );
