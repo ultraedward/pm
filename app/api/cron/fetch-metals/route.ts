@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendAlertEmail } from "@/lib/alerts/sendAlertEmail";
+
+const COOLDOWN_MINUTES = 60; // prevent repeat spam
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -10,108 +11,157 @@ export async function GET(req: Request) {
   }
 
   try {
+    // -----------------------------
     // 1️⃣ Fetch latest prices
+    // -----------------------------
     const res = await fetch(
       `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`
     );
 
-    if (!res.ok) {
-      throw new Error("Metals API failed");
-    }
+    if (!res.ok) throw new Error("Metals API failed");
 
     const data = await res.json();
 
-    // API returns USD per 1 metal unit inverted
     const goldPrice = 1 / data.rates.XAU;
     const silverPrice = 1 / data.rates.XAG;
 
-    const now = new Date();
-
-    // 2️⃣ Store prices
+    // Save prices
     await prisma.price.createMany({
       data: [
-        {
-          metal: "gold",
-          price: goldPrice,
-          source: "metals-api",
-          timestamp: now,
-        },
-        {
-          metal: "silver",
-          price: silverPrice,
-          source: "metals-api",
-          timestamp: now,
-        },
+        { metal: "gold", price: goldPrice, source: "metals-api" },
+        { metal: "silver", price: silverPrice, source: "metals-api" },
       ],
     });
 
-    // 3️⃣ Get active alerts with user
+    // -----------------------------
+    // 2️⃣ Get 24h ago prices
+    // -----------------------------
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const [goldOld, silverOld] = await Promise.all([
+      prisma.price.findFirst({
+        where: {
+          metal: "gold",
+          timestamp: { lte: twentyFourHoursAgo },
+        },
+        orderBy: { timestamp: "desc" },
+      }),
+      prisma.price.findFirst({
+        where: {
+          metal: "silver",
+          timestamp: { lte: twentyFourHoursAgo },
+        },
+        orderBy: { timestamp: "desc" },
+      }),
+    ]);
+
+    const goldPercent =
+      goldOld && goldOld.price
+        ? ((goldPrice - goldOld.price) / goldOld.price) * 100
+        : 0;
+
+    const silverPercent =
+      silverOld && silverOld.price
+        ? ((silverPrice - silverOld.price) / silverOld.price) * 100
+        : 0;
+
+    // -----------------------------
+    // 3️⃣ Evaluate alerts
+    // -----------------------------
     const alerts = await prisma.alert.findMany({
       where: { active: true },
       include: { user: true },
     });
 
-    let triggeredCount = 0;
+    let alertsTriggered = 0;
+    const now = new Date();
 
-    // 4️⃣ Evaluate alerts
     for (const alert of alerts) {
       const currentPrice =
         alert.metal === "gold" ? goldPrice : silverPrice;
 
-      const shouldTrigger =
-        (alert.direction === "above" &&
-          currentPrice >= alert.price) ||
-        (alert.direction === "below" &&
-          currentPrice <= alert.price);
+      const percentChange =
+        alert.metal === "gold" ? goldPercent : silverPercent;
 
-      if (!shouldTrigger) continue;
-
-      // ⏱ Cooldown protection (30 min default)
-      const cooldownMinutes =
-        Number(process.env.ALERT_COOLDOWN_MIN) || 30;
-
+      // Cooldown check
       if (
         alert.lastTriggeredAt &&
-        new Date().getTime() -
-          new Date(alert.lastTriggeredAt).getTime() <
-          cooldownMinutes * 60 * 1000
+        now.getTime() - alert.lastTriggeredAt.getTime() <
+          COOLDOWN_MINUTES * 60 * 1000
       ) {
         continue;
       }
 
-      // 5️⃣ Create trigger record
-      await prisma.alertTrigger.create({
-        data: {
-          alertId: alert.id,
-          price: currentPrice,
-          triggeredAt: now,
-        },
-      });
+      let shouldTrigger = false;
 
-      // 6️⃣ Update lastTriggeredAt
-      await prisma.alert.update({
-        where: { id: alert.id },
-        data: { lastTriggeredAt: now },
-      });
+      // -----------------------------
+      // PRICE ALERT
+      // -----------------------------
+      if (alert.type === "price" && alert.price != null) {
+        if (
+          alert.direction === "above" &&
+          currentPrice >= alert.price
+        ) {
+          shouldTrigger = true;
+        }
 
-      // 7️⃣ Send email
-      if (alert.user.email) {
-        await sendAlertEmail({
-          to: alert.user.email,
-          metal: alert.metal,
-          price: currentPrice,
-          direction: alert.direction,
-        });
+        if (
+          alert.direction === "below" &&
+          currentPrice <= alert.price
+        ) {
+          shouldTrigger = true;
+        }
       }
 
-      triggeredCount++;
+      // -----------------------------
+      // PERCENT ALERT (24h move)
+      // -----------------------------
+      if (
+        alert.type === "percent" &&
+        alert.percentValue != null
+      ) {
+        if (
+          alert.direction === "above" &&
+          percentChange >= alert.percentValue
+        ) {
+          shouldTrigger = true;
+        }
+
+        if (
+          alert.direction === "below" &&
+          percentChange <= -alert.percentValue
+        ) {
+          shouldTrigger = true;
+        }
+      }
+
+      // -----------------------------
+      // TRIGGER
+      // -----------------------------
+      if (shouldTrigger) {
+        await prisma.alertTrigger.create({
+          data: {
+            alertId: alert.id,
+            price: currentPrice,
+          },
+        });
+
+        await prisma.alert.update({
+          where: { id: alert.id },
+          data: { lastTriggeredAt: now },
+        });
+
+        alertsTriggered++;
+      }
     }
 
     return NextResponse.json({
       success: true,
       gold: goldPrice,
       silver: silverPrice,
-      alertsTriggered: triggeredCount,
+      gold24hPercent: goldPercent,
+      silver24hPercent: silverPercent,
+      alertsTriggered,
     });
   } catch (err) {
     console.error("Cron failed:", err);
