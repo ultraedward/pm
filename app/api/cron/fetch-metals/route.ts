@@ -9,9 +9,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    // -------------------------------------
-    // 1️⃣ Fetch latest prices
-    // -------------------------------------
+    // Fetch latest prices
     const res = await fetch(
       `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`
     );
@@ -25,80 +23,45 @@ export async function GET(req: Request) {
     const goldPrice = 1 / data.rates.XAU;
     const silverPrice = 1 / data.rates.XAG;
 
-    // -------------------------------------
-    // 2️⃣ Insert new price rows
-    // -------------------------------------
+    // Insert price rows
     await prisma.price.createMany({
       data: [
-        {
-          metal: "gold",
-          price: goldPrice,
-          source: "metals-api",
-        },
-        {
-          metal: "silver",
-          price: silverPrice,
-          source: "metals-api",
-        },
+        { metal: "gold", price: goldPrice, source: "metals-api" },
+        { metal: "silver", price: silverPrice, source: "metals-api" },
       ],
     });
 
-    // -------------------------------------
-    // 3️⃣ Get price closest to 24h ago
-    // -------------------------------------
+    // Calculate 24h percent change
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const [goldOld, silverOld] = await Promise.all([
       prisma.price.findFirst({
         where: {
           metal: "gold",
-          timestamp: {
-            gte: new Date(twentyFourHoursAgo.getTime() - 60 * 60 * 1000),
-            lte: new Date(twentyFourHoursAgo.getTime() + 60 * 60 * 1000),
-          },
+          timestamp: { lte: twentyFourHoursAgo },
         },
         orderBy: { timestamp: "desc" },
       }),
       prisma.price.findFirst({
         where: {
           metal: "silver",
-          timestamp: {
-            gte: new Date(twentyFourHoursAgo.getTime() - 60 * 60 * 1000),
-            lte: new Date(twentyFourHoursAgo.getTime() + 60 * 60 * 1000),
-          },
+          timestamp: { lte: twentyFourHoursAgo },
         },
         orderBy: { timestamp: "desc" },
       }),
     ]);
 
-    // Fallback if no 24h data exists yet
-    const goldPrevious =
-      goldOld ||
-      (await prisma.price.findFirst({
-        where: { metal: "gold" },
-        orderBy: { timestamp: "asc" },
-      }));
-
-    const silverPrevious =
-      silverOld ||
-      (await prisma.price.findFirst({
-        where: { metal: "silver" },
-        orderBy: { timestamp: "asc" },
-      }));
-
     const gold24hPercent =
-      goldPrevious && goldPrevious.price
-        ? ((goldPrice - goldPrevious.price) / goldPrevious.price) * 100
+      goldOld && goldOld.price
+        ? ((goldPrice - goldOld.price) / goldOld.price) * 100
         : 0;
 
     const silver24hPercent =
-      silverPrevious && silverPrevious.price
-        ? ((silverPrice - silverPrevious.price) / silverPrevious.price) * 100
+      silverOld && silverOld.price
+        ? ((silverPrice - silverOld.price) / silverOld.price) * 100
         : 0;
 
-    // -------------------------------------
-    // 4️⃣ Evaluate Alerts
-    // -------------------------------------
+    // Evaluate alerts
     const alerts = await prisma.alert.findMany({
       where: { active: true },
     });
@@ -114,8 +77,8 @@ export async function GET(req: Request) {
 
       let shouldTrigger = false;
 
-      // ---- Absolute Price Alert ----
-      if (!alert.percentChange && alert.price) {
+      // Absolute price alerts
+      if (alert.type === "price" && alert.price !== null) {
         if (alert.direction === "above" && currentPrice >= alert.price) {
           shouldTrigger = true;
         }
@@ -124,18 +87,17 @@ export async function GET(req: Request) {
         }
       }
 
-      // ---- Percent Alert ----
-      if (alert.percentChange !== null) {
+      // Percent alerts
+      if (alert.type === "percent" && alert.percentValue !== null) {
         if (
           alert.direction === "above" &&
-          currentPercent >= alert.percentChange
+          currentPercent >= alert.percentValue
         ) {
           shouldTrigger = true;
         }
-
         if (
           alert.direction === "below" &&
-          currentPercent <= -alert.percentChange
+          currentPercent <= -alert.percentValue
         ) {
           shouldTrigger = true;
         }
@@ -161,9 +123,6 @@ export async function GET(req: Request) {
       }
     }
 
-    // -------------------------------------
-    // 5️⃣ Response
-    // -------------------------------------
     return NextResponse.json({
       success: true,
       gold: goldPrice,
