@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-function shouldTrigger(
-  direction: string,
-  target: number,
-  current: number
-) {
-  if (direction === "above") return current >= target;
-  if (direction === "below") return current <= target;
-  return false;
-}
+import { sendAlertEmail } from "@/lib/alerts/sendAlertEmail";
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -19,70 +10,109 @@ export async function GET(req: Request) {
   }
 
   try {
-    // Fetch prices from Metals API
+    // 1️⃣ Fetch latest prices
     const res = await fetch(
       `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`
     );
 
-    if (!res.ok) throw new Error("Metals API failed");
+    if (!res.ok) {
+      throw new Error("Metals API failed");
+    }
 
     const data = await res.json();
 
+    // API returns USD per 1 metal unit inverted
     const goldPrice = 1 / data.rates.XAU;
     const silverPrice = 1 / data.rates.XAG;
 
-    // Save prices
+    const now = new Date();
+
+    // 2️⃣ Store prices
     await prisma.price.createMany({
       data: [
-        { metal: "gold", price: goldPrice, source: "metals-api" },
-        { metal: "silver", price: silverPrice, source: "metals-api" }
-      ]
+        {
+          metal: "gold",
+          price: goldPrice,
+          source: "metals-api",
+          timestamp: now,
+        },
+        {
+          metal: "silver",
+          price: silverPrice,
+          source: "metals-api",
+          timestamp: now,
+        },
+      ],
     });
 
-    // Evaluate alerts
-    const activeAlerts = await prisma.alert.findMany({
-      where: { active: true }
+    // 3️⃣ Get active alerts with user
+    const alerts = await prisma.alert.findMany({
+      where: { active: true },
+      include: { user: true },
     });
 
-    for (const alert of activeAlerts) {
-      const current =
+    let triggeredCount = 0;
+
+    // 4️⃣ Evaluate alerts
+    for (const alert of alerts) {
+      const currentPrice =
         alert.metal === "gold" ? goldPrice : silverPrice;
 
-      const triggered = shouldTrigger(
-        alert.direction,
-        alert.price,
-        current
-      );
+      const shouldTrigger =
+        (alert.direction === "above" &&
+          currentPrice >= alert.price) ||
+        (alert.direction === "below" &&
+          currentPrice <= alert.price);
 
-      if (!triggered) continue;
+      if (!shouldTrigger) continue;
 
-      // Prevent duplicate firing in short window
-      if (alert.lastTriggeredAt) {
-        const hoursSinceLast =
-          (Date.now() - new Date(alert.lastTriggeredAt).getTime()) /
-          (1000 * 60 * 60);
+      // ⏱ Cooldown protection (30 min default)
+      const cooldownMinutes =
+        Number(process.env.ALERT_COOLDOWN_MIN) || 30;
 
-        if (hoursSinceLast < 6) continue;
+      if (
+        alert.lastTriggeredAt &&
+        new Date().getTime() -
+          new Date(alert.lastTriggeredAt).getTime() <
+          cooldownMinutes * 60 * 1000
+      ) {
+        continue;
       }
 
-      // Create trigger record
+      // 5️⃣ Create trigger record
       await prisma.alertTrigger.create({
         data: {
           alertId: alert.id,
-          price: current
-        }
+          price: currentPrice,
+          triggeredAt: now,
+        },
       });
 
-      // Update alert
+      // 6️⃣ Update lastTriggeredAt
       await prisma.alert.update({
         where: { id: alert.id },
-        data: {
-          lastTriggeredAt: new Date()
-        }
+        data: { lastTriggeredAt: now },
       });
+
+      // 7️⃣ Send email
+      if (alert.user.email) {
+        await sendAlertEmail({
+          to: alert.user.email,
+          metal: alert.metal,
+          price: currentPrice,
+          direction: alert.direction,
+        });
+      }
+
+      triggeredCount++;
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      gold: goldPrice,
+      silver: silverPrice,
+      alertsTriggered: triggeredCount,
+    });
   } catch (err) {
     console.error("Cron failed:", err);
     return new NextResponse("Cron failed", { status: 500 });
