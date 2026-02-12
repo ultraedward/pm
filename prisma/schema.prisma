@@ -68,8 +68,15 @@ model Alert {
   id              String    @id @default(cuid())
   userId          String
   metal           String
-  price           Float
-  direction       String
+  type            String    @default("price") // "price" | "percent"
+
+  // Price-based alerts
+  price           Float?    
+
+  // Percent-based alerts (24h move)
+  percentValue    Float?    
+
+  direction       String    // "above" | "below"
   active          Boolean   @default(true)
   lastTriggeredAt DateTime?
 

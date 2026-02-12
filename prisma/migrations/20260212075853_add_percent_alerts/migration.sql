@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Alert" ADD COLUMN     "percentValue" DOUBLE PRECISION,
+ADD COLUMN     "type" TEXT NOT NULL DEFAULT 'price',
+ALTER COLUMN "price" DROP NOT NULL;
