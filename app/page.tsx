@@ -1,38 +1,81 @@
 import { prisma } from "@/lib/prisma";
 import MetalDashboard from "@/components/MetalDashboard";
 
-async function getHistory(metal: "gold" | "silver") {
-  const prices = await prisma.price.findMany({
-    where: { metal },
-    orderBy: { timestamp: "asc" },
-    take: 200,
-  });
-
-  return prices.map((p) => ({
-    price: p.price,
-    timestamp: p.timestamp,
+function formatHistory(rows: { price: number; timestamp: Date }[]) {
+  return rows.map((r) => ({
+    price: r.price,
+    timestamp: r.timestamp.toISOString(),
   }));
 }
 
+async function getMetalData(metal: "gold" | "silver") {
+  const latest = await prisma.price.findFirst({
+    where: { metal },
+    orderBy: { timestamp: "desc" },
+  });
+
+  if (!latest) {
+    return {
+      price: 0,
+      percentChange: 0,
+      history1D: [],
+      history7D: [],
+      history30D: [],
+    };
+  }
+
+  const now = new Date();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const history1D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: oneDayAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const history7D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: sevenDaysAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const history30D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: thirtyDaysAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const first24h = history1D[0];
+  const percentChange = first24h
+    ? ((latest.price - first24h.price) / first24h.price) * 100
+    : 0;
+
+  return {
+    price: latest.price,
+    percentChange,
+    history1D: formatHistory(history1D),
+    history7D: formatHistory(history7D),
+    history30D: formatHistory(history30D),
+  };
+}
+
 export default async function HomePage() {
-  const goldHistory = await getHistory("gold");
-  const silverHistory = await getHistory("silver");
+  const gold = await getMetalData("gold");
+  const silver = await getMetalData("silver");
 
   return (
-    <div className="mx-auto max-w-6xl p-8 space-y-12">
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight">
-          Precious Metals
-        </h1>
-        <p className="text-gray-400 mt-2">
-          Real-time gold and silver tracking.
-        </p>
-      </div>
+    <main className="min-h-screen bg-black text-white p-10">
+      <div className="max-w-6xl mx-auto space-y-12">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Precious Metals
+          </h1>
+          <p className="text-neutral-400 mt-2">
+            Live gold and silver pricing with alerts.
+          </p>
+        </div>
 
-      <MetalDashboard
-        goldHistory={goldHistory}
-        silverHistory={silverHistory}
-      />
-    </div>
+        <MetalDashboard gold={gold} silver={silver} />
+      </div>
+    </main>
   );
 }
