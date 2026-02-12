@@ -1,6 +1,12 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState } from "react";
+
+type Trigger = {
+  id: string;
+  price: number;
+  triggeredAt: Date;
+};
 
 type Alert = {
   id: string;
@@ -8,97 +14,89 @@ type Alert = {
   price: number;
   direction: string;
   active: boolean;
-  lastTriggeredAt: string | null;
+  triggers: Trigger[];
+  createdAt: Date;
 };
 
 export function AlertsTable({ alerts }: { alerts: Alert[] }) {
-  const [isPending, startTransition] = useTransition();
-
-  async function toggleAlert(id: string) {
-    await fetch(`/api/alerts/${id}/toggle`, { method: "POST" });
-    location.reload();
-  }
-
-  async function deleteAlert(id: string) {
-    if (!confirm("Delete this alert?")) return;
-    await fetch(`/api/alerts/${id}/delete`, { method: "POST" });
-    location.reload();
-  }
+  const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <div className="overflow-hidden rounded border border-gray-800">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-900 text-gray-400">
-          <tr>
-            <th className="px-4 py-3 text-left">Metal</th>
-            <th className="px-4 py-3 text-left">Condition</th>
-            <th className="px-4 py-3 text-left">Status</th>
-            <th className="px-4 py-3 text-left">Last triggered</th>
-            <th className="px-4 py-3 text-right">Actions</th>
-          </tr>
-        </thead>
+    <div className="space-y-4">
+      {alerts.map((alert) => {
+        const triggerCount = alert.triggers.length;
+        const lastTriggered =
+          triggerCount > 0 ? alert.triggers[0].triggeredAt : null;
 
-        <tbody className="divide-y divide-gray-800">
-          {alerts.map((alert) => {
-            const lastTriggered = alert.lastTriggeredAt
-              ? new Date(alert.lastTriggeredAt).toLocaleString()
-              : "—";
+        const isOpen = openId === alert.id;
 
-            return (
-              <tr
-                key={alert.id}
-                className="bg-black hover:bg-gray-900 transition"
-              >
-                <td className="px-4 py-3 capitalize font-medium">
-                  {alert.metal}
-                </td>
+        return (
+          <div
+            key={alert.id}
+            className="panel p-5 space-y-3 transition-all"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-lg font-semibold capitalize">
+                  {alert.metal} {alert.direction === "above" ? "≥" : "≤"} $
+                  {alert.price.toLocaleString()}
+                </div>
 
-                <td className="px-4 py-3">
-                  {alert.direction} ${alert.price.toLocaleString()}
-                </td>
-
-                <td className="px-4 py-3">
-                  {alert.active ? (
-                    <span className="rounded bg-green-600/20 px-2 py-1 text-xs text-green-400">
-                      Active
-                    </span>
-                  ) : (
-                    <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-400">
-                      Paused
-                    </span>
+                <div className="text-sm text-gray-400">
+                  {triggerCount} trigger
+                  {triggerCount !== 1 && "s"}
+                  {lastTriggered && (
+                    <> • Last: {new Date(lastTriggered).toLocaleString()}</>
                   )}
-                </td>
+                </div>
+              </div>
 
-                <td className="px-4 py-3 text-gray-400">
-                  {lastTriggered}
-                </td>
+              <div className="flex items-center gap-4">
+                <span
+                  className={`text-xs px-2 py-1 rounded ${
+                    alert.active
+                      ? "bg-green-900 text-green-400"
+                      : "bg-gray-800 text-gray-400"
+                  }`}
+                >
+                  {alert.active ? "Active" : "Paused"}
+                </span>
 
-                <td className="px-4 py-3 text-right space-x-2">
+                {triggerCount > 0 && (
                   <button
-                    disabled={isPending}
                     onClick={() =>
-                      startTransition(() => toggleAlert(alert.id))
+                      setOpenId(isOpen ? null : alert.id)
                     }
-                    className="rounded border border-gray-700 px-2 py-1 text-xs hover:bg-gray-800"
+                    className="text-sm text-gray-400 hover:text-white transition"
                   >
-                    {alert.active ? "Pause" : "Resume"}
+                    {isOpen ? "Hide history" : "View history"}
                   </button>
+                )}
+              </div>
+            </div>
 
-                  <button
-                    disabled={isPending}
-                    onClick={() =>
-                      startTransition(() => deleteAlert(alert.id))
-                    }
-                    className="rounded border border-red-800 px-2 py-1 text-xs text-red-400 hover:bg-red-900/20"
+            {/* Expandable Trigger History */}
+            {isOpen && (
+              <div className="border-t border-gray-800 pt-3 space-y-2">
+                {alert.triggers.map((trigger) => (
+                  <div
+                    key={trigger.id}
+                    className="flex justify-between text-sm text-gray-300"
                   >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                    <span>
+                      ${trigger.price.toLocaleString()}
+                    </span>
+                    <span>
+                      {new Date(trigger.triggeredAt).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
