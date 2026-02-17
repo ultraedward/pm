@@ -1,96 +1,85 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
+import MetalDashboard from "@/components/MetalDashboard";
 
-export const dynamic = "force-dynamic";
+function formatHistory(rows: { price: number; timestamp: Date }[]) {
+  return rows.map((r) => ({
+    price: r.price,
+    timestamp: r.timestamp.toISOString(),
+  }));
+}
+
+async function getMetalData(metal: "gold" | "silver") {
+  const latest = await prisma.price.findFirst({
+    where: { metal },
+    orderBy: { timestamp: "desc" },
+  });
+
+  if (!latest) {
+    return {
+      price: 0,
+      percentChange: 0,
+      history1D: [],
+      history7D: [],
+      history30D: [],
+    };
+  }
+
+  const now = new Date();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const history1D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: oneDayAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const history7D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: sevenDaysAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const history30D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: thirtyDaysAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const first24h = history1D[0];
+  const percentChange = first24h
+    ? ((latest.price - first24h.price) / first24h.price) * 100
+    : 0;
+
+  return {
+    price: latest.price,
+    percentChange,
+    history1D: formatHistory(history1D),
+    history7D: formatHistory(history7D),
+    history30D: formatHistory(history30D),
+  };
+}
 
 export default async function DashboardPage() {
-  const user = await requireUser();
+  // 🔒 Protect dashboard
+  await requireUser();
 
-  const [gold, silver, alertCount] = await Promise.all([
-    prisma.price.findFirst({
-      where: { metal: "gold" },
-      orderBy: { timestamp: "desc" },
-    }),
-    prisma.price.findFirst({
-      where: { metal: "silver" },
-      orderBy: { timestamp: "desc" },
-    }),
-    prisma.alert.count({
-      where: { userId: user.id },
-    }),
-  ]);
-
-  const isPro = user.subscriptionStatus === "active";
+  const gold = await getMetalData("gold");
+  const silver = await getMetalData("silver");
 
   return (
-    <div className="mx-auto max-w-6xl p-10 space-y-12">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-bold">Dashboard</h1>
-
-        <span
-          className={`px-4 py-1 rounded-full text-sm font-medium ${
-            isPro
-              ? "bg-green-500/20 text-green-400"
-              : "bg-gray-700 text-gray-300"
-          }`}
-        >
-          {isPro ? "Pro Plan" : "Free Plan"}
-        </span>
-      </div>
-
-      {/* Prices */}
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="panel p-8 space-y-2">
-          <div className="text-gray-400 text-sm uppercase tracking-wide">
-            Gold
-          </div>
-          <div className="text-5xl font-bold">
-            ${gold?.price?.toFixed(2) ?? "--"}
-          </div>
-          <div className="text-gray-500 text-sm">
-            Last updated{" "}
-            {gold
-              ? new Date(gold.timestamp).toLocaleTimeString()
-              : "N/A"}
-          </div>
-        </div>
-
-        <div className="panel p-8 space-y-2">
-          <div className="text-gray-400 text-sm uppercase tracking-wide">
-            Silver
-          </div>
-          <div className="text-5xl font-bold">
-            ${silver?.price?.toFixed(2) ?? "--"}
-          </div>
-          <div className="text-gray-500 text-sm">
-            Last updated{" "}
-            {silver
-              ? new Date(silver.timestamp).toLocaleTimeString()
-              : "N/A"}
-          </div>
-        </div>
-      </div>
-
-      {/* Alerts Section */}
-      <div className="panel p-8 flex items-center justify-between">
+    <main className="min-h-screen bg-black text-white p-10">
+      <div className="mx-auto max-w-6xl space-y-12">
         <div>
-          <div className="text-gray-400 text-sm uppercase tracking-wide">
-            Your Alerts
-          </div>
-          <div className="text-3xl font-bold">
-            {alertCount}
-          </div>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Dashboard
+          </h1>
+          <p className="mt-2 text-neutral-400">
+            Live gold and silver pricing with smart alerts.
+          </p>
         </div>
 
-        <Link
-          href="/alerts/new"
-          className="rounded bg-white px-6 py-3 text-sm font-medium text-black hover:bg-gray-200"
-        >
-          + Create Alert
-        </Link>
+        <MetalDashboard gold={gold} silver={silver} />
       </div>
-    </div>
+    </main>
   );
 }

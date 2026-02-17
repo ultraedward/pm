@@ -1,81 +1,79 @@
-import { prisma } from "@/lib/prisma";
-import MetalDashboard from "@/components/MetalDashboard";
-
-function formatHistory(rows: { price: number; timestamp: Date }[]) {
-  return rows.map((r) => ({
-    price: r.price,
-    timestamp: r.timestamp.toISOString(),
-  }));
-}
-
-async function getMetalData(metal: "gold" | "silver") {
-  const latest = await prisma.price.findFirst({
-    where: { metal },
-    orderBy: { timestamp: "desc" },
-  });
-
-  if (!latest) {
-    return {
-      price: 0,
-      percentChange: 0,
-      history1D: [],
-      history7D: [],
-      history30D: [],
-    };
-  }
-
-  const now = new Date();
-  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-  const history1D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: oneDayAgo } },
-    orderBy: { timestamp: "asc" },
-  });
-
-  const history7D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: sevenDaysAgo } },
-    orderBy: { timestamp: "asc" },
-  });
-
-  const history30D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: thirtyDaysAgo } },
-    orderBy: { timestamp: "asc" },
-  });
-
-  const first24h = history1D[0];
-  const percentChange = first24h
-    ? ((latest.price - first24h.price) / first24h.price) * 100
-    : 0;
-
-  return {
-    price: latest.price,
-    percentChange,
-    history1D: formatHistory(history1D),
-    history7D: formatHistory(history7D),
-    history30D: formatHistory(history30D),
-  };
-}
+import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export default async function HomePage() {
-  const gold = await getMetalData("gold");
-  const silver = await getMetalData("silver");
+  const session = await getServerSession(authOptions);
+
+  // If logged in → go to dashboard
+  if (session?.user) {
+    return (
+      <meta httpEquiv="refresh" content="0; url=/dashboard" />
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-black text-white p-10">
-      <div className="max-w-6xl mx-auto space-y-12">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">
-            Precious Metals
-          </h1>
-          <p className="text-neutral-400 mt-2">
-            Live gold and silver pricing with alerts.
-          </p>
-        </div>
+    <div className="flex min-h-screen flex-col bg-black text-white">
+      {/* HERO */}
+      <section className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center px-6 text-center">
+        <h1 className="text-5xl font-bold leading-tight">
+          Precious Metals Alerts
+        </h1>
 
-        <MetalDashboard gold={gold} silver={silver} />
-      </div>
-    </main>
+        <p className="mt-6 max-w-2xl text-lg text-gray-400">
+          Real-time gold and silver tracking with smart alerts.
+          Get notified when price moves matter.
+        </p>
+
+        <div className="mt-10 flex gap-4">
+          <Link
+            href="/pricing"
+            className="rounded bg-yellow-500 px-6 py-3 font-semibold text-black hover:bg-yellow-400"
+          >
+            Get Started
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className="rounded border border-gray-700 px-6 py-3 text-gray-300 hover:bg-gray-900"
+          >
+            View Dashboard
+          </Link>
+        </div>
+      </section>
+
+      {/* FEATURE STRIP */}
+      <section className="border-t border-gray-900 bg-black py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 md:grid-cols-3">
+          <Feature
+            title="Live Pricing"
+            desc="Track gold (XAU) and silver (XAG) in real-time."
+          />
+          <Feature
+            title="Smart Alerts"
+            desc="Price-based and percent-based alert triggers."
+          />
+          <Feature
+            title="Pro Tools"
+            desc="Unlimited alerts and priority email delivery."
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Feature({
+  title,
+  desc,
+}: {
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <p className="mt-3 text-sm text-gray-400">{desc}</p>
+    </div>
   );
 }
