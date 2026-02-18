@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import AnimatedNumber from "@/components/AnimatedNumber";
-import PriceChart from "@/components/PriceChart";
-import Link from "next/link";
+import { useState } from "react";
+import PriceChart from "./PriceChart";
+import AnimatedNumber from "./AnimatedNumber";
 
 type HistoryPoint = {
   price: number;
@@ -30,152 +29,79 @@ export default function MetalDashboard({
   silver,
   isPro,
 }: Props) {
-  return (
-    <div className="grid gap-10 md:grid-cols-2">
-      <MetalCard metal="gold" data={gold} isPro={isPro} />
-      <MetalCard metal="silver" data={silver} isPro={isPro} />
-    </div>
-  );
-}
+  const [timeframe, setTimeframe] = useState<"1D" | "7D" | "30D">("1D");
 
-function MetalCard({
-  metal,
-  data,
-  isPro,
-}: {
-  metal: "gold" | "silver";
-  data: MetalData;
-  isPro: boolean;
-}) {
-  const [timeframe, setTimeframe] =
-    useState<"1D" | "7D" | "30D">("1D");
-  const [flash, setFlash] =
-    useState<"up" | "down" | null>(null);
-  const [previousPrice, setPreviousPrice] =
-    useState(data.price);
+  function renderCard(
+    metal: "gold" | "silver",
+    data: MetalData
+  ) {
+    const history =
+      timeframe === "1D"
+        ? data.history1D
+        : timeframe === "7D"
+        ? data.history7D
+        : data.history30D;
 
-  useEffect(() => {
-    if (data.price > previousPrice) {
-      setFlash("up");
-    } else if (data.price < previousPrice) {
-      setFlash("down");
-    }
-
-    const timeout = setTimeout(() => setFlash(null), 800);
-    setPreviousPrice(data.price);
-
-    return () => clearTimeout(timeout);
-  }, [data.price, previousPrice]);
-
-  const history =
-    timeframe === "1D"
-      ? data.history1D
-      : timeframe === "7D"
-      ? data.history7D
-      : data.history30D;
-
-  const isUp =
-    data.percentChange !== null &&
-    data.percentChange >= 0;
-
-  const percentColor =
-    data.percentChange === null
-      ? "text-gray-400"
-      : isUp
-      ? "text-green-400"
-      : "text-red-400";
-
-  const glowClass =
-    flash === "up"
-      ? "shadow-[0_0_25px_rgba(34,197,94,0.4)]"
-      : flash === "down"
-      ? "shadow-[0_0_25px_rgba(239,68,68,0.4)]"
-      : "";
-
-  return (
-    <div
-      className={`rounded-2xl border border-gray-800 bg-black p-6 transition-all ${glowClass}`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold">
-            {metal === "gold"
-              ? "Gold (XAU)"
-              : "Silver (XAG)"}
+    return (
+      <div className="rounded-xl bg-neutral-900 p-6 space-y-4 border border-neutral-800">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold capitalize">
+            {metal}
           </h2>
-
-          <div className="mt-2 text-4xl font-bold">
-            $
-            <AnimatedNumber
-              value={data.price}
-              decimals={3}
-            />
-          </div>
-
-          <div className={`mt-2 text-sm ${percentColor}`}>
-            {data.percentChange === null
-              ? "—"
-              : `${isUp ? "▲" : "▼"} ${Math.abs(
-                  data.percentChange
-                ).toFixed(2)}%`}
-          </div>
-
-          <div className="mt-2 text-xs text-gray-500">
-            Updated{" "}
-            {new Date(
-              data.lastUpdated
-            ).toLocaleTimeString()}
+          <div className="text-right">
+            <AnimatedNumber value={data.price} />
+            <div className="text-sm text-neutral-400">
+              Updated {new Date(data.lastUpdated).toLocaleTimeString()}
+            </div>
           </div>
         </div>
 
+        {/* Timeframe Toggle */}
         <div className="flex gap-2">
           {(["1D", "7D", "30D"] as const).map((tf) => {
             const locked =
-              tf === "30D" && !isPro;
+              !isPro && (tf === "7D" || tf === "30D");
 
             return (
               <button
                 key={tf}
                 disabled={locked}
                 onClick={() => setTimeframe(tf)}
-                className={`rounded-full px-3 py-1 text-xs ${
+                className={`px-3 py-1 rounded text-sm ${
                   timeframe === tf
                     ? "bg-white text-black"
-                    : "border border-gray-700 text-gray-400"
-                } ${
-                  locked
-                    ? "opacity-40 cursor-not-allowed"
-                    : ""
-                }`}
+                    : "bg-neutral-800 text-neutral-300"
+                } ${locked ? "opacity-40 cursor-not-allowed" : ""}`}
               >
                 {tf}
-                {locked && " 🔒"}
               </button>
             );
           })}
         </div>
-      </div>
 
-      <div className="mt-6">
-        {timeframe === "30D" && !isPro ? (
-          <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-6 text-center">
-            <p className="text-sm text-yellow-400">
-              30-day history is a Pro feature.
+        {!isPro && timeframe !== "1D" ? (
+          <div className="p-6 text-center bg-neutral-800 rounded-lg">
+            <p className="text-neutral-300 mb-3">
+              7D and 30D charts are a Pro feature.
             </p>
-            <Link
+            <a
               href="/pricing"
-              className="mt-3 inline-block rounded bg-yellow-500 px-4 py-2 text-sm font-semibold text-black hover:bg-yellow-400"
+              className="inline-block px-4 py-2 bg-yellow-500 text-black rounded"
             >
               Upgrade to Pro
-            </Link>
+            </a>
           </div>
         ) : (
-          <PriceChart
-            data={history}
-            metal={metal}
-          />
+          <PriceChart data={history} metal={metal} />
         )}
       </div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-2 gap-8">
+      {renderCard("gold", gold)}
+      {renderCard("silver", silver)}
     </div>
   );
 }

@@ -1,14 +1,32 @@
 import { prisma } from "@/lib/prisma";
 import MetalDashboard from "@/components/MetalDashboard";
 
-function formatHistory(rows: { price: number; timestamp: Date }[]) {
+type HistoryPoint = {
+  price: number;
+  timestamp: string;
+};
+
+type MetalData = {
+  price: number;
+  percentChange: number | null;
+  history1D: HistoryPoint[];
+  history7D: HistoryPoint[];
+  history30D: HistoryPoint[];
+  lastUpdated: string;
+};
+
+function formatHistory(
+  rows: { price: number; timestamp: Date }[]
+): HistoryPoint[] {
   return rows.map((r) => ({
     price: r.price,
     timestamp: r.timestamp.toISOString(),
   }));
 }
 
-async function getMetalData(metal: "gold" | "silver") {
+async function getMetalData(
+  metal: "gold" | "silver"
+): Promise<MetalData> {
   const latest = await prisma.price.findFirst({
     where: { metal },
     orderBy: { timestamp: "desc" },
@@ -17,11 +35,11 @@ async function getMetalData(metal: "gold" | "silver") {
   if (!latest) {
     return {
       price: 0,
-      percentChange: 0,
-      lastUpdated: null,
+      percentChange: null,
       history1D: [],
       history7D: [],
       history30D: [],
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -45,22 +63,20 @@ async function getMetalData(metal: "gold" | "silver") {
     orderBy: { timestamp: "asc" },
   });
 
-  const first24h =
-    history1D.find((r) => r.timestamp <= oneDayAgo) ||
-    history1D[0];
+  const baseline = history1D[0];
 
   const percentChange =
-    first24h && first24h.price !== 0
-      ? ((latest.price - first24h.price) / first24h.price) * 100
-      : 0;
+    baseline && baseline.price !== 0
+      ? ((latest.price - baseline.price) / baseline.price) * 100
+      : null;
 
   return {
     price: latest.price,
     percentChange,
-    lastUpdated: latest.timestamp.toISOString(),
     history1D: formatHistory(history1D),
     history7D: formatHistory(history7D),
     history30D: formatHistory(history30D),
+    lastUpdated: latest.timestamp.toISOString(),
   };
 }
 
@@ -69,18 +85,23 @@ export default async function HomePage() {
   const silver = await getMetalData("silver");
 
   return (
-    <main className="min-h-screen bg-black text-white p-10">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <main className="min-h-screen bg-black p-10 text-white">
+      <div className="mx-auto max-w-6xl space-y-12">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight">
-            Precious Metals
+          <h1 className="text-4xl font-bold">
+            Live Precious Metals
           </h1>
-          <p className="text-neutral-400 mt-2">
-            Live gold and silver pricing with alerts.
+          <p className="mt-2 text-neutral-400">
+            Real-time gold and silver pricing.
           </p>
         </div>
 
-        <MetalDashboard gold={gold} silver={silver} />
+        {/* IMPORTANT: Marketing page is NOT Pro */}
+        <MetalDashboard
+          gold={gold}
+          silver={silver}
+          isPro={false}
+        />
       </div>
     </main>
   );
