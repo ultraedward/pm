@@ -1,80 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import PriceChart from "./PriceChart";
+import { useEffect, useState } from "react";
+import AnimatedNumber from "@/components/AnimatedNumber";
+import PriceChart from "@/components/PriceChart";
+import Link from "next/link";
 
-export type HistoryPoint = {
+type HistoryPoint = {
   price: number;
   timestamp: string;
 };
 
-export type MetalData = {
+type MetalData = {
   price: number;
-  percentChange: number;
-  lastUpdated: string | null;
+  percentChange: number | null;
   history1D: HistoryPoint[];
   history7D: HistoryPoint[];
   history30D: HistoryPoint[];
+  lastUpdated: string;
 };
 
 type Props = {
   gold: MetalData;
   silver: MetalData;
+  isPro: boolean;
 };
 
-function AnimatedPrice({
-  value,
-  metal,
-}: {
-  value: number;
-  metal: "gold" | "silver";
-}) {
-  const prev = useRef(value);
-  const [flash, setFlash] = useState<"up" | "down" | null>(null);
-  const [display, setDisplay] = useState(value);
-
-  useEffect(() => {
-    if (value > prev.current) setFlash("up");
-    if (value < prev.current) setFlash("down");
-
-    const start = prev.current;
-    const end = value;
-    const duration = 400;
-    const startTime = performance.now();
-
-    function animate(now: number) {
-      const progress = Math.min((now - startTime) / duration, 1);
-      const current = start + (end - start) * progress;
-      setDisplay(current);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    }
-
-    requestAnimationFrame(animate);
-
-    prev.current = value;
-
-    const timeout = setTimeout(() => setFlash(null), 700);
-    return () => clearTimeout(timeout);
-  }, [value]);
-
-  const baseColor =
-    metal === "gold" ? "text-yellow-400" : "text-gray-300";
-
-  const flashColor =
-    flash === "up"
-      ? "text-green-400"
-      : flash === "down"
-      ? "text-red-400"
-      : baseColor;
-
+export default function MetalDashboard({
+  gold,
+  silver,
+  isPro,
+}: Props) {
   return (
-    <div
-      className={`text-4xl font-bold transition-colors duration-300 ${flashColor}`}
-    >
-      ${display.toFixed(2)}
+    <div className="grid gap-10 md:grid-cols-2">
+      <MetalCard metal="gold" data={gold} isPro={isPro} />
+      <MetalCard metal="silver" data={silver} isPro={isPro} />
     </div>
   );
 }
@@ -82,63 +41,141 @@ function AnimatedPrice({
 function MetalCard({
   metal,
   data,
+  isPro,
 }: {
   metal: "gold" | "silver";
   data: MetalData;
+  isPro: boolean;
 }) {
-  const isUp = data.percentChange >= 0;
+  const [timeframe, setTimeframe] =
+    useState<"1D" | "7D" | "30D">("1D");
+  const [flash, setFlash] =
+    useState<"up" | "down" | null>(null);
+  const [previousPrice, setPreviousPrice] =
+    useState(data.price);
 
-  const percentColor = isUp
-    ? "text-green-400"
-    : "text-red-400";
+  useEffect(() => {
+    if (data.price > previousPrice) {
+      setFlash("up");
+    } else if (data.price < previousPrice) {
+      setFlash("down");
+    }
 
-  const gradient =
-    metal === "gold"
-      ? "from-yellow-500/20 to-transparent"
-      : "from-gray-400/20 to-transparent";
+    const timeout = setTimeout(() => setFlash(null), 800);
+    setPreviousPrice(data.price);
+
+    return () => clearTimeout(timeout);
+  }, [data.price, previousPrice]);
+
+  const history =
+    timeframe === "1D"
+      ? data.history1D
+      : timeframe === "7D"
+      ? data.history7D
+      : data.history30D;
+
+  const isUp =
+    data.percentChange !== null &&
+    data.percentChange >= 0;
+
+  const percentColor =
+    data.percentChange === null
+      ? "text-gray-400"
+      : isUp
+      ? "text-green-400"
+      : "text-red-400";
+
+  const glowClass =
+    flash === "up"
+      ? "shadow-[0_0_25px_rgba(34,197,94,0.4)]"
+      : flash === "down"
+      ? "shadow-[0_0_25px_rgba(239,68,68,0.4)]"
+      : "";
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-6">
+    <div
+      className={`rounded-2xl border border-gray-800 bg-black p-6 transition-all ${glowClass}`}
+    >
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold capitalize">
-          {metal}
-        </h2>
+        <div>
+          <h2 className="text-xl font-semibold">
+            {metal === "gold"
+              ? "Gold (XAU)"
+              : "Silver (XAG)"}
+          </h2>
 
-        {data.lastUpdated && (
-          <span className="text-xs text-gray-500">
-            Updated {new Date(data.lastUpdated).toLocaleTimeString()}
-          </span>
+          <div className="mt-2 text-4xl font-bold">
+            $
+            <AnimatedNumber
+              value={data.price}
+              decimals={3}
+            />
+          </div>
+
+          <div className={`mt-2 text-sm ${percentColor}`}>
+            {data.percentChange === null
+              ? "—"
+              : `${isUp ? "▲" : "▼"} ${Math.abs(
+                  data.percentChange
+                ).toFixed(2)}%`}
+          </div>
+
+          <div className="mt-2 text-xs text-gray-500">
+            Updated{" "}
+            {new Date(
+              data.lastUpdated
+            ).toLocaleTimeString()}
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          {(["1D", "7D", "30D"] as const).map((tf) => {
+            const locked =
+              tf === "30D" && !isPro;
+
+            return (
+              <button
+                key={tf}
+                disabled={locked}
+                onClick={() => setTimeframe(tf)}
+                className={`rounded-full px-3 py-1 text-xs ${
+                  timeframe === tf
+                    ? "bg-white text-black"
+                    : "border border-gray-700 text-gray-400"
+                } ${
+                  locked
+                    ? "opacity-40 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {tf}
+                {locked && " 🔒"}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-6">
+        {timeframe === "30D" && !isPro ? (
+          <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-6 text-center">
+            <p className="text-sm text-yellow-400">
+              30-day history is a Pro feature.
+            </p>
+            <Link
+              href="/pricing"
+              className="mt-3 inline-block rounded bg-yellow-500 px-4 py-2 text-sm font-semibold text-black hover:bg-yellow-400"
+            >
+              Upgrade to Pro
+            </Link>
+          </div>
+        ) : (
+          <PriceChart
+            data={history}
+            metal={metal}
+          />
         )}
       </div>
-
-      <AnimatedPrice value={data.price} metal={metal} />
-
-      <div className={`text-sm font-medium ${percentColor}`}>
-        {isUp ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
-      </div>
-
-      <div
-        className={`h-48 rounded-lg bg-gradient-to-b ${gradient}`}
-      >
-        <PriceChart
-          history1D={data.history1D}
-          history7D={data.history7D}
-          history30D={data.history30D}
-          metal={metal}
-        />
-      </div>
-    </div>
-  );
-}
-
-export default function MetalDashboard({
-  gold,
-  silver,
-}: Props) {
-  return (
-    <div className="grid gap-8 md:grid-cols-2">
-      <MetalCard metal="gold" data={gold} />
-      <MetalCard metal="silver" data={silver} />
     </div>
   );
 }
