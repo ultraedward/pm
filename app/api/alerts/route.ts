@@ -8,61 +8,44 @@ export async function POST(req: Request) {
     const user = await requireUser();
     const body = await req.json();
 
-    const { metal, type, direction, price, percentValue } = body;
+    const {
+      metal,
+      type, // "price" | "percent"
+      price,
+      percentValue,
+      direction, // "above" | "below"
+    } = body;
 
-    if (!metal || !direction || !type) {
+    if (!metal || !type || !direction) {
       return NextResponse.json(
-        { error: "Missing required fields." },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const subscription = await getUserSubscription(user.id);
-    const isPro = subscription?.status === "active";
+    const subscription = await getUserSubscription(
+      user.id
+    );
 
-    // 🔒 FREE TIER LIMIT: Only 1 active alert
-    if (!isPro) {
-      const activeCount = await prisma.alert.count({
+    const isPro =
+      subscription?.status === "active";
+
+    const existingAlerts =
+      await prisma.alert.count({
         where: {
           userId: user.id,
           active: true,
         },
       });
 
-      if (activeCount >= 1) {
-        return NextResponse.json(
-          {
-            error:
-              "Free users can only have 1 active alert. Upgrade to Pro for unlimited alerts.",
-          },
-          { status: 403 }
-        );
-      }
-    }
-
-    // 🔒 FREE TIER LIMIT: No percent alerts
-    if (!isPro && type === "percent") {
+    // 🔥 FREE LIMIT: 1 alert max
+    if (!isPro && existingAlerts >= 1) {
       return NextResponse.json(
         {
           error:
-            "Percent-based alerts are a Pro feature. Upgrade to unlock.",
+            "Free plan allows only 1 active alert. Upgrade to Pro for unlimited alerts.",
         },
         { status: 403 }
-      );
-    }
-
-    // Validation
-    if (type === "price" && !price) {
-      return NextResponse.json(
-        { error: "Price is required for price alerts." },
-        { status: 400 }
-      );
-    }
-
-    if (type === "percent" && !percentValue) {
-      return NextResponse.json(
-        { error: "Percent value required for percent alerts." },
-        { status: 400 }
       );
     }
 
@@ -71,19 +54,21 @@ export async function POST(req: Request) {
         userId: user.id,
         metal,
         type,
-        direction,
-        price: type === "price" ? Number(price) : null,
+        price: type === "price" ? price : null,
         percentValue:
-          type === "percent" ? Number(percentValue) : null,
+          type === "percent"
+            ? percentValue
+            : null,
+        direction,
         active: true,
       },
     });
 
     return NextResponse.json(alert);
   } catch (error) {
-    console.error("Alert creation error:", error);
+    console.error(error);
     return NextResponse.json(
-      { error: "Something went wrong." },
+      { error: "Failed to create alert" },
       { status: 500 }
     );
   }
