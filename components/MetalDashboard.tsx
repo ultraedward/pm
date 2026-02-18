@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PriceChart from "./PriceChart";
 
 export type HistoryPoint = {
@@ -22,18 +22,61 @@ type Props = {
   silver: MetalData;
 };
 
-function formatTimeAgo(dateString: string | null) {
-  if (!dateString) return "No data";
+function AnimatedPrice({
+  value,
+  metal,
+}: {
+  value: number;
+  metal: "gold" | "silver";
+}) {
+  const prev = useRef(value);
+  const [flash, setFlash] = useState<"up" | "down" | null>(null);
+  const [display, setDisplay] = useState(value);
 
-  const diffMs = Date.now() - new Date(dateString).getTime();
-  const diffMin = Math.floor(diffMs / 60000);
+  useEffect(() => {
+    if (value > prev.current) setFlash("up");
+    if (value < prev.current) setFlash("down");
 
-  if (diffMin < 1) return "Updated just now";
-  if (diffMin === 1) return "Updated 1 min ago";
-  if (diffMin < 60) return `Updated ${diffMin} min ago`;
+    const start = prev.current;
+    const end = value;
+    const duration = 400;
+    const startTime = performance.now();
 
-  const diffHr = Math.floor(diffMin / 60);
-  return `Updated ${diffHr}h ago`;
+    function animate(now: number) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const current = start + (end - start) * progress;
+      setDisplay(current);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    requestAnimationFrame(animate);
+
+    prev.current = value;
+
+    const timeout = setTimeout(() => setFlash(null), 700);
+    return () => clearTimeout(timeout);
+  }, [value]);
+
+  const baseColor =
+    metal === "gold" ? "text-yellow-400" : "text-gray-300";
+
+  const flashColor =
+    flash === "up"
+      ? "text-green-400"
+      : flash === "down"
+      ? "text-red-400"
+      : baseColor;
+
+  return (
+    <div
+      className={`text-4xl font-bold transition-colors duration-300 ${flashColor}`}
+    >
+      ${display.toFixed(2)}
+    </div>
+  );
 }
 
 function MetalCard({
@@ -43,64 +86,47 @@ function MetalCard({
   metal: "gold" | "silver";
   data: MetalData;
 }) {
-  const [timeAgo, setTimeAgo] = useState(
-    formatTimeAgo(data.lastUpdated)
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeAgo(formatTimeAgo(data.lastUpdated));
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [data.lastUpdated]);
-
   const isUp = data.percentChange >= 0;
-  const color =
-    metal === "gold"
-      ? isUp
-        ? "text-yellow-400"
-        : "text-red-400"
-      : isUp
-      ? "text-green-400"
-      : "text-red-400";
 
-  const history = data.history1D;
+  const percentColor = isUp
+    ? "text-green-400"
+    : "text-red-400";
+
+  const gradient =
+    metal === "gold"
+      ? "from-yellow-500/20 to-transparent"
+      : "from-gray-400/20 to-transparent";
 
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 space-y-4">
-      {/* Header */}
+    <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold capitalize">
-            {metal}
-          </h2>
+        <h2 className="text-lg font-semibold capitalize">
+          {metal}
+        </h2>
 
-          <div className="flex items-center gap-3 mt-1 text-sm text-neutral-400">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              LIVE
-            </div>
-
-            <span>{timeAgo}</span>
-          </div>
-        </div>
-
-        <div className="text-right">
-          <div className="text-2xl font-bold">
-            ${data.price.toFixed(2)}
-          </div>
-          <div className={`text-sm font-medium ${color}`}>
-            {isUp ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
-          </div>
-        </div>
+        {data.lastUpdated && (
+          <span className="text-xs text-gray-500">
+            Updated {new Date(data.lastUpdated).toLocaleTimeString()}
+          </span>
+        )}
       </div>
 
-      {/* Chart */}
-      <PriceChart data={history} metal={metal} />
+      <AnimatedPrice value={data.price} metal={metal} />
+
+      <div className={`text-sm font-medium ${percentColor}`}>
+        {isUp ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
+      </div>
+
+      <div
+        className={`h-48 rounded-lg bg-gradient-to-b ${gradient}`}
+      >
+        <PriceChart
+          history1D={data.history1D}
+          history7D={data.history7D}
+          history30D={data.history30D}
+          metal={metal}
+        />
+      </div>
     </div>
   );
 }
