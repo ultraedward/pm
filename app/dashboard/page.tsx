@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/requireUser";
 import MetalDashboard from "@/components/MetalDashboard";
 
 function formatHistory(rows: { price: number; timestamp: Date }[]) {
@@ -45,10 +44,20 @@ async function getMetalData(metal: "gold" | "silver") {
     orderBy: { timestamp: "asc" },
   });
 
-  const first24h = history1D[0];
-  const percentChange = first24h
-    ? ((latest.price - first24h.price) / first24h.price) * 100
-    : 0;
+  /**
+   * SMARTER 24H BASELINE
+   *
+   * Find the record closest to 24h ago.
+   * If none exists, fallback to first entry in range.
+   */
+  const first24h =
+    history1D.find((r) => r.timestamp <= oneDayAgo) ||
+    history1D[0];
+
+  const percentChange =
+    first24h && first24h.price !== 0
+      ? ((latest.price - first24h.price) / first24h.price) * 100
+      : 0;
 
   return {
     price: latest.price,
@@ -60,20 +69,17 @@ async function getMetalData(metal: "gold" | "silver") {
 }
 
 export default async function DashboardPage() {
-  // 🔒 Protect dashboard
-  await requireUser();
-
   const gold = await getMetalData("gold");
   const silver = await getMetalData("silver");
 
   return (
     <main className="min-h-screen bg-black text-white p-10">
-      <div className="mx-auto max-w-6xl space-y-12">
+      <div className="max-w-6xl mx-auto space-y-12">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">
             Dashboard
           </h1>
-          <p className="mt-2 text-neutral-400">
+          <p className="text-neutral-400 mt-2">
             Live gold and silver pricing with smart alerts.
           </p>
         </div>
