@@ -1,78 +1,87 @@
-import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import MetalDashboard from "@/components/MetalDashboard";
 
-export default async function HomePage() {
-  const session = await getServerSession(authOptions);
-
-  // 🔒 If logged in → go to dashboard cleanly
-  if (session?.user) {
-    redirect("/dashboard");
-  }
-
-  return (
-    <div className="flex min-h-screen flex-col bg-black text-white">
-      {/* HERO */}
-      <section className="mx-auto flex max-w-6xl flex-1 flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-5xl font-bold leading-tight tracking-tight">
-          Precious Metals Alerts
-        </h1>
-
-        <p className="mt-6 max-w-2xl text-lg text-gray-400">
-          Real-time gold and silver tracking with intelligent alerts.
-          Move when price action matters.
-        </p>
-
-        <div className="mt-10 flex gap-4">
-          <Link
-            href="/pricing"
-            className="rounded-lg bg-yellow-500 px-6 py-3 font-semibold text-black transition hover:bg-yellow-400"
-          >
-            Get Started
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="rounded-lg border border-gray-700 px-6 py-3 text-gray-300 transition hover:bg-gray-900"
-          >
-            View Dashboard
-          </Link>
-        </div>
-      </section>
-
-      {/* FEATURE STRIP */}
-      <section className="border-t border-gray-900 bg-black py-20">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 md:grid-cols-3">
-          <Feature
-            title="Live Pricing"
-            desc="Track gold (XAU) and silver (XAG) in real-time."
-          />
-          <Feature
-            title="Smart Alerts"
-            desc="Price-based and percent-based alert triggers."
-          />
-          <Feature
-            title="Pro Tools"
-            desc="Unlimited alerts with priority email delivery."
-          />
-        </div>
-      </section>
-    </div>
-  );
+function formatHistory(rows: { price: number; timestamp: Date }[]) {
+  return rows.map((r) => ({
+    price: r.price,
+    timestamp: r.timestamp.toISOString(),
+  }));
 }
 
-function Feature({
-  title,
-  desc,
-}: {
-  title: string;
-  desc: string;
-}) {
+async function getMetalData(metal: "gold" | "silver") {
+  const latest = await prisma.price.findFirst({
+    where: { metal },
+    orderBy: { timestamp: "desc" },
+  });
+
+  if (!latest) {
+    return {
+      price: 0,
+      percentChange: 0,
+      lastUpdated: null,
+      history1D: [],
+      history7D: [],
+      history30D: [],
+    };
+  }
+
+  const now = new Date();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const history1D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: oneDayAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const history7D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: sevenDaysAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const history30D = await prisma.price.findMany({
+    where: { metal, timestamp: { gte: thirtyDaysAgo } },
+    orderBy: { timestamp: "asc" },
+  });
+
+  const first24h =
+    history1D.find((r) => r.timestamp <= oneDayAgo) ||
+    history1D[0];
+
+  const percentChange =
+    first24h && first24h.price !== 0
+      ? ((latest.price - first24h.price) / first24h.price) * 100
+      : 0;
+
+  return {
+    price: latest.price,
+    percentChange,
+    lastUpdated: latest.timestamp.toISOString(),
+    history1D: formatHistory(history1D),
+    history7D: formatHistory(history7D),
+    history30D: formatHistory(history30D),
+  };
+}
+
+export default async function HomePage() {
+  const gold = await getMetalData("gold");
+  const silver = await getMetalData("silver");
+
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 transition hover:border-gray-700">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-3 text-sm text-gray-400">{desc}</p>
-    </div>
+    <main className="min-h-screen bg-black text-white p-10">
+      <div className="max-w-6xl mx-auto space-y-12">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Precious Metals
+          </h1>
+          <p className="text-neutral-400 mt-2">
+            Live gold and silver pricing with alerts.
+          </p>
+        </div>
+
+        <MetalDashboard gold={gold} silver={silver} />
+      </div>
+    </main>
   );
 }
