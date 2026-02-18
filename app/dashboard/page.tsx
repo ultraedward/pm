@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import MetalDashboard from "@/components/MetalDashboard";
 
+export const revalidate = 60; // ⏱ Auto refresh every 60 seconds
+
 function formatHistory(rows: { price: number; timestamp: Date }[]) {
   return rows.map((r) => ({
     price: r.price,
@@ -31,21 +33,30 @@ async function getMetalData(metal: "gold" | "silver") {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
   const history1D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: oneDayAgo } },
+    where: {
+      metal,
+      timestamp: { gte: oneDayAgo },
+    },
     orderBy: { timestamp: "asc" },
   });
 
   const history7D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: sevenDaysAgo } },
+    where: {
+      metal,
+      timestamp: { gte: sevenDaysAgo },
+    },
     orderBy: { timestamp: "asc" },
   });
 
   const history30D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: thirtyDaysAgo } },
+    where: {
+      metal,
+      timestamp: { gte: thirtyDaysAgo },
+    },
     orderBy: { timestamp: "asc" },
   });
 
-  // Better 24h calculation
+  // Find price closest to 24h ago
   const first24h =
     history1D.find((r) => r.timestamp <= oneDayAgo) ||
     history1D[0];
@@ -71,13 +82,13 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-black text-white p-10">
-      <div className="max-w-6xl mx-auto space-y-12">
+      <div className="mx-auto max-w-6xl space-y-12">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">
             Dashboard
           </h1>
-          <p className="text-neutral-400 mt-2">
-            Live gold and silver pricing with alerts.
+          <p className="mt-2 text-neutral-400">
+            Live gold and silver pricing with smart alerts.
           </p>
         </div>
 
