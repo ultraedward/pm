@@ -22,12 +22,10 @@ export default async function Navbar() {
   return (
     <nav className="border-b border-gray-900 bg-black">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        {/* Left */}
         <Link href="/" className="text-lg font-semibold tracking-tight">
           Precious Metals
         </Link>
 
-        {/* Right */}
         <div className="flex items-center gap-6 text-sm">
           <Link href="/dashboard" className="text-gray-400 hover:text-white">
             Dashboard
