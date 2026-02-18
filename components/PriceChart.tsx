@@ -1,79 +1,79 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
+  AreaChart,
+  Area,
   XAxis,
-  YAxis,
-  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
-export type HistoryPoint = {
+type HistoryPoint = {
   price: number;
   timestamp: string;
 };
 
 type Props = {
-  history1D: HistoryPoint[];
-  history7D: HistoryPoint[];
-  history30D: HistoryPoint[];
+  data: HistoryPoint[];
   metal: "gold" | "silver";
 };
 
-export default function PriceChart({
-  history1D,
-  history7D,
-  history30D,
-  metal,
-}: Props) {
-  // Default timeframe (1D)
-  const data = history1D;
-
+export default function PriceChart({ data, metal }: Props) {
   const strokeColor =
-    metal === "gold" ? "#facc15" : "#e5e7eb";
+    metal === "gold" ? "#facc15" : "#94a3b8";
+
+  const gradientId =
+    metal === "gold" ? "goldGradient" : "silverGradient";
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data}>
-        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-        <XAxis
-          dataKey="timestamp"
-          tickFormatter={(value) =>
-            new Date(value).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          }
-          stroke="#6b7280"
-        />
-        <YAxis
-          domain={["auto", "auto"]}
-          stroke="#6b7280"
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "#111827",
-            border: "1px solid #374151",
-          }}
-          labelFormatter={(value) =>
-            new Date(value).toLocaleString()
-          }
-          formatter={(value: number) => [
-            `$${value.toFixed(2)}`,
-            metal.toUpperCase(),
-          ]}
-        />
-        <Line
-          type="monotone"
-          dataKey="price"
-          stroke={strokeColor}
-          strokeWidth={2}
-          dot={false}
-          isAnimationActive
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="h-64 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient
+              id={gradientId}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="0%"
+                stopColor={strokeColor}
+                stopOpacity={0.4}
+              />
+              <stop
+                offset="100%"
+                stopColor={strokeColor}
+                stopOpacity={0}
+              />
+            </linearGradient>
+          </defs>
+
+          <XAxis
+            dataKey="timestamp"
+            hide
+          />
+
+          <Tooltip
+            contentStyle={{
+              background: "#111",
+              border: "1px solid #333",
+              borderRadius: "8px",
+            }}
+            labelStyle={{ color: "#aaa" }}
+          />
+
+          <Area
+            type="monotone"
+            dataKey="price"
+            stroke={strokeColor}
+            fill={`url(#${gradientId})`}
+            strokeWidth={2}
+            dot={false}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
