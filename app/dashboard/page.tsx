@@ -1,9 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import MetalDashboard from "@/components/MetalDashboard";
 
-type PriceRow = { price: number; timestamp: Date };
-
-function formatHistory(rows: PriceRow[]) {
+function formatHistory(rows: { price: number; timestamp: Date }[]) {
   return rows.map((r) => ({
     price: r.price,
     timestamp: r.timestamp.toISOString(),
@@ -11,11 +9,6 @@ function formatHistory(rows: PriceRow[]) {
 }
 
 async function getMetalData(metal: "gold" | "silver") {
-  const now = new Date();
-  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
   const latest = await prisma.price.findFirst({
     where: { metal },
     orderBy: { timestamp: "desc" },
@@ -24,14 +17,19 @@ async function getMetalData(metal: "gold" | "silver") {
   if (!latest) {
     return {
       price: 0,
-      percentChange: null as number | null,
+      percentChange: 0,
+      lastUpdated: null,
       history1D: [],
       history7D: [],
       history30D: [],
     };
   }
 
-  // Chart data (pure ranges)
+  const now = new Date();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
   const history1D = await prisma.price.findMany({
     where: { metal, timestamp: { gte: oneDayAgo } },
     orderBy: { timestamp: "asc" },
@@ -47,33 +45,20 @@ async function getMetalData(metal: "gold" | "silver") {
     orderBy: { timestamp: "asc" },
   });
 
-  /**
-   * TRUE 24H BASELINE:
-   * Get the last price at or before oneDayAgo.
-   * This is the correct baseline for a 24h %.
-   */
-  const baseline24h = await prisma.price.findFirst({
-    where: { metal, timestamp: { lte: oneDayAgo } },
-    orderBy: { timestamp: "desc" },
-  });
-
-  /**
-   * If you have no historical point before 24h ago,
-   * fall back to the first point we *do* have in the last 24h.
-   * If there's still not enough data, return null (not fake 0).
-   */
-  const baselinePrice =
-    baseline24h?.price ??
-    (history1D.length > 0 ? history1D[0].price : null);
+  // Better 24h calculation
+  const first24h =
+    history1D.find((r) => r.timestamp <= oneDayAgo) ||
+    history1D[0];
 
   const percentChange =
-    baselinePrice && baselinePrice !== 0
-      ? ((latest.price - baselinePrice) / baselinePrice) * 100
-      : null;
+    first24h && first24h.price !== 0
+      ? ((latest.price - first24h.price) / first24h.price) * 100
+      : 0;
 
   return {
     price: latest.price,
     percentChange,
+    lastUpdated: latest.timestamp.toISOString(),
     history1D: formatHistory(history1D),
     history7D: formatHistory(history7D),
     history30D: formatHistory(history30D),
@@ -86,11 +71,13 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-black text-white p-10">
-      <div className="mx-auto max-w-6xl space-y-12">
+      <div className="max-w-6xl mx-auto space-y-12">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-          <p className="mt-2 text-neutral-400">
-            Live gold and silver pricing with smart alerts.
+          <h1 className="text-4xl font-bold tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-neutral-400 mt-2">
+            Live gold and silver pricing with alerts.
           </p>
         </div>
 
