@@ -22,7 +22,8 @@ model User {
   stripeSubscriptionId   String?
   stripeCurrentPeriodEnd DateTime?
 
-  alerts Alert[]
+  alerts   Alert[]
+  holdings Holding[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,4 +104,20 @@ model Price {
   price     Float
   source    String
   timestamp DateTime @default(now())
+}
+
+model Holding {
+  id      String @id @default(cuid())
+  userId  String
+  metal   String // "gold" | "silver"
+
+  ounces  Float
+  avgCost Float   // cost per ounce
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
