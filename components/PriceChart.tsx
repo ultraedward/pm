@@ -1,95 +1,76 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
+  AreaChart,
+  Area,
+  Tooltip,
+  XAxis,
 } from "recharts";
-import { useEffect, useState } from "react";
 
-export type Range = "24h" | "7d" | "30d";
-
-type PricePoint = {
-  t: number;
+type HistoryPoint = {
   price: number;
-};
-
-type AlertLine = {
-  price: number;
-  direction: "above" | "below";
-};
-
-type ApiResponse = {
-  prices: PricePoint[];
-  alerts: AlertLine[];
+  timestamp: string;
 };
 
 type Props = {
-  metal: string;
-  range: Range;
+  data: HistoryPoint[];
+  metal: "gold" | "silver";
 };
 
-export default function PriceChart({ metal, range }: Props) {
-  const [prices, setPrices] = useState<PricePoint[]>([]);
-  const [alerts, setAlerts] = useState<AlertLine[]>([]);
+export default function PriceChart({ data, metal }: Props) {
+  const strokeColor =
+    metal === "gold" ? "#facc15" : "#d4d4d8";
 
-  useEffect(() => {
-    fetch(`/api/charts/prices?metal=${metal}&range=${range}`)
-      .then(r => r.json())
-      .then((res: ApiResponse) => {
-        setPrices(Array.isArray(res.prices) ? res.prices : []);
-        setAlerts(Array.isArray(res.alerts) ? res.alerts : []);
-      });
-  }, [metal, range]);
-
-  if (!prices.length) {
-    return (
-      <div className="h-[320px] flex items-center justify-center text-gray-400">
-        No data
-      </div>
-    );
-  }
+  const gradientId =
+    metal === "gold" ? "goldGradient" : "silverGradient";
 
   return (
-    <div className="h-[320px] w-full">
+    <div className="h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={prices}>
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="0%"
+                stopColor={strokeColor}
+                stopOpacity={0.4}
+              />
+              <stop
+                offset="100%"
+                stopColor={strokeColor}
+                stopOpacity={0}
+              />
+            </linearGradient>
+          </defs>
+
           <XAxis
-            dataKey="t"
-            tickFormatter={t =>
-              new Date(t).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            }
+            dataKey="timestamp"
+            hide
           />
-          <YAxis domain={["auto", "auto"]} />
+
           <Tooltip
-            labelFormatter={l => new Date(Number(l)).toLocaleString()}
+            contentStyle={{
+              backgroundColor: "#111",
+              border: "1px solid #333",
+              borderRadius: "8px",
+            }}
+            labelStyle={{ color: "#aaa" }}
+            formatter={(value: number) => [
+              `$${value.toFixed(2)}`,
+              "Price",
+            ]}
           />
 
-          {alerts.map((a, i) => (
-            <ReferenceLine
-              key={i}
-              y={a.price}
-              stroke={a.direction === "above" ? "green" : "red"}
-              strokeDasharray="4 4"
-              ifOverflow="extendDomain"
-            />
-          ))}
-
-          <Line
+          <Area
             type="monotone"
             dataKey="price"
-            stroke="#000"
+            stroke={strokeColor}
+            fill={`url(#${gradientId})`}
             strokeWidth={2}
             dot={false}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
