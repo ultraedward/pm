@@ -1,21 +1,38 @@
 import { prisma } from "@/lib/prisma";
 
-export async function canCreateAlert(userId: string) {
-  const [alertCount, user] = await Promise.all([
-    prisma.alert.count({
-      where: { userId },
-    }),
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: { subscriptionStatus: true },
-    }),
-  ]);
+const FREE_ALERT_LIMIT = 3;
 
-  const isPaid = user?.subscriptionStatus === "active";
+export async function canCreateAlert(userId: string) {
+  // Check if user is Pro
+  const subscription = await prisma.subscription.findUnique({
+    where: { userId },
+  });
+
+  const isPro =
+    subscription?.status === "active" ||
+    subscription?.status === "trialing";
+
+  if (isPro) {
+    return {
+      allowed: true,
+      isPro: true,
+      remaining: null,
+    };
+  }
+
+  // Count active alerts
+  const count = await prisma.alert.count({
+    where: {
+      userId,
+      active: true,
+    },
+  });
+
+  const remaining = FREE_ALERT_LIMIT - count;
 
   return {
-    allowed: isPaid || alertCount < 3,
-    alertCount,
-    isPaid,
+    allowed: remaining > 0,
+    isPro: false,
+    remaining: Math.max(remaining, 0),
   };
 }
