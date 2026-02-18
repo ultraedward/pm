@@ -3,14 +3,16 @@ import { prisma } from "@/lib/prisma";
 const FREE_ALERT_LIMIT = 3;
 
 export async function canCreateAlert(userId: string) {
-  // Check if user is Pro
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId },
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      subscriptionStatus: true,
+    },
   });
 
   const isPro =
-    subscription?.status === "active" ||
-    subscription?.status === "trialing";
+    user?.subscriptionStatus === "active" ||
+    user?.subscriptionStatus === "trialing";
 
   if (isPro) {
     return {
@@ -20,7 +22,6 @@ export async function canCreateAlert(userId: string) {
     };
   }
 
-  // Count active alerts
   const count = await prisma.alert.count({
     where: {
       userId,
