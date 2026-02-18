@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import PriceChart from "@/components/PriceChart";
+import AnimatedNumber from "@/components/AnimatedNumber";
 
 type HistoryPoint = {
   price: number;
@@ -29,7 +31,7 @@ export default function MetalDashboard({
   isPro,
 }: Props) {
   return (
-    <div className="space-y-12">
+    <div className="space-y-16">
       <MetalCard metal="gold" data={gold} isPro={isPro} />
       <MetalCard metal="silver" data={silver} isPro={isPro} />
     </div>
@@ -45,113 +47,101 @@ function MetalCard({
   data: MetalData;
   isPro: boolean;
 }) {
-  const [timeframe, setTimeframe] = useState<
-    "1D" | "7D" | "30D"
-  >("1D");
+  const [timeframe, setTimeframe] = useState<"1D" | "7D" | "30D">("1D");
 
-  const percent = data.percentChange;
-  const isUp = percent !== null && percent >= 0;
+  const history =
+    timeframe === "1D"
+      ? data.history1D
+      : timeframe === "7D"
+      ? data.history7D
+      : data.history30D;
 
-  let history: HistoryPoint[] = data.history1D;
+  const isLocked = !isPro && timeframe !== "1D";
 
-  if (timeframe === "7D") history = data.history7D;
-  if (timeframe === "30D") history = data.history30D;
-
-  const locked = !isPro && timeframe !== "1D";
+  const isUp =
+    data.percentChange !== null && data.percentChange >= 0;
 
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6">
+    <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold capitalize">
             {metal}
           </h2>
-          <p className="text-neutral-400 text-sm">
-            Last updated:{" "}
-            {new Date(data.lastUpdated).toLocaleString()}
+
+          <div className="mt-3 flex items-baseline gap-4">
+            <AnimatedNumber
+              value={data.price}
+              decimals={2}
+              className="text-3xl font-bold"
+            />
+
+            {data.percentChange !== null && (
+              <span
+                className={`text-sm font-medium ${
+                  isUp
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
+              >
+                {isUp ? "▲" : "▼"}{" "}
+                {Math.abs(data.percentChange).toFixed(2)}%
+              </span>
+            )}
+          </div>
+
+          <p className="mt-2 text-xs text-neutral-500">
+            Updated{" "}
+            {new Date(
+              data.lastUpdated
+            ).toLocaleTimeString()}
           </p>
         </div>
 
-        <div className="text-right">
-          <div className="text-3xl font-bold">
-            ${data.price.toFixed(2)}
-          </div>
-
-          {percent !== null ? (
-            <div
-              className={`text-sm font-medium ${
-                isUp
-                  ? "text-green-400"
-                  : "text-red-400"
-              }`}
-            >
-              {isUp ? "▲" : "▼"}{" "}
-              {Math.abs(percent).toFixed(2)}%
-            </div>
-          ) : (
-            <div className="text-sm text-neutral-500">
-              —
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Timeframe Toggle */}
-      <div className="mt-6 flex gap-3">
-        {["1D", "7D", "30D"].map((tf) => {
-          const disabled = !isPro && tf !== "1D";
-
-          return (
+        {/* Timeframe Buttons */}
+        <div className="flex gap-2">
+          {["1D", "7D", "30D"].map((tf) => (
             <button
               key={tf}
               onClick={() =>
-                !disabled &&
                 setTimeframe(
                   tf as "1D" | "7D" | "30D"
                 )
               }
-              disabled={disabled}
-              className={`rounded px-4 py-2 text-sm font-medium transition ${
+              className={`rounded px-3 py-1 text-sm ${
                 timeframe === tf
                   ? "bg-yellow-500 text-black"
-                  : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-              } ${
-                disabled
-                  ? "opacity-40 cursor-not-allowed"
-                  : ""
+                  : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
               }`}
             >
               {tf}
             </button>
-          );
-        })}
+          ))}
+        </div>
       </div>
 
-      {/* Chart */}
-      <div className="relative mt-6">
-        <div className={locked ? "blur-sm" : ""}>
-          <PriceChart
-            data={history}
-            metal={metal}
-          />
-        </div>
+      {/* Chart Section */}
+      <div className="relative mt-8">
+        <PriceChart data={history} metal={metal} />
 
-        {locked && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-xl text-center px-6">
-            <p className="text-lg font-semibold text-white">
-              Unlock Advanced Trend Analysis
+        {/* 🔒 Lock Overlay */}
+        {isLocked && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/70 backdrop-blur-sm text-center">
+            <p className="text-lg font-semibold">
+              🔒 Unlock 7D & 30D Trends
             </p>
-            <p className="mt-2 text-sm text-neutral-300">
-              Upgrade to Pro to access 7D and 30D
-              historical charts.
+            <p className="mt-2 max-w-sm text-sm text-neutral-400">
+              Understand market direction — not just
+              intraday movement.
             </p>
-            <a
+
+            <Link
               href="/pricing"
-              className="mt-4 rounded bg-yellow-500 px-5 py-2 font-semibold text-black hover:bg-yellow-400 transition"
+              className="mt-4 rounded bg-yellow-500 px-5 py-2 font-semibold text-black hover:bg-yellow-400"
             >
               Upgrade to Pro
-            </a>
+            </Link>
           </div>
         )}
       </div>
