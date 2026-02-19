@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -72,10 +73,10 @@ model Alert {
   type            String    @default("price") // "price" | "percent"
 
   // Price-based alerts
-  price           Float?    
+  price        Float?
 
   // Percent-based alerts (24h move)
-  percentValue    Float?    
+  percentValue Float?
 
   direction       String    // "above" | "below"
   active          Boolean   @default(true)
@@ -107,12 +108,14 @@ model Price {
 }
 
 model Holding {
-  id      String @id @default(cuid())
-  userId  String
-  metal   String // "gold" | "silver"
-
-  ounces  Float
-  avgCost Float   // cost per ounce
+  id          String   @id @default(cuid())
+  userId      String
+  metal       String   // "gold" | "silver" (we can expand later)
+  quantity    Float    // how many ounces (or your chosen unit)
+  unit        String   @default("oz") // "oz" for now
+  costBasis   Float?   // optional: total cost basis for this holding
+  avgCost     Float?   // optional: average cost per unit (oz)
+  notes       String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -120,4 +123,5 @@ model Holding {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([metal])
 }
