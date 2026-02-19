@@ -3,22 +3,20 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import AddHoldingForm from "@/components/AddHoldingForm";
+import Link from "next/link";
 
-async function getCurrentPrice(metal: string) {
-  const latest = await prisma.price.findFirst({
+async function getLatestPrice(metal: "gold" | "silver") {
+  return prisma.price.findFirst({
     where: { metal },
     orderBy: { timestamp: "desc" },
   });
-
-  return latest?.price ?? 0;
 }
 
 export default async function HoldingsPage() {
   const session = await getServerSession(authOptions);
+
   if (!session?.user?.email) {
-    redirect("/login");
+    return <div className="p-10 text-white">Unauthorized</div>;
   }
 
   const user = await prisma.user.findUnique({
@@ -26,91 +24,84 @@ export default async function HoldingsPage() {
   });
 
   if (!user) {
-    redirect("/login");
+    return <div className="p-10 text-white">User not found</div>;
   }
 
   const holdings = await prisma.holding.findMany({
     where: { userId: user.id },
+    orderBy: { purchaseDate: "desc" },
   });
 
-  const goldPrice = await getCurrentPrice("gold");
-  const silverPrice = await getCurrentPrice("silver");
-
-  let totalValue = 0;
-  let totalInvested = 0;
-
-  const enriched = holdings.map((h) => {
-    const currentPrice =
-      h.metal === "gold" ? goldPrice : silverPrice;
-
-    const value = h.ounces * currentPrice;
-    const invested = h.costBasis
-      ? h.ounces * h.costBasis
-      : 0;
-
-    totalValue += value;
-    totalInvested += invested;
-
-    return {
-      ...h,
-      value,
-      invested,
-      profit: value - invested,
-    };
-  });
-
-  const totalProfit = totalValue - totalInvested;
+  const goldPrice = await getLatestPrice("gold");
+  const silverPrice = await getLatestPrice("silver");
 
   return (
-    <main className="p-10 text-white">
-      <h1 className="text-3xl font-bold mb-6">
-        Your Portfolio
-      </h1>
+    <main className="min-h-screen bg-black p-10 text-white">
+      <div className="mx-auto max-w-5xl space-y-8">
 
-      <AddHoldingForm />
-
-      <div className="grid gap-6 mb-10">
-        {enriched.map((h) => (
-          <div
-            key={h.id}
-            className="p-6 rounded-xl bg-neutral-900"
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Your Holdings</h1>
+          <Link
+            href="/dashboard"
+            className="rounded bg-gray-800 px-4 py-2 hover:bg-gray-700"
           >
-            <h2 className="text-xl font-semibold">
-              {h.metal.toUpperCase()}
-            </h2>
-            <p>Ounces: {h.ounces}</p>
-            <p>Current Value: ${h.value.toFixed(2)}</p>
-            <p>
-              Profit/Loss:{" "}
-              <span
-                className={
-                  h.profit >= 0
-                    ? "text-green-400"
-                    : "text-red-400"
-                }
-              >
-                ${h.profit.toFixed(2)}
-              </span>
-            </p>
-          </div>
-        ))}
-      </div>
+            Back to Dashboard
+          </Link>
+        </div>
 
-      <div className="p-6 rounded-xl bg-neutral-800">
-        <h2 className="text-2xl font-semibold mb-4">
-          Portfolio Summary
-        </h2>
-        <p>Total Value: ${totalValue.toFixed(2)}</p>
-        <p>Total Invested: ${totalInvested.toFixed(2)}</p>
-        <p
-          className={
-            totalProfit >= 0
-              ? "text-green-400"
-              : "text-red-400"
-          }
-        >
-          Total Profit: ${totalProfit.toFixed(2)}
-        </p>
+        {holdings.length === 0 && (
+          <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+            No holdings yet.
+          </div>
+        )}
+
+        {holdings.map((h) => {
+          const currentPrice =
+            h.metal === "gold"
+              ? goldPrice?.price ?? 0
+              : silverPrice?.price ?? 0;
+
+          const currentValue = h.ounces * currentPrice;
+          const invested = h.ounces * h.purchasePrice;
+          const pnl = currentValue - invested;
+          const pnlPercent =
+            invested > 0 ? (pnl / invested) * 100 : 0;
+
+          return (
+            <div
+              key={h.id}
+              className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-2"
+            >
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-lg font-semibold capitalize">
+                    {h.metal}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {h.ounces.toFixed(2)} oz @ ${h.purchasePrice.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Purchased {new Date(h.purchaseDate).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  <p className="text-lg font-semibold">
+                    ${currentValue.toFixed(2)}
+                  </p>
+                  <p
+                    className={`text-sm ${
+                      pnl >= 0 ? "text-green-400" : "text-red-400"
+                    }`}
+                  >
+                    {pnl >= 0 ? "+" : ""}
+                    ${pnl.toFixed(2)} ({pnlPercent.toFixed(2)}%)
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </main>
   );
