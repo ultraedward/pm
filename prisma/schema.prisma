@@ -5,30 +5,24 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // If you use Neon + migrations, keep DIRECT_URL in your env and optionally add:
-  // directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-
-  accounts Account[]
-  sessions Session[]
-
-  subscriptionStatus     String?
+  id                     String    @id @default(cuid())
+  email                  String?   @unique
+  createdAt              DateTime  @default(now())
+  image                  String?
+  name                   String?
+  updatedAt              DateTime  @updatedAt
   stripeCustomerId       String?
   stripeSubscriptionId   String?
+  subscriptionStatus     String?
+  emailVerified          DateTime?
   stripeCurrentPeriodEnd DateTime?
-
-  alerts    Alert[]
-  holdings  Holding[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  accounts               Account[]
+  alerts                 Alert[]
+  holdings               Holding[]
+  sessions               Session[]
 }
 
 model Account {
@@ -44,8 +38,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -55,8 +48,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -68,27 +60,19 @@ model VerificationToken {
 }
 
 model Alert {
-  id              String    @id @default(cuid())
-  userId          String
+  id              String         @id @default(cuid())
   metal           String
-  type            String    @default("price") // "price" | "percent"
-
-  // Price-based alerts
+  direction       String
+  active          Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  userId          String
   price           Float?
-
-  // Percent-based alerts (24h move)
-  percentValue    Float?
-
-  direction       String    // "above" | "below"
-  active          Boolean   @default(true)
+  updatedAt       DateTime       @updatedAt
   lastTriggeredAt DateTime?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  triggers AlertTrigger[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  percentValue    Float?
+  type            String         @default("price")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  triggers        AlertTrigger[]
 }
 
 model AlertTrigger {
@@ -96,8 +80,7 @@ model AlertTrigger {
   alertId     String
   price       Float
   triggeredAt DateTime @default(now())
-
-  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  alert       Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
 }
 
 model Price {
@@ -109,18 +92,12 @@ model Price {
 }
 
 model Holding {
-  id            String   @id @default(cuid())
-  userId        String
-  metal         String   // "gold" | "silver"
-  ounces        Float
-  purchasePrice Float    // price per oz at time of purchase
-  purchaseDate  DateTime // date purchased
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id        String   @id @default(cuid())
+  userId    String
+  metal     String
+  ounces    Float
+  costBasis Float?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([metal])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
