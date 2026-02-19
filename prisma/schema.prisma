@@ -108,20 +108,15 @@ model Price {
 }
 
 model Holding {
-  id          String   @id @default(cuid())
-  userId      String
-  metal       String   // "gold" | "silver" (we can expand later)
-  quantity    Float    // how many ounces (or your chosen unit)
-  unit        String   @default("oz") // "oz" for now
-  costBasis   Float?   // optional: total cost basis for this holding
-  avgCost     Float?   // optional: average cost per unit (oz)
-  notes       String?
+  id        String   @id @default(cuid())
+  userId    String
+  metal     String   // "gold" | "silver"
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ounces    Float
+  costBasis Float?   // price per ounce user paid
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId])
-  @@index([metal])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
