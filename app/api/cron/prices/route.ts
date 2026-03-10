@@ -3,18 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    // ✅ Only allow Vercel Cron
-    const cronHeader = request.headers.get("x-vercel-cron");
-
-    if (!cronHeader) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
     const API_KEY = process.env.METALS_API_KEY;
 
     if (!API_KEY) {
@@ -24,47 +14,39 @@ export async function GET(request: Request) {
       );
     }
 
-    // Fetch latest prices (Gold & Silver)
-    const response = await fetch(
+    const res = await fetch(
       `https://api.metals-api.com/v1/latest?access_key=${API_KEY}&base=USD&symbols=XAU,XAG`,
-      {
-        cache: "no-store",
-      }
+      { cache: "no-store" }
     );
 
-    const data = await response.json();
+    const data = await res.json();
 
     if (!data.success) {
-      console.error("Metals API error:", data);
       return NextResponse.json(
         { error: "Metals API failed" },
         { status: 500 }
       );
     }
 
-    const goldPrice = data.rates.XAU;
-    const silverPrice = data.rates.XAG;
+    const goldPrice = 1 / data.rates.XAU;
+    const silverPrice = 1 / data.rates.XAG;
 
-    if (!goldPrice || !silverPrice) {
-      return NextResponse.json(
-        { error: "Invalid price data" },
-        { status: 500 }
-      );
-    }
+    const now = new Date();
 
-    // Save to database
     await prisma.price.createMany({
       data: [
         {
-      metal: "gold",
-      price: goldPrice,
-      timestamp: new Date(),
-      },
-      {
-      metal: "silver",
-      price: silverPrice,
-      timestamp: new Date(),
-      },
+          metal: "gold",
+          price: goldPrice,
+          source: "cron",
+          timestamp: now,
+        },
+        {
+          metal: "silver",
+          price: silverPrice,
+          source: "cron",
+          timestamp: now,
+        },
       ],
     });
 
@@ -74,10 +56,10 @@ export async function GET(request: Request) {
       silver: silverPrice,
     });
   } catch (error) {
-    console.error("Cron error:", error);
+    console.error("Cron price error:", error);
 
     return NextResponse.json(
-      { error: "Cron failed" },
+      { error: "Cron update failed" },
       { status: 500 }
     );
   }
