@@ -1,28 +1,8 @@
-# dependencies
-/node_modules
-
-# next
-/.next
-/out
-
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# env
+node_modules
+.next
+.vercel
 .env
 .env.local
 .env.production
-
-# vercel
-.vercel
-.vercel-deploy
-vercel.force
-
-# temporary
-tmp-*
-FORCE_REDEPLOY*
-
-# OS
+.env.*
 .DS_Store
