@@ -1,1 +1,0 @@
-DELETE FROM "Alert" WHERE "metalId" = 'TEMP_METAL_ID';
