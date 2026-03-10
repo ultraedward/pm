@@ -38,13 +38,11 @@ export async function GET() {
         {
           metal: "gold",
           price: goldPrice,
-          source: "cron",
           timestamp: now,
         },
         {
           metal: "silver",
           price: silverPrice,
-          source: "cron",
           timestamp: now,
         },
       ],
