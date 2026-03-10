@@ -1,150 +1,267 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import PriceChart from "@/components/PriceChart";
-import AnimatedNumber from "@/components/AnimatedNumber";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ReferenceDot,
+} from "recharts";
+
+import { useRouter } from "next/navigation";
 
 type HistoryPoint = {
   price: number;
   timestamp: string;
 };
 
-type MetalData = {
-  price: number;
-  percentChange: number | null;
-  history1D: HistoryPoint[];
-  history7D: HistoryPoint[];
-  history30D: HistoryPoint[];
-  lastUpdated: string;
-};
-
-type Props = {
-  gold: MetalData;
-  silver: MetalData;
-  isPro: boolean;
-};
-
-export default function MetalDashboard({
-  gold,
-  silver,
-  isPro,
-}: Props) {
-  return (
-    <div className="space-y-16">
-      <MetalCard metal="gold" data={gold} isPro={isPro} />
-      <MetalCard metal="silver" data={silver} isPro={isPro} />
-    </div>
-  );
-}
-
-function MetalCard({
-  metal,
+export default function PriceChart({
   data,
-  isPro,
+  metal,
 }: {
+  data: HistoryPoint[];
   metal: "gold" | "silver";
-  data: MetalData;
-  isPro: boolean;
 }) {
-  const [timeframe, setTimeframe] = useState<"1D" | "7D" | "30D">("1D");
+  const strokeColor = metal === "gold" ? "#facc15" : "#e5e7eb";
+  const latest = data[data.length - 1];
 
-  const history =
-    timeframe === "1D"
-      ? data.history1D
-      : timeframe === "7D"
-      ? data.history7D
-      : data.history30D;
+  const router = useRouter();
 
-  const isLocked = !isPro && timeframe !== "1D";
+  const pollingRef = useRef(false);
 
-  const isUp =
-    data.percentChange !== null && data.percentChange >= 0;
+  // Holdings calculator state (persisted)
+  const storageKey = `holdings-${metal}`;
+  const [ounces, setOunces] = useState<number>(0);
+
+  useEffect(() => {
+    // Live dashboard refresh every 10 seconds
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) setOunces(Number(saved));
+    } catch {}
+  }, [storageKey]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, String(ounces));
+    } catch {}
+  }, [ounces, storageKey]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (pollingRef.current) return;
+
+      // pause polling if tab not visible
+      if (document.visibilityState !== "visible") return;
+
+      pollingRef.current = true;
+
+      try {
+        await fetch("/api/update-prices", { cache: "no-store" });
+        router.refresh();
+      } catch (e) {
+        console.error("Live price refresh failed", e);
+      } finally {
+        pollingRef.current = false;
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [router]);
+
+  const portfolioValue = latest ? ounces * latest.price : 0;
 
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold capitalize">
-            {metal}
-          </h2>
+    <div className="space-y-4">
 
-          <div className="mt-3 flex items-baseline gap-4">
-            <AnimatedNumber
-              value={data.price}
-              decimals={2}
-              className="text-3xl font-bold"
-            />
-
-            {data.percentChange !== null && (
-              <span
-                className={`text-sm font-medium ${
-                  isUp
-                    ? "text-green-400"
-                    : "text-red-400"
-                }`}
-              >
-                {isUp ? "▲" : "▼"}{" "}
-                {Math.abs(data.percentChange).toFixed(2)}%
-              </span>
-            )}
+      {/* portfolio summary */}
+      {latest && ounces > 0 && (
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+          <div className="text-xs uppercase tracking-wide text-neutral-400">
+            Your {metal} Holdings
           </div>
 
-          <p className="mt-2 text-xs text-neutral-500">
-            Updated{" "}
-            {new Date(
-              data.lastUpdated
-            ).toLocaleTimeString()}
-          </p>
-        </div>
+          <div className="mt-1 flex items-baseline justify-between">
+            <span className="text-sm text-neutral-400">
+              {ounces.toLocaleString()} oz
+            </span>
 
-        {/* Timeframe Buttons */}
-        <div className="flex gap-2">
-          {["1D", "7D", "30D"].map((tf) => (
-            <button
-              key={tf}
-              onClick={() =>
-                setTimeframe(
-                  tf as "1D" | "7D" | "30D"
-                )
-              }
-              className={`rounded px-3 py-1 text-sm ${
-                timeframe === tf
-                  ? "bg-yellow-500 text-black"
-                  : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
-              }`}
-            >
-              {tf}
-            </button>
-          ))}
+            <span className="text-lg font-semibold text-white">
+              ${portfolioValue.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+          </div>
         </div>
+      )}
+
+      {/* live ticker */}
+      {latest && (
+        <div className="flex items-center justify-between rounded-lg bg-neutral-900 px-4 py-2 text-sm">
+          <span className="font-semibold uppercase tracking-wide">{metal}</span>
+          <span className="font-mono">
+            ${latest.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </div>
+      )}
+
+      {/* holdings calculator */}
+      <div className="flex items-center gap-3 text-sm">
+        <input
+          type="number"
+          placeholder={`Your ${metal} oz`}
+          value={ounces || ""}
+          onChange={(e) => setOunces(Number(e.target.value))}
+          className="w-24 rounded bg-neutral-900 px-2 py-1 text-white outline-none"
+        />
+
+        <span className="text-neutral-400">Value:</span>
+
+        <span className="font-mono">
+          ${portfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </span>
       </div>
 
-      {/* Chart Section */}
-      <div className="relative mt-8">
-        <PriceChart data={history} metal={metal} />
+      <ResponsiveContainer width="100%" height={200}>
+      <LineChart
+        data={data}
+        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+      >
+        <defs>
+          <linearGradient id={`${metal}-gradient`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={strokeColor} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={strokeColor} stopOpacity={0} />
+          </linearGradient>
+          <filter id={`${metal}-glow`} height="200%" width="200%" x="-50%" y="-50%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-        {/* 🔒 Lock Overlay */}
-        {isLocked && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/70 backdrop-blur-sm text-center">
-            <p className="text-lg font-semibold">
-              🔒 Unlock 7D & 30D Trends
-            </p>
-            <p className="mt-2 max-w-sm text-sm text-neutral-400">
-              Understand market direction — not just
-              intraday movement.
-            </p>
+        {/* subtle horizontal grid lines for readability */}
+        <CartesianGrid
+          stroke="#222"
+          strokeDasharray="3 3"
+          vertical={false}
+        />
 
-            <Link
-              href="/pricing"
-              className="mt-4 rounded bg-yellow-500 px-5 py-2 font-semibold text-black hover:bg-yellow-400"
-            >
-              Upgrade to Pro
-            </Link>
-          </div>
+        {/* time axis */}
+        <XAxis
+          dataKey="timestamp"
+          minTickGap={30}
+          tickFormatter={(tick) => {
+            const date = new Date(tick);
+            return date.toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            });
+          }}
+          stroke="#666"
+          tick={{ fontSize: 12 }}
+        />
+
+        {/* price axis */}
+        <YAxis
+          domain={["dataMin - 5", "dataMax + 5"]}
+          tickFormatter={(tick) => `$${Math.round(tick)}`}
+          stroke="#666"
+          tick={{ fontSize: 12 }}
+          tickCount={6}
+          width={60}
+        />
+
+        {/* animated price line */}
+        <Area
+          type="monotone"
+          dataKey="price"
+          stroke="none"
+          fill={`url(#${metal}-gradient)`}
+          isAnimationActive={true}
+          animationDuration={400}
+        />
+
+        <Line
+          type="monotone"
+          dataKey="price"
+          stroke={strokeColor}
+          strokeWidth={2.5}
+          dot={false}
+          activeDot={{ r: 5 }}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          filter={`url(#${metal}-glow)`}
+          isAnimationActive={true}
+          animationDuration={400}
+          animationEasing="ease-out"
+        />
+
+        {latest && (
+          <ReferenceDot
+            x={latest.timestamp}
+            y={latest.price}
+            r={5}
+            isFront
+            shape={(props: any) => {
+              const { cx, cy } = props;
+              return (
+                <g>
+                  <circle cx={cx} cy={cy} r={4} fill={strokeColor} />
+                  <circle cx={cx} cy={cy} r={4} fill={strokeColor} opacity={0.4}>
+                    <animate
+                      attributeName="r"
+                      from="4"
+                      to="12"
+                      dur="1.5s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      from="0.4"
+                      to="0"
+                      dur="1.5s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </g>
+              );
+            }}
+          />
         )}
-      </div>
+
+        {/* trading-style hover tooltip */}
+        <Tooltip
+          cursor={{ stroke: strokeColor, strokeWidth: 1, strokeDasharray: "4 4" }}
+          contentStyle={{
+            background: "#111",
+            border: "1px solid #333",
+            borderRadius: "8px",
+            padding: "8px 10px",
+          }}
+          labelFormatter={(label) => {
+            const d = new Date(label);
+            return d.toLocaleString();
+          }}
+          formatter={(value: number) => [
+            `$${value.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`,
+            "Price",
+          ]}
+          labelStyle={{ color: "#aaa", marginBottom: 4 }}
+        />
+      </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }
