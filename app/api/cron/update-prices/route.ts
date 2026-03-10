@@ -12,10 +12,10 @@ export async function GET() {
       ...prices,
     });
   } catch (error) {
-    console.error("Cron update failed:", error);
+    console.error("Manual update failed:", error);
 
     return NextResponse.json(
-      { error: "Cron update failed" },
+      { error: "Update failed" },
       { status: 500 }
     );
   }
