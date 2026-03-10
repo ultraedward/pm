@@ -10,8 +10,8 @@ export async function GET() {
     take: 2
   });
 
-  let gold = latest.find(p => p.metal === "gold");
-  let silver = latest.find(p => p.metal === "silver");
+  const gold = latest.find(p => p.metal === "gold");
+  const silver = latest.find(p => p.metal === "silver");
 
   const now = Date.now();
 
@@ -22,8 +22,10 @@ export async function GET() {
   ) {
     const updated = await updateMetalsPrices();
 
-    gold = { price: updated.gold };
-    silver = { price: updated.silver };
+    return NextResponse.json({
+      gold: updated.gold,
+      silver: updated.silver
+    });
   }
 
   return NextResponse.json({
