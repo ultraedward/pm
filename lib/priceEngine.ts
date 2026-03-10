@@ -1,5 +1,37 @@
 import { prisma } from "@/lib/prisma";
 
+let cachedPrices: any = null;
+let cacheTimestamp = 0;
+
+const CACHE_DURATION = 30000; // 30 seconds
+
+export async function getCachedPrices() {
+  const now = Date.now();
+
+  if (cachedPrices && now - cacheTimestamp < CACHE_DURATION) {
+    return cachedPrices;
+  }
+
+  const gold = await prisma.price.findFirst({
+    where: { metal: "gold" },
+    orderBy: { timestamp: "desc" },
+  });
+
+  const silver = await prisma.price.findFirst({
+    where: { metal: "silver" },
+    orderBy: { timestamp: "desc" },
+  });
+
+  cachedPrices = {
+    gold: gold?.price ?? 0,
+    silver: silver?.price ?? 0,
+  };
+
+  cacheTimestamp = now;
+
+  return cachedPrices;
+}
+
 export async function updateMetalsPrices() {
   const API_KEY = process.env.METALS_API_KEY;
 
@@ -38,8 +70,12 @@ export async function updateMetalsPrices() {
     ],
   });
 
-  return {
+  cachedPrices = {
     gold: goldPrice,
     silver: silverPrice,
   };
+
+  cacheTimestamp = Date.now();
+
+  return cachedPrices;
 }
