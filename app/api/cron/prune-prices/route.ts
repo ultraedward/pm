@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
-import { updateMetalsPrices } from "@/lib/priceEngine";
+import { prunePriceHistory } from "@/lib/prunePrices";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const prices = await updateMetalsPrices();
+    const result = await prunePriceHistory();
 
     return NextResponse.json({
       success: true,
-      ...prices,
+      ...result,
     });
   } catch (error) {
-    console.error("Manual update failed:", error);
+    console.error("Prune failed:", error);
 
     return NextResponse.json(
-      { error: "Update failed" },
+      { error: "Prune failed" },
       { status: 500 }
     );
   }
