@@ -56,17 +56,15 @@ export async function GET(request: Request) {
     await prisma.price.createMany({
       data: [
         {
-          metal: "gold",
-          price: goldPrice,
-          source: "metals-api",
-          timestamp: new Date(),
-        },
-        {
-          metal: "silver",
-          price: silverPrice,
-          source: "metals-api",
-          timestamp: new Date(),
-        },
+      metal: "gold",
+      price: goldPrice,
+      timestamp: new Date(),
+      },
+      {
+      metal: "silver",
+      price: silverPrice,
+      timestamp: new Date(),
+      },
       ],
     });
 
