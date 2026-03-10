@@ -5,46 +5,29 @@ import { updateMetalsPrices } from "@/lib/priceEngine";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  try {
-    const gold = await prisma.price.findFirst({
-      where: { metal: "gold" },
-      orderBy: { timestamp: "desc" },
-    });
+  const latest = await prisma.price.findMany({
+    orderBy: { timestamp: "desc" },
+    take: 2
+  });
 
-    const silver = await prisma.price.findFirst({
-      where: { metal: "silver" },
-      orderBy: { timestamp: "desc" },
-    });
+  let gold = latest.find(p => p.metal === "gold");
+  let silver = latest.find(p => p.metal === "silver");
 
-    const lastUpdate = gold?.timestamp?.getTime() || 0;
-    const now = Date.now();
+  const now = Date.now();
 
-    // refresh if older than 5 minutes
-    if (now - lastUpdate > 5 * 60 * 1000) {
-      await updateMetalsPrices();
-    }
+  if (
+    !gold ||
+    !silver ||
+    now - new Date(gold.timestamp).getTime() > 5 * 60 * 1000
+  ) {
+    const updated = await updateMetalsPrices();
 
-    const latestGold = await prisma.price.findFirst({
-      where: { metal: "gold" },
-      orderBy: { timestamp: "desc" },
-    });
-
-    const latestSilver = await prisma.price.findFirst({
-      where: { metal: "silver" },
-      orderBy: { timestamp: "desc" },
-    });
-
-    return NextResponse.json({
-      success: true,
-      gold: latestGold?.price ?? 0,
-      silver: latestSilver?.price ?? 0,
-    });
-  } catch (error) {
-    console.error("Price fetch failed:", error);
-
-    return NextResponse.json(
-      { error: "Failed to fetch prices" },
-      { status: 500 }
-    );
+    gold = { price: updated.gold };
+    silver = { price: updated.silver };
   }
+
+  return NextResponse.json({
+    gold: gold.price,
+    silver: silver.price
+  });
 }
