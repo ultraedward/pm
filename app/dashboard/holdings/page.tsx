@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
 
 export const dynamic = "force-dynamic";
 
@@ -54,8 +52,20 @@ async function addHolding(formData: FormData) {
 async function deleteHolding(id: string) {
   "use server";
 
-  await prisma.holding.delete({
-    where: { id },
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) return;
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!user) return;
+
+  await prisma.holding.deleteMany({
+    where: {
+      id,
+      userId: user.id,
+    },
   });
 
   revalidatePath("/dashboard/holdings");
@@ -68,13 +78,29 @@ async function deleteHolding(id: string) {
 export default async function HoldingsPage() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.email) {
+  /* ============================= */
+  /*        DEBUG BLOCK            */
+  /* ============================= */
+
+  if (!session) {
     return (
-      <div className="p-10 text-white">
-        Unauthorized
-      </div>
+      <pre className="p-10 text-white">
+        {JSON.stringify(session, null, 2)}
+      </pre>
     );
   }
+
+  if (!session.user?.email) {
+    return (
+      <pre className="p-10 text-white">
+        {JSON.stringify(session, null, 2)}
+      </pre>
+    );
+  }
+
+  /* ============================= */
+  /*        NORMAL FLOW            */
+  /* ============================= */
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
@@ -93,14 +119,87 @@ export default async function HoldingsPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const goldPrice = await getLatestPrice("gold");
-  const silverPrice = await getLatestPrice("silver");
+  const [goldPrice, silverPrice] = await Promise.all([
+    getLatestPrice("gold"),
+    getLatestPrice("silver"),
+  ]);
+
+  const [goldHistory, silverHistory] = await Promise.all([
+    prisma.price.findMany({
+      where: { metal: "gold" },
+      orderBy: { timestamp: "asc" },
+      take: 30,
+    }),
+    prisma.price.findMany({
+      where: { metal: "silver" },
+      orderBy: { timestamp: "asc" },
+      take: 30,
+    }),
+  ]);
+
+  const totalInvested = holdings.reduce((sum, h) => {
+    return sum + h.ounces * h.purchasePrice;
+  }, 0);
+
+  const totalValue = holdings.reduce((sum, h) => {
+    const currentPrice =
+      h.metal === "gold"
+        ? goldPrice?.price ?? 0
+        : silverPrice?.price ?? 0;
+
+    return sum + h.ounces * currentPrice;
+  }, 0);
+
+  const totalGainLoss = totalValue - totalInvested;
+
+  const totalPercent =
+    totalInvested > 0 ? (totalGainLoss / totalInvested) * 100 : 0;
+
+  const goldValue = holdings
+    .filter((h) => h.metal === "gold")
+    .reduce((sum, h) => sum + h.ounces * (goldPrice?.price ?? 0), 0);
+
+  const silverValue = holdings
+    .filter((h) => h.metal === "silver")
+    .reduce((sum, h) => sum + h.ounces * (silverPrice?.price ?? 0), 0);
+
+  const goldPercent = totalValue > 0 ? (goldValue / totalValue) * 100 : 0;
+  const silverPercent = totalValue > 0 ? (silverValue / totalValue) * 100 : 0;
+
+  const portfolioHistory = goldHistory.map((g, i) => {
+    const s = silverHistory[i];
+    const goldOunces = holdings
+      .filter((h) => h.metal === "gold")
+      .reduce((sum, h) => sum + h.ounces, 0);
+
+    const silverOunces = holdings
+      .filter((h) => h.metal === "silver")
+      .reduce((sum, h) => sum + h.ounces, 0);
+
+    const value =
+      goldOunces * (g?.price ?? 0) +
+      silverOunces * (s?.price ?? 0);
+
+    return value;
+  });
+
+  const maxValue = Math.max(...portfolioHistory, 1);
+
+  const points =
+    portfolioHistory.length > 1
+      ? portfolioHistory
+          .map((v, i) => {
+            const x = (i / (portfolioHistory.length - 1)) * 100;
+            const y = 100 - (v / maxValue) * 100;
+            return `${x},${y}`;
+          })
+          .join(" ")
+      : "0,100 100,100";
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
       <div className="mx-auto max-w-5xl space-y-10">
 
-        {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Your Holdings</h1>
           <Link
@@ -111,15 +210,77 @@ export default async function HoldingsPage() {
           </Link>
         </div>
 
-        {/* ============================= */}
-        {/*        ADD HOLDING FORM       */}
-        {/* ============================= */}
+        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+          <h2 className="mb-4 text-lg font-semibold">Portfolio Performance</h2>
+
+          <div className="h-40 w-full">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+              <polyline
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={points}
+              />
+            </svg>
+          </div>
+
+          <div className="mt-2 text-sm text-gray-400">
+            Last 30 price updates
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+          <h2 className="mb-4 text-lg font-semibold">Portfolio Allocation</h2>
+
+          <div className="space-y-4">
+            <div>
+              <div className="mb-1 flex justify-between text-sm">
+                <span className="text-yellow-400">Gold</span>
+                <span>{goldPercent.toFixed(1)}%</span>
+              </div>
+              <div className="h-3 w-full overflow-hidden rounded bg-gray-800">
+                <div
+                  className="h-full bg-yellow-400"
+                  style={{ width: `${goldPercent}%` }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-1 flex justify-between text-sm">
+                <span className="text-gray-300">Silver</span>
+                <span>{silverPercent.toFixed(1)}%</span>
+              </div>
+              <div className="h-3 w-full overflow-hidden rounded bg-gray-800">
+                <div
+                  className="h-full bg-gray-400"
+                  style={{ width: `${silverPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <div className="relative h-40 w-40">
+              <div
+                className="h-full w-full rounded-full"
+                style={{
+                  background: `conic-gradient(#facc15 0% ${goldPercent}%, #9ca3af ${goldPercent}% 100%)`
+                }}
+              />
+              <div className="absolute inset-4 flex items-center justify-center rounded-full bg-gray-950 text-sm text-gray-300">
+                {goldPercent.toFixed(0)} / {silverPercent.toFixed(0)}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4">
           <h2 className="text-lg font-semibold">Add Holding</h2>
 
           <form action={addHolding} className="grid gap-4 md:grid-cols-4">
-            
             <select
               name="metal"
               required
@@ -163,10 +324,6 @@ export default async function HoldingsPage() {
             </button>
           </form>
         </div>
-
-        {/* ============================= */}
-        {/*         HOLDINGS LIST         */}
-        {/* ============================= */}
 
         {holdings.length === 0 && (
           <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -222,10 +379,18 @@ export default async function HoldingsPage() {
                       ${gainLoss.toFixed(2)} (
                       {percent.toFixed(2)}%)
                     </p>
+                    <div className="mt-3 h-2 w-full overflow-hidden rounded bg-gray-800">
+                      <div
+                        className={`h-full ${
+                          percent >= 0 ? "bg-green-500" : "bg-red-500"
+                        }`}
+                        style={{ width: `${Math.min(Math.abs(percent), 100)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <form action={() => deleteHolding(h.id)}>
+                <form action={deleteHolding.bind(null, h.id)}>
                   <button
                     type="submit"
                     className="rounded bg-red-600 px-3 py-1 text-sm hover:bg-red-500"

@@ -87,8 +87,9 @@ model Price {
   id        String   @id @default(cuid())
   metal     String
   price     Float
-  source    String
-  timestamp DateTime @default(now())
+  timestamp DateTime
+
+  @@unique([metal, timestamp], name: "metal_timestamp")
 }
 
 model Holding {
@@ -96,11 +97,9 @@ model Holding {
   userId        String
   metal         String
   ounces        Float
-  purchasePrice Float
-  purchaseDate  DateTime
-
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  purchaseDate  DateTime
+  purchasePrice Float
+  user          User     @relation(fields: [userId], references: [id])
 }

@@ -1,11 +1,21 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/requireUser";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
 import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
 import { AlertsTable } from "@/components/AlertsTable";
 
 export default async function AlertsPage() {
-  const user = await requireUser();
+  const session = await getServerSession(authOptions);
+
+if (!session?.user) {
+  redirect("/api/auth/signin?callbackUrl=/alerts");
+}
+
+// NextAuth sessions usually do not include user.id
+// so we use email as the stable identifier
+const user = { id: session.user.email! };
   const alerts = await getUserAlerts(user.id);
   const plan = await canCreateAlert(user.id);
 

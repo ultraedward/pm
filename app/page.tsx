@@ -3,12 +3,12 @@ export const revalidate = 0;
 import { prisma } from "@/lib/prisma";
 import MetalDashboard from "@/components/MetalDashboard";
 
-type HistoryPoint = {
+export type HistoryPoint = {
   price: number;
   timestamp: string;
 };
 
-type MetalData = {
+export type MetalData = {
   price: number;
   percentChange: number | null;
   history1D: HistoryPoint[];
@@ -26,15 +26,22 @@ function formatHistory(
   }));
 }
 
+function filterSince(
+  rows: { price: number; timestamp: Date }[],
+  since: Date
+) {
+  return rows.filter((r) => r.timestamp >= since);
+}
+
 async function getMetalData(
   metal: "gold" | "silver"
 ): Promise<MetalData> {
-  const latest = await prisma.price.findFirst({
+  const rows = await prisma.price.findMany({
     where: { metal },
-    orderBy: { timestamp: "desc" },
+    orderBy: { timestamp: "asc" },
   });
 
-  if (!latest) {
+  if (!rows.length) {
     return {
       price: 0,
       percentChange: null,
@@ -45,25 +52,20 @@ async function getMetalData(
     };
   }
 
+  const latest = rows[rows.length - 1];
+
   const now = new Date();
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const history1D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: oneDayAgo } },
-    orderBy: { timestamp: "asc" },
-  });
+  let history1D = filterSince(rows, oneDayAgo);
 
-  const history7D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: sevenDaysAgo } },
-    orderBy: { timestamp: "asc" },
-  });
-
-  const history30D = await prisma.price.findMany({
-    where: { metal, timestamp: { gte: thirtyDaysAgo } },
-    orderBy: { timestamp: "asc" },
-  });
+  if (history1D.length < 2) {
+  history1D = rows.slice(-7);
+  }
+  const history7D = filterSince(rows, sevenDaysAgo);
+  const history30D = filterSince(rows, thirtyDaysAgo);
 
   const baseline = history1D[0];
 
@@ -83,8 +85,10 @@ async function getMetalData(
 }
 
 export default async function HomePage() {
-  const gold = await getMetalData("gold");
-  const silver = await getMetalData("silver");
+  const [gold, silver] = await Promise.all([
+    getMetalData("gold"),
+    getMetalData("silver"),
+  ]);
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
@@ -98,7 +102,6 @@ export default async function HomePage() {
           </p>
         </div>
 
-        {/* IMPORTANT: Marketing page is NOT Pro */}
         <MetalDashboard
           gold={gold}
           silver={silver}

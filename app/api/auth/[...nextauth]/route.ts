@@ -1,5 +1,3 @@
-// FULL FILE — COPY / PASTE
-
 import NextAuth from "next-auth";
 import { authOptions } from "@/lib/auth";
 
