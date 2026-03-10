@@ -1,9 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { compressPrices } from "@/lib/compressPrices";
 
 export async function updateMetalsPrices() {
-  const response = await fetch(
-    "https://api.metals.live/v1/spot"
-  );
+  const response = await fetch("https://api.metals.live/v1/spot");
 
   const data = await response.json();
 
@@ -30,6 +29,9 @@ export async function updateMetalsPrices() {
       }
     ]
   });
+
+  // compress database automatically
+  await compressPrices();
 
   return { gold, silver };
 }
