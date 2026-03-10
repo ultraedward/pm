@@ -92,10 +92,10 @@ export async function GET(req: Request) {
     // 2️⃣ Store prices
     // --------------------------------------------------
     await prisma.price.createMany({
-      data: [
-        { metal: "gold", price: goldPrice, source: "metals-api" },
-        { metal: "silver", price: silverPrice, source: "metals-api" },
-      ],
+    data: [
+    { metal: "gold", price: goldPrice },
+    { metal: "silver", price: silverPrice },
+    ],
     });
 
     // --------------------------------------------------
