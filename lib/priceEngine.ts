@@ -1,19 +1,42 @@
 import { prisma } from "@/lib/prisma";
 
+const TEN_MINUTES = 10 * 60 * 1000;
+
 export async function updateMetalsPrices() {
   try {
-    const response = await fetch("https://api.metals.live/v1/spot", {
-      cache: "no-store"
+
+    const latest = await prisma.price.findFirst({
+      orderBy: { timestamp: "desc" }
     });
+
+    const now = Date.now();
+
+    if (latest && now - new Date(latest.timestamp).getTime() < TEN_MINUTES) {
+
+      const latestPrices = await prisma.price.findMany({
+        orderBy: { timestamp: "desc" },
+        take: 2
+      });
+
+      const gold = latestPrices.find(p => p.metal === "gold")?.price ?? null;
+      const silver = latestPrices.find(p => p.metal === "silver")?.price ?? null;
+
+      return { gold, silver };
+    }
+
+    const response = await fetch(
+      `https://metals-api.com/api/latest?access_key=${process.env.METALS_API_KEY}&base=USD&symbols=XAU,XAG`,
+      { cache: "no-store" }
+    );
 
     const data = await response.json();
 
-    const gold = data?.find((m: any) => m.gold)?.gold ?? null;
-    const silver = data?.find((m: any) => m.silver)?.silver ?? null;
-
-    if (!gold || !silver) {
-      throw new Error("Metals API returned invalid data");
+    if (!data.success) {
+      throw new Error("Metals API failed");
     }
+
+    const gold = 1 / data.rates.XAU;
+    const silver = 1 / data.rates.XAG;
 
     const timestamp = new Date();
 
