@@ -1,36 +1,37 @@
 import { prisma } from "@/lib/prisma";
-import { compressPrices } from "@/lib/compressPrices";
 
 export async function updateMetalsPrices() {
-  const response = await fetch("https://api.metals.live/v1/spot");
+  try {
+    const response = await fetch("https://api.metals.live/v1/spot", {
+      cache: "no-store"
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  const gold = data.find((m: any) => m.gold)?.gold;
-  const silver = data.find((m: any) => m.silver)?.silver;
+    const gold = data?.find((m: any) => m.gold)?.gold ?? null;
+    const silver = data?.find((m: any) => m.silver)?.silver ?? null;
 
-  if (!gold || !silver) {
-    throw new Error("Invalid metals API response");
+    if (!gold || !silver) {
+      throw new Error("Metals API returned invalid data");
+    }
+
+    const timestamp = new Date();
+
+    await prisma.price.createMany({
+      data: [
+        { metal: "gold", price: gold, timestamp },
+        { metal: "silver", price: silver, timestamp }
+      ]
+    });
+
+    return { gold, silver };
+
+  } catch (error) {
+    console.error("Price engine failure:", error);
+
+    return {
+      gold: null,
+      silver: null
+    };
   }
-
-  const now = new Date();
-
-  await prisma.price.createMany({
-    data: [
-      {
-        metal: "gold",
-        price: gold,
-        timestamp: now
-      },
-      {
-        metal: "silver",
-        price: silver,
-        timestamp: now
-      }
-    ]
-  });
-
-  await compressPrices();
-
-  return { gold, silver };
 }
