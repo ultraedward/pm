@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 const TEN_MINUTES = 10 * 60 * 1000;
+const GRAMS_PER_TROY_OUNCE = 31.1035;
 
 export async function updateMetalsPrices() {
   try {
@@ -21,7 +22,12 @@ export async function updateMetalsPrices() {
       const gold = latestPrices.find(p => p.metal === "gold")?.price ?? null;
       const silver = latestPrices.find(p => p.metal === "silver")?.price ?? null;
 
-      return { gold, silver };
+      return {
+        ok: true,
+        gold,
+        silver,
+        source: "database"
+      };
     }
 
     const response = await fetch(
@@ -32,11 +38,11 @@ export async function updateMetalsPrices() {
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error("Metals API failed");
+      throw new Error("Metals API request failed");
     }
 
-    const gold = 1 / data.rates.XAU;
-    const silver = 1 / data.rates.XAG;
+    const gold = Number((data.rates.XAU * GRAMS_PER_TROY_OUNCE).toFixed(2));
+    const silver = Number((data.rates.XAG * GRAMS_PER_TROY_OUNCE).toFixed(2));
 
     const timestamp = new Date();
 
@@ -47,14 +53,21 @@ export async function updateMetalsPrices() {
       ]
     });
 
-    return { gold, silver };
+    return {
+      ok: true,
+      gold,
+      silver,
+      source: "api"
+    };
 
   } catch (error) {
     console.error("Price engine failure:", error);
 
     return {
+      ok: false,
       gold: null,
-      silver: null
+      silver: null,
+      source: "error"
     };
   }
 }
