@@ -30,7 +30,6 @@ export async function updateMetalsPrices() {
     ]
   });
 
-  // compress database automatically
   await compressPrices();
 
   return { gold, silver };
