@@ -2,6 +2,7 @@ export const revalidate = 0;
 
 import { prisma } from "@/lib/prisma";
 import MetalDashboard from "@/components/MetalDashboard";
+import MetalsChart from "@/components/MetalsChart";
 
 export type HistoryPoint = {
   price: number;
@@ -37,7 +38,12 @@ async function getMetalData(
   metal: "gold" | "silver"
 ): Promise<MetalData> {
   const rows = await prisma.price.findMany({
-    where: { metal },
+    where: {
+      metal,
+      timestamp: {
+        gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      }
+    },
     orderBy: { timestamp: "asc" },
   });
 
@@ -62,8 +68,9 @@ async function getMetalData(
   let history1D = filterSince(rows, oneDayAgo);
 
   if (history1D.length < 2) {
-  history1D = rows.slice(-7);
+    history1D = rows.slice(-7);
   }
+
   const history7D = filterSince(rows, sevenDaysAgo);
   const history30D = filterSince(rows, thirtyDaysAgo);
 
@@ -107,6 +114,20 @@ export default async function HomePage() {
           silver={silver}
           isPro={false}
         />
+
+        <section className="mt-12 space-y-4">
+          <h2 className="text-2xl font-semibold text-white">
+            Market History
+          </h2>
+
+          <p className="text-neutral-400 text-sm">
+            Historical price movement for gold and silver.
+          </p>
+
+          <div className="mt-6">
+            <MetalsChart />
+          </div>
+        </section>
       </div>
     </main>
   );
