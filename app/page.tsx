@@ -15,6 +15,8 @@ type MetalData = {
   lastUpdated: string;
 };
 
+type Metal = "gold" | "silver" | "platinum" | "palladium";
+
 // ─── data fetching ────────────────────────────────────────────────────────────
 
 function filterSince(
@@ -24,9 +26,7 @@ function filterSince(
   return rows.filter((r) => r.timestamp >= since);
 }
 
-async function getMetalData(
-  metal: "gold" | "silver"
-): Promise<MetalData> {
+async function getMetalData(metal: Metal): Promise<MetalData> {
   try {
     const rows = await prisma.price.findMany({
       where: {
@@ -67,17 +67,15 @@ async function getMetalData(
 
 // ─── sub-components ───────────────────────────────────────────────────────────
 
-function PriceCard({
-  label,
-  symbol,
-  data,
-  accentColor,
-}: {
-  label: string;
-  symbol: string;
-  data: MetalData;
-  accentColor: string;
-}) {
+const METAL_META: Record<Metal, { label: string; symbol: string; color: string }> = {
+  gold:      { label: "Gold",      symbol: "XAU/USD", color: "#f59e0b" },
+  silver:    { label: "Silver",    symbol: "XAG/USD", color: "#94a3b8" },
+  platinum:  { label: "Platinum",  symbol: "XPT/USD", color: "#a78bfa" },
+  palladium: { label: "Palladium", symbol: "XPD/USD", color: "#34d399" },
+};
+
+function PriceCard({ metal, data }: { metal: Metal; data: MetalData }) {
+  const { label, symbol, color } = METAL_META[metal];
   const isPositive = (data.percentChange ?? 0) >= 0;
   const sparkData = data.history1D.map((p) => ({ value: p.price }));
   const hasPrice = data.price > 0;
@@ -88,7 +86,7 @@ function PriceCard({
         <div className="flex items-center gap-2">
           <span
             className="inline-block h-2.5 w-2.5 rounded-full"
-            style={{ backgroundColor: accentColor }}
+            style={{ backgroundColor: color }}
           />
           <span className="text-sm font-medium text-gray-400 uppercase tracking-wider">
             {label}
@@ -160,17 +158,25 @@ function StepBadge({ n }: { n: number }) {
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [gold, silver] = await Promise.all([
+  const [gold, silver, platinum, palladium] = await Promise.all([
     getMetalData("gold"),
     getMetalData("silver"),
+    getMetalData("platinum"),
+    getMetalData("palladium"),
   ]);
+
+  const prices: [Metal, MetalData][] = [
+    ["gold", gold],
+    ["silver", silver],
+    ["platinum", platinum],
+    ["palladium", palladium],
+  ];
 
   return (
     <main className="min-h-screen bg-black text-white">
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden border-b border-gray-900">
-        {/* subtle radial glow */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -192,8 +198,8 @@ export default async function HomePage() {
           </h1>
 
           <p className="mt-6 mx-auto max-w-xl text-lg text-gray-400 leading-relaxed">
-            Track gold and silver spot prices, set custom alerts, and monitor
-            your precious metals portfolio — all in one place.
+            Track gold, silver, platinum, and palladium spot prices. Set custom
+            alerts. Monitor your portfolio — all in one place.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -230,19 +236,10 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <PriceCard
-            label="Gold"
-            symbol="XAU/USD"
-            data={gold}
-            accentColor="#f59e0b"
-          />
-          <PriceCard
-            label="Silver"
-            symbol="XAG/USD"
-            data={silver}
-            accentColor="#94a3b8"
-          />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {prices.map(([metal, data]) => (
+            <PriceCard key={metal} metal={metal} data={data} />
+          ))}
         </div>
       </section>
 
@@ -252,7 +249,8 @@ export default async function HomePage() {
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold">Everything you need</h2>
             <p className="mt-3 text-gray-400 max-w-md mx-auto">
-              Built for investors who want to stay ahead of the market without watching charts all day.
+              Built for investors who want to stay ahead of the market without
+              watching charts all day.
             </p>
           </div>
 
@@ -264,7 +262,7 @@ export default async function HomePage() {
                 </svg>
               }
               title="Price Alerts"
-              description="Set a target price and get an email the moment gold or silver crosses it. No more refreshing charts."
+              description="Set a target price and get an email the moment a metal crosses it. Works for all four metals."
             />
             <FeatureCard
               icon={
@@ -273,7 +271,7 @@ export default async function HomePage() {
                 </svg>
               }
               title="Portfolio Tracker"
-              description="Log your gold and silver holdings with your purchase price. See your total value and gain/loss update in real time."
+              description="Log your holdings with purchase price. See your total value and gain/loss update in real time."
             />
             <FeatureCard
               icon={
@@ -282,7 +280,7 @@ export default async function HomePage() {
                 </svg>
               }
               title="Price History Charts"
-              description="View 24h, 7-day, and 30-day price charts for gold and silver. Toggle between metals and spot trends at a glance."
+              description="24h, 7-day, and 30-day charts for all four metals. Spot trends at a glance."
             />
             <FeatureCard
               icon={
@@ -291,7 +289,7 @@ export default async function HomePage() {
                 </svg>
               }
               title="Email Notifications"
-              description="Instant email alerts when your price targets are hit. No app required — works wherever your inbox is."
+              description="Instant email alerts when your price targets are hit. No app required."
             />
             <FeatureCard
               icon={
@@ -300,7 +298,7 @@ export default async function HomePage() {
                 </svg>
               }
               title="Metal Calculator"
-              description="Quickly calculate the spot value of any quantity of gold or silver using live prices — useful before you buy or sell."
+              description="Calculate the spot value of any quantity using live prices — useful before you buy or sell."
             />
             <FeatureCard
               icon={
@@ -309,7 +307,7 @@ export default async function HomePage() {
                 </svg>
               }
               title="Secure & Private"
-              description="Your portfolio data stays yours. No ads, no selling your data — just a clean tool that does what it says."
+              description="No ads, no selling your data. Your portfolio stays yours."
             />
           </div>
         </div>
@@ -332,7 +330,7 @@ export default async function HomePage() {
               {
                 title: "Set your first alert",
                 description:
-                  "Choose a metal, pick a target price, and decide whether to trigger when it goes above or below. Done in 30 seconds.",
+                  "Choose a metal, pick a target price, and decide whether to trigger above or below. Done in 30 seconds.",
               },
               {
                 title: "Get notified instantly",
@@ -385,7 +383,7 @@ export default async function HomePage() {
               <ul className="mt-8 space-y-3 text-sm text-gray-400">
                 {[
                   "Up to 3 price alerts",
-                  "Gold & silver tracking",
+                  "All 4 metals tracked",
                   "Portfolio value tracker",
                   "Email notifications",
                 ].map((f) => (

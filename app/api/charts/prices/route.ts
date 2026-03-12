@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
-type MetalKey = "gold" | "silver";
+type MetalKey = "gold" | "silver" | "platinum" | "palladium";
 
 type PriceRow = {
   price: number;
@@ -88,9 +88,9 @@ export async function GET(req: NextRequest) {
     const metal = (searchParams.get("metal") || "gold") as MetalKey;
     const range = (searchParams.get("range") || "24h") as RangeKey;
 
-    if (metal !== "gold" && metal !== "silver") {
+    if (!["gold", "silver", "platinum", "palladium"].includes(metal)) {
       return NextResponse.json(
-        { error: "Invalid metal. Use gold or silver." },
+        { error: "Invalid metal. Use gold, silver, platinum, or palladium." },
         { status: 400 }
       );
     }

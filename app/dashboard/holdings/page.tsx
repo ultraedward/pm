@@ -119,9 +119,11 @@ export default async function HoldingsPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const [goldPrice, silverPrice] = await Promise.all([
+  const [goldPrice, silverPrice, platinumPrice, palladiumPrice] = await Promise.all([
     getLatestPrice("gold"),
     getLatestPrice("silver"),
+    getLatestPrice("platinum"),
+    getLatestPrice("palladium"),
   ]);
 
   const [goldHistory, silverHistory] = await Promise.all([
@@ -141,12 +143,15 @@ export default async function HoldingsPage() {
     return sum + h.ounces * h.purchasePrice;
   }, 0);
 
-  const totalValue = holdings.reduce((sum, h) => {
-    const currentPrice =
-      h.metal === "gold"
-        ? goldPrice?.price ?? 0
-        : silverPrice?.price ?? 0;
+  const spotMap: Record<string, number> = {
+    gold:      goldPrice?.price      ?? 0,
+    silver:    silverPrice?.price    ?? 0,
+    platinum:  platinumPrice?.price  ?? 0,
+    palladium: palladiumPrice?.price ?? 0,
+  };
 
+  const totalValue = holdings.reduce((sum, h) => {
+    const currentPrice = spotMap[h.metal] ?? 0;
     return sum + h.ounces * currentPrice;
   }, 0);
 
@@ -155,16 +160,22 @@ export default async function HoldingsPage() {
   const totalPercent =
     totalInvested > 0 ? (totalGainLoss / totalInvested) * 100 : 0;
 
-  const goldValue = holdings
-    .filter((h) => h.metal === "gold")
-    .reduce((sum, h) => sum + h.ounces * (goldPrice?.price ?? 0), 0);
+  const metalValues = ["gold", "silver", "platinum", "palladium"].map((metal) => ({
+    metal,
+    value: holdings
+      .filter((h) => h.metal === metal)
+      .reduce((sum, h) => sum + h.ounces * (spotMap[metal] ?? 0), 0),
+  }));
 
-  const silverValue = holdings
-    .filter((h) => h.metal === "silver")
-    .reduce((sum, h) => sum + h.ounces * (silverPrice?.price ?? 0), 0);
+  const goldValue     = metalValues.find((m) => m.metal === "gold")?.value ?? 0;
+  const silverValue   = metalValues.find((m) => m.metal === "silver")?.value ?? 0;
+  const platinumValue = metalValues.find((m) => m.metal === "platinum")?.value ?? 0;
+  const palladiumValue= metalValues.find((m) => m.metal === "palladium")?.value ?? 0;
 
-  const goldPercent = totalValue > 0 ? (goldValue / totalValue) * 100 : 0;
-  const silverPercent = totalValue > 0 ? (silverValue / totalValue) * 100 : 0;
+  const goldPercent     = totalValue > 0 ? (goldValue / totalValue) * 100 : 0;
+  const silverPercent   = totalValue > 0 ? (silverValue / totalValue) * 100 : 0;
+  const platinumPercent = totalValue > 0 ? (platinumValue / totalValue) * 100 : 0;
+  const palladiumPercent= totalValue > 0 ? (palladiumValue / totalValue) * 100 : 0;
 
   const portfolioHistory = goldHistory.map((g, i) => {
     const s = silverHistory[i];
@@ -234,32 +245,23 @@ export default async function HoldingsPage() {
         <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
           <h2 className="mb-4 text-lg font-semibold">Portfolio Allocation</h2>
 
-          <div className="space-y-4">
-            <div>
-              <div className="mb-1 flex justify-between text-sm">
-                <span className="text-yellow-400">Gold</span>
-                <span>{goldPercent.toFixed(1)}%</span>
+          <div className="space-y-3">
+            {[
+              { label: "Gold",      pct: goldPercent,      bar: "bg-yellow-400",  text: "text-yellow-400"  },
+              { label: "Silver",    pct: silverPercent,    bar: "bg-gray-400",    text: "text-gray-300"    },
+              { label: "Platinum",  pct: platinumPercent,  bar: "bg-purple-400",  text: "text-purple-400"  },
+              { label: "Palladium", pct: palladiumPercent, bar: "bg-emerald-400", text: "text-emerald-400" },
+            ].map(({ label, pct, bar, text }) => pct > 0 ? (
+              <div key={label}>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className={text}>{label}</span>
+                  <span>{pct.toFixed(1)}%</span>
+                </div>
+                <div className="h-3 w-full overflow-hidden rounded bg-gray-800">
+                  <div className={`h-full ${bar}`} style={{ width: `${pct}%` }} />
+                </div>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded bg-gray-800">
-                <div
-                  className="h-full bg-yellow-400"
-                  style={{ width: `${goldPercent}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-1 flex justify-between text-sm">
-                <span className="text-gray-300">Silver</span>
-                <span>{silverPercent.toFixed(1)}%</span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded bg-gray-800">
-                <div
-                  className="h-full bg-gray-400"
-                  style={{ width: `${silverPercent}%` }}
-                />
-              </div>
-            </div>
+            ) : null)}
           </div>
 
           <div className="mt-6 flex justify-center">
@@ -267,11 +269,16 @@ export default async function HoldingsPage() {
               <div
                 className="h-full w-full rounded-full"
                 style={{
-                  background: `conic-gradient(#facc15 0% ${goldPercent}%, #9ca3af ${goldPercent}% 100%)`
+                  background: `conic-gradient(
+                    #facc15 0% ${goldPercent}%,
+                    #9ca3af ${goldPercent}% ${goldPercent + silverPercent}%,
+                    #a78bfa ${goldPercent + silverPercent}% ${goldPercent + silverPercent + platinumPercent}%,
+                    #34d399 ${goldPercent + silverPercent + platinumPercent}% 100%
+                  )`,
                 }}
               />
-              <div className="absolute inset-4 flex items-center justify-center rounded-full bg-gray-950 text-sm text-gray-300">
-                {goldPercent.toFixed(0)} / {silverPercent.toFixed(0)}
+              <div className="absolute inset-4 flex items-center justify-center rounded-full bg-gray-950 text-xs text-gray-400 text-center leading-tight">
+                {goldPercent.toFixed(0)}%<br />gold
               </div>
             </div>
           </div>
@@ -289,6 +296,8 @@ export default async function HoldingsPage() {
               <option value="">Select Metal</option>
               <option value="gold">Gold</option>
               <option value="silver">Silver</option>
+              <option value="platinum">Platinum</option>
+              <option value="palladium">Palladium</option>
             </select>
 
             <input
@@ -333,10 +342,7 @@ export default async function HoldingsPage() {
 
         <div className="grid gap-6">
           {holdings.map((h) => {
-            const currentPrice =
-              h.metal === "gold"
-                ? goldPrice?.price ?? 0
-                : silverPrice?.price ?? 0;
+            const currentPrice = spotMap[h.metal] ?? 0;
 
             const value = h.ounces * currentPrice;
             const invested = h.ounces * h.purchasePrice;
