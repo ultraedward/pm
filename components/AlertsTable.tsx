@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 type Trigger = {
   id: string;
@@ -20,6 +21,30 @@ type Alert = {
 
 export function AlertsTable({ alerts }: { alerts: Alert[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  async function handleToggle(alertId: string) {
+    setLoadingId(alertId);
+    try {
+      await fetch(`/api/alerts/${alertId}/toggle`, { method: "POST" });
+      startTransition(() => router.refresh());
+    } finally {
+      setLoadingId(null);
+    }
+  }
+
+  async function handleDelete(alertId: string) {
+    if (!confirm("Delete this alert?")) return;
+    setLoadingId(alertId);
+    try {
+      await fetch(`/api/alerts/${alertId}/delete`, { method: "POST" });
+      startTransition(() => router.refresh());
+    } finally {
+      setLoadingId(null);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -29,50 +54,68 @@ export function AlertsTable({ alerts }: { alerts: Alert[] }) {
           triggerCount > 0 ? alert.triggers[0].triggeredAt : null;
 
         const isOpen = openId === alert.id;
+        const isLoading = loadingId === alert.id;
 
         return (
           <div
             key={alert.id}
-            className="panel p-5 space-y-3 transition-all"
+            className="rounded-xl border border-gray-800 bg-gray-900 p-5 space-y-3 transition-all"
           >
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-lg font-semibold capitalize">
                   {alert.metal} {alert.direction === "above" ? "≥" : "≤"} $
                   {alert.price.toLocaleString()}
                 </div>
 
-                <div className="text-sm text-gray-400">
-                  {triggerCount} trigger
-                  {triggerCount !== 1 && "s"}
+                <div className="text-sm text-gray-400 mt-0.5">
+                  {triggerCount} trigger{triggerCount !== 1 && "s"}
                   {lastTriggered && (
-                    <> • Last: {new Date(lastTriggered).toLocaleString()}</>
+                    <> · Last: {new Date(lastTriggered).toLocaleString()}</>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 shrink-0">
+                {/* Active/Paused badge */}
                 <span
-                  className={`text-xs px-2 py-1 rounded ${
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${
                     alert.active
-                      ? "bg-green-900 text-green-400"
-                      : "bg-gray-800 text-gray-400"
+                      ? "bg-green-900/50 text-green-400 border border-green-800"
+                      : "bg-gray-800 text-gray-400 border border-gray-700"
                   }`}
                 >
                   {alert.active ? "Active" : "Paused"}
                 </span>
 
+                {/* History toggle */}
                 {triggerCount > 0 && (
                   <button
-                    onClick={() =>
-                      setOpenId(isOpen ? null : alert.id)
-                    }
-                    className="text-sm text-gray-400 hover:text-white transition"
+                    onClick={() => setOpenId(isOpen ? null : alert.id)}
+                    className="text-xs text-gray-400 hover:text-white transition"
                   >
-                    {isOpen ? "Hide history" : "View history"}
+                    {isOpen ? "Hide history" : "History"}
                   </button>
                 )}
+
+                {/* Toggle active */}
+                <button
+                  onClick={() => handleToggle(alert.id)}
+                  disabled={isLoading}
+                  className="text-xs px-2 py-1 rounded border border-gray-700 text-gray-300 hover:bg-gray-800 transition disabled:opacity-40"
+                >
+                  {isLoading ? "…" : alert.active ? "Pause" : "Resume"}
+                </button>
+
+                {/* Delete */}
+                <button
+                  onClick={() => handleDelete(alert.id)}
+                  disabled={isLoading}
+                  className="text-xs px-2 py-1 rounded border border-red-900 text-red-400 hover:bg-red-950 transition disabled:opacity-40"
+                >
+                  {isLoading ? "…" : "Delete"}
+                </button>
               </div>
             </div>
 
@@ -84,10 +127,8 @@ export function AlertsTable({ alerts }: { alerts: Alert[] }) {
                     key={trigger.id}
                     className="flex justify-between text-sm text-gray-300"
                   >
-                    <span>
-                      ${trigger.price.toLocaleString()}
-                    </span>
-                    <span>
+                    <span>${trigger.price.toLocaleString()}</span>
+                    <span className="text-gray-500">
                       {new Date(trigger.triggeredAt).toLocaleString()}
                     </span>
                   </div>

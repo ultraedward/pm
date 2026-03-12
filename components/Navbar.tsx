@@ -18,6 +18,7 @@ export default async function Navbar() {
   }
 
   const isPro = subscriptionStatus === "active";
+  const isLoggedIn = !!session?.user;
 
   return (
     <nav className="border-b border-gray-900 bg-black">
@@ -27,16 +28,16 @@ export default async function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6 text-sm">
-          <Link href="/dashboard" className="text-gray-400 hover:text-white">
-            Dashboard
-          </Link>
-
-          <Link href="/alerts" className="text-gray-400 hover:text-white">
-            Alerts
-          </Link>
-
-          {session?.user && (
+          {isLoggedIn ? (
             <>
+              <Link href="/dashboard" className="text-gray-400 hover:text-white">
+                Dashboard
+              </Link>
+
+              <Link href="/alerts" className="text-gray-400 hover:text-white">
+                Alerts
+              </Link>
+
               {isPro ? (
                 <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
                   PRO
@@ -49,6 +50,18 @@ export default async function Navbar() {
                   Upgrade
                 </Link>
               )}
+            </>
+          ) : (
+            <>
+              <Link href="/pricing" className="text-gray-400 hover:text-white">
+                Pricing
+              </Link>
+              <Link
+                href="/login"
+                className="rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-gray-200"
+              >
+                Sign in
+              </Link>
             </>
           )}
         </div>

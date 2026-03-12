@@ -1,61 +1,81 @@
-"use client";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
+import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
+import { AlertsTable } from "@/components/AlertsTable";
 
-import { useEffect, useState } from "react";
+export const dynamic = "force-dynamic";
 
-type Alert = {
-  id: string;
-  metal: string;
-  target: number;
-  direction: string;
-  active: boolean;
-};
+export default async function DashboardAlertsPage() {
+  const session = await getServerSession(authOptions);
 
-export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/alerts");
-        const data = await res.json();
-
-        setAlerts(Array.isArray(data.alerts) ? data.alerts : []);
-      } catch {
-        setAlerts([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  if (loading) {
-    return <p>Loading alerts…</p>;
+  if (!session?.user) {
+    redirect("/api/auth/signin?callbackUrl=/dashboard/alerts");
   }
 
-  if (alerts.length === 0) {
-    return <p>No alerts yet.</p>;
-  }
+  const user = { id: session.user.email! };
+  const alerts = await getUserAlerts(user.id);
+  const plan = await canCreateAlert(user.id);
+
+  const hasAlerts = alerts.length > 0;
 
   return (
-    <ul className="space-y-3">
-      {alerts.map((e) => (
-        <li
-          key={e.id}
-          className="rounded border p-3 flex justify-between items-center"
-        >
-          <div>
-            <p className="font-medium">
-              {e.metal.toUpperCase()} {e.direction} ${e.target.toFixed(2)}
-            </p>
-            <p className="text-sm text-gray-500">
-              Status: {e.active ? "Active" : "Inactive"}
-            </p>
+    <div className="min-h-screen bg-black p-8 text-white">
+      <div className="mx-auto max-w-4xl space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Alerts</h1>
+
+          <Link
+            href="/alerts/new"
+            className="rounded bg-white px-4 py-2 text-sm font-medium text-black hover:bg-gray-200"
+          >
+            + Create alert
+          </Link>
+        </div>
+
+        {/* Plan Banner */}
+        {!plan.isPro && (
+          <div className="rounded-lg border border-yellow-600 bg-yellow-950/30 p-4 text-sm">
+            <span className="font-semibold">Free Plan:</span>{" "}
+            {plan.remaining} of 3 alerts remaining.
+            <Link
+              href="/pricing"
+              className="ml-3 font-medium text-yellow-400 hover:underline"
+            >
+              Upgrade for unlimited alerts →
+            </Link>
           </div>
-        </li>
-      ))}
-    </ul>
+        )}
+
+        {/* Content */}
+        {hasAlerts ? (
+          <AlertsTable alerts={alerts} />
+        ) : (
+          <div className="rounded-lg border border-gray-800 bg-gray-900 p-10 text-center">
+            <h2 className="mb-2 text-xl font-semibold">No alerts yet</h2>
+            <p className="mb-6 text-gray-400">
+              Create an alert to get notified when gold or silver prices move.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link
+                href="/alerts/new"
+                className="rounded bg-white px-5 py-2 text-sm font-medium text-black hover:bg-gray-200"
+              >
+                Create your first alert
+              </Link>
+              <Link
+                href="/pricing"
+                className="rounded border border-gray-700 px-5 py-2 text-sm text-gray-300 hover:bg-gray-800"
+              >
+                View plans
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

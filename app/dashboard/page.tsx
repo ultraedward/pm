@@ -6,7 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type Metal = "gold" | "silver";
 
@@ -52,7 +53,7 @@ function buildSparkline(values: number[], width = 300, height = 100) {
     .join(" ");
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: any) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
@@ -131,6 +132,13 @@ export default async function DashboardPage() {
   const changeColor30d =
     change30d >= 0 ? "text-green-400" : "text-red-400";
 
+  const calcGoldOz = Number(searchParams?.goldOz ?? 0);
+  const calcSilverOz = Number(searchParams?.silverOz ?? 0);
+
+  const calcGoldValue = calcGoldOz * goldSpot;
+  const calcSilverValue = calcSilverOz * silverSpot;
+  const calcTotal = calcGoldValue + calcSilverValue;
+
   return (
     <main className="min-h-screen bg-black p-10 text-white">
       <div className="mx-auto max-w-5xl space-y-10">
@@ -189,6 +197,48 @@ export default async function DashboardPage() {
               points={portfolioSpark}
             />
           </svg>
+        </div>
+
+        {/* Quick Metal Calculator */}
+        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4">
+          <p className="text-sm text-gray-400">Quick Metal Calculator</p>
+
+          <form className="flex gap-4 items-end">
+            <div>
+              <label className="text-xs text-gray-400">Gold oz</label>
+              <input
+                name="goldOz"
+                defaultValue={calcGoldOz}
+                className="mt-1 w-24 rounded bg-black border border-gray-700 p-2 text-white"
+                type="number"
+                step="0.01"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-400">Silver oz</label>
+              <input
+                name="silverOz"
+                defaultValue={calcSilverOz}
+                className="mt-1 w-24 rounded bg-black border border-gray-700 p-2 text-white"
+                type="number"
+                step="0.01"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="rounded bg-gray-800 px-4 py-2 hover:bg-gray-700"
+            >
+              Calculate
+            </button>
+          </form>
+
+          <div className="text-sm text-gray-300 space-y-1">
+            <p>Gold Value: {fmtMoney(calcGoldValue)}</p>
+            <p>Silver Value: {fmtMoney(calcSilverValue)}</p>
+            <p className="font-semibold">Total: {fmtMoney(calcTotal)}</p>
+          </div>
         </div>
 
       </div>
