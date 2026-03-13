@@ -162,7 +162,7 @@ export default async function DashboardPage({ searchParams }: any) {
           </Link>
         </div>
 
-        {/* Live spot prices */}
+        {/* Daily spot prices */}
         <div className="grid grid-cols-2 gap-px sm:grid-cols-4 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
           {METALS.map((metal) => {
             const price = spots[metal];
@@ -186,7 +186,7 @@ export default async function DashboardPage({ searchParams }: any) {
             <p className="text-5xl">📊</p>
             <p className="text-xl font-black tracking-tight text-white">No holdings yet</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-              Add your gold, silver, platinum, or palladium positions to track portfolio value in real time.
+              Add your gold, silver, platinum, or palladium positions to track portfolio value as prices update.
             </p>
             <Link
               href="/dashboard/holdings"

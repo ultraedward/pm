@@ -135,18 +135,18 @@ export default async function HomePage() {
           <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
             <div className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
               style={{ borderColor: "rgba(212,160,23,0.3)", background: "rgba(212,160,23,0.07)" }}>
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase">Live Market Data</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase">Daily Spot Prices</span>
             </div>
 
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
-              Know when
+              Four metals.
               <br />
-              <span className="text-amber-400">gold moves.</span>
+              <span className="text-amber-400">One dashboard.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
-              Real-time spot prices, custom price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
+              Spot prices updated daily for gold, silver, platinum, and palladium — with price alerts and portfolio tracking in one place.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
@@ -162,7 +162,7 @@ export default async function HomePage() {
           {/* Live price tiles — visible above the fold as social proof */}
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <span className="label">Live Spot Prices</span>
+              <span className="label">Today&apos;s Spot Prices</span>
               <span className="text-xs text-gray-700">Updated daily</span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
