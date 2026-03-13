@@ -105,9 +105,35 @@ export default async function OGImage() {
             fontWeight: 400,
             color: "rgba(255,255,255,0.45)",
             letterSpacing: "-0.01em",
+            marginBottom: "36px",
           }}
         >
           Live prices · Price alerts · Portfolio tracker
+        </div>
+
+        {/* CTA pill */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            background: "#f59e0b",
+            borderRadius: "999px",
+            padding: "12px 28px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "15px",
+              fontWeight: 700,
+              color: "#000000",
+              letterSpacing: "0.03em",
+              textTransform: "uppercase",
+            }}
+          >
+            Start tracking free
+          </span>
+          <span style={{ fontSize: "15px", color: "#000000" }}>→</span>
         </div>
 
         {/* Bottom gold line */}

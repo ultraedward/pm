@@ -10,13 +10,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Precious Metals — Live Prices & Alerts",
+  title: "Precious Metals — Live Gold, Silver & Spot Prices",
   description:
-    "Track gold, silver, platinum, and palladium spot prices. Set price alerts. Monitor your portfolio.",
+    "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
   openGraph: {
-    title: "Precious Metals — Live Prices & Alerts",
+    title: "Precious Metals — Live Gold, Silver & Spot Prices",
     description:
-      "Track gold, silver, platinum, and palladium spot prices. Set price alerts. Monitor your portfolio.",
+      "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
     type: "website",
   },
 };
