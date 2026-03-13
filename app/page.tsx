@@ -131,22 +131,16 @@ export default async function HomePage() {
 
         <div className="relative z-10 mx-auto max-w-6xl">
 
-          {/* Badge + headline */}
+          {/* Headline */}
           <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
-              style={{ borderColor: "rgba(212,160,23,0.3)", background: "rgba(212,160,23,0.07)" }}>
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase">Daily Spot Prices</span>
-            </div>
-
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
-              Four metals.
+              Gold. Silver.
               <br />
-              <span className="text-amber-400">One dashboard.</span>
+              <span className="text-amber-400">Platinum. Palladium.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
-              Spot prices updated daily for gold, silver, platinum, and palladium — with price alerts and portfolio tracking in one place.
+              Spot prices, price alerts, and portfolio tracking for all four metals in one place.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
