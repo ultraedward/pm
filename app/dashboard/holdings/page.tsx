@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
@@ -78,29 +79,7 @@ async function deleteHolding(id: string) {
 export default async function HoldingsPage() {
   const session = await getServerSession(authOptions);
 
-  /* ============================= */
-  /*        DEBUG BLOCK            */
-  /* ============================= */
-
-  if (!session) {
-    return (
-      <pre className="p-10 text-white">
-        {JSON.stringify(session, null, 2)}
-      </pre>
-    );
-  }
-
-  if (!session.user?.email) {
-    return (
-      <pre className="p-10 text-white">
-        {JSON.stringify(session, null, 2)}
-      </pre>
-    );
-  }
-
-  /* ============================= */
-  /*        NORMAL FLOW            */
-  /* ============================= */
+  if (!session?.user?.email) redirect("/login");
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },

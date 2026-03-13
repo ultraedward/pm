@@ -181,17 +181,33 @@ export default async function DashboardPage({ searchParams }: any) {
           })}
         </div>
 
-        {/* Portfolio value */}
-        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-          <p className="text-sm text-gray-400">Total Portfolio Value</p>
-          <p className="text-3xl font-bold mt-1">{fmtMoney(totalValue)}</p>
-          <p className={`text-sm mt-1 ${gainColor}`}>
-            {gainLoss >= 0 ? "+" : ""}{fmtMoney(gainLoss)} ({fmtPct(pctReturn)}) all-time
-          </p>
-        </div>
+        {/* Portfolio value — empty state for new users */}
+        {holdings.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-700 bg-gray-950 p-8 text-center space-y-4">
+            <p className="text-4xl">📊</p>
+            <p className="text-lg font-semibold text-white">No holdings yet</p>
+            <p className="text-sm text-gray-400 max-w-sm mx-auto">
+              Add your gold, silver, platinum, or palladium positions to start tracking your portfolio value in real time.
+            </p>
+            <Link
+              href="/dashboard/holdings"
+              className="inline-block rounded-full bg-amber-500 px-6 py-2 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+            >
+              Add Your First Holding
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
+            <p className="text-sm text-gray-400">Total Portfolio Value</p>
+            <p className="text-3xl font-bold mt-1">{fmtMoney(totalValue)}</p>
+            <p className={`text-sm mt-1 ${gainColor}`}>
+              {gainLoss >= 0 ? "+" : ""}{fmtMoney(gainLoss)} ({fmtPct(pctReturn)}) all-time
+            </p>
+          </div>
+        )}
 
-        {/* 30d equity chart */}
-        {portfolioSpark && (
+        {/* 30d equity chart — only shown when there are holdings */}
+        {holdings.length > 0 && portfolioSpark && (
           <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4">
             <div className="flex justify-between items-start">
               <p className="text-sm text-gray-400">Portfolio Equity (30 data points)</p>
