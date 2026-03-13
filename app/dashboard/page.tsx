@@ -149,32 +149,31 @@ export default async function DashboardPage({ searchParams }: any) {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-gray-400">Welcome back, {user.name ?? "trader"}.</p>
+            <p className="label mb-1">Dashboard</p>
+            <h1 className="text-3xl font-black tracking-tight">
+              Welcome back{user.name ? `, ${user.name.split(" ")[0]}` : ""}.
+            </h1>
           </div>
           <Link
             href="/dashboard/holdings"
-            className="rounded-lg bg-gray-800 px-4 py-2 text-sm hover:bg-gray-700 transition-colors"
+            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
           >
             Manage Holdings
           </Link>
         </div>
 
         {/* Live spot prices */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px sm:grid-cols-4 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
           {METALS.map((metal) => {
             const price = spots[metal];
             const colorClass = METAL_COLORS[metal];
             return (
-              <div
-                key={metal}
-                className="rounded-xl border border-gray-800 bg-gray-950 p-4 space-y-1"
-              >
-                <p className={`text-xs font-semibold uppercase tracking-wider ${colorClass}`}>
+              <div key={metal} className="bg-black p-5 space-y-1">
+                <p className={`text-xs font-bold uppercase tracking-widest ${colorClass}`}>
                   {metal}
                 </p>
-                <p className="text-xl font-bold">
-                  {price > 0 ? fmtMoney(price) : <span className="text-gray-600">—</span>}
+                <p className="text-xl font-bold tabular-nums">
+                  {price > 0 ? fmtMoney(price) : <span className="text-white/20">—</span>}
                 </p>
               </div>
             );
@@ -183,24 +182,24 @@ export default async function DashboardPage({ searchParams }: any) {
 
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-700 bg-gray-950 p-8 text-center space-y-4">
-            <p className="text-4xl">📊</p>
-            <p className="text-lg font-semibold text-white">No holdings yet</p>
-            <p className="text-sm text-gray-400 max-w-sm mx-auto">
-              Add your gold, silver, platinum, or palladium positions to start tracking your portfolio value in real time.
+          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-5">
+            <p className="text-5xl">📊</p>
+            <p className="text-xl font-black tracking-tight text-white">No holdings yet</p>
+            <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
+              Add your gold, silver, platinum, or palladium positions to track portfolio value in real time.
             </p>
             <Link
               href="/dashboard/holdings"
-              className="inline-block rounded-full bg-amber-500 px-6 py-2 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+              className="inline-block rounded-full bg-amber-500 px-7 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
             >
               Add Your First Holding
             </Link>
           </div>
         ) : (
-          <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-            <p className="text-sm text-gray-400">Total Portfolio Value</p>
-            <p className="text-3xl font-bold mt-1">{fmtMoney(totalValue)}</p>
-            <p className={`text-sm mt-1 ${gainColor}`}>
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6">
+            <p className="label mb-2">Total Portfolio Value</p>
+            <p className="text-4xl font-black tracking-tight tabular-nums">{fmtMoney(totalValue)}</p>
+            <p className={`text-sm mt-2 font-medium tabular-nums ${gainColor}`}>
               {gainLoss >= 0 ? "+" : ""}{fmtMoney(gainLoss)} ({fmtPct(pctReturn)}) all-time
             </p>
           </div>
@@ -208,10 +207,10 @@ export default async function DashboardPage({ searchParams }: any) {
 
         {/* 30d equity chart — only shown when there are holdings */}
         {holdings.length > 0 && portfolioSpark && (
-          <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4">
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
             <div className="flex justify-between items-start">
-              <p className="text-sm text-gray-400">Portfolio Equity (30 data points)</p>
-              <p className={`text-sm font-semibold ${changeColor30d}`}>
+              <p className="label">30-Day Equity</p>
+              <p className={`text-sm font-semibold tabular-nums ${changeColor30d}`}>
                 {change30d >= 0 ? "+" : ""}{fmtMoney(change30d)} ({fmtPct(pct30d)})
               </p>
             </div>
@@ -227,8 +226,8 @@ export default async function DashboardPage({ searchParams }: any) {
         )}
 
         {/* Quick Metal Calculator */}
-        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4">
-          <p className="text-sm font-medium text-gray-400">Quick Metal Calculator</p>
+        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-5">
+          <p className="label">Quick Calculator</p>
 
           <form className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {METALS.map((metal) => (
@@ -237,7 +236,7 @@ export default async function DashboardPage({ searchParams }: any) {
                 <input
                   name={`${metal}Oz`}
                   defaultValue={calcOz[metal] || ""}
-                  className="mt-1 w-full rounded bg-black border border-gray-700 p-2 text-white text-sm"
+                  className="mt-1 w-full rounded-lg bg-black border border-white/10 p-2.5 text-white text-sm focus:outline-none focus:border-amber-500/50 transition-colors"
                   type="number"
                   step="0.01"
                   min="0"
@@ -247,43 +246,44 @@ export default async function DashboardPage({ searchParams }: any) {
             ))}
             <button
               type="submit"
-              className="sm:col-span-4 col-span-2 rounded bg-gray-800 py-2 text-sm hover:bg-gray-700 transition-colors"
+              className="sm:col-span-4 col-span-2 rounded-full bg-white/5 border border-white/10 py-2.5 text-sm font-medium hover:bg-white/10 transition-colors"
             >
               Calculate
             </button>
           </form>
 
           {calcTotal > 0 && (
-            <div className="border-t border-gray-800 pt-4 space-y-1 text-sm text-gray-300">
+            <div className="border-t border-white/5 pt-4 space-y-2 text-sm">
               {METALS.map((metal, i) =>
                 calcValues[i] > 0 ? (
                   <p key={metal} className="flex justify-between">
                     <span className="capitalize text-gray-500">{metal}</span>
-                    <span>{fmtMoney(calcValues[i])}</span>
+                    <span className="tabular-nums">{fmtMoney(calcValues[i])}</span>
                   </p>
                 ) : null
               )}
-              <p className="flex justify-between font-semibold text-white pt-1 border-t border-gray-800">
+              <p className="flex justify-between font-bold text-white pt-2 border-t border-white/5">
                 <span>Total</span>
-                <span>{fmtMoney(calcTotal)}</span>
+                <span className="tabular-nums">{fmtMoney(calcTotal)}</span>
               </p>
             </div>
           )}
         </div>
 
         {/* Nav links */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-px sm:grid-cols-3 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
           {[
-            { href: "/dashboard/charts",  label: "Price Charts"   },
-            { href: "/alerts",            label: "My Alerts"      },
-            { href: "/dashboard/holdings", label: "Holdings"      },
-          ].map(({ href, label }) => (
+            { href: "/dashboard/charts",   label: "Price Charts",  sub: "30-day history"    },
+            { href: "/alerts",             label: "My Alerts",     sub: "Manage price alerts" },
+            { href: "/dashboard/holdings", label: "Holdings",      sub: "Portfolio detail"   },
+          ].map(({ href, label, sub }) => (
             <Link
               key={href}
               href={href}
-              className="rounded-xl border border-gray-800 bg-gray-950 p-4 text-center text-sm font-medium hover:bg-gray-900 hover:border-gray-700 transition-colors"
+              className="group bg-black p-5 hover:bg-white/5 transition-colors"
             >
-              {label}
+              <p className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">{label}</p>
+              <p className="text-xs text-gray-600 mt-0.5">{sub}</p>
             </Link>
           ))}
         </div>
