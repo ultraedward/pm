@@ -1,11 +1,24 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Precious Metals Prices & Alerts",
+  title: "Precious Metals — Live Prices & Alerts",
   description:
-    "Track gold and silver prices. Set alerts. Move when it matters.",
+    "Track gold, silver, platinum, and palladium spot prices. Set price alerts. Monitor your portfolio.",
+  openGraph: {
+    title: "Precious Metals — Live Prices & Alerts",
+    description:
+      "Track gold, silver, platinum, and palladium spot prices. Set price alerts. Monitor your portfolio.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -14,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-black text-white">
-      <body className="min-h-screen bg-black text-white antialiased">
+    <html lang="en" className={`bg-black text-white ${inter.variable}`}>
+      <body className="min-h-screen bg-black text-white antialiased font-sans">
         <Navbar />
         {children}
       </body>

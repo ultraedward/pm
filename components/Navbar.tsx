@@ -2,18 +2,17 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import NavMobile from "@/components/NavMobile";
 
 export default async function Navbar() {
   const session = await getServerSession(authOptions);
 
   let subscriptionStatus: string | null = null;
-
   if (session?.user?.email) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { subscriptionStatus: true },
     });
-
     subscriptionStatus = user?.subscriptionStatus || null;
   }
 
@@ -21,50 +20,43 @@ export default async function Navbar() {
   const isLoggedIn = !!session?.user;
 
   return (
-    <nav className="border-b border-gray-900 bg-black">
+    <nav className="sticky top-0 z-40 border-b bg-black/80 backdrop-blur-md" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
+
+        {/* Logo */}
+        <Link href="/" className="text-sm font-black uppercase tracking-widest hover:text-amber-400 transition-colors">
           Precious Metals
         </Link>
 
-        <div className="flex items-center gap-6 text-sm">
+        {/* Desktop */}
+        <div className="hidden sm:flex items-center gap-8 text-xs font-medium uppercase tracking-widest">
           {isLoggedIn ? (
             <>
-              <Link href="/dashboard" className="text-gray-400 hover:text-white">
-                Dashboard
-              </Link>
-
-              <Link href="/alerts" className="text-gray-400 hover:text-white">
-                Alerts
-              </Link>
-
+              <Link href="/dashboard" className="text-gray-500 hover:text-white transition-colors">Dashboard</Link>
+              <Link href="/alerts"    className="text-gray-500 hover:text-white transition-colors">Alerts</Link>
+              <Link href="/account"   className="text-gray-500 hover:text-white transition-colors">Account</Link>
               {isPro ? (
-                <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
-                  PRO
+                <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-emerald-400 border border-emerald-500/20">
+                  Pro
                 </span>
               ) : (
-                <Link
-                  href="/pricing"
-                  className="rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-black hover:bg-yellow-400"
-                >
+                <Link href="/pricing" className="rounded-full bg-amber-500 px-4 py-1.5 text-black font-bold hover:bg-amber-400 transition-colors">
                   Upgrade
                 </Link>
               )}
             </>
           ) : (
             <>
-              <Link href="/pricing" className="text-gray-400 hover:text-white">
-                Pricing
-              </Link>
-              <Link
-                href="/login"
-                className="rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-gray-200"
-              >
+              <Link href="/pricing" className="text-gray-500 hover:text-white transition-colors">Pricing</Link>
+              <Link href="/login"   className="rounded-full border border-white/20 px-4 py-1.5 text-white hover:bg-white/10 transition-colors">
                 Sign in
               </Link>
             </>
           )}
         </div>
+
+        {/* Mobile */}
+        <NavMobile isLoggedIn={isLoggedIn} isPro={isPro} />
       </div>
     </nav>
   );

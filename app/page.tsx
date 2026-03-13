@@ -7,24 +7,14 @@ import { Sparkline } from "@/components/Sparkline";
 // ─── types ────────────────────────────────────────────────────────────────────
 
 type HistoryPoint = { price: number; timestamp: string };
-
 type MetalData = {
   price: number;
   percentChange: number | null;
   history1D: HistoryPoint[];
-  lastUpdated: string;
 };
-
 type Metal = "gold" | "silver" | "platinum" | "palladium";
 
-// ─── data fetching ────────────────────────────────────────────────────────────
-
-function filterSince(
-  rows: { price: number; timestamp: Date }[],
-  since: Date
-) {
-  return rows.filter((r) => r.timestamp >= since);
-}
+// ─── data ────────────────────────────────────────────────────────────────────
 
 async function getMetalData(metal: Metal): Promise<MetalData> {
   try {
@@ -36,420 +26,339 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
       orderBy: { timestamp: "asc" },
     });
 
-    if (!rows.length) {
-      return { price: 0, percentChange: null, history1D: [], lastUpdated: new Date().toISOString() };
-    }
+    if (!rows.length) return { price: 0, percentChange: null, history1D: [] };
 
     const latest = rows[rows.length - 1];
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    let history1D = filterSince(rows, oneDayAgo);
-    if (history1D.length < 2) history1D = rows.slice(-12);
+    let h1D = rows.filter((r) => r.timestamp >= oneDayAgo);
+    if (h1D.length < 2) h1D = rows.slice(-12);
 
-    const baseline = history1D[0];
+    const baseline = h1D[0];
     const percentChange =
-      baseline && baseline.price !== 0
+      baseline?.price
         ? ((latest.price - baseline.price) / baseline.price) * 100
         : null;
 
     return {
       price: latest.price,
       percentChange,
-      history1D: history1D.map((r) => ({
+      history1D: h1D.map((r) => ({
         price: r.price,
         timestamp: r.timestamp.toISOString(),
       })),
-      lastUpdated: latest.timestamp.toISOString(),
     };
   } catch {
-    return { price: 0, percentChange: null, history1D: [], lastUpdated: new Date().toISOString() };
+    return { price: 0, percentChange: null, history1D: [] };
   }
 }
 
-// ─── sub-components ───────────────────────────────────────────────────────────
+// ─── design tokens ────────────────────────────────────────────────────────────
 
-const METAL_META: Record<Metal, { label: string; symbol: string; color: string }> = {
-  gold:      { label: "Gold",      symbol: "XAU/USD", color: "#f59e0b" },
-  silver:    { label: "Silver",    symbol: "XAG/USD", color: "#94a3b8" },
-  platinum:  { label: "Platinum",  symbol: "XPT/USD", color: "#a78bfa" },
-  palladium: { label: "Palladium", symbol: "XPD/USD", color: "#34d399" },
+const METALS: Metal[] = ["gold", "silver", "platinum", "palladium"];
+
+const METAL_META: Record<Metal, { label: string; symbol: string; dot: string }> = {
+  gold:      { label: "Gold",      symbol: "XAU", dot: "#f59e0b" },
+  silver:    { label: "Silver",    symbol: "XAG", dot: "#94a3b8" },
+  platinum:  { label: "Platinum",  symbol: "XPT", dot: "#a78bfa" },
+  palladium: { label: "Palladium", symbol: "XPD", dot: "#34d399" },
 };
 
-function PriceCard({ metal, data }: { metal: Metal; data: MetalData }) {
-  const { label, symbol, color } = METAL_META[metal];
-  const isPositive = (data.percentChange ?? 0) >= 0;
-  const sparkData = data.history1D.map((p) => ({ value: p.price }));
-  const hasPrice = data.price > 0;
+// ─── components ───────────────────────────────────────────────────────────────
+
+function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
+  const { label, symbol, dot } = METAL_META[metal];
+  const isUp = (data.percentChange ?? 0) >= 0;
+  const spark = data.history1D.map((p) => ({ value: p.price }));
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 flex flex-col gap-4">
+    <div className="card p-6 flex flex-col gap-5 group hover:border-white/15 transition-colors duration-300">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span
-            className="inline-block h-2.5 w-2.5 rounded-full"
-            style={{ backgroundColor: color }}
-          />
-          <span className="text-sm font-medium text-gray-400 uppercase tracking-wider">
-            {label}
-          </span>
+        <div className="flex items-center gap-2.5">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />
+          <span className="label">{label}</span>
         </div>
-        <span className="text-xs text-gray-600">{symbol}</span>
+        <span className="text-[10px] font-mono text-gray-600">{symbol}/USD</span>
       </div>
 
+      {/* Price */}
       <div>
-        {hasPrice ? (
-          <div className="text-3xl font-bold tracking-tight">
-            $
-            {data.price.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        ) : (
-          <div className="text-3xl font-bold text-gray-700">—</div>
-        )}
-
+        <div className="text-3xl font-black tracking-tightest">
+          {data.price > 0
+            ? `$${data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            : <span className="text-gray-700">—</span>
+          }
+        </div>
         {data.percentChange != null && (
-          <div
-            className={`mt-1 text-sm font-medium ${
-              isPositive ? "text-green-400" : "text-red-400"
-            }`}
-          >
-            {isPositive ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
-            <span className="ml-1 text-gray-600 font-normal">24h</span>
+          <div className={`mt-1 text-xs font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+            {isUp ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
+            <span className="ml-1.5 font-normal text-gray-600">24H</span>
           </div>
         )}
       </div>
 
-      {sparkData.length > 1 && (
-        <Sparkline data={sparkData} isPositive={isPositive} />
+      {/* Sparkline */}
+      {spark.length > 1 && (
+        <div className="opacity-70 group-hover:opacity-100 transition-opacity">
+          <Sparkline data={spark} isPositive={isUp} />
+        </div>
       )}
     </div>
   );
 }
 
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 space-y-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 text-yellow-400">
-        {icon}
-      </div>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-gray-400 leading-relaxed">{description}</p>
-    </div>
-  );
-}
-
-function StepBadge({ n }: { n: number }) {
-  return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-yellow-500/40 bg-yellow-500/10 text-sm font-bold text-yellow-400">
-      {n}
-    </div>
-  );
-}
+const FEATURES = [
+  {
+    label: "Alerts",
+    title: "Move when it matters.",
+    body: "Set a target price and get an email the instant gold or silver crosses it. No app. No noise. Just signal.",
+    icon: (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+      </svg>
+    ),
+  },
+  {
+    label: "Portfolio",
+    title: "Your stack. Quantified.",
+    body: "Log your holdings with purchase price and date. Watch your real P&L move in real time as the market does.",
+    icon: (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Charts",
+    title: "Spot the trend early.",
+    body: "24H, 7D, and 30D price charts for all four metals. Toggle between them. Read the market, not the noise.",
+    icon: (
+      <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+      </svg>
+    ),
+  },
+];
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [gold, silver, platinum, palladium] = await Promise.all([
-    getMetalData("gold"),
-    getMetalData("silver"),
-    getMetalData("platinum"),
-    getMetalData("palladium"),
-  ]);
-
+  const [gold, silver, platinum, palladium] = await Promise.all(
+    METALS.map((m) => getMetalData(m))
+  );
   const prices: [Metal, MetalData][] = [
-    ["gold", gold],
-    ["silver", silver],
-    ["platinum", platinum],
-    ["palladium", palladium],
+    ["gold", gold], ["silver", silver],
+    ["platinum", platinum], ["palladium", palladium],
   ];
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-black text-white overflow-x-hidden">
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden border-b border-gray-900">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(234,179,8,0.08) 0%, transparent 70%)",
-          }}
-        />
+      {/* ── HERO ─────────────────────────────────────────────────── */}
+      <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-center px-6 py-32">
 
-        <div className="mx-auto max-w-6xl px-6 py-24 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-1.5 text-xs font-medium text-yellow-400 mb-8">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-yellow-400 animate-pulse" />
-            Live prices updated daily
+        {/* Ambient glow */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
+            style={{ background: "radial-gradient(circle, #d4a017 0%, transparent 70%)" }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5" style={{ borderColor: "rgba(212,160,23,0.3)", background: "rgba(212,160,23,0.07)" }}>
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase">Live Market Data</span>
           </div>
 
-          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-tight">
-            Know the moment
+          {/* Headline */}
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
+            Know when
             <br />
-            <span className="text-yellow-400">gold moves.</span>
+            <span className="text-amber-400">gold moves.</span>
           </h1>
 
-          <p className="mt-6 mx-auto max-w-xl text-lg text-gray-400 leading-relaxed">
-            Track gold, silver, platinum, and palladium spot prices. Set custom
-            alerts. Monitor your portfolio — all in one place.
+          {/* Sub */}
+          <p className="mx-auto max-w-lg text-lg text-gray-400 font-light leading-relaxed">
+            Spot prices for all four precious metals.
+            Custom alerts. Portfolio tracking. All signal, no noise.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/login"
-              className="rounded-full bg-yellow-500 px-8 py-3 text-sm font-semibold text-black hover:bg-yellow-400 transition-colors"
-            >
-              Get started free
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+            <Link href="/login" className="btn-gold">
+              START FOR FREE
             </Link>
-            <Link
-              href="/pricing"
-              className="rounded-full border border-gray-700 px-8 py-3 text-sm font-medium text-gray-300 hover:bg-gray-900 hover:border-gray-600 transition-colors"
-            >
+            <Link href="/pricing" className="btn-ghost">
               View pricing
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Live Prices ── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mb-10 flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Live Spot Prices</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Updated daily from market data
-            </p>
-          </div>
-          <Link
-            href="/login"
-            className="text-sm text-yellow-400 hover:text-yellow-300 transition-colors"
-          >
-            Track your portfolio →
-          </Link>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {prices.map(([metal, data]) => (
-            <PriceCard key={metal} metal={metal} data={data} />
-          ))}
-        </div>
-      </section>
-
-      {/* ── Features ── */}
-      <section className="border-t border-gray-900">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold">Everything you need</h2>
-            <p className="mt-3 text-gray-400 max-w-md mx-auto">
-              Built for investors who want to stay ahead of the market without
-              watching charts all day.
-            </p>
+      {/* ── LIVE PRICES ──────────────────────────────────────────── */}
+      <section className="px-6 pb-28">
+        <div className="mx-auto max-w-6xl">
+          {/* Section label */}
+          <div className="mb-8 flex items-center justify-between">
+            <span className="label">Live Spot Prices</span>
+            <span className="text-xs text-gray-600">Updated daily</span>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <FeatureCard
-              icon={
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-              }
-              title="Price Alerts"
-              description="Set a target price and get an email the moment a metal crosses it. Works for all four metals."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              }
-              title="Portfolio Tracker"
-              description="Log your holdings with purchase price. See your total value and gain/loss update in real time."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                </svg>
-              }
-              title="Price History Charts"
-              description="24h, 7-day, and 30-day charts for all four metals. Spot trends at a glance."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              }
-              title="Email Notifications"
-              description="Instant email alerts when your price targets are hit. No app required."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              }
-              title="Metal Calculator"
-              description="Calculate the spot value of any quantity using live prices — useful before you buy or sell."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              }
-              title="Secure & Private"
-              description="No ads, no selling your data. Your portfolio stays yours."
-            />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {prices.map(([metal, data]) => (
+              <PriceTile key={metal} metal={metal} data={data} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── How it works ── */}
-      <section className="border-t border-gray-900">
-        <div className="mx-auto max-w-3xl px-6 py-20">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold">Up and running in minutes</h2>
+      {/* ── FEATURES ─────────────────────────────────────────────── */}
+      <section className="border-t px-6 py-28" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-16 max-w-xl">
+            <span className="label">Built for Investors</span>
+            <h2 className="mt-4 text-4xl sm:text-5xl font-black tracking-tightest">
+              Everything you need.
+              <br />
+              <span className="text-gray-500">Nothing you don't.</span>
+            </h2>
           </div>
 
-          <div className="space-y-8">
-            {[
-              {
-                title: "Create a free account",
-                description:
-                  "Sign up with your email — no credit card required. Free accounts include up to 3 price alerts.",
-              },
-              {
-                title: "Set your first alert",
-                description:
-                  "Choose a metal, pick a target price, and decide whether to trigger above or below. Done in 30 seconds.",
-              },
-              {
-                title: "Get notified instantly",
-                description:
-                  "When the market hits your target, you'll get an email right away. No need to watch prices yourself.",
-              },
-            ].map((step, i) => (
-              <div key={i} className="flex gap-5 items-start">
-                <StepBadge n={i + 1} />
+          <div className="grid gap-px bg-white/5 sm:grid-cols-3 rounded-2xl overflow-hidden">
+            {FEATURES.map(({ label, title, body, icon }) => (
+              <div key={label} className="bg-black p-8 space-y-5 hover:bg-gray-950 transition-colors duration-200">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-amber-400">
+                  {icon}
+                </div>
                 <div>
-                  <h3 className="font-semibold text-lg">{step.title}</h3>
-                  <p className="mt-1 text-gray-400 text-sm leading-relaxed">
-                    {step.description}
-                  </p>
+                  <span className="label">{label}</span>
+                  <h3 className="mt-2 text-xl font-bold tracking-tight">{title}</h3>
+                  <p className="mt-2 text-sm text-gray-500 leading-relaxed">{body}</p>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-12 text-center">
-            <Link
-              href="/login"
-              className="inline-block rounded-full bg-yellow-500 px-10 py-3 text-sm font-semibold text-black hover:bg-yellow-400 transition-colors"
-            >
-              Start for free
-            </Link>
+      {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
+      <section className="border-t px-6 py-28" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-16 text-center">
+            <span className="label">Process</span>
+            <h2 className="mt-4 text-4xl sm:text-5xl font-black tracking-tightest">
+              Up in 60 seconds.
+            </h2>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-3">
+            {[
+              { n: "01", title: "Sign up free", body: "No credit card. No friction. Just your email." },
+              { n: "02", title: "Set a target", body: "Pick a metal. Set your price. Choose above or below." },
+              { n: "03", title: "Get the email", body: "When the market hits your number, we let you know instantly." },
+            ].map(({ n, title, body }) => (
+              <div key={n} className="space-y-4">
+                <div className="text-5xl font-black tracking-tightest text-white/10">{n}</div>
+                <div>
+                  <h3 className="text-lg font-bold">{title}</h3>
+                  <p className="mt-1 text-sm text-gray-500 leading-relaxed">{body}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── Pricing teaser ── */}
-      <section className="border-t border-gray-900">
-        <div className="mx-auto max-w-4xl px-6 py-20">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold">Simple pricing</h2>
-            <p className="mt-3 text-gray-400">
-              Start free. Upgrade when you need more.
-            </p>
+      {/* ── PRICING ──────────────────────────────────────────────── */}
+      <section className="border-t px-6 py-28" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-16 text-center">
+            <span className="label">Pricing</span>
+            <h2 className="mt-4 text-4xl sm:text-5xl font-black tracking-tightest">
+              Start free.
+              <br />
+              <span className="text-gray-500">Scale when ready.</span>
+            </h2>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {/* Free */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-950 p-8">
-              <h3 className="text-xl font-semibold">Free</h3>
-              <p className="mt-1 text-sm text-gray-500">For casual investors</p>
-              <div className="mt-5 text-4xl font-bold">
-                $0
-                <span className="text-base font-normal text-gray-500">/mo</span>
+            <div className="card p-8 space-y-8">
+              <div>
+                <span className="label">Free</span>
+                <div className="mt-3 text-5xl font-black tracking-tightest">$0</div>
+                <p className="mt-1 text-sm text-gray-500">Forever free. No card needed.</p>
               </div>
-              <ul className="mt-8 space-y-3 text-sm text-gray-400">
-                {[
-                  "Up to 3 price alerts",
-                  "All 4 metals tracked",
-                  "Portfolio value tracker",
-                  "Email notifications",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <svg className="h-4 w-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+              <ul className="space-y-3 text-sm text-gray-400">
+                {["3 price alerts", "All 4 metals", "Portfolio tracker", "Email notifications"].map((f) => (
+                  <li key={f} className="flex items-center gap-3">
+                    <span className="h-px w-4 bg-gray-700" />
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/login"
-                className="mt-8 block rounded-lg border border-gray-700 py-2.5 text-center text-sm font-medium text-gray-300 hover:bg-gray-900 transition-colors"
-              >
+              <Link href="/login" className="block rounded-xl border py-3 text-center text-sm font-semibold hover:bg-white/5 transition-colors" style={{ borderColor: "var(--border)" }}>
                 Get started
               </Link>
             </div>
 
             {/* Pro */}
-            <div className="relative rounded-2xl border border-yellow-500 bg-black p-8 shadow-[0_0_40px_-10px_rgba(234,179,8,0.15)]">
-              <div className="absolute -top-3 right-6 rounded-full bg-yellow-500 px-3 py-1 text-xs font-bold text-black">
-                MOST POPULAR
+            <div className="relative rounded-2xl p-8 space-y-8 overflow-hidden" style={{ background: "linear-gradient(135deg, #1a1400 0%, #000 60%)", border: "1px solid rgba(212,160,23,0.35)" }}>
+              <div
+                className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
+                style={{ background: "radial-gradient(circle, #d4a017 0%, transparent 70%)" }}
+              />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <span className="label text-amber-600">Pro</span>
+                  <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-bold text-amber-400 uppercase tracking-widest">Popular</span>
+                </div>
+                <div className="mt-3 text-5xl font-black tracking-tightest">$9</div>
+                <p className="mt-1 text-sm text-gray-500">Per month. Cancel anytime.</p>
               </div>
-              <h3 className="text-xl font-semibold text-yellow-400">Pro</h3>
-              <p className="mt-1 text-sm text-gray-500">For serious traders</p>
-              <div className="mt-5 text-4xl font-bold">
-                $9
-                <span className="text-base font-normal text-gray-500">/mo</span>
-              </div>
-              <ul className="mt-8 space-y-3 text-sm text-gray-400">
-                {[
-                  "Unlimited price alerts",
-                  "Percent-change alerts",
-                  "Priority email delivery",
-                  "Faster alert evaluation",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <svg className="h-4 w-4 text-yellow-500 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+              <ul className="relative space-y-3 text-sm text-gray-400">
+                {["Unlimited alerts", "Percent-change alerts", "Priority email delivery", "Faster evaluation"].map((f) => (
+                  <li key={f} className="flex items-center gap-3">
+                    <span className="h-px w-4 bg-amber-600/50" />
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/pricing"
-                className="mt-8 block rounded-lg bg-yellow-500 py-2.5 text-center text-sm font-semibold text-black hover:bg-yellow-400 transition-colors"
-              >
-                Upgrade to Pro
+              <Link href="/pricing" className="relative block rounded-xl bg-amber-500 py-3 text-center text-sm font-bold text-black hover:bg-amber-400 transition-colors">
+                UPGRADE TO PRO
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-gray-900">
-        <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-          <span className="font-semibold text-gray-400">Precious Metals</span>
-          <div className="flex gap-6">
-            <Link href="/pricing" className="hover:text-gray-400 transition-colors">Pricing</Link>
-            <Link href="/login" className="hover:text-gray-400 transition-colors">Sign in</Link>
-            <Link href="/dashboard" className="hover:text-gray-400 transition-colors">Dashboard</Link>
+      {/* ── FOOTER CTA ───────────────────────────────────────────── */}
+      <section className="border-t px-6 py-28 text-center" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-2xl space-y-6">
+          <h2 className="text-5xl sm:text-6xl font-black tracking-tightest">
+            Ready to track
+            <br />
+            <span className="text-amber-400">the market?</span>
+          </h2>
+          <p className="text-gray-500">Free to start. No credit card required.</p>
+          <Link href="/login" className="btn-gold inline-block">
+            GET STARTED FREE
+          </Link>
+        </div>
+      </section>
+
+      {/* ── FOOTER ───────────────────────────────────────────────── */}
+      <footer className="border-t px-6 py-8" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
+          <span className="font-bold text-gray-400 tracking-widest uppercase">Precious Metals</span>
+          <div className="flex gap-8">
+            <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
+            <Link href="/login" className="hover:text-gray-300 transition-colors">Sign in</Link>
+            <Link href="/dashboard" className="hover:text-gray-300 transition-colors">Dashboard</Link>
           </div>
-          <span>© {new Date().getFullYear()} Precious Metals</span>
+          <span>© {new Date().getFullYear()}</span>
         </div>
       </footer>
 
