@@ -10,20 +10,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Precious Metals — Live Gold, Silver & Spot Prices",
+  title: "Precious Metals — Spot Prices, Alerts & Portfolio Tracker",
   description:
-    "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
+    "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
   openGraph: {
-    title: "Precious Metals — Live Gold, Silver & Spot Prices",
+    title: "Precious Metals — Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
+      "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Precious Metals — Live Gold, Silver & Spot Prices",
+    title: "Precious Metals — Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
+      "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
   },
 };
 

@@ -24,7 +24,7 @@ export default function TermsPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">2. Description of Service</h2>
-            <p>Precious Metals provides real-time spot price tracking, price alert notifications, and portfolio tracking for gold, silver, platinum, and palladium. Spot prices are sourced from a third-party API and are provided for informational purposes only.</p>
+            <p>Precious Metals provides daily spot price tracking, price alert notifications, and portfolio tracking for gold, silver, platinum, and palladium. Spot prices are sourced from a third-party API and are provided for informational purposes only.</p>
           </section>
 
           <section className="space-y-3">
