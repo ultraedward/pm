@@ -3,11 +3,9 @@ import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 
-export async function GET() {
-  // 1. Get session user (identity only)
+async function createCheckoutSession() {
   const sessionUser = await requireUser();
 
-  // 2. Load full DB user (billing fields live here)
   const user = await prisma.user.findUnique({
     where: { id: sessionUser.id },
   });
@@ -18,36 +16,48 @@ export async function GET() {
 
   let customerId = user.stripeCustomerId;
 
-  // 3. Create Stripe customer if missing
   if (!customerId) {
     const customer = await stripe.customers.create({
       email: user.email ?? undefined,
-      metadata: {
-        userId: user.id,
-      },
+      metadata: { userId: user.id },
     });
-
     customerId = customer.id;
-
     await prisma.user.update({
       where: { id: user.id },
       data: { stripeCustomerId: customerId },
     });
   }
 
-  // 4. Create checkout session
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [
-      {
-        price: process.env.STRIPE_PRICE_ID!,
-        quantity: 1,
-      },
-    ],
-    success_url: `${process.env.NEXTAUTH_URL}/alerts`,
-    cancel_url: `${process.env.NEXTAUTH_URL}/pricing`,
+    line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
+    success_url: `${process.env.NEXTAUTH_URL}/account`,
+    cancel_url:  `${process.env.NEXTAUTH_URL}/pricing`,
   });
 
-  return NextResponse.redirect(session.url!);
+  return session;
+}
+
+// GET — for direct link clicks
+export async function GET() {
+  const result = await createCheckoutSession();
+  if (result instanceof NextResponse) return result;
+  return NextResponse.redirect(result.url!);
+}
+
+// POST — handles both HTML <form method="POST"> and fetch() calls
+// Browser forms include "text/html" in Accept; fetch calls don't.
+export async function POST(req: Request) {
+  const result = await createCheckoutSession();
+  if (result instanceof NextResponse) return result;
+
+  const accept = req.headers.get("accept") ?? "";
+  if (accept.includes("text/html")) {
+    // HTML form submission — do a redirect directly to Stripe
+    return NextResponse.redirect(result.url!, 303);
+  }
+
+  // fetch() from CreateAlertForm — return JSON so caller can redirect
+  return NextResponse.json({ url: result.url });
 }

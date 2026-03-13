@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2023-10-16",
 });
 
-export async function POST() {
+export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
@@ -25,8 +25,16 @@ export async function POST() {
 
   const portal = await stripe.billingPortal.sessions.create({
     customer: user.stripeCustomerId,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/account`,
+    return_url: `${process.env.NEXTAUTH_URL}/account`,
   });
 
+  // Browser form submissions include "text/html" in Accept.
+  // Return a redirect so they land on the Stripe portal directly.
+  const accept = req.headers.get("accept") ?? "";
+  if (accept.includes("text/html")) {
+    return NextResponse.redirect(portal.url, 303);
+  }
+
+  // fetch() callers get JSON
   return NextResponse.json({ url: portal.url });
 }
