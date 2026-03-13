@@ -1,109 +1,148 @@
-import { requireUser } from "@/lib/requireUser";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function PricingPage() {
-  const user = await requireUser();
+  const session = await getServerSession(authOptions);
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: {
-      subscriptionStatus: true,
-    },
-  });
-
-  const isPro = dbUser?.subscriptionStatus === "active";
+  let isPro = false;
+  if (session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { subscriptionStatus: true },
+    });
+    isPro = dbUser?.subscriptionStatus === "active";
+  }
 
   return (
-    <div className="mx-auto max-w-6xl p-8">
-      <h1 className="mb-12 text-center text-4xl font-bold">
-        Pricing
-      </h1>
+    <main className="min-h-screen bg-black px-6 py-24 text-white">
+      <div className="mx-auto max-w-4xl space-y-16">
 
-      <div className="grid gap-8 md:grid-cols-2">
-        {/* FREE PLAN */}
-        <div className="rounded-xl border border-gray-800 bg-gray-900 p-8">
-          <h2 className="text-2xl font-semibold">Free</h2>
-          <p className="mt-2 text-gray-400">
-            For casual tracking
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Pricing</p>
+          <h1 className="text-5xl font-black tracking-tight">
+            Simple, transparent pricing
+          </h1>
+          <p className="text-gray-400 max-w-md mx-auto">
+            Start free. Upgrade when you need more power.
           </p>
-
-          <div className="mt-6 text-4xl font-bold">
-            $0
-            <span className="text-lg font-normal text-gray-400">
-              /month
-            </span>
-          </div>
-
-          <ul className="mt-8 space-y-3 text-sm text-gray-300">
-            <li>• Up to 3 alerts</li>
-            <li>• Price alerts only</li>
-            <li>• Email notifications</li>
-          </ul>
-
-          <div className="mt-8">
-            {isPro ? (
-              <div className="rounded bg-gray-800 py-2 text-center text-sm">
-                You're on Pro
-              </div>
-            ) : (
-              <div className="rounded bg-gray-800 py-2 text-center text-sm">
-                Current plan
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* PRO PLAN */}
-        <div className="relative rounded-xl border border-yellow-500 bg-black p-8 shadow-lg shadow-yellow-500/10">
-          <div className="absolute -top-3 right-6 rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-black">
-            MOST POPULAR
-          </div>
+        {/* Cards */}
+        <div className="grid gap-6 md:grid-cols-2">
 
-          <h2 className="text-2xl font-semibold text-yellow-400">
-            Pro
-          </h2>
-
-          <p className="mt-2 text-gray-400">
-            For serious traders
-          </p>
-
-          <div className="mt-6 text-4xl font-bold">
-            $9
-            <span className="text-lg font-normal text-gray-400">
-              /month
-            </span>
-          </div>
-
-          <ul className="mt-8 space-y-3 text-sm text-gray-300">
-            <li>• Unlimited alerts</li>
-            <li>• Percent change alerts</li>
-            <li>• Faster alert evaluation</li>
-            <li>• Priority email delivery</li>
-          </ul>
-
-          <div className="mt-8">
-            {isPro ? (
-              <div className="rounded bg-yellow-500 py-2 text-center text-sm font-semibold text-black">
-                Active
+          {/* Free */}
+          <div className="rounded-2xl border border-white/10 bg-gray-950 p-8 space-y-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Free</p>
+              <div className="flex items-end gap-1">
+                <span className="text-5xl font-black">$0</span>
+                <span className="text-gray-500 mb-1">/month</span>
               </div>
-            ) : (
-              <form action="/api/billing/checkout" method="POST">
-                <button
-                  type="submit"
-                  className="w-full rounded bg-yellow-500 py-2 font-semibold text-black hover:bg-yellow-400"
+              <p className="text-sm text-gray-400 mt-2">For casual tracking</p>
+            </div>
+
+            <ul className="space-y-3 text-sm text-gray-300">
+              {["Up to 3 price alerts", "Gold, silver, platinum & palladium", "Email notifications", "Portfolio tracker"].map((f) => (
+                <li key={f} className="flex items-center gap-2">
+                  <span className="text-amber-500">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+
+            <div>
+              {session ? (
+                isPro ? (
+                  <div className="rounded-full border border-white/10 py-2.5 text-center text-sm text-gray-500">
+                    Not your plan
+                  </div>
+                ) : (
+                  <div className="rounded-full border border-white/10 py-2.5 text-center text-sm text-gray-400">
+                    Current plan
+                  </div>
+                )
+              ) : (
+                <Link
+                  href="/login"
+                  className="block rounded-full border border-white/10 py-2.5 text-center text-sm text-white hover:bg-white/5 transition-colors"
                 >
-                  Upgrade to Pro
-                </button>
-              </form>
-            )}
+                  Get started free
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Pro */}
+          <div className="relative rounded-2xl border border-amber-500/40 bg-gray-950 p-8 space-y-8 overflow-hidden">
+            {/* Radial glow */}
+            <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+
+            <div className="relative">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold uppercase tracking-widest text-amber-500">Pro</p>
+                <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-xs font-semibold text-amber-400 uppercase tracking-wide">
+                  Most popular
+                </span>
+              </div>
+              <div className="flex items-end gap-1">
+                <span className="text-5xl font-black">$9</span>
+                <span className="text-gray-500 mb-1">/month</span>
+              </div>
+              <p className="text-sm text-gray-400 mt-2">For serious traders</p>
+            </div>
+
+            <ul className="relative space-y-3 text-sm text-gray-300">
+              {[
+                "Everything in Free",
+                "Unlimited alerts",
+                "Percent change alerts",
+                "Faster alert evaluation",
+                "Priority email delivery",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2">
+                  <span className="text-amber-500">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+
+            <div className="relative">
+              {isPro ? (
+                <div className="rounded-full bg-amber-500/20 py-2.5 text-center text-sm font-semibold text-amber-400">
+                  Active plan
+                </div>
+              ) : session ? (
+                <form action="/api/billing/checkout" method="POST">
+                  <button
+                    type="submit"
+                    className="w-full rounded-full bg-amber-500 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+                  >
+                    Upgrade to Pro
+                  </button>
+                </form>
+              ) : (
+                <Link
+                  href="/login"
+                  className="block rounded-full bg-amber-500 py-2.5 text-center text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+                >
+                  Start with Pro
+                </Link>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-16 text-center text-sm text-gray-500">
-        Questions? Email support anytime.
+        {/* Footer note */}
+        <p className="text-center text-sm text-gray-600">
+          Questions? Email{" "}
+          <a href="mailto:support@pm-iota-wheat.vercel.app" className="text-gray-400 hover:text-white transition-colors">
+            support
+          </a>{" "}
+          anytime. Cancel or change plans at any time.
+        </p>
+
       </div>
-    </div>
+    </main>
   );
 }

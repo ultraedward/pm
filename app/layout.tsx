@@ -19,6 +19,12 @@ export const metadata: Metadata = {
       "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Precious Metals — Live Gold, Silver & Spot Prices",
+    description:
+      "Track real-time gold, silver, platinum, and palladium spot prices. Set custom price alerts and monitor your precious metals portfolio — free to start.",
+  },
 };
 
 export default function RootLayout({
