@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Precious Metals — Live Prices & Alerts";
+export const alt = "Precious Metals — Spot prices, alerts, and portfolio tracking";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -108,7 +108,7 @@ export default async function OGImage() {
             marginBottom: "36px",
           }}
         >
-          Live prices · Price alerts · Portfolio tracker
+          Spot prices · Price alerts · Portfolio tracking
         </div>
 
         {/* CTA pill */}

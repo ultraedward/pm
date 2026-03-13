@@ -21,7 +21,6 @@ export default async function PricingPage() {
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Pricing</p>
           <h1 className="text-5xl font-black tracking-tight">
             Pricing
           </h1>
@@ -95,7 +94,6 @@ export default async function PricingPage() {
                 "Everything in Free",
                 "Unlimited alerts",
                 "Percent change alerts",
-                "Faster alert evaluation",
                 "Priority email delivery",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2">
@@ -132,11 +130,7 @@ export default async function PricingPage() {
 
         {/* Footer note */}
         <p className="text-center text-sm text-gray-600">
-          Questions? Email{" "}
-          <a href="mailto:support@pm-iota-wheat.vercel.app" className="text-gray-400 hover:text-white transition-colors">
-            support
-          </a>{" "}
-          anytime. Cancel or change plans at any time.
+          Cancel or change plans at any time.
         </p>
 
       </div>
