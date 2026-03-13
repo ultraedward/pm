@@ -3,14 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const METALS = [
+  { value: "gold",      label: "Gold",      color: "text-yellow-400" },
+  { value: "silver",    label: "Silver",    color: "text-gray-300"   },
+  { value: "platinum",  label: "Platinum",  color: "text-purple-400" },
+  { value: "palladium", label: "Palladium", color: "text-emerald-400"},
+];
+
 export function CreateAlertForm() {
   const router = useRouter();
 
-  const [metal, setMetal] = useState("gold");
+  const [metal, setMetal]         = useState("gold");
   const [direction, setDirection] = useState("above");
-  const [price, setPrice] = useState("");
+  const [price, setPrice]         = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]         = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,17 +26,11 @@ export function CreateAlertForm() {
 
     const res = await fetch("/api/alerts/create", {
       method: "POST",
-      body: JSON.stringify({
-        metal,
-        direction,
-        price: Number(price),
-      }),
+      body: JSON.stringify({ metal, direction, price: Number(price) }),
     });
 
     if (res.status === 402) {
-      const checkout = await fetch("/api/billing/checkout", {
-        method: "POST",
-      });
+      const checkout = await fetch("/api/billing/checkout", { method: "POST" });
       const data = await checkout.json();
       window.location.href = data.url;
       return;
@@ -44,56 +45,91 @@ export function CreateAlertForm() {
     router.push("/alerts");
   }
 
+  const inputClass =
+    "w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors";
+
   return (
-    <form
-      onSubmit={submit}
-      className="max-w-sm space-y-5 rounded-lg border border-gray-800 p-6"
-    >
-      <div>
-        <label className="mb-1 block text-sm font-medium">Metal</label>
-        <select
-          value={metal}
-          onChange={e => setMetal(e.target.value)}
-          className="w-full rounded border border-gray-700 bg-black p-2"
-        >
-          <option value="gold">Gold</option>
-          <option value="silver">Silver</option>
-        </select>
+    <form onSubmit={submit} className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-6">
+
+      {/* Metal picker */}
+      <div className="space-y-2">
+        <label className="label">Metal</label>
+        <div className="grid grid-cols-2 gap-2">
+          {METALS.map(({ value, label, color }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setMetal(value)}
+              className={`rounded-xl border px-4 py-3 text-sm font-semibold text-left transition-all ${
+                metal === value
+                  ? "border-amber-500/40 bg-amber-500/10 text-white"
+                  : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
+              }`}
+            >
+              <span className={`block text-xs font-bold uppercase tracking-widest mb-0.5 ${metal === value ? color : ""}`}>
+                {label}
+              </span>
+              <span className="text-xs text-gray-600 font-mono">
+                {value === "gold" ? "XAU" : value === "silver" ? "XAG" : value === "platinum" ? "XPT" : "XPD"}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">Condition</label>
-        <select
-          value={direction}
-          onChange={e => setDirection(e.target.value)}
-          className="w-full rounded border border-gray-700 bg-black p-2"
-        >
-          <option value="above">Price goes above</option>
-          <option value="below">Price goes below</option>
-        </select>
+      {/* Condition */}
+      <div className="space-y-2">
+        <label className="label">Condition</label>
+        <div className="flex gap-2">
+          {[
+            { value: "above", label: "Goes above" },
+            { value: "below", label: "Goes below" },
+          ].map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setDirection(value)}
+              className={`flex-1 rounded-full border py-2.5 text-sm font-semibold transition-all ${
+                direction === value
+                  ? "border-amber-500/40 bg-amber-500/10 text-white"
+                  : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">Target price</label>
-        <input
-          type="number"
-          inputMode="decimal"
-          required
-          value={price}
-          onChange={e => setPrice(e.target.value)}
-          placeholder="e.g. 2500"
-          className="w-full rounded border border-gray-700 bg-black p-2"
-        />
+      {/* Target price */}
+      <div className="space-y-2">
+        <label className="label">Target Price (USD / oz)</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-600">$</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            required
+            value={price}
+            onChange={e => setPrice(e.target.value)}
+            placeholder="2500.00"
+            className={`${inputClass} pl-7`}
+          />
+        </div>
       </div>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && (
+        <p className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded bg-white py-2 font-medium text-black hover:bg-gray-200 disabled:opacity-50"
+        className="w-full rounded-full bg-amber-500 py-3 text-sm font-bold text-black hover:bg-amber-400 transition-colors disabled:opacity-50"
       >
-        {submitting ? "Creating…" : "Create alert"}
+        {submitting ? "Creating…" : "Create Alert"}
       </button>
     </form>
   );

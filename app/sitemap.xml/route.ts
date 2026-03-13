@@ -4,6 +4,8 @@ const PUBLIC_ROUTES = [
   { url: "/",        priority: "1.0", changefreq: "daily"   },
   { url: "/pricing", priority: "0.8", changefreq: "weekly"  },
   { url: "/login",   priority: "0.5", changefreq: "monthly" },
+  { url: "/privacy", priority: "0.3", changefreq: "yearly"  },
+  { url: "/terms",   priority: "0.3", changefreq: "yearly"  },
 ];
 
 export async function GET() {

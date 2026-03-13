@@ -355,10 +355,11 @@ export default async function HomePage() {
           <span className="font-bold text-gray-400 tracking-widest uppercase">Precious Metals</span>
           <div className="flex gap-8">
             <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
+            <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
             <Link href="/login" className="hover:text-gray-300 transition-colors">Sign in</Link>
-            <Link href="/dashboard" className="hover:text-gray-300 transition-colors">Dashboard</Link>
           </div>
-          <span>© {new Date().getFullYear()}</span>
+          <span>© {new Date().getFullYear()} Precious Metals</span>
         </div>
       </footer>
 

@@ -41,7 +41,10 @@ export default function LoginPage() {
           </button>
 
           <p className="text-xs text-gray-600">
-            By signing in you agree to our terms of service.
+            By signing in you agree to our{" "}
+            <a href="/terms" className="text-gray-500 hover:text-gray-300 transition-colors">Terms</a>
+            {" "}and{" "}
+            <a href="/privacy" className="text-gray-500 hover:text-gray-300 transition-colors">Privacy Policy</a>.
           </p>
         </div>
 
