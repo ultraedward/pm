@@ -187,22 +187,26 @@ export default async function HoldingsPage() {
       : "0,100 100,100";
 
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
-      <div className="mx-auto max-w-5xl space-y-10">
+    <main className="min-h-screen bg-black p-8 text-white">
+      <div className="mx-auto max-w-5xl space-y-8">
 
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Your Holdings</h1>
+          <div>
+            <p className="label mb-1">Holdings</p>
+            <h1 className="text-3xl font-black tracking-tight">Your Portfolio</h1>
+          </div>
           <Link
             href="/dashboard"
-            className="rounded bg-gray-800 px-4 py-2 hover:bg-gray-700"
+            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
           >
-            Back to Dashboard
+            ← Dashboard
           </Link>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-          <h2 className="mb-4 text-lg font-semibold">Portfolio Performance</h2>
-
+        {/* Performance chart */}
+        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+          <p className="label">Portfolio Performance</p>
           <div className="h-40 w-full">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
               <polyline
@@ -215,62 +219,63 @@ export default async function HoldingsPage() {
               />
             </svg>
           </div>
-
-          <div className="mt-2 text-sm text-gray-400">
-            Last 30 price updates
-          </div>
+          <p className="text-xs text-gray-600">Last 30 price updates</p>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-          <h2 className="mb-4 text-lg font-semibold">Portfolio Allocation</h2>
+        {/* Allocation */}
+        {totalValue > 0 && (
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-6">
+            <p className="label">Allocation</p>
 
-          <div className="space-y-3">
-            {[
-              { label: "Gold",      pct: goldPercent,      bar: "bg-yellow-400",  text: "text-yellow-400"  },
-              { label: "Silver",    pct: silverPercent,    bar: "bg-gray-400",    text: "text-gray-300"    },
-              { label: "Platinum",  pct: platinumPercent,  bar: "bg-purple-400",  text: "text-purple-400"  },
-              { label: "Palladium", pct: palladiumPercent, bar: "bg-emerald-400", text: "text-emerald-400" },
-            ].map(({ label, pct, bar, text }) => pct > 0 ? (
-              <div key={label}>
-                <div className="mb-1 flex justify-between text-sm">
-                  <span className={text}>{label}</span>
-                  <span>{pct.toFixed(1)}%</span>
+            <div className="space-y-3">
+              {[
+                { label: "Gold",      pct: goldPercent,      bar: "bg-yellow-400",  text: "text-yellow-400"  },
+                { label: "Silver",    pct: silverPercent,    bar: "bg-gray-400",    text: "text-gray-300"    },
+                { label: "Platinum",  pct: platinumPercent,  bar: "bg-purple-400",  text: "text-purple-400"  },
+                { label: "Palladium", pct: palladiumPercent, bar: "bg-emerald-400", text: "text-emerald-400" },
+              ].map(({ label, pct, bar, text }) => pct > 0 ? (
+                <div key={label}>
+                  <div className="mb-1.5 flex justify-between text-sm">
+                    <span className={`font-medium ${text}`}>{label}</span>
+                    <span className="tabular-nums text-gray-400">{pct.toFixed(1)}%</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                    <div className={`h-full rounded-full ${bar}`} style={{ width: `${pct}%` }} />
+                  </div>
                 </div>
-                <div className="h-3 w-full overflow-hidden rounded bg-gray-800">
-                  <div className={`h-full ${bar}`} style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-            ) : null)}
-          </div>
+              ) : null)}
+            </div>
 
-          <div className="mt-6 flex justify-center">
-            <div className="relative h-40 w-40">
-              <div
-                className="h-full w-full rounded-full"
-                style={{
-                  background: `conic-gradient(
-                    #facc15 0% ${goldPercent}%,
-                    #9ca3af ${goldPercent}% ${goldPercent + silverPercent}%,
-                    #a78bfa ${goldPercent + silverPercent}% ${goldPercent + silverPercent + platinumPercent}%,
-                    #34d399 ${goldPercent + silverPercent + platinumPercent}% 100%
-                  )`,
-                }}
-              />
-              <div className="absolute inset-4 flex items-center justify-center rounded-full bg-gray-950 text-xs text-gray-400 text-center leading-tight">
-                {goldPercent.toFixed(0)}%<br />gold
+            <div className="flex justify-center pt-2">
+              <div className="relative h-36 w-36">
+                <div
+                  className="h-full w-full rounded-full"
+                  style={{
+                    background: `conic-gradient(
+                      #facc15 0% ${goldPercent}%,
+                      #9ca3af ${goldPercent}% ${goldPercent + silverPercent}%,
+                      #a78bfa ${goldPercent + silverPercent}% ${goldPercent + silverPercent + platinumPercent}%,
+                      #34d399 ${goldPercent + silverPercent + platinumPercent}% 100%
+                    )`,
+                  }}
+                />
+                <div className="absolute inset-4 flex items-center justify-center rounded-full bg-gray-950 text-xs text-gray-500 text-center leading-snug">
+                  {goldPercent.toFixed(0)}%<br />gold
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Add Holding</h2>
+        {/* Add Holding form */}
+        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-5">
+          <p className="label">Add Holding</p>
 
-          <form action={addHolding} className="grid gap-4 md:grid-cols-4">
+          <form action={addHolding} className="grid gap-3 md:grid-cols-4">
             <select
               name="metal"
               required
-              className="rounded bg-gray-900 border border-gray-700 px-3 py-2"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
             >
               <option value="">Select Metal</option>
               <option value="gold">Gold</option>
@@ -285,7 +290,7 @@ export default async function HoldingsPage() {
               step="0.01"
               placeholder="Ounces"
               required
-              className="rounded bg-gray-900 border border-gray-700 px-3 py-2"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
 
             <input
@@ -294,99 +299,79 @@ export default async function HoldingsPage() {
               step="0.01"
               placeholder="Price per oz"
               required
-              className="rounded bg-gray-900 border border-gray-700 px-3 py-2"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
 
             <input
               name="purchaseDate"
               type="date"
               required
-              className="rounded bg-gray-900 border border-gray-700 px-3 py-2"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
             />
 
             <button
               type="submit"
-              className="md:col-span-4 rounded bg-green-600 py-2 hover:bg-green-500"
+              className="md:col-span-4 rounded-full bg-amber-500 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
             >
               Add Holding
             </button>
           </form>
         </div>
 
-        {holdings.length === 0 && (
-          <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
-            <p className="text-gray-400">No holdings yet.</p>
+        {/* Holdings list */}
+        {holdings.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-3">
+            <p className="text-xl font-black tracking-tight">No holdings yet</p>
+            <p className="text-sm text-gray-500">Use the form above to add your first position.</p>
           </div>
-        )}
+        ) : (
+          <div className="grid gap-4">
+            {holdings.map((h) => {
+              const currentPrice = spotMap[h.metal] ?? 0;
+              const value = h.ounces * currentPrice;
+              const invested = h.ounces * h.purchasePrice;
+              const gainLoss = value - invested;
+              const percent = invested > 0 ? (gainLoss / invested) * 100 : 0;
 
-        <div className="grid gap-6">
-          {holdings.map((h) => {
-            const currentPrice = spotMap[h.metal] ?? 0;
-
-            const value = h.ounces * currentPrice;
-            const invested = h.ounces * h.purchasePrice;
-            const gainLoss = value - invested;
-            const percent =
-              invested > 0 ? (gainLoss / invested) * 100 : 0;
-
-            return (
-              <div
-                key={h.id}
-                className="rounded-xl border border-gray-800 bg-gray-950 p-6 space-y-4"
-              >
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-lg font-semibold capitalize">
-                      {h.metal}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      {h.ounces.toFixed(2)} oz @ $
-                      {h.purchasePrice.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Purchased{" "}
-                      {new Date(h.purchaseDate).toLocaleDateString()}
-                    </p>
-                  </div>
-
-                  <div className="text-right">
-                    <p className="text-lg font-semibold">
-                      ${value.toFixed(2)}
-                    </p>
-                    <p
-                      className={`text-sm ${
-                        gainLoss >= 0
-                          ? "text-green-400"
-                          : "text-red-400"
-                      }`}
-                    >
-                      {gainLoss >= 0 ? "+" : ""}
-                      ${gainLoss.toFixed(2)} (
-                      {percent.toFixed(2)}%)
-                    </p>
-                    <div className="mt-3 h-2 w-full overflow-hidden rounded bg-gray-800">
-                      <div
-                        className={`h-full ${
-                          percent >= 0 ? "bg-green-500" : "bg-red-500"
-                        }`}
-                        style={{ width: `${Math.min(Math.abs(percent), 100)}%` }}
-                      />
+              return (
+                <div key={h.id} className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+                  <div className="flex justify-between">
+                    <div>
+                      <p className="text-lg font-black tracking-tight capitalize">{h.metal}</p>
+                      <p className="text-sm text-gray-500 mt-0.5 tabular-nums">
+                        {h.ounces.toFixed(2)} oz @ ${h.purchasePrice.toFixed(2)}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        Purchased {new Date(h.purchaseDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-black tabular-nums">${value.toFixed(2)}</p>
+                      <p className={`text-sm font-medium tabular-nums mt-0.5 ${gainLoss >= 0 ? "text-green-400" : "text-red-400"}`}>
+                        {gainLoss >= 0 ? "+" : ""}${gainLoss.toFixed(2)} ({percent.toFixed(2)}%)
+                      </p>
+                      <div className="mt-2 h-1 w-24 ml-auto overflow-hidden rounded-full bg-white/5">
+                        <div
+                          className={`h-full rounded-full ${percent >= 0 ? "bg-green-500" : "bg-red-500"}`}
+                          style={{ width: `${Math.min(Math.abs(percent), 100)}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <form action={deleteHolding.bind(null, h.id)}>
-                  <button
-                    type="submit"
-                    className="rounded bg-red-600 px-3 py-1 text-sm hover:bg-red-500"
-                  >
-                    Delete
-                  </button>
-                </form>
-              </div>
-            );
-          })}
-        </div>
+                  <form action={deleteHolding.bind(null, h.id)}>
+                    <button
+                      type="submit"
+                      className="rounded-full border border-red-500/20 px-4 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </form>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </main>
   );

@@ -12,7 +12,7 @@ export default async function DashboardAlertsPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    redirect("/api/auth/signin?callbackUrl=/dashboard/alerts");
+    redirect("/login");
   }
 
   const user = { id: session.user.email! };
@@ -22,30 +22,35 @@ export default async function DashboardAlertsPage() {
   const hasAlerts = alerts.length > 0;
 
   return (
-    <div className="min-h-screen bg-black p-8 text-white">
+    <main className="min-h-screen bg-black p-8 text-white">
       <div className="mx-auto max-w-4xl space-y-8">
+
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Alerts</h1>
-
+          <div>
+            <p className="label mb-1">Alerts</p>
+            <h1 className="text-3xl font-black tracking-tight">Price Alerts</h1>
+          </div>
           <Link
             href="/alerts/new"
-            className="rounded bg-white px-4 py-2 text-sm font-medium text-black hover:bg-gray-200"
+            className="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
           >
-            + Create alert
+            + New alert
           </Link>
         </div>
 
         {/* Plan Banner */}
         {!plan.isPro && (
-          <div className="rounded-lg border border-yellow-600 bg-yellow-950/30 p-4 text-sm">
-            <span className="font-semibold">Free Plan:</span>{" "}
-            {plan.remaining} of 3 alerts remaining.
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm flex items-center justify-between gap-4">
+            <span className="text-gray-300">
+              <span className="font-semibold text-white">Free plan —</span>{" "}
+              {plan.remaining} of 3 alerts remaining.
+            </span>
             <Link
               href="/pricing"
-              className="ml-3 font-medium text-yellow-400 hover:underline"
+              className="shrink-0 rounded-full bg-amber-500/20 px-4 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-500/30 transition-colors"
             >
-              Upgrade for unlimited alerts →
+              Upgrade for unlimited →
             </Link>
           </div>
         )}
@@ -54,21 +59,22 @@ export default async function DashboardAlertsPage() {
         {hasAlerts ? (
           <AlertsTable alerts={alerts} />
         ) : (
-          <div className="rounded-lg border border-gray-800 bg-gray-900 p-10 text-center">
-            <h2 className="mb-2 text-xl font-semibold">No alerts yet</h2>
-            <p className="mb-6 text-gray-400">
-              Create an alert to get notified when gold or silver prices move.
+          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-12 text-center space-y-5">
+            <p className="text-5xl">🔔</p>
+            <p className="text-xl font-black tracking-tight">No alerts yet</p>
+            <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
+              Get notified the moment gold, silver, platinum, or palladium hits your target price.
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3">
               <Link
                 href="/alerts/new"
-                className="rounded bg-white px-5 py-2 text-sm font-medium text-black hover:bg-gray-200"
+                className="rounded-full bg-amber-500 px-6 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
               >
                 Create your first alert
               </Link>
               <Link
                 href="/pricing"
-                className="rounded border border-gray-700 px-5 py-2 text-sm text-gray-300 hover:bg-gray-800"
+                className="rounded-full border border-white/10 px-6 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
               >
                 View plans
               </Link>
@@ -76,6 +82,6 @@ export default async function DashboardAlertsPage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }
