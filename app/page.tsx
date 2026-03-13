@@ -71,32 +71,32 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
   const spark = data.history1D.map((p) => ({ value: p.price }));
 
   return (
-    <div className="card p-5 flex flex-col gap-4 group hover:border-white/15 transition-colors duration-300">
+    <div className="group px-7 py-6 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />
-          <span className="label">{label}</span>
+          <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{label}</span>
         </div>
         <span className="text-[10px] font-mono text-gray-700">{symbol}</span>
       </div>
 
       <div>
-        <div className="text-2xl font-black tracking-tightest">
+        <div className="text-2xl font-black tracking-tightest tabular-nums">
           {data.price > 0
             ? `$${data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-            : <span className="text-gray-700">—</span>
+            : <span className="text-white/15">—</span>
           }
         </div>
         {data.percentChange != null && (
           <div className={`mt-0.5 text-xs font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
-            {isUp ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
-            <span className="ml-1.5 font-normal text-gray-600">24H</span>
+            {isUp ? "+" : ""}{data.percentChange.toFixed(2)}%
+            <span className="ml-1.5 font-normal text-gray-700">24H</span>
           </div>
         )}
       </div>
 
       {spark.length > 1 && (
-        <div className="opacity-60 group-hover:opacity-100 transition-opacity">
+        <div className="opacity-30 group-hover:opacity-70 transition-opacity duration-300">
           <Sparkline data={spark} isPositive={isUp} />
         </div>
       )}
@@ -153,16 +153,16 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Live price tiles — visible above the fold as social proof */}
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <span className="label">Today&apos;s Spot Prices</span>
-              <span className="text-xs text-gray-700">Updated daily</span>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Price panel */}
+          <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0" style={{ borderColor: "var(--border)" }}>
               {prices.map(([metal, data]) => (
                 <PriceTile key={metal} metal={metal} data={data} />
               ))}
+            </div>
+            <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Spot prices</span>
+              <span className="text-[10px] text-gray-700">Updated daily</span>
             </div>
           </div>
         </div>
