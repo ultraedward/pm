@@ -60,17 +60,16 @@ export default async function DashboardAlertsPage() {
           <AlertsTable alerts={alerts} />
         ) : (
           <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-12 text-center space-y-5">
-            <p className="text-5xl">🔔</p>
-            <p className="text-xl font-black tracking-tight">No alerts yet</p>
+            <p className="text-xl font-black tracking-tight">No alerts set</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-              Get notified the moment gold, silver, platinum, or palladium hits your target price.
+              You'll receive an email when a daily spot price crosses your target threshold.
             </p>
             <div className="flex justify-center gap-3">
               <Link
                 href="/alerts/new"
                 className="rounded-full bg-amber-500 px-6 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
               >
-                Create your first alert
+                Set an alert
               </Link>
               <Link
                 href="/pricing"

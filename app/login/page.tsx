@@ -17,10 +17,10 @@ export default function LoginPage() {
             Precious Metals
           </p>
           <h1 className="text-4xl font-black tracking-tight text-white">
-            Welcome back
+            Sign in
           </h1>
           <p className="mt-3 text-sm text-gray-400">
-            Sign in to track prices, manage alerts, and monitor your portfolio.
+            Track spot prices, set price alerts, and monitor your holdings.
           </p>
         </div>
 

@@ -151,7 +151,7 @@ export default async function HomePage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
               <Link href="/login" className="btn-gold">
-                START FOR FREE
+                Start tracking
               </Link>
               <Link href="/pricing" className="btn-ghost">
                 View pricing
@@ -177,33 +177,33 @@ export default async function HomePage() {
       {/* ── FEATURES — scannable, no paragraphs ──────────────────── */}
       <section className="border-t px-6 py-20" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl">
-          <span className="label block mb-10">What you get</span>
+          <span className="label block mb-10">The platform</span>
 
           <div className="grid gap-px bg-white/5 sm:grid-cols-3 rounded-2xl overflow-hidden">
             {[
               {
-                icon: "🔔",
+                num: "01",
                 title: "Price Alerts",
-                lines: ["Set a target price", "Get an email when it hits", "Above or below triggers"],
+                lines: ["Name your target price", "Email notification on trigger", "Above and below thresholds"],
               },
               {
-                icon: "📊",
+                num: "02",
                 title: "Portfolio Tracker",
-                lines: ["Log ounces & purchase price", "Real-time P&L per holding", "Allocation breakdown"],
+                lines: ["Track ounces and cost basis", "P&L per holding, updated daily", "Allocation by metal"],
               },
               {
-                icon: "📈",
+                num: "03",
                 title: "Price Charts",
-                lines: ["24H, 7D, 30D history", "All four metals", "Toggle metals on/off"],
+                lines: ["24H, 7D, 30D history", "All four metals", "Toggle series on and off"],
               },
-            ].map(({ icon, title, lines }) => (
-              <div key={title} className="bg-black p-8 space-y-4">
-                <div className="text-3xl">{icon}</div>
+            ].map(({ num, title, lines }) => (
+              <div key={title} className="bg-black p-8 space-y-5">
+                <span className="text-xs font-bold text-white/20 font-mono">{num}</span>
                 <h3 className="text-base font-black tracking-tight">{title}</h3>
                 <ul className="space-y-1.5">
                   {lines.map((l) => (
                     <li key={l} className="flex items-center gap-2 text-sm text-gray-500">
-                      <span className="text-amber-500/60">—</span>
+                      <span className="text-amber-500/40">—</span>
                       {l}
                     </li>
                   ))}
@@ -221,9 +221,9 @@ export default async function HomePage() {
 
           <div className="grid gap-8 sm:grid-cols-3">
             {[
-              { n: "01", title: "Sign up free",   body: "No credit card. Just your Google account." },
-              { n: "02", title: "Set a target",   body: "Pick a metal. Enter your price. Choose above or below." },
-              { n: "03", title: "Get notified",   body: "We email you the moment the market hits your number." },
+              { n: "01", title: "Sign up free",   body: "Connect your Google account. No payment information required." },
+              { n: "02", title: "Set a target",   body: "Choose a metal, enter your target price, and select above or below." },
+              { n: "03", title: "Get notified",   body: "You receive an email when the daily spot price crosses your threshold." },
             ].map(({ n, title, body }) => (
               <div key={n} className="space-y-3">
                 <div className="text-4xl font-black tracking-tightest text-white/10">{n}</div>
@@ -239,13 +239,13 @@ export default async function HomePage() {
       <section className="border-t px-6 py-20 text-center" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-xl space-y-5">
           <h2 className="text-4xl sm:text-5xl font-black tracking-tightest">
-            Ready?
-            <span className="text-amber-400"> It&apos;s free.</span>
+            Start free.
+            <span className="text-amber-400"> Upgrade when it makes sense.</span>
           </h2>
-          <p className="text-sm text-gray-500">No credit card. Cancel anytime. Up in 60 seconds.</p>
+          <p className="text-sm text-gray-500">No credit card required. Cancel anytime.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/login" className="btn-gold">
-              GET STARTED FREE
+              Get started free
             </Link>
             <Link href="/pricing" className="btn-ghost">
               See pricing

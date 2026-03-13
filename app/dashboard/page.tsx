@@ -183,7 +183,6 @@ export default async function DashboardPage({ searchParams }: any) {
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-5">
-            <p className="text-5xl">📊</p>
             <p className="text-xl font-black tracking-tight text-white">No holdings yet</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
               Add your gold, silver, platinum, or palladium positions to track portfolio value as prices update.
@@ -192,7 +191,7 @@ export default async function DashboardPage({ searchParams }: any) {
               href="/dashboard/holdings"
               className="inline-block rounded-full bg-amber-500 px-7 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
             >
-              Add Your First Holding
+              Add a holding
             </Link>
           </div>
         ) : (

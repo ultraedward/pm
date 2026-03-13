@@ -23,10 +23,10 @@ export default async function PricingPage() {
         <div className="text-center space-y-4">
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Pricing</p>
           <h1 className="text-5xl font-black tracking-tight">
-            Simple, transparent pricing
+            Pricing
           </h1>
           <p className="text-gray-400 max-w-md mx-auto">
-            Start free. Upgrade when you need more power.
+            Start on the free plan. Add more alerts when you need them.
           </p>
         </div>
 
@@ -41,7 +41,7 @@ export default async function PricingPage() {
                 <span className="text-5xl font-black">$0</span>
                 <span className="text-gray-500 mb-1">/month</span>
               </div>
-              <p className="text-sm text-gray-400 mt-2">For casual tracking</p>
+              <p className="text-sm text-gray-400 mt-2">Up to 3 active alerts</p>
             </div>
 
             <ul className="space-y-3 text-sm text-gray-300">
@@ -82,15 +82,12 @@ export default async function PricingPage() {
             <div className="relative">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold uppercase tracking-widest text-amber-500">Pro</p>
-                <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-xs font-semibold text-amber-400 uppercase tracking-wide">
-                  Most popular
-                </span>
               </div>
               <div className="flex items-end gap-1">
                 <span className="text-5xl font-black">$9</span>
                 <span className="text-gray-500 mb-1">/month</span>
               </div>
-              <p className="text-sm text-gray-400 mt-2">For serious traders</p>
+              <p className="text-sm text-gray-400 mt-2">Unlimited alerts</p>
             </div>
 
             <ul className="relative space-y-3 text-sm text-gray-300">
