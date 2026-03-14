@@ -71,7 +71,7 @@ export default async function AccountPage() {
                 </p>
               ) : (
                 <p className="mt-1 text-sm text-gray-400">
-                  3 alerts included ·{" "}
+                  1 alert included ·{" "}
                   <Link href="/pricing" className="text-yellow-400 hover:underline">
                     Upgrade for unlimited
                   </Link>
@@ -110,7 +110,7 @@ export default async function AccountPage() {
               {alertCount === 1 ? "Alert" : "Alerts"}
             </p>
             <p className="text-xs text-gray-600 mt-0.5">
-              {isPro ? "Unlimited plan" : `${Math.max(0, 3 - alertCount)} of 3 remaining`}
+              {isPro ? "Unlimited plan" : `${Math.max(0, 1 - alertCount)} of 1 remaining`}
             </p>
           </Link>
 

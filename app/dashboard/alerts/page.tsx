@@ -44,7 +44,7 @@ export default async function DashboardAlertsPage() {
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm flex items-center justify-between gap-4">
             <span className="text-gray-300">
               <span className="font-semibold text-white">Free plan —</span>{" "}
-              {plan.remaining} of 3 alerts remaining.
+              {plan.remaining === 0 ? "No alerts remaining." : "1 free alert remaining."}
             </span>
             <Link
               href="/pricing"

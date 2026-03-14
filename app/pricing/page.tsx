@@ -40,11 +40,11 @@ export default async function PricingPage() {
                 <span className="text-5xl font-black">$0</span>
                 <span className="text-gray-500 mb-1">/month</span>
               </div>
-              <p className="text-sm text-gray-400 mt-2">Up to 3 active alerts</p>
+              <p className="text-sm text-gray-400 mt-2">1 active alert</p>
             </div>
 
             <ul className="space-y-3 text-sm text-gray-300">
-              {["Up to 3 price alerts", "Gold, silver, platinum & palladium", "Email notifications", "Portfolio tracker"].map((f) => (
+              {["1 price alert", "Gold, silver, platinum & palladium", "Email notifications", "Portfolio tracker"].map((f) => (
                 <li key={f} className="flex items-center gap-2">
                   <span className="text-amber-500">✓</span> {f}
                 </li>
@@ -83,10 +83,14 @@ export default async function PricingPage() {
                 <p className="text-xs font-semibold uppercase tracking-widest text-amber-500">Pro</p>
               </div>
               <div className="flex items-end gap-1">
-                <span className="text-5xl font-black">$9</span>
+                <span className="text-5xl font-black">$7</span>
                 <span className="text-gray-500 mb-1">/month</span>
               </div>
-              <p className="text-sm text-gray-400 mt-2">Unlimited alerts</p>
+              <p className="text-sm text-gray-400 mt-2">
+                or{" "}
+                <span className="text-amber-400 font-semibold">$67/year</span>
+                <span className="ml-1.5 text-xs text-gray-600">save $17</span>
+              </p>
             </div>
 
             <ul className="relative space-y-3 text-sm text-gray-300">
