@@ -4,16 +4,16 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center px-6">
+    <main className="min-h-screen bg-surface flex items-center justify-center px-6">
       {/* Ambient glow — stronger */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[600px] w-[600px] rounded-full bg-amber-500/10 blur-[120px]" />
+        <div className="h-[600px] w-[600px] rounded-full blur-[120px]" style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)", opacity: 0.08 }} />
       </div>
 
       <div className="relative w-full max-w-sm space-y-12 text-center">
         {/* Wordmark + headline */}
         <div className="space-y-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-amber-500">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--gold-bright)" }}>
             Precious Metals
           </p>
           <h1 className="text-5xl font-black tracking-tightest text-white leading-none">

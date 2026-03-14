@@ -6,7 +6,7 @@ const LAST_UPDATED = "March 12, 2026";
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-black px-6 py-24 text-white">
+    <main className="min-h-screen bg-surface px-6 py-24 text-white">
       <div className="mx-auto max-w-2xl space-y-12">
 
         <div>

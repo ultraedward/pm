@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --bg: #000;
+  --bg: #0a0907;
   --text: #fff;
-  --gold: #d4a017;
-  --gold-bright: #f59e0b;
-  --border: rgba(255,255,255,0.08);
+  --gold: #B8962E;
+  --gold-bright: #D4AF37;
+  --border: rgba(212, 175, 55, 0.12);
 }
 
 html, body {
@@ -41,7 +41,11 @@ html, body {
 
   /* Gold accent button */
   .btn-gold {
-    @apply rounded-full bg-amber-500 px-8 py-3 text-sm font-bold text-black tracking-wide hover:bg-amber-400 transition-colors;
+    @apply rounded-full px-8 py-3 text-sm font-bold text-black tracking-wide transition-colors;
+    background-color: var(--gold-bright);
+  }
+  .btn-gold:hover {
+    background-color: #C8A028;
   }
 
   /* Ghost button */

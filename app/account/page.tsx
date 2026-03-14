@@ -29,7 +29,7 @@ export default async function AccountPage() {
   const isPro = dbUser.subscriptionStatus === "active";
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-surface text-white">
       <div className="mx-auto max-w-xl px-6 py-16 space-y-12">
 
         {/* Header */}

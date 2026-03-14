@@ -3,18 +3,30 @@ import { requireUser } from "@/lib/requireUser";
 import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
 import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
 import { AlertsTable } from "@/components/AlertsTable";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardAlertsPage() {
   const user = await requireUser();
-  const alerts = await getUserAlerts(user.id);
-  const plan = await canCreateAlert(user.id);
+  const [alerts, plan, spotRows] = await Promise.all([
+    getUserAlerts(user.id),
+    canCreateAlert(user.id),
+    prisma.price.findMany({
+      where: { metal: { in: ["gold", "silver", "platinum", "palladium"] } },
+      orderBy: { timestamp: "desc" },
+      distinct: ["metal"],
+    }),
+  ]);
+
+  const spots: Record<string, number> = Object.fromEntries(
+    spotRows.map((r) => [r.metal, r.price])
+  );
 
   const hasAlerts = alerts.length > 0;
 
   return (
-    <main className="min-h-screen bg-black p-8 text-white">
+    <main className="min-h-screen bg-surface p-8 text-white">
       <div className="mx-auto max-w-4xl space-y-8">
 
         {/* Header */}
@@ -49,7 +61,7 @@ export default async function DashboardAlertsPage() {
 
         {/* Content */}
         {hasAlerts ? (
-          <AlertsTable alerts={alerts} />
+          <AlertsTable alerts={alerts} spots={spots} />
         ) : (
           <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-12 text-center space-y-5">
             <p className="text-xl font-black tracking-tight">No alerts set</p>

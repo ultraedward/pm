@@ -11,11 +11,11 @@ export const revalidate = 0;
 
 type Metal = "gold" | "silver" | "platinum" | "palladium";
 
-const METAL_COLORS: Record<Metal, string> = {
-  gold:      "text-yellow-400",
-  silver:    "text-gray-300",
-  platinum:  "text-purple-400",
-  palladium: "text-emerald-400",
+const METAL_DOTS: Record<Metal, string> = {
+  gold:      "#D4AF37",
+  silver:    "#C0C0C0",
+  platinum:  "#E5E4E2",
+  palladium: "#9FA8C7",
 };
 
 const METALS: Metal[] = ["gold", "silver", "platinum", "palladium"];
@@ -92,6 +92,20 @@ export default async function DashboardPage({ searchParams }: any) {
     palladium: palladiumRow?.price ?? 0,
   };
 
+  // 24h % change — compare latest to previous data point
+  const prevSpots: Record<Metal, number> = {
+    gold:      goldHistory.length >= 2      ? goldHistory[goldHistory.length - 2].price      : 0,
+    silver:    silverHistory.length >= 2    ? silverHistory[silverHistory.length - 2].price    : 0,
+    platinum:  platinumHistory.length >= 2  ? platinumHistory[platinumHistory.length - 2].price  : 0,
+    palladium: palladiumHistory.length >= 2 ? palladiumHistory[palladiumHistory.length - 2].price : 0,
+  };
+  const pctChange: Record<Metal, number | null> = {
+    gold:      prevSpots.gold > 0      ? ((spots.gold - prevSpots.gold) / prevSpots.gold) * 100           : null,
+    silver:    prevSpots.silver > 0    ? ((spots.silver - prevSpots.silver) / prevSpots.silver) * 100     : null,
+    platinum:  prevSpots.platinum > 0  ? ((spots.platinum - prevSpots.platinum) / prevSpots.platinum) * 100   : null,
+    palladium: prevSpots.palladium > 0 ? ((spots.palladium - prevSpots.palladium) / prevSpots.palladium) * 100 : null,
+  };
+
   // Portfolio totals
   let totalInvested = 0;
   let totalValue = 0;
@@ -143,7 +157,7 @@ export default async function DashboardPage({ searchParams }: any) {
   const calcTotal  = calcValues.reduce((s, v) => s + v, 0);
 
   return (
-    <main className="min-h-screen bg-black p-8 text-white">
+    <main className="min-h-screen bg-surface p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
@@ -163,21 +177,31 @@ export default async function DashboardPage({ searchParams }: any) {
         </div>
 
         {/* Daily spot prices */}
-        <div className="grid grid-cols-2 gap-px sm:grid-cols-4 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
-          {METALS.map((metal) => {
-            const price = spots[metal];
-            const colorClass = METAL_COLORS[metal];
-            return (
-              <div key={metal} className="bg-black p-5 space-y-1">
-                <p className={`text-xs font-bold uppercase tracking-widest ${colorClass}`}>
-                  {metal}
-                </p>
-                <p className="text-xl font-bold tabular-nums">
-                  {price > 0 ? fmtMoney(price) : <span className="text-white/20">—</span>}
-                </p>
-              </div>
-            );
-          })}
+        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0" style={{ borderColor: "var(--border)" }}>
+            {METALS.map((metal) => {
+              const price = spots[metal];
+              const chg = pctChange[metal];
+              const isUp = (chg ?? 0) >= 0;
+              return (
+                <div key={metal} className="px-5 py-4 space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: METAL_DOTS[metal] }} />
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{metal}</p>
+                  </div>
+                  <p className="text-xl font-black tabular-nums tracking-tightest">
+                    {price > 0 ? fmtMoney(price) : <span className="text-white/20">—</span>}
+                  </p>
+                  {chg !== null && (
+                    <p className={`text-xs font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+                      {isUp ? "+" : ""}{chg.toFixed(2)}%
+                      <span className="ml-1 font-normal text-gray-600">24H</span>
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Portfolio value — empty state for new users */}
@@ -189,7 +213,7 @@ export default async function DashboardPage({ searchParams }: any) {
             </p>
             <Link
               href="/dashboard/holdings"
-              className="inline-block rounded-full bg-amber-500 px-7 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+              className="inline-block btn-gold px-7 py-2.5"
             >
               Add a holding
             </Link>

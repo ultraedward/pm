@@ -10,7 +10,7 @@ type HistoryPoint = { price: number; timestamp: string };
 type MetalData = {
   price: number;
   percentChange: number | null;
-  history1D: HistoryPoint[];
+  history30D: HistoryPoint[];
   week52High: number | null;
   week52Low: number | null;
 };
@@ -28,19 +28,22 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
       orderBy: { timestamp: "asc" },
     });
 
-    if (!rows.length) return { price: 0, percentChange: null, history1D: [], week52High: null, week52Low: null };
+    if (!rows.length) return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null };
 
     const latest = rows[rows.length - 1];
 
-    // 24H change
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    let h1D = rows.filter((r) => r.timestamp >= oneDayAgo);
-    if (h1D.length < 2) h1D = rows.slice(-12);
-    const baseline = h1D[0];
+    // 24H % change — compare latest to the previous available data point
+    const prev = rows.length >= 2 ? rows[rows.length - 2] : null;
     const percentChange =
-      baseline?.price
-        ? ((latest.price - baseline.price) / baseline.price) * 100
+      prev?.price
+        ? ((latest.price - prev.price) / prev.price) * 100
         : null;
+
+    // 30D sparkline — last 30 data points
+    const history30D = rows.slice(-30).map((r) => ({
+      price: r.price,
+      timestamp: r.timestamp.toISOString(),
+    }));
 
     // 52W high / low
     const prices = rows.map((r) => r.price);
@@ -50,15 +53,12 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
     return {
       price: latest.price,
       percentChange,
-      history1D: h1D.map((r) => ({
-        price: r.price,
-        timestamp: r.timestamp.toISOString(),
-      })),
+      history30D,
       week52High,
       week52Low,
     };
   } catch {
-    return { price: 0, percentChange: null, history1D: [], week52High: null, week52Low: null };
+    return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null };
   }
 }
 
@@ -67,10 +67,10 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
 const METALS: Metal[] = ["gold", "silver", "platinum", "palladium"];
 
 const METAL_META: Record<Metal, { label: string; symbol: string; dot: string }> = {
-  gold:      { label: "Gold",      symbol: "XAU", dot: "#f59e0b" },
-  silver:    { label: "Silver",    symbol: "XAG", dot: "#94a3b8" },
-  platinum:  { label: "Platinum",  symbol: "XPT", dot: "#a78bfa" },
-  palladium: { label: "Palladium", symbol: "XPD", dot: "#34d399" },
+  gold:      { label: "Gold",      symbol: "XAU", dot: "#D4AF37" },
+  silver:    { label: "Silver",    symbol: "XAG", dot: "#C0C0C0" },
+  platinum:  { label: "Platinum",  symbol: "XPT", dot: "#E5E4E2" },
+  palladium: { label: "Palladium", symbol: "XPD", dot: "#9FA8C7" },
 };
 
 // ─── components ───────────────────────────────────────────────────────────────
@@ -78,7 +78,7 @@ const METAL_META: Record<Metal, { label: string; symbol: string; dot: string }> 
 function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
   const { label, symbol, dot } = METAL_META[metal];
   const isUp = (data.percentChange ?? 0) >= 0;
-  const spark = data.history1D.map((p) => ({ value: p.price }));
+  const spark = data.history30D.map((p) => ({ value: p.price }));
 
   // 52W range bar position (0–100%)
   const rangePos =
@@ -163,7 +163,7 @@ export default async function HomePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-x-hidden">
+    <main className="min-h-screen bg-surface text-white overflow-x-hidden">
 
       {/* ── HERO + LIVE PRICES ───────────────────────────────────── */}
       <section className="relative px-6 pt-24 pb-20">
@@ -172,7 +172,7 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 blur-3xl"
-            style={{ background: "radial-gradient(circle, #d4a017 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
           />
         </div>
 
@@ -183,7 +183,7 @@ export default async function HomePage() {
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
               Gold. Silver.
               <br />
-              <span className="text-amber-400">Platinum. Palladium.</span>
+              <span style={{ color: "var(--gold-bright)" }}>Platinum. Palladium.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
@@ -208,7 +208,7 @@ export default async function HomePage() {
               ))}
             </div>
             <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Spot prices</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Spot prices · 30D trend</span>
               <span className="text-xs text-gray-600">Updated daily</span>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default async function HomePage() {
           {[
             { title: "Price alerts", body: "Set a target. Get an email when the market crosses it." },
             { title: "Portfolio tracker", body: "Log your ounces and cost basis. See P&L as prices update." },
-            { title: "Price charts", body: "24H, 7D, and 30D history for all four metals." },
+            { title: "Price charts", body: "30D and 52-week history for all four metals." },
           ].map(({ title, body }) => (
             <div key={title} className="px-8 py-12 space-y-3">
               <p className="text-base font-black tracking-tight text-white">{title}</p>

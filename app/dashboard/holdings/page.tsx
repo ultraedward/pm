@@ -190,8 +190,30 @@ export default async function HoldingsPage() {
           .join(" ")
       : "0,100 100,100";
 
+  const METAL_META = {
+    gold:      { label: "Gold",      symbol: "XAU", dot: "#D4AF37" },
+    silver:    { label: "Silver",    symbol: "XAG", dot: "#C0C0C0" },
+    platinum:  { label: "Platinum",  symbol: "XPT", dot: "#E5E4E2" },
+    palladium: { label: "Palladium", symbol: "XPD", dot: "#9FA8C7" },
+  };
+
+  const metalSummaries = (["gold", "silver", "platinum", "palladium"] as const)
+    .map((metal) => {
+      const lots = holdings.filter((h) => h.metal === metal);
+      if (lots.length === 0) return null;
+      const totalOz       = lots.reduce((s, h) => s + h.ounces, 0);
+      const totalCost     = lots.reduce((s, h) => s + h.ounces * h.purchasePrice, 0);
+      const avgCost       = totalCost / totalOz;
+      const currentSpot   = spotMap[metal] ?? 0;
+      const currentValue  = totalOz * currentSpot;
+      const gainLoss      = currentValue - totalCost;
+      const gainPct       = totalCost > 0 ? (gainLoss / totalCost) * 100 : 0;
+      return { metal, totalOz, avgCost, currentSpot, currentValue, gainLoss, gainPct };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
+
   return (
-    <main className="min-h-screen bg-black p-8 text-white">
+    <main className="min-h-screen bg-surface p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
@@ -233,18 +255,18 @@ export default async function HoldingsPage() {
 
             <div className="space-y-3">
               {[
-                { label: "Gold",      pct: goldPercent,      bar: "bg-yellow-400",  text: "text-yellow-400"  },
-                { label: "Silver",    pct: silverPercent,    bar: "bg-gray-400",    text: "text-gray-300"    },
-                { label: "Platinum",  pct: platinumPercent,  bar: "bg-purple-400",  text: "text-purple-400"  },
-                { label: "Palladium", pct: palladiumPercent, bar: "bg-emerald-400", text: "text-emerald-400" },
-              ].map(({ label, pct, bar, text }) => pct > 0 ? (
+                { label: "Gold",      pct: goldPercent,      dot: "#D4AF37" },
+                { label: "Silver",    pct: silverPercent,    dot: "#C0C0C0" },
+                { label: "Platinum",  pct: platinumPercent,  dot: "#E5E4E2" },
+                { label: "Palladium", pct: palladiumPercent, dot: "#9FA8C7" },
+              ].map(({ label, pct, dot }) => pct > 0 ? (
                 <div key={label}>
                   <div className="mb-1.5 flex justify-between text-sm">
-                    <span className={`font-medium ${text}`}>{label}</span>
+                    <span className="font-medium" style={{ color: dot }}>{label}</span>
                     <span className="tabular-nums text-gray-400">{pct.toFixed(1)}%</span>
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                    <div className={`h-full rounded-full ${bar}`} style={{ width: `${pct}%` }} />
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: dot }} />
                   </div>
                 </div>
               ) : null)}
@@ -256,10 +278,10 @@ export default async function HoldingsPage() {
                   className="h-full w-full rounded-full"
                   style={{
                     background: `conic-gradient(
-                      #facc15 0% ${goldPercent}%,
-                      #9ca3af ${goldPercent}% ${goldPercent + silverPercent}%,
-                      #a78bfa ${goldPercent + silverPercent}% ${goldPercent + silverPercent + platinumPercent}%,
-                      #34d399 ${goldPercent + silverPercent + platinumPercent}% 100%
+                      #D4AF37 0% ${goldPercent}%,
+                      #C0C0C0 ${goldPercent}% ${goldPercent + silverPercent}%,
+                      #E5E4E2 ${goldPercent + silverPercent}% ${goldPercent + silverPercent + platinumPercent}%,
+                      #9FA8C7 ${goldPercent + silverPercent + platinumPercent}% 100%
                     )`,
                   }}
                 />
@@ -321,6 +343,41 @@ export default async function HoldingsPage() {
             </button>
           </form>
         </div>
+
+        {/* Per-metal summary */}
+        {metalSummaries.length > 0 && (
+          <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+            {metalSummaries.map((s, i) => {
+              const meta = METAL_META[s.metal];
+              const isUp = s.gainLoss >= 0;
+              return (
+                <div
+                  key={s.metal}
+                  className={`flex items-center justify-between px-6 py-4 gap-4 ${i > 0 ? "border-t" : ""}`}
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: meta.dot }} />
+                    <div>
+                      <p className="text-sm font-bold">{meta.label}</p>
+                      <p className="text-xs text-gray-500 tabular-nums">
+                        {s.totalOz.toFixed(3)} oz · avg ${s.avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold tabular-nums">
+                      ${s.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <p className={`text-xs tabular-nums font-medium ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+                      {isUp ? "+" : ""}${s.gainLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({isUp ? "+" : ""}{s.gainPct.toFixed(2)}%)
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Holdings list */}
         {holdings.length === 0 ? (

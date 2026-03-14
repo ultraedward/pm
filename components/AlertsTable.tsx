@@ -19,7 +19,7 @@ type Alert = {
   createdAt: Date;
 };
 
-export function AlertsTable({ alerts }: { alerts: Alert[] }) {
+export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: Record<string, number> }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -63,13 +63,39 @@ export function AlertsTable({ alerts }: { alerts: Alert[] }) {
           >
             {/* Header */}
             <div className="flex items-start justify-between gap-4">
-              <div>
+              <div className="space-y-1.5">
                 <div className="text-lg font-semibold capitalize">
                   {alert.metal} {alert.direction === "above" ? "≥" : "≤"} $
                   {alert.price.toLocaleString()}
                 </div>
 
-                <div className="text-sm text-gray-400 mt-0.5">
+                {/* Distance-to-trigger */}
+                {spots[alert.metal] ? (() => {
+                  const current = spots[alert.metal];
+                  const target = alert.price;
+                  const diff = target - current;
+                  const pct = Math.abs((diff / current) * 100);
+                  const isTriggered = alert.direction === "above" ? current >= target : current <= target;
+                  const approaching = pct < 5;
+
+                  return (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-gray-500">
+                        Current <span className="tabular-nums text-gray-300">${current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </span>
+                      <span className="text-gray-700">·</span>
+                      {isTriggered ? (
+                        <span className="text-emerald-400 font-medium">At threshold</span>
+                      ) : (
+                        <span className={approaching ? "text-amber-400 font-medium" : "text-gray-500"}>
+                          ${Math.abs(diff).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} away ({pct.toFixed(1)}%)
+                        </span>
+                      )}
+                    </div>
+                  );
+                })() : null}
+
+                <div className="text-sm text-gray-500">
                   {triggerCount} trigger{triggerCount !== 1 && "s"}
                   {lastTriggered && (
                     <> · Last: {new Date(lastTriggered).toLocaleString()}</>

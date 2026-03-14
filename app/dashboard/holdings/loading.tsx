@@ -1,6 +1,6 @@
 export default function HoldingsLoading() {
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
+    <main className="min-h-screen bg-surface p-10 text-white">
       <div className="mx-auto max-w-5xl space-y-8 animate-pulse">
         {/* Header */}
         <div className="flex items-center justify-between">

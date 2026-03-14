@@ -16,7 +16,7 @@ export default function GlobalError({
 
   return (
     <html>
-      <body className="min-h-screen bg-black flex items-center justify-center px-6">
+      <body className="min-h-screen bg-surface flex items-center justify-center px-6" style={{ backgroundColor: "#0a0907" }}>
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-96 w-96 rounded-full bg-red-500/10 blur-3xl" />
         </div>
@@ -32,7 +32,7 @@ export default function GlobalError({
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={reset}
-              className="rounded-full bg-amber-500 px-8 py-3 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+              className="btn-gold"
             >
               Try again
             </button>

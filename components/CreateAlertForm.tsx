@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const METALS = [
-  { value: "gold",      label: "Gold",      color: "text-yellow-400" },
-  { value: "silver",    label: "Silver",    color: "text-gray-300"   },
-  { value: "platinum",  label: "Platinum",  color: "text-purple-400" },
-  { value: "palladium", label: "Palladium", color: "text-emerald-400"},
+  { value: "gold",      label: "Gold",      dot: "#D4AF37" },
+  { value: "silver",    label: "Silver",    dot: "#C0C0C0" },
+  { value: "platinum",  label: "Platinum",  dot: "#E5E4E2" },
+  { value: "palladium", label: "Palladium", dot: "#9FA8C7" },
 ];
 
 export function CreateAlertForm() {
@@ -26,7 +26,8 @@ export function CreateAlertForm() {
 
     const res = await fetch("/api/alerts/create", {
       method: "POST",
-      body: JSON.stringify({ metal, direction, price: Number(price) }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metal, direction, price: Number(price), type: "price" }),
     });
 
     if (res.status === 402) {
@@ -55,21 +56,22 @@ export function CreateAlertForm() {
       <div className="space-y-2">
         <label className="label">Metal</label>
         <div className="grid grid-cols-2 gap-2">
-          {METALS.map(({ value, label, color }) => (
+          {METALS.map(({ value, label, dot }) => (
             <button
               key={value}
               type="button"
               onClick={() => setMetal(value)}
               className={`rounded-xl border px-4 py-3 text-sm font-semibold text-left transition-all ${
                 metal === value
-                  ? "border-amber-500/40 bg-amber-500/10 text-white"
+                  ? "border-white/10 bg-white/5 text-white"
                   : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
               }`}
             >
-              <span className={`block text-xs font-bold uppercase tracking-widest mb-0.5 ${metal === value ? color : ""}`}>
-                {label}
-              </span>
-              <span className="text-xs text-gray-600 font-mono">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+                <span className="text-xs font-bold uppercase tracking-widest">{label}</span>
+              </div>
+              <span className="text-xs text-gray-600 font-mono pl-3">
                 {value === "gold" ? "XAU" : value === "silver" ? "XAG" : value === "platinum" ? "XPT" : "XPD"}
               </span>
             </button>

@@ -13,7 +13,7 @@ export default async function NewAlertPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black p-8 text-white">
+    <main className="min-h-screen bg-surface p-8 text-white">
       <div className="mx-auto max-w-xl space-y-8">
         <div>
           <Link

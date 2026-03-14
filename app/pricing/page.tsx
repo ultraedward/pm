@@ -16,7 +16,7 @@ export default async function PricingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black px-6 py-24 text-white">
+    <main className="min-h-screen bg-surface px-6 py-24 text-white">
       <div className="mx-auto max-w-4xl space-y-16">
 
         {/* Header */}

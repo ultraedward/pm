@@ -12,6 +12,9 @@ module.exports = {
       letterSpacing: {
         tightest: "-0.04em",
       },
+      colors: {
+        surface: "#0a0907",
+      },
     },
   },
   plugins: [],
