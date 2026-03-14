@@ -11,6 +11,8 @@ type MetalData = {
   price: number;
   percentChange: number | null;
   history1D: HistoryPoint[];
+  week52High: number | null;
+  week52Low: number | null;
 };
 type Metal = "gold" | "silver" | "platinum" | "palladium";
 
@@ -21,23 +23,29 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
     const rows = await prisma.price.findMany({
       where: {
         metal,
-        timestamp: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        timestamp: { gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) },
       },
       orderBy: { timestamp: "asc" },
     });
 
-    if (!rows.length) return { price: 0, percentChange: null, history1D: [] };
+    if (!rows.length) return { price: 0, percentChange: null, history1D: [], week52High: null, week52Low: null };
 
     const latest = rows[rows.length - 1];
+
+    // 24H change
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     let h1D = rows.filter((r) => r.timestamp >= oneDayAgo);
     if (h1D.length < 2) h1D = rows.slice(-12);
-
     const baseline = h1D[0];
     const percentChange =
       baseline?.price
         ? ((latest.price - baseline.price) / baseline.price) * 100
         : null;
+
+    // 52W high / low
+    const prices = rows.map((r) => r.price);
+    const week52High = Math.max(...prices);
+    const week52Low  = Math.min(...prices);
 
     return {
       price: latest.price,
@@ -46,9 +54,11 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
         price: r.price,
         timestamp: r.timestamp.toISOString(),
       })),
+      week52High,
+      week52Low,
     };
   } catch {
-    return { price: 0, percentChange: null, history1D: [] };
+    return { price: 0, percentChange: null, history1D: [], week52High: null, week52Low: null };
   }
 }
 
@@ -69,6 +79,18 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
   const { label, symbol, dot } = METAL_META[metal];
   const isUp = (data.percentChange ?? 0) >= 0;
   const spark = data.history1D.map((p) => ({ value: p.price }));
+
+  // 52W range bar position (0–100%)
+  const rangePos =
+    data.week52High && data.week52Low && data.week52High !== data.week52Low && data.price > 0
+      ? ((data.price - data.week52Low) / (data.week52High - data.week52Low)) * 100
+      : null;
+
+  // % from 52W high
+  const fromHigh =
+    data.week52High && data.price > 0
+      ? ((data.price - data.week52High) / data.week52High) * 100
+      : null;
 
   return (
     <div className="group px-7 py-6 flex flex-col gap-3">
@@ -98,6 +120,31 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       {spark.length > 1 && (
         <div className="opacity-30 group-hover:opacity-70 transition-opacity duration-300">
           <Sparkline data={spark} isPositive={isUp} />
+        </div>
+      )}
+
+      {/* 52W range */}
+      {rangePos !== null && data.week52Low && data.week52High && (
+        <div className="space-y-1.5 pt-1">
+          <div className="relative h-px w-full bg-white/10">
+            <div
+              className="absolute top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-amber-400 -translate-x-1/2"
+              style={{ left: `${Math.min(Math.max(rangePos, 4), 96)}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] tabular-nums text-gray-700">
+              ${data.week52Low.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+            {fromHigh !== null && (
+              <span className="text-[9px] tabular-nums text-gray-600">
+                {fromHigh >= -0.1 ? "At 52W high" : `${fromHigh.toFixed(1)}% from high`}
+              </span>
+            )}
+            <span className="text-[9px] tabular-nums text-gray-700">
+              ${data.week52High.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+          </div>
         </div>
       )}
     </div>
