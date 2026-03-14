@@ -29,63 +29,39 @@ export default async function AccountPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-2xl px-6 py-12 space-y-6">
+      <div className="mx-auto max-w-xl px-6 py-16 space-y-12">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Account</h1>
-          <Link
-            href="/dashboard"
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            ← Dashboard
-          </Link>
-        </div>
-
-        {/* Profile */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
-          <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Profile</p>
-          <p className="text-lg font-semibold mt-3">{dbUser.name ?? "User"}</p>
-          <p className="text-sm text-gray-400">{dbUser.email}</p>
-          <p className="text-xs text-gray-600 mt-1">
-            Member since {new Date(dbUser.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
-          </p>
+        <div>
+          <p className="label mb-2">Account</p>
+          <h1 className="text-3xl font-black tracking-tight">{dbUser.name ?? "User"}</h1>
+          <p className="text-sm text-gray-500 mt-1">{dbUser.email}</p>
         </div>
 
         {/* Plan */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="space-y-4 border-t pt-8" style={{ borderColor: "var(--border)" }}>
+          <p className="label">Plan</p>
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Plan</p>
-              <div className="mt-3 flex items-center gap-2">
-                <p className="text-lg font-semibold">{isPro ? "Pro" : "Free"}</p>
+              <p className="text-lg font-black tracking-tight">
+                {isPro ? "Pro" : "Free"}
                 {isPro && (
-                  <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400">
-                    Active
-                  </span>
+                  <span className="ml-2 text-xs font-semibold text-emerald-400">Active</span>
                 )}
-              </div>
-              {isPro ? (
-                <p className="mt-1 text-sm text-gray-400">
-                  {dbUser.stripeCurrentPeriodEnd
+              </p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {isPro
+                  ? dbUser.stripeCurrentPeriodEnd
                     ? `Renews ${new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}`
-                    : "Unlimited alerts"}
-                </p>
-              ) : (
-                <p className="mt-1 text-sm text-gray-400">
-                  1 alert included ·{" "}
-                  <Link href="/pricing" className="text-yellow-400 hover:underline">
-                    Upgrade for unlimited
-                  </Link>
-                </p>
-              )}
+                    : "Unlimited alerts"
+                  : "1 alert included"}
+              </p>
             </div>
-
             {isPro ? (
               <form action="/api/billing/portal" method="POST">
                 <button
                   type="submit"
-                  className="rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors"
+                  className="rounded-full border border-white/10 px-5 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 transition-colors"
                 >
                   Manage billing
                 </button>
@@ -93,7 +69,7 @@ export default async function AccountPage() {
             ) : (
               <Link
                 href="/pricing"
-                className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black hover:bg-yellow-400 transition-colors shrink-0"
+                className="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
               >
                 Upgrade to Pro
               </Link>
@@ -101,45 +77,31 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* Quick stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <Link
-            href="/alerts"
-            className="rounded-2xl border border-gray-800 bg-gray-950 p-5 hover:border-gray-700 transition-colors"
-          >
-            <p className="text-2xl font-bold">{alertCount}</p>
-            <p className="text-sm text-gray-400 mt-1">
-              {alertCount === 1 ? "Alert" : "Alerts"}
-            </p>
-            <p className="text-xs text-gray-600 mt-0.5">
-              {isPro ? "Unlimited plan" : `${Math.max(0, 1 - alertCount)} of 1 remaining`}
-            </p>
-          </Link>
-
-          <Link
-            href="/dashboard/holdings"
-            className="rounded-2xl border border-gray-800 bg-gray-950 p-5 hover:border-gray-700 transition-colors"
-          >
-            <p className="text-2xl font-bold">{holdingCount}</p>
-            <p className="text-sm text-gray-400 mt-1">
-              {holdingCount === 1 ? "Holding" : "Holdings"}
-            </p>
-            <p className="text-xs text-gray-600 mt-0.5">View portfolio →</p>
-          </Link>
+        {/* Stats */}
+        <div className="space-y-4 border-t pt-8" style={{ borderColor: "var(--border)" }}>
+          <p className="label">Usage</p>
+          <div className="grid grid-cols-2 gap-x-8">
+            <Link href="/dashboard/alerts" className="group space-y-1 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+              <p className="text-2xl font-black tabular-nums">{alertCount}</p>
+              <p className="text-sm text-gray-500">{alertCount === 1 ? "Alert" : "Alerts"}</p>
+              <p className="text-xs text-gray-700 group-hover:text-gray-500 transition-colors">
+                {isPro ? "Unlimited" : `${Math.max(0, 1 - alertCount)} of 1 remaining`}
+              </p>
+            </Link>
+            <Link href="/dashboard/holdings" className="group space-y-1 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+              <p className="text-2xl font-black tabular-nums">{holdingCount}</p>
+              <p className="text-sm text-gray-500">{holdingCount === 1 ? "Holding" : "Holdings"}</p>
+              <p className="text-xs text-gray-700 group-hover:text-gray-500 transition-colors">View portfolio →</p>
+            </Link>
+          </div>
         </div>
 
         {/* Sign out */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Sign out</p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              You'll be returned to the home page.
-            </p>
-          </div>
+        <div className="border-t pt-8" style={{ borderColor: "var(--border)" }}>
           <form action="/api/auth/signout" method="POST">
             <button
               type="submit"
-              className="rounded-lg border border-red-900 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-950 transition-colors"
+              className="text-sm text-red-500 hover:text-red-400 transition-colors"
             >
               Sign out
             </button>

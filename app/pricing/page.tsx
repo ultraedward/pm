@@ -33,7 +33,7 @@ export default async function PricingPage() {
         <div className="grid gap-6 md:grid-cols-2">
 
           {/* Free */}
-          <div className="rounded-2xl border border-white/10 bg-gray-950 p-8 space-y-8">
+          <div className="rounded-2xl border border-white/10 p-8 space-y-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Free</p>
               <div className="flex items-end gap-1">
@@ -74,7 +74,7 @@ export default async function PricingPage() {
           </div>
 
           {/* Pro */}
-          <div className="relative rounded-2xl border border-amber-500/40 bg-gray-950 p-8 space-y-8 overflow-hidden">
+          <div className="relative rounded-2xl border border-amber-500/40 p-8 space-y-8 overflow-hidden">
             {/* Radial glow */}
             <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
 

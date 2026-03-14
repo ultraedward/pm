@@ -68,7 +68,7 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
                     : "text-gray-400 hover:bg-gray-900 hover:text-white"
                 } ${
                   label === "Upgrade to Pro"
-                    ? "mt-2 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 hover:text-yellow-300"
+                    ? "mt-2 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300"
                     : ""
                 }`}
               >

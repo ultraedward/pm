@@ -85,7 +85,7 @@ export default function AddHoldingForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-yellow-500 text-black font-semibold py-3 rounded hover:bg-yellow-400 disabled:opacity-50"
+          className="w-full bg-amber-500 text-black font-semibold py-3 rounded-full hover:bg-amber-400 disabled:opacity-50"
         >
           {loading ? "Adding..." : "Add Holding"}
         </button>
