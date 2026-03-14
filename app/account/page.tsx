@@ -65,9 +65,11 @@ export default async function AccountPage() {
                   </span>
                 )}
               </div>
-              {isPro && dbUser.stripeCurrentPeriodEnd ? (
+              {isPro ? (
                 <p className="mt-1 text-sm text-gray-400">
-                  Renews {new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
+                  {dbUser.stripeCurrentPeriodEnd
+                    ? `Renews ${new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}`
+                    : "Unlimited alerts"}
                 </p>
               ) : (
                 <p className="mt-1 text-sm text-gray-400">
