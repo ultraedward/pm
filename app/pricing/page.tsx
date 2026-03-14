@@ -86,11 +86,6 @@ export default async function PricingPage() {
                 <span className="text-5xl font-black">$7</span>
                 <span className="text-gray-500 mb-1">/month</span>
               </div>
-              <p className="text-sm text-gray-400 mt-2">
-                or{" "}
-                <span className="text-amber-400 font-semibold">$67/year</span>
-                <span className="ml-1.5 text-xs text-gray-600">save $17</span>
-              </p>
             </div>
 
             <ul className="relative space-y-3 text-sm text-gray-300">
