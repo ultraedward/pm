@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { updateMetalsPrices } from "@/lib/priceEngine";
+import { runAlertEngine } from "@/lib/alerts/engine";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,10 @@ export async function GET(req: Request) {
 
   try {
     const prices = await updateMetalsPrices();
+
+    // Run alert engine after every price update
+    await runAlertEngine();
+
     return NextResponse.json({ success: true, ...prices });
   } catch (error) {
     console.error("Price update failed:", error);
