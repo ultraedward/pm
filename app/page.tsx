@@ -215,83 +215,31 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURES — scannable, no paragraphs ──────────────────── */}
-      <section className="border-t px-6 py-20" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl">
-          <span className="label block mb-10">The platform</span>
-
-          <div className="grid gap-px bg-white/5 sm:grid-cols-3 rounded-2xl overflow-hidden">
-            {[
-              {
-                num: "01",
-                title: "Price Alerts",
-                lines: ["Name your target price", "Email notification on trigger", "Above and below thresholds"],
-              },
-              {
-                num: "02",
-                title: "Portfolio Tracker",
-                lines: ["Track ounces and cost basis", "P&L per holding, updated daily", "Allocation by metal"],
-              },
-              {
-                num: "03",
-                title: "Price Charts",
-                lines: ["24H, 7D, 30D history", "All four metals", "Toggle series on and off"],
-              },
-            ].map(({ num, title, lines }) => (
-              <div key={title} className="bg-black p-8 space-y-5">
-                <span className="text-xs font-bold text-white/20 font-mono">{num}</span>
-                <h3 className="text-base font-black tracking-tight">{title}</h3>
-                <ul className="space-y-1.5">
-                  {lines.map((l) => (
-                    <li key={l} className="flex items-center gap-2 text-sm text-gray-500">
-                      <span className="text-amber-500/40">—</span>
-                      {l}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+      {/* ── FEATURE STRIP ────────────────────────────────────────── */}
+      <section className="border-t" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
+          {[
+            { title: "Price alerts", body: "Set a target. Get an email when the market crosses it." },
+            { title: "Portfolio tracker", body: "Log your ounces and cost basis. See P&L as prices update." },
+            { title: "Price charts", body: "24H, 7D, and 30D history for all four metals." },
+          ].map(({ title, body }) => (
+            <div key={title} className="px-8 py-10 space-y-2">
+              <p className="text-sm font-bold text-white">{title}</p>
+              <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
-      <section className="border-t px-6 py-20" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-4xl">
-          <span className="label block mb-10 text-center">How it works</span>
-
-          <div className="grid gap-8 sm:grid-cols-3">
-            {[
-              { n: "01", title: "Sign up free",   body: "Connect your Google account. No payment information required." },
-              { n: "02", title: "Set a target",   body: "Choose a metal, enter your target price, and select above or below." },
-              { n: "03", title: "Get notified",   body: "You receive an email when the daily spot price crosses your threshold." },
-            ].map(({ n, title, body }) => (
-              <div key={n} className="space-y-3">
-                <div className="text-4xl font-black tracking-tightest text-white/10">{n}</div>
-                <h3 className="text-base font-black">{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ────────────────────────────────────────────── */}
-      <section className="border-t px-6 py-20 text-center" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-xl space-y-5">
-          <h2 className="text-4xl sm:text-5xl font-black tracking-tightest">
-            Start free.
-            <span className="text-amber-400"> Upgrade when it makes sense.</span>
-          </h2>
-          <p className="text-sm text-gray-500">No credit card required. Cancel anytime.</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/login" className="btn-gold">
-              Get started free
-            </Link>
-            <Link href="/pricing" className="btn-ghost">
-              See pricing
-            </Link>
-          </div>
+      {/* ── CTA ──────────────────────────────────────────────────── */}
+      <section className="border-t px-6 py-16 text-center" style={{ borderColor: "var(--border)" }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link href="/login" className="btn-gold">
+            Get started free
+          </Link>
+          <Link href="/pricing" className="btn-ghost">
+            See pricing
+          </Link>
         </div>
       </section>
 
