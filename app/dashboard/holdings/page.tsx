@@ -35,7 +35,11 @@ async function addHolding(formData: FormData) {
   const purchasePrice = Number(formData.get("purchasePrice"));
   const purchaseDate = new Date(formData.get("purchaseDate") as string);
 
-  if (!metal || !ounces || !purchasePrice || !purchaseDate) return;
+  const VALID_METALS = ["gold", "silver", "platinum", "palladium"];
+  if (!VALID_METALS.includes(metal)) return;
+  if (!ounces || isNaN(ounces) || ounces <= 0) return;
+  if (!purchasePrice || isNaN(purchasePrice) || purchasePrice <= 0) return;
+  if (isNaN(purchaseDate.getTime())) return;
 
   await prisma.holding.create({
     data: {
