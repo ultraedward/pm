@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireUser } from "@/lib/requireUser";
 import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
 import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
 import { AlertsTable } from "@/components/AlertsTable";
@@ -9,13 +7,7 @@ import { AlertsTable } from "@/components/AlertsTable";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardAlertsPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  const user = { id: session.user.email! };
+  const user = await requireUser();
   const alerts = await getUserAlerts(user.id);
   const plan = await canCreateAlert(user.id);
 
