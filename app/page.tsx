@@ -93,26 +93,26 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       : null;
 
   return (
-    <div className="group px-7 py-6 flex flex-col gap-3">
+    <div className="group px-7 py-7 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{label}</span>
+          <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-500">{label}</span>
         </div>
-        <span className="text-[10px] font-mono text-gray-700">{symbol}</span>
+        <span className="text-xs font-mono text-gray-600">{symbol}</span>
       </div>
 
       <div>
-        <div className="text-2xl font-black tracking-tightest tabular-nums">
+        <div className="text-3xl font-black tracking-tightest tabular-nums">
           {data.price > 0
             ? `$${data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
             : <span className="text-white/15">—</span>
           }
         </div>
         {data.percentChange != null && (
-          <div className={`mt-0.5 text-xs font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+          <div className={`mt-1 text-sm font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
             {isUp ? "+" : ""}{data.percentChange.toFixed(2)}%
-            <span className="ml-1.5 font-normal text-gray-700">24H</span>
+            <span className="ml-1.5 font-normal text-gray-600">24H</span>
           </div>
         )}
       </div>
@@ -125,7 +125,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 
       {/* 52W range */}
       {rangePos !== null && data.week52Low && data.week52High && (
-        <div className="space-y-1.5 pt-1">
+        <div className="space-y-2 pt-1">
           <div className="relative h-px w-full bg-white/10">
             <div
               className="absolute top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-amber-400 -translate-x-1/2"
@@ -133,15 +133,15 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
             />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[9px] tabular-nums text-gray-700">
+            <span className="text-xs tabular-nums text-gray-600">
               ${data.week52Low.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
             {fromHigh !== null && (
-              <span className="text-[9px] tabular-nums text-gray-600">
+              <span className="text-xs tabular-nums text-gray-500">
                 {fromHigh >= -0.1 ? "At 52W high" : `${fromHigh.toFixed(1)}% from high`}
               </span>
             )}
-            <span className="text-[9px] tabular-nums text-gray-700">
+            <span className="text-xs tabular-nums text-gray-600">
               ${data.week52High.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>
@@ -208,8 +208,8 @@ export default async function HomePage() {
               ))}
             </div>
             <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-700">Spot prices</span>
-              <span className="text-[10px] text-gray-700">Updated daily</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Spot prices</span>
+              <span className="text-xs text-gray-600">Updated daily</span>
             </div>
           </div>
         </div>
@@ -223,9 +223,9 @@ export default async function HomePage() {
             { title: "Portfolio tracker", body: "Log your ounces and cost basis. See P&L as prices update." },
             { title: "Price charts", body: "24H, 7D, and 30D history for all four metals." },
           ].map(({ title, body }) => (
-            <div key={title} className="px-8 py-10 space-y-2">
-              <p className="text-sm font-bold text-white">{title}</p>
-              <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+            <div key={title} className="px-8 py-12 space-y-3">
+              <p className="text-base font-black tracking-tight text-white">{title}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
             </div>
           ))}
         </div>
