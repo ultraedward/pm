@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/requireUser";
 import { prisma } from "@/lib/prisma";
+import { SignOutButton } from "@/components/SignOutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -98,14 +99,7 @@ export default async function AccountPage() {
 
         {/* Sign out */}
         <div className="border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <form action="/api/auth/signout" method="POST">
-            <button
-              type="submit"
-              className="text-sm text-red-500 hover:text-red-400 transition-colors"
-            >
-              Sign out
-            </button>
-          </form>
+          <SignOutButton />
         </div>
 
       </div>
