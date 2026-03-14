@@ -95,10 +95,12 @@ export default async function PricingPage() {
 
             <ul className="relative space-y-3 text-sm text-gray-300">
               {[
-                "Everything in Free",
-                "Unlimited alerts",
+                "Unlimited price alerts",
                 "Percent change alerts",
-                "Priority email delivery",
+                "Gold, silver, platinum & palladium",
+                "Email notifications",
+                "Portfolio tracker",
+                "Price charts",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2">
                   <span className="text-amber-500">✓</span> {f}
