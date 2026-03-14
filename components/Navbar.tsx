@@ -36,7 +36,7 @@ export default async function Navbar() {
               <Link href="/alerts"    className="text-gray-500 hover:text-white transition-colors">Alerts</Link>
               <Link href="/account"   className="text-gray-500 hover:text-white transition-colors">Account</Link>
               {isPro ? (
-                <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-emerald-400 border border-emerald-500/20">
+                <span className="rounded-full bg-amber-500/15 px-3 py-1 text-amber-400 border border-amber-500/20">
                   Pro
                 </span>
               ) : (

@@ -46,7 +46,7 @@ export default async function AccountPage() {
               <p className="text-lg font-black tracking-tight">
                 {isPro ? "Pro" : "Free"}
                 {isPro && (
-                  <span className="ml-2 text-xs font-semibold text-emerald-400">Active</span>
+                  <span className="ml-2 text-xs font-semibold text-amber-400">Active</span>
                 )}
               </p>
               <p className="text-sm text-gray-500 mt-0.5">
