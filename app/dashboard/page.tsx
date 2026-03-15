@@ -178,7 +178,7 @@ export default async function DashboardPage({ searchParams }: any) {
 
         {/* Daily spot prices */}
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0" style={{ borderColor: "var(--border)" }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)]">
             {METALS.map((metal) => {
               const price = spots[metal];
               const chg = pctChange[metal];

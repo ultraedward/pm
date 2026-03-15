@@ -202,7 +202,7 @@ export default async function HomePage() {
 
           {/* Price panel */}
           <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0" style={{ borderColor: "var(--border)" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)]">
               {prices.map(([metal, data]) => (
                 <PriceTile key={metal} metal={metal} data={data} />
               ))}
@@ -217,7 +217,7 @@ export default async function HomePage() {
 
       {/* ── FEATURE STRIP ────────────────────────────────────────── */}
       <section className="border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(212,175,55,0.12)]">
           {[
             { title: "Price alerts", body: "Set a target. Get an email when the market crosses it." },
             { title: "Portfolio tracker", body: "Log your ounces and cost basis. See P&L as prices update." },
