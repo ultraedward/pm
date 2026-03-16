@@ -125,26 +125,30 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 
       {/* 52W range */}
       {rangePos !== null && data.week52Low && data.week52High && (
-        <div className="space-y-2 pt-1">
+        <div className="space-y-1.5 pt-1">
+          {/* Range bar */}
           <div className="relative h-px w-full bg-white/10">
             <div
-              className="absolute top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-amber-400 -translate-x-1/2"
-              style={{ left: `${Math.min(Math.max(rangePos, 4), 96)}%` }}
+              className="absolute top-1/2 -translate-y-1/2 h-2 w-2 rounded-full -translate-x-1/2"
+              style={{ left: `${Math.min(Math.max(rangePos, 4), 96)}%`, backgroundColor: "var(--gold-bright)" }}
             />
           </div>
+          {/* Low / High labels */}
           <div className="flex items-center justify-between">
             <span className="text-xs tabular-nums text-gray-600">
               ${data.week52Low.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
-            {fromHigh !== null && (
-              <span className="text-xs tabular-nums text-gray-500">
-                {fromHigh >= -0.1 ? "At 52W high" : `${fromHigh.toFixed(1)}% from high`}
-              </span>
-            )}
+            <span className="text-xs text-gray-700">52W</span>
             <span className="text-xs tabular-nums text-gray-600">
               ${data.week52High.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>
+          {/* % from high — own line, no wrapping */}
+          {fromHigh !== null && (
+            <p className="text-xs tabular-nums text-center text-gray-500">
+              {fromHigh >= -0.1 ? "At 52W high" : `${fromHigh.toFixed(1)}% from 52W high`}
+            </p>
+          )}
         </div>
       )}
     </div>
