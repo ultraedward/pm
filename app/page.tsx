@@ -93,7 +93,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       : null;
 
   return (
-    <div className="group px-7 py-7 flex flex-col gap-4">
+    <div className="group px-7 py-7 flex flex-col gap-4 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white/[0.02]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
@@ -118,7 +118,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       </div>
 
       {spark.length > 1 && (
-        <div className="opacity-30 group-hover:opacity-70 transition-opacity duration-300">
+        <div className="opacity-80 group-hover:opacity-100 transition-opacity duration-300">
           <Sparkline data={spark} isPositive={isUp} />
         </div>
       )}
@@ -185,13 +185,13 @@ export default async function HomePage() {
           {/* Headline */}
           <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
-              Gold. Silver.
+              Track every
               <br />
-              <span style={{ color: "var(--gold-bright)" }}>Platinum. Palladium.</span>
+              <span style={{ color: "var(--gold-bright)" }}>ounce.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
-              Spot prices, price alerts, and portfolio tracking for all four metals in one place.
+              Live spot prices, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
@@ -222,16 +222,31 @@ export default async function HomePage() {
       {/* ── FEATURE STRIP ────────────────────────────────────────── */}
       <section className="border-t" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(212,175,55,0.12)]">
-          {[
-            { title: "Price alerts", body: "Set a target. Get an email when the market crosses it." },
-            { title: "Portfolio tracker", body: "Log your ounces and cost basis. See P&L as prices update." },
-            { title: "Price charts", body: "30D and 52-week history for all four metals." },
-          ].map(({ title, body }) => (
-            <div key={title} className="px-8 py-12 space-y-3">
-              <p className="text-base font-black tracking-tight text-white">{title}</p>
-              <p className="text-sm text-gray-400 leading-relaxed">{body}</p>
-            </div>
-          ))}
+
+          <div className="px-8 py-14 space-y-4 group">
+            <p className="text-5xl font-black tracking-tightest" style={{ color: "var(--gold-bright)" }}>01</p>
+            <p className="text-lg font-black tracking-tight text-white">Price alerts</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Set a target. Get an email the moment gold, silver, platinum, or palladium crosses it.
+            </p>
+          </div>
+
+          <div className="px-8 py-14 space-y-4 group">
+            <p className="text-5xl font-black tracking-tightest" style={{ color: "var(--gold-bright)" }}>02</p>
+            <p className="text-lg font-black tracking-tight text-white">Portfolio tracker</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Log your ounces and cost basis. Watch P&amp;L update in real time as spot prices move.
+            </p>
+          </div>
+
+          <div className="px-8 py-14 space-y-4 group">
+            <p className="text-5xl font-black tracking-tightest" style={{ color: "var(--gold-bright)" }}>03</p>
+            <p className="text-lg font-black tracking-tight text-white">Price charts</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              30-day trends and 52-week range for all four metals, updated daily.
+            </p>
+          </div>
+
         </div>
       </section>
 
@@ -250,14 +265,14 @@ export default async function HomePage() {
       {/* ── FOOTER ───────────────────────────────────────────────── */}
       <footer className="border-t px-6 py-8" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
-          <span className="font-bold text-gray-400 tracking-widest uppercase">Precious Metals</span>
+          <span className="font-bold text-gray-400 tracking-widest uppercase">Lode</span>
           <div className="flex gap-8">
             <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
             <Link href="/login" className="hover:text-gray-300 transition-colors">Sign in</Link>
           </div>
-          <span>© {new Date().getFullYear()} Precious Metals</span>
+          <span>© {new Date().getFullYear()} Lode</span>
         </div>
       </footer>
 

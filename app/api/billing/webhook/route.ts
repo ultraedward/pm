@@ -33,15 +33,19 @@ export async function POST(req: Request) {
 
       if (!session.customer || !session.subscription) break;
 
-      await prisma.user.updateMany({
-        where: {
-          stripeCustomerId: session.customer.toString(),
-        },
-        data: {
-          stripeSubscriptionId: session.subscription.toString(),
-          subscriptionStatus: "active",
-        },
+      const user = await prisma.user.findFirst({
+        where: { stripeCustomerId: session.customer.toString() },
       });
+
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            stripeSubscriptionId: session.subscription.toString(),
+            subscriptionStatus: "active",
+          },
+        });
+      }
 
       break;
     }
@@ -49,14 +53,16 @@ export async function POST(req: Request) {
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
 
-      await prisma.user.updateMany({
-        where: {
-          stripeSubscriptionId: subscription.id,
-        },
-        data: {
-          subscriptionStatus: subscription.status,
-        },
+      const user = await prisma.user.findFirst({
+        where: { stripeSubscriptionId: subscription.id },
       });
+
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { subscriptionStatus: subscription.status },
+        });
+      }
 
       break;
     }
@@ -64,14 +70,16 @@ export async function POST(req: Request) {
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
 
-      await prisma.user.updateMany({
-        where: {
-          stripeSubscriptionId: subscription.id,
-        },
-        data: {
-          subscriptionStatus: "canceled",
-        },
+      const user = await prisma.user.findFirst({
+        where: { stripeSubscriptionId: subscription.id },
       });
+
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { subscriptionStatus: "canceled" },
+        });
+      }
 
       break;
     }

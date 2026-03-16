@@ -10,18 +10,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Precious Metals — Spot Prices, Alerts & Portfolio Tracker",
+  title: "Lode — Spot Prices, Alerts & Portfolio Tracker",
   description:
     "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
   openGraph: {
-    title: "Precious Metals — Spot Prices, Alerts & Portfolio Tracker",
+    title: "Lode — Spot Prices, Alerts & Portfolio Tracker",
     description:
       "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Precious Metals — Spot Prices, Alerts & Portfolio Tracker",
+    title: "Lode — Spot Prices, Alerts & Portfolio Tracker",
     description:
       "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
   },

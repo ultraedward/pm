@@ -8,18 +8,19 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const latestPrices = await prisma.price.findMany({
-      orderBy: { timestamp: "desc" },
-      take: 10
-    });
-
-    const gold = latestPrices.find((p) => p.metal === "gold")?.price ?? null;
-    const silver = latestPrices.find((p) => p.metal === "silver")?.price ?? null;
+    const [goldRow, silverRow, platinumRow, palladiumRow] = await Promise.all([
+      prisma.price.findFirst({ where: { metal: "gold" },      orderBy: { timestamp: "desc" }, select: { price: true } }),
+      prisma.price.findFirst({ where: { metal: "silver" },    orderBy: { timestamp: "desc" }, select: { price: true } }),
+      prisma.price.findFirst({ where: { metal: "platinum" },  orderBy: { timestamp: "desc" }, select: { price: true } }),
+      prisma.price.findFirst({ where: { metal: "palladium" }, orderBy: { timestamp: "desc" }, select: { price: true } }),
+    ]);
 
     return NextResponse.json({
       ok: true,
-      gold,
-      silver,
+      gold:      goldRow?.price      ?? null,
+      silver:    silverRow?.price    ?? null,
+      platinum:  platinumRow?.price  ?? null,
+      palladium: palladiumRow?.price ?? null,
       source: "database"
     });
   } catch (error: any) {
@@ -35,6 +36,8 @@ export async function GET() {
         ok: false,
         gold: null,
         silver: null,
+        platinum: null,
+        palladium: null,
         error: "current_prices_query_failed",
         message,
         details: "This route now reads directly from Prisma and no longer depends on the price engine."

@@ -109,7 +109,7 @@ export default async function HoldingsPage() {
     getLatestPrice("palladium"),
   ]);
 
-  const [goldHistory, silverHistory] = await Promise.all([
+  const [goldHistory, silverHistory, platinumHistory, palladiumHistory] = await Promise.all([
     prisma.price.findMany({
       where: { metal: "gold" },
       orderBy: { timestamp: "asc" },
@@ -117,6 +117,16 @@ export default async function HoldingsPage() {
     }),
     prisma.price.findMany({
       where: { metal: "silver" },
+      orderBy: { timestamp: "asc" },
+      take: 30,
+    }),
+    prisma.price.findMany({
+      where: { metal: "platinum" },
+      orderBy: { timestamp: "asc" },
+      take: 30,
+    }),
+    prisma.price.findMany({
+      where: { metal: "palladium" },
       orderBy: { timestamp: "asc" },
       take: 30,
     }),
@@ -160,20 +170,20 @@ export default async function HoldingsPage() {
   const platinumPercent = totalValue > 0 ? (platinumValue / totalValue) * 100 : 0;
   const palladiumPercent= totalValue > 0 ? (palladiumValue / totalValue) * 100 : 0;
 
+  // Pre-compute ounces per metal once
+  const ozByMetal: Record<string, number> = {};
+  for (const metal of ["gold", "silver", "platinum", "palladium"]) {
+    ozByMetal[metal] = holdings
+      .filter((h) => h.metal === metal)
+      .reduce((sum, h) => sum + h.ounces, 0);
+  }
+
   const portfolioHistory = goldHistory.map((g, i) => {
-    const s = silverHistory[i];
-    const goldOunces = holdings
-      .filter((h) => h.metal === "gold")
-      .reduce((sum, h) => sum + h.ounces, 0);
-
-    const silverOunces = holdings
-      .filter((h) => h.metal === "silver")
-      .reduce((sum, h) => sum + h.ounces, 0);
-
     const value =
-      goldOunces * (g?.price ?? 0) +
-      silverOunces * (s?.price ?? 0);
-
+      ozByMetal["gold"]      * (g?.price                  ?? 0) +
+      ozByMetal["silver"]    * (silverHistory[i]?.price   ?? 0) +
+      ozByMetal["platinum"]  * (platinumHistory[i]?.price ?? 0) +
+      ozByMetal["palladium"] * (palladiumHistory[i]?.price ?? 0);
     return value;
   });
 

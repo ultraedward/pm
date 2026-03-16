@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-const FREE_ALERT_LIMIT = 1;
+const FREE_ALERT_LIMIT = 3;
 
 export async function canCreateAlert(userId: string) {
   const user = await prisma.user.findUnique({

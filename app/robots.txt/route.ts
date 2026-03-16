@@ -9,7 +9,7 @@ Disallow: /account
 Disallow: /alerts
 Disallow: /api/
 
-Sitemap: https://pm-iota-wheat.vercel.app/sitemap.xml
+Sitemap: https://lode.rocks/sitemap.xml
 `,
     { headers: { "Content-Type": "text/plain" } }
   );

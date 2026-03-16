@@ -19,11 +19,29 @@ export async function evaluateAlert(alertId: string, currentPrice: number) {
 
   if (!alert || !alert.active) return { triggered: false };
 
+  // Null-safety: can't send email without an address
+  if (!alert.user?.email) {
+    console.warn(`Alert ${alertId}: user has no email, skipping`);
+    return { triggered: false };
+  }
+
   const conditionMet =
     (alert.direction === "above" && currentPrice >= alert.price) ||
     (alert.direction === "below" && currentPrice <= alert.price);
 
   if (!conditionMet) return { triggered: false };
+
+  // Dedup guard: skip if this alert already fired in the last 23 hours
+  // (prevents duplicate emails from clock skew or double cron runs)
+  const recentTrigger = alert.triggers[0];
+  if (recentTrigger) {
+    const hoursSince =
+      (Date.now() - new Date(recentTrigger.triggeredAt).getTime()) / 1000 / 3600;
+    if (hoursSince < 23) return { triggered: false };
+  }
+
+  const metal = alert.metal.charAt(0).toUpperCase() + alert.metal.slice(1);
+  const direction = alert.direction === "above" ? "risen above" : "fallen below";
 
   await prisma.alertTrigger.create({
     data: {
@@ -36,13 +54,23 @@ export async function evaluateAlert(alertId: string, currentPrice: number) {
   await queueEmail({
     alertId: alert.id,
     to: alert.user.email,
-    subject: `Alert triggered: ${alert.metal}`,
+    subject: `${metal} alert triggered — $${currentPrice.toLocaleString()}`,
     html: `
-      <h2>Price Alert Triggered</h2>
-      <p><b>Metal:</b> ${alert.metal}</p>
-      <p><b>Direction:</b> ${alert.direction}</p>
-      <p><b>Target Price:</b> $${alert.price}</p>
-      <p><b>Current Price:</b> $${currentPrice}</p>
+      <div style="font-family:sans-serif;padding:24px;background:#0a0907;color:#fff;max-width:480px;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#D4AF37;margin:0 0 16px;">Lode</p>
+        <h2 style="margin:0 0 16px;font-size:20px;">${metal} Alert Triggered</h2>
+        <p style="color:#aaa;margin:0 0 20px;">The spot price has ${direction} your target of <strong style="color:#fff;">$${alert.price?.toLocaleString()}</strong>.</p>
+        <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:24px;">
+          <p style="margin:0;font-size:14px;">Current price: <strong>$${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
+        </div>
+        <a href="https://lode.rocks/dashboard"
+           style="display:inline-block;padding:12px 20px;background:#D4AF37;color:#000;font-weight:700;text-decoration:none;border-radius:999px;font-size:13px;">
+          View Dashboard
+        </a>
+        <p style="margin-top:32px;font-size:11px;color:#555;">
+          You're receiving this because you set a price alert on lode.rocks.
+        </p>
+      </div>
     `,
   });
 

@@ -25,7 +25,7 @@ export default async function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="text-sm font-black uppercase tracking-widest hover:text-amber-400 transition-colors">
-          Precious Metals
+          Lode
         </Link>
 
         {/* Desktop */}

@@ -14,7 +14,7 @@ export default function LoginPage() {
         {/* Wordmark + headline */}
         <div className="space-y-4">
           <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--gold-bright)" }}>
-            Precious Metals
+            Lode
           </p>
           <h1 className="text-5xl font-black tracking-tightest text-white leading-none">
             Sign in

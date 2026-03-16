@@ -40,11 +40,11 @@ export default async function PricingPage() {
                 <span className="text-5xl font-black">$0</span>
                 <span className="text-gray-500 mb-1">/month</span>
               </div>
-              <p className="text-sm text-gray-400 mt-2">1 active alert</p>
+              <p className="text-sm text-gray-400 mt-2">3 active alerts</p>
             </div>
 
             <ul className="space-y-3 text-sm text-gray-300">
-              {["1 price alert", "Gold, silver, platinum & palladium", "Email notifications", "Portfolio tracker"].map((f) => (
+              {["3 price alerts", "Gold, silver, platinum & palladium", "Email notifications", "Portfolio tracker"].map((f) => (
                 <li key={f} className="flex items-center gap-2">
                   <span className="text-amber-500">✓</span> {f}
                 </li>

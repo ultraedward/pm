@@ -1,4 +1,4 @@
-const BASE = "https://pm-iota-wheat.vercel.app";
+const BASE = "https://lode.rocks";
 
 const PUBLIC_ROUTES = [
   { url: "/",        priority: "1.0", changefreq: "daily"   },

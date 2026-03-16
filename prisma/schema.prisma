@@ -73,6 +73,9 @@ model Alert {
   type            String         @default("price")
   user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   triggers        AlertTrigger[]
+
+  @@index([userId])
+  @@index([active])
 }
 
 model AlertTrigger {
@@ -81,6 +84,8 @@ model AlertTrigger {
   price       Float
   triggeredAt DateTime @default(now())
   alert       Alert    @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@index([alertId])
 }
 
 model Price {
@@ -90,6 +95,7 @@ model Price {
   timestamp DateTime
 
   @@unique([metal, timestamp], name: "metal_timestamp")
+  @@index([metal, timestamp(sort: Desc)])
 }
 
 model Holding {
@@ -101,5 +107,7 @@ model Holding {
   updatedAt     DateTime @updatedAt
   purchaseDate  DateTime
   purchasePrice Float
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
