@@ -81,19 +81,12 @@ function bucketPrices(rows: PriceRow[], bucketSizeMs: number) {
     });
 }
 
+const ALL_METALS: MetalKey[] = ["gold", "silver", "platinum", "palladium"];
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-
-    const metal = (searchParams.get("metal") || "gold") as MetalKey;
-    const range = (searchParams.get("range") || "24h") as RangeKey;
-
-    if (!["gold", "silver", "platinum", "palladium"].includes(metal)) {
-      return NextResponse.json(
-        { error: "Invalid metal. Use gold, silver, platinum, or palladium." },
-        { status: 400 }
-      );
-    }
+    const range = (searchParams.get("range") || "7d") as RangeKey;
 
     if (!["24h", "7d", "30d", "90d", "all"].includes(range)) {
       return NextResponse.json(
@@ -105,33 +98,38 @@ export async function GET(req: NextRequest) {
     const since = getRangeStart(range);
     const bucketSizeMs = getBucketSizeMs(range);
 
-    const rows = await prisma.price.findMany({
-      where: {
-        metal,
-        ...(since ? { timestamp: { gte: since } } : {}),
-      },
-      orderBy: {
-        timestamp: "asc",
-      },
-      select: {
-        price: true,
-        timestamp: true,
-      },
-      ...(range === "all" ? { take: 10000 } : {}),
-    });
+    // Fetch all 4 metals in parallel
+    const results = await Promise.all(
+      ALL_METALS.map((metal) =>
+        prisma.price.findMany({
+          where: {
+            metal,
+            ...(since ? { timestamp: { gte: since } } : {}),
+          },
+          orderBy: { timestamp: "asc" },
+          select: { price: true, timestamp: true },
+          ...(range === "all" ? { take: 10000 } : {}),
+        })
+      )
+    );
 
-    const chart = bucketPrices(rows, bucketSizeMs);
+    // Shape into { gold: [{t, price}], silver: [...], ... }
+    const response: Record<MetalKey, { t: number; price: number }[]> = {
+      gold: [], silver: [], platinum: [], palladium: [],
+    };
 
-    return NextResponse.json({
-      success: true,
-      metal,
-      range,
-      points: chart,
-      count: chart.length,
-    });
+    for (let i = 0; i < ALL_METALS.length; i++) {
+      const metal = ALL_METALS[i];
+      const bucketed = bucketPrices(results[i], bucketSizeMs);
+      response[metal] = bucketed.map((b) => ({
+        t: new Date(b.timestamp).getTime(),
+        price: b.price,
+      }));
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Chart prices route failed:", error);
-
     return NextResponse.json(
       { error: "Failed to load chart prices" },
       { status: 500 }

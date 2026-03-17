@@ -37,7 +37,7 @@ export default async function DashboardAlertsPage() {
           </div>
           <Link
             href="/alerts/new"
-            className="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+            className="btn-gold px-5 py-2 text-sm"
           >
             + New alert
           </Link>
@@ -48,7 +48,9 @@ export default async function DashboardAlertsPage() {
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm flex items-center justify-between gap-4">
             <span className="text-gray-300">
               <span className="font-semibold text-white">Free plan —</span>{" "}
-              {plan.remaining === 0 ? "No alerts remaining." : "1 free alert remaining."}
+              {plan.remaining === 0
+                ? "All 3 free alerts used."
+                : `${plan.remaining} of 3 free alert${plan.remaining !== 1 ? "s" : ""} remaining.`}
             </span>
             <Link
               href="/pricing"
@@ -63,21 +65,18 @@ export default async function DashboardAlertsPage() {
         {hasAlerts ? (
           <AlertsTable alerts={alerts} spots={spots} />
         ) : (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-12 text-center space-y-5">
-            <p className="text-xl font-black tracking-tight">No alerts set</p>
+          <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-12 text-center space-y-4">
+            <p className="text-xl font-black tracking-tight">No alerts yet</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-              You'll receive an email when a daily spot price crosses your target threshold.
+              Get notified by email the moment gold, silver, platinum, or palladium crosses your target price.
             </p>
-            <div className="flex justify-center gap-3">
-              <Link
-                href="/alerts/new"
-                className="rounded-full bg-amber-500 px-6 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
-              >
-                Set an alert
+            <div className="flex justify-center gap-3 pt-1">
+              <Link href="/alerts/new" className="btn-gold px-6 py-2.5 text-sm">
+                Set your first alert
               </Link>
               <Link
                 href="/pricing"
-                className="rounded-full border border-white/10 px-6 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                className="rounded-full border border-white/10 px-6 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
               >
                 View plans
               </Link>

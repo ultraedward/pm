@@ -251,19 +251,15 @@ export default async function DashboardPage() {
         )}
 
         {/* Quick Calculator */}
-        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Value Calculator</p>
-            <p className="text-xs text-gray-700">Enter ounces to calculate</p>
-          </div>
+        <div className="rounded-2xl border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+          <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Value Calculator</p>
           <QuickCalculator spots={spots} />
         </div>
 
-        {/* Nav links */}
-        <div className="grid grid-cols-2 gap-px sm:grid-cols-3 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+        {/* Nav links — Charts and Holdings only; Alerts is already in top Navbar */}
+        <div className="grid grid-cols-2 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
           {[
             { href: "/dashboard/charts",   label: "Price Charts",  sub: "30-day history"    },
-            { href: "/alerts",             label: "My Alerts",     sub: "Manage price alerts" },
             { href: "/dashboard/holdings", label: "Holdings",      sub: "Portfolio detail"   },
           ].map(({ href, label, sub }) => (
             <Link

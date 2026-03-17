@@ -50,7 +50,7 @@ export function CreateAlertForm() {
     "w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors";
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-6">
+    <form onSubmit={submit} className="rounded-2xl border p-6 space-y-6" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}>
 
       {/* Metal picker */}
       <div className="space-y-2">
@@ -129,7 +129,7 @@ export function CreateAlertForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-full bg-amber-500 py-3 text-sm font-bold text-black hover:bg-amber-400 transition-colors disabled:opacity-50"
+        className="btn-gold w-full py-3 text-sm disabled:opacity-50"
       >
         {submitting ? "Creating…" : "Create Alert"}
       </button>

@@ -34,17 +34,28 @@ export function QuickCalculator({ spots }: Props) {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Inputs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="space-y-3">
+      {/* Input tiles — match the visual weight of the price panel */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)] rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(212,175,55,0.12)" }}>
         {METALS.map((metal) => {
           const { label, dot } = METAL_META[metal];
+          const active = parseFloat(oz[metal]) > 0;
           return (
-            <div key={metal}>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
-                <label className="text-xs font-bold uppercase tracking-widest text-gray-500">{label}</label>
+            <div key={metal} className="px-5 py-5 flex flex-col gap-3 bg-black/20">
+              {/* Metal label */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+                  <span className="text-xs font-bold uppercase tracking-widest text-gray-500">{label}</span>
+                </div>
+                {active && (
+                  <span className="text-xs tabular-nums font-semibold" style={{ color: "var(--gold-bright)" }}>
+                    {fmt(values.find(v => v.metal === metal)!.value)}
+                  </span>
+                )}
               </div>
+
+              {/* Oz input */}
               <input
                 type="number"
                 inputMode="decimal"
@@ -53,10 +64,12 @@ export function QuickCalculator({ spots }: Props) {
                 placeholder="0"
                 value={oz[metal]}
                 onChange={(e) => setOz((prev) => ({ ...prev, [metal]: e.target.value }))}
-                className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors tabular-nums"
+                className="w-full bg-transparent text-2xl font-black tracking-tightest tabular-nums text-white placeholder:text-white/15 focus:outline-none"
               />
+
+              {/* Spot price */}
               {spots[metal] > 0 && (
-                <p className="mt-1 text-xs text-gray-700 tabular-nums">
+                <p className="text-xs tabular-nums text-gray-700">
                   {fmt(spots[metal])} / oz
                 </p>
               )}
@@ -65,44 +78,35 @@ export function QuickCalculator({ spots }: Props) {
         })}
       </div>
 
-      {/* Result */}
-      <div
-        className="rounded-xl border transition-all duration-200"
-        style={{ borderColor: hasAny ? "rgba(212,175,55,0.2)" : "rgba(255,255,255,0.05)" }}
-      >
-        {hasAny ? (
+      {/* Result bar — only renders when there's something to show */}
+      {hasAny && (
+        <div
+          className="rounded-xl border overflow-hidden"
+          style={{ borderColor: "rgba(212,175,55,0.2)" }}
+        >
           <div className="divide-y divide-white/5">
             {values.filter((v) => v.value > 0).map(({ metal, value }) => {
               const { label, dot } = METAL_META[metal];
               return (
-                <div key={metal} className="flex items-center justify-between px-4 py-2.5">
+                <div key={metal} className="flex items-center justify-between px-5 py-2.5">
                   <div className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: dot }} />
                     <span className="text-sm text-gray-400">{label}</span>
-                    <span className="text-xs text-gray-700 tabular-nums">
-                      {oz[metal]} oz
-                    </span>
+                    <span className="text-xs text-gray-700 tabular-nums">{oz[metal]} oz</span>
                   </div>
                   <span className="text-sm tabular-nums font-medium">{fmt(value)}</span>
                 </div>
               );
             })}
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm font-bold text-white">Total</span>
-              <span
-                className="text-lg font-black tabular-nums tracking-tightest"
-                style={{ color: "var(--gold-bright)" }}
-              >
+            <div className="flex items-center justify-between px-5 py-4">
+              <span className="text-sm font-bold text-white">Total value</span>
+              <span className="text-2xl font-black tabular-nums tracking-tightest" style={{ color: "var(--gold-bright)" }}>
                 {fmt(total)}
               </span>
             </div>
           </div>
-        ) : (
-          <div className="px-4 py-3 text-sm text-gray-700 text-center">
-            Enter ounces above to calculate value
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

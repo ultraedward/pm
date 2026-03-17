@@ -14,6 +14,7 @@ type MetalData = {
   history30D: HistoryPoint[];
   week52High: number | null;
   week52Low: number | null;
+  updatedAt: Date | null;
 };
 type Metal = "gold" | "silver" | "platinum" | "palladium";
 
@@ -29,7 +30,7 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
       orderBy: { timestamp: "asc" },
     });
 
-    if (!rows.length) return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null };
+    if (!rows.length) return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt: null };
 
     const latest = rows[rows.length - 1];
 
@@ -57,9 +58,10 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
       history30D,
       week52High,
       week52Low,
+      updatedAt: latest.timestamp,
     };
   } catch {
-    return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null };
+    return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt: null };
   }
 }
 
@@ -85,12 +87,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
   const rangePos =
     data.week52High && data.week52Low && data.week52High !== data.week52Low && data.price > 0
       ? ((data.price - data.week52Low) / (data.week52High - data.week52Low)) * 100
-      : null;
-
-  // % from 52W high
-  const fromHigh =
-    data.week52High && data.price > 0
-      ? ((data.price - data.week52High) / data.week52High) * 100
       : null;
 
   return (
@@ -144,12 +140,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
               ${data.week52High.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>
-          {/* % from high — own line, no wrapping */}
-          {fromHigh !== null && (
-            <p className="text-xs tabular-nums text-center text-gray-500">
-              {fromHigh >= -0.1 ? "At 52W high" : `${fromHigh.toFixed(1)}% from 52W high`}
-            </p>
-          )}
         </div>
       )}
     </div>
@@ -157,6 +147,17 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 }
 
 // ─── page ─────────────────────────────────────────────────────────────────────
+
+function fmtUpdated(date: Date | null): string {
+  if (!date) return "Updated daily";
+  const diffMs  = Date.now() - date.getTime();
+  const diffH   = diffMs / 1000 / 60 / 60;
+  if (diffH < 1)  return "Updated just now";
+  if (diffH < 24) return `Updated ${Math.floor(diffH)}h ago`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD === 1) return "Updated yesterday";
+  return `Updated ${diffD}d ago`;
+}
 
 export default async function HomePage() {
   const [gold, silver, platinum, palladium] = await Promise.all(
@@ -166,6 +167,11 @@ export default async function HomePage() {
     ["gold", gold], ["silver", silver],
     ["platinum", platinum], ["palladium", palladium],
   ];
+
+  const lastUpdated = [gold, silver, platinum, palladium]
+    .map((d) => d.updatedAt)
+    .filter(Boolean)
+    .sort((a, b) => b!.getTime() - a!.getTime())[0] ?? null;
 
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
@@ -214,7 +220,7 @@ export default async function HomePage() {
             </div>
             <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
               <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Spot prices · 30D trend</span>
-              <span className="text-xs text-gray-600">Updated daily</span>
+              <span className="text-xs text-gray-600">{fmtUpdated(lastUpdated)}</span>
             </div>
           </div>
         </div>
@@ -222,8 +228,8 @@ export default async function HomePage() {
 
       {/* ── CALCULATOR ───────────────────────────────────────────── */}
       <section className="border-t px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-xl space-y-6">
-          <div className="text-center space-y-2">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="text-center space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl font-black tracking-tight">How much is your stack worth?</h2>
             <p className="text-sm text-gray-500">Based on live spot prices — no account needed.</p>
           </div>
