@@ -3,6 +3,7 @@ export const revalidate = 60;
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Sparkline } from "@/components/Sparkline";
+import { QuickCalculator } from "@/components/QuickCalculator";
 
 // ─── types ────────────────────────────────────────────────────────────────────
 
@@ -123,9 +124,9 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
         </div>
       )}
 
-      {/* 52W range */}
+      {/* 52W range — subtle by default, clearer on hover */}
       {rangePos !== null && data.week52Low && data.week52High && (
-        <div className="space-y-1.5 pt-1">
+        <div className="space-y-1.5 pt-1 opacity-40 group-hover:opacity-100 transition-opacity duration-300">
           {/* Range bar */}
           <div className="relative h-px w-full bg-white/10">
             <div
@@ -194,12 +195,12 @@ export default async function HomePage() {
               Live spot prices, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
-              <Link href="/login" className="btn-gold">
-                Start tracking
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
+              <Link href="/login" className="btn-gold px-10">
+                Start tracking free
               </Link>
-              <Link href="/pricing" className="btn-ghost">
-                View pricing
+              <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                See pricing →
               </Link>
             </div>
           </div>
@@ -219,45 +220,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURE STRIP ────────────────────────────────────────── */}
-      <section className="border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(212,175,55,0.12)]">
-
-          <div className="px-8 py-14 space-y-4 group">
-            <p className="text-5xl font-black tracking-tightest" style={{ color: "var(--gold-bright)" }}>01</p>
-            <p className="text-lg font-black tracking-tight text-white">Price alerts</p>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Set a target. Get an email the moment gold, silver, platinum, or palladium crosses it.
-            </p>
+      {/* ── CALCULATOR ───────────────────────────────────────────── */}
+      <section className="border-t px-6 py-14" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-xl space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-black tracking-tight">How much is your stack worth?</h2>
+            <p className="text-sm text-gray-500">Based on live spot prices — no account needed.</p>
           </div>
-
-          <div className="px-8 py-14 space-y-4 group">
-            <p className="text-5xl font-black tracking-tightest" style={{ color: "var(--gold-bright)" }}>02</p>
-            <p className="text-lg font-black tracking-tight text-white">Portfolio tracker</p>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Log your ounces and cost basis. Watch P&amp;L update in real time as spot prices move.
-            </p>
-          </div>
-
-          <div className="px-8 py-14 space-y-4 group">
-            <p className="text-5xl font-black tracking-tightest" style={{ color: "var(--gold-bright)" }}>03</p>
-            <p className="text-lg font-black tracking-tight text-white">Price charts</p>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              30-day trends and 52-week range for all four metals, updated daily.
-            </p>
-          </div>
-
+          <QuickCalculator spots={{
+            gold:      gold.price,
+            silver:    silver.price,
+            platinum:  platinum.price,
+            palladium: palladium.price,
+          }} />
+          <p className="text-center text-xs text-gray-600">
+            <Link href="/login" className="hover:text-gray-400 transition-colors underline underline-offset-2">Sign in to track your full portfolio →</Link>
+          </p>
         </div>
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────── */}
-      <section className="border-t px-6 py-16 text-center" style={{ borderColor: "var(--border)" }}>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/login" className="btn-gold">
+      <section className="border-t px-6 py-20 text-center space-y-6" style={{ borderColor: "var(--border)" }}>
+        <p className="text-3xl font-black tracking-tight">Ready to track your stack?</p>
+        <p className="text-sm text-gray-500">Free to start. No credit card required.</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link href="/login" className="btn-gold px-10">
             Get started free
           </Link>
-          <Link href="/pricing" className="btn-ghost">
-            See pricing
+          <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+            See pricing →
           </Link>
         </div>
       </section>

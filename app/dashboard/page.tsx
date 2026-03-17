@@ -1,6 +1,7 @@
 // /app/dashboard/page.tsx
 
 import Link from "next/link";
+import { QuickCalculator } from "@/components/QuickCalculator";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -57,7 +58,7 @@ function buildSparkline(values: number[], width = 300, height = 100) {
     .join(" ");
 }
 
-export default async function DashboardPage({ searchParams }: any) {
+export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
@@ -146,28 +147,15 @@ export default async function DashboardPage({ searchParams }: any) {
   const pct30d     = firstValue > 0 ? (change30d / firstValue) * 100 : 0;
   const changeColor30d = change30d >= 0 ? "text-green-400" : "text-red-400";
 
-  // Calculator
-  const calcOz: Record<Metal, number> = {
-    gold:      Number(searchParams?.goldOz      ?? 0),
-    silver:    Number(searchParams?.silverOz    ?? 0),
-    platinum:  Number(searchParams?.platinumOz  ?? 0),
-    palladium: Number(searchParams?.palladiumOz ?? 0),
-  };
-  const calcValues = METALS.map((m) => calcOz[m] * spots[m]);
-  const calcTotal  = calcValues.reduce((s, v) => s + v, 0);
-
   return (
     <main className="min-h-screen bg-surface p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
         <div className="flex justify-between items-center">
-          <div>
-            <p className="label mb-1">Dashboard</p>
-            <h1 className="text-3xl font-black tracking-tight">
-              Welcome back{user.name ? `, ${user.name.split(" ")[0]}` : ""}.
-            </h1>
-          </div>
+          <h1 className="text-3xl font-black tracking-tight">
+            Welcome back{user.name ? `, ${user.name.split(" ")[0]}` : ""}.
+          </h1>
           <Link
             href="/dashboard/holdings"
             className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
@@ -219,10 +207,10 @@ export default async function DashboardPage({ searchParams }: any) {
             </Link>
           </div>
         ) : (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6">
-            <p className="label mb-2">Total Portfolio Value</p>
-            <p className="text-4xl font-black tracking-tight tabular-nums">{fmtMoney(totalValue)}</p>
-            <p className={`text-sm mt-2 font-medium tabular-nums ${gainColor}`}>
+          <div className="rounded-2xl border border-white/5 bg-gray-950 px-6 py-7">
+            <p className="text-xs text-gray-600 font-medium uppercase tracking-widest mb-3">Total Portfolio Value</p>
+            <p className="text-5xl font-black tracking-tightest tabular-nums leading-none">{fmtMoney(totalValue)}</p>
+            <p className={`text-sm mt-3 font-medium tabular-nums ${gainColor}`}>
               {gainLoss >= 0 ? "+" : ""}{fmtMoney(gainLoss)} ({fmtPct(pctReturn)}) all-time
             </p>
           </div>
@@ -232,65 +220,43 @@ export default async function DashboardPage({ searchParams }: any) {
         {holdings.length > 0 && portfolioSpark && (
           <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
             <div className="flex justify-between items-start">
-              <p className="label">30-Day Equity</p>
+              <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">30-Day Equity</p>
               <p className={`text-sm font-semibold tabular-nums ${changeColor30d}`}>
                 {change30d >= 0 ? "+" : ""}{fmtMoney(change30d)} ({fmtPct(pct30d)})
               </p>
             </div>
-            <svg width="100%" height="80" viewBox="0 0 300 100" preserveAspectRatio="none">
+            <svg width="100%" height="80" viewBox="0 0 300 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>
+              <defs>
+                <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={change30d >= 0 ? "#22c55e" : "#ef4444"} stopOpacity="0.2" />
+                  <stop offset="100%" stopColor={change30d >= 0 ? "#22c55e" : "#ef4444"} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {/* Area fill */}
+              <polygon
+                fill="url(#equityGrad)"
+                points={`${portfolioSpark} 300,100 0,100`}
+              />
+              {/* Line */}
               <polyline
                 fill="none"
                 stroke={change30d >= 0 ? "#22c55e" : "#ef4444"}
                 strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 points={portfolioSpark}
               />
             </svg>
           </div>
         )}
 
-        {/* Quick Metal Calculator */}
-        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-5">
-          <p className="label">Quick Calculator</p>
-
-          <form className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {METALS.map((metal) => (
-              <div key={metal}>
-                <label className="text-xs text-gray-500 capitalize">{metal} oz</label>
-                <input
-                  name={`${metal}Oz`}
-                  defaultValue={calcOz[metal] || ""}
-                  className="mt-1 w-full rounded-lg bg-black border border-white/10 p-2.5 text-white text-sm focus:outline-none focus:border-amber-500/50 transition-colors"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0"
-                />
-              </div>
-            ))}
-            <button
-              type="submit"
-              className="sm:col-span-4 col-span-2 rounded-full bg-white/5 border border-white/10 py-2.5 text-sm font-medium hover:bg-white/10 transition-colors"
-            >
-              Calculate
-            </button>
-          </form>
-
-          {calcTotal > 0 && (
-            <div className="border-t border-white/5 pt-4 space-y-2 text-sm">
-              {METALS.map((metal, i) =>
-                calcValues[i] > 0 ? (
-                  <p key={metal} className="flex justify-between">
-                    <span className="capitalize text-gray-500">{metal}</span>
-                    <span className="tabular-nums">{fmtMoney(calcValues[i])}</span>
-                  </p>
-                ) : null
-              )}
-              <p className="flex justify-between font-bold text-white pt-2 border-t border-white/5">
-                <span>Total</span>
-                <span className="tabular-nums">{fmtMoney(calcTotal)}</span>
-              </p>
-            </div>
-          )}
+        {/* Quick Calculator */}
+        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Value Calculator</p>
+            <p className="text-xs text-gray-700">Enter ounces to calculate</p>
+          </div>
+          <QuickCalculator spots={spots} />
         </div>
 
         {/* Nav links */}
