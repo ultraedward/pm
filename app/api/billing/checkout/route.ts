@@ -3,7 +3,7 @@ import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 
-async function createCheckoutSession() {
+async function createCheckoutSession(interval: "month" | "year" = "month") {
   const sessionUser = await requireUser();
 
   const user = await prisma.user.findUnique({
@@ -28,10 +28,15 @@ async function createCheckoutSession() {
     });
   }
 
+  const priceId =
+    interval === "year"
+      ? process.env.STRIPE_PRICE_ANNUAL!
+      : process.env.STRIPE_PRICE_MONTHLY!;
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
-    line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${process.env.NEXTAUTH_URL}/account`,
     cancel_url:  `${process.env.NEXTAUTH_URL}/pricing`,
   });
@@ -39,25 +44,25 @@ async function createCheckoutSession() {
   return session;
 }
 
-// GET — for direct link clicks
+// GET — defaults to monthly
 export async function GET() {
-  const result = await createCheckoutSession();
+  const result = await createCheckoutSession("month");
   if (result instanceof NextResponse) return result;
   return NextResponse.redirect(result.url!);
 }
 
-// POST — handles both HTML <form method="POST"> and fetch() calls
-// Browser forms include "text/html" in Accept; fetch calls don't.
+// POST — reads interval from form body
 export async function POST(req: Request) {
-  const result = await createCheckoutSession();
+  const formData = await req.formData();
+  const interval = formData.get("interval") === "year" ? "year" : "month";
+
+  const result = await createCheckoutSession(interval);
   if (result instanceof NextResponse) return result;
 
   const accept = req.headers.get("accept") ?? "";
   if (accept.includes("text/html")) {
-    // HTML form submission — do a redirect directly to Stripe
     return NextResponse.redirect(result.url!, 303);
   }
 
-  // fetch() from CreateAlertForm — return JSON so caller can redirect
   return NextResponse.json({ url: result.url });
 }
