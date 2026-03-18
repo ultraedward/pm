@@ -4,6 +4,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Sparkline } from "@/components/Sparkline";
 import { QuickCalculator } from "@/components/QuickCalculator";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // ─── types ────────────────────────────────────────────────────────────────────
 
@@ -90,7 +92,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       : null;
 
   return (
-    <div className="group px-7 py-7 flex flex-col gap-4 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white/[0.02]">
+    <div className="group px-4 py-5 sm:px-7 sm:py-7 flex flex-col gap-4 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white/[0.02]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
@@ -107,7 +109,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
           }
         </div>
         {data.percentChange != null && (
-          <div className={`mt-1 text-sm font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+          <div className={`mt-1 text-sm font-semibold tabular-nums ${isUp ? "text-amber-400" : "text-red-400"}`}>
             {isUp ? "+" : ""}{data.percentChange.toFixed(2)}%
             <span className="ml-1.5 font-normal text-gray-600">24H</span>
           </div>
@@ -116,7 +118,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 
       {spark.length > 1 && (
         <div className="opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-          <Sparkline data={spark} isPositive={isUp} />
+          <Sparkline data={spark} color={dot} />
         </div>
       )}
 
@@ -160,9 +162,12 @@ function fmtUpdated(date: Date | null): string {
 }
 
 export default async function HomePage() {
-  const [gold, silver, platinum, palladium] = await Promise.all(
-    METALS.map((m) => getMetalData(m))
-  );
+  const [session, [gold, silver, platinum, palladium]] = await Promise.all([
+    getServerSession(authOptions),
+    Promise.all(METALS.map((m) => getMetalData(m))),
+  ]);
+
+  const isLoggedIn = !!session?.user?.email;
   const prices: [Metal, MetalData][] = [
     ["gold", gold], ["silver", silver],
     ["platinum", platinum], ["palladium", palladium],
@@ -177,7 +182,7 @@ export default async function HomePage() {
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
 
       {/* ── HERO + LIVE PRICES ───────────────────────────────────── */}
-      <section className="relative px-6 pt-24 pb-20">
+      <section className="relative px-4 sm:px-6 pt-14 pb-12 sm:pt-24 sm:pb-20">
 
         {/* Ambient glow */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -202,12 +207,14 @@ export default async function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
-              <Link href="/login" className="btn-gold px-10">
-                Start tracking free
+              <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
+                {isLoggedIn ? "Go to dashboard" : "Start tracking free"}
               </Link>
-              <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-                See pricing →
-              </Link>
+              {!isLoggedIn && (
+                <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                  See pricing →
+                </Link>
+              )}
             </div>
           </div>
 
@@ -227,7 +234,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── CALCULATOR ───────────────────────────────────────────── */}
-      <section className="border-t px-6 py-14" style={{ borderColor: "var(--border)" }}>
+      <section className="border-t px-4 sm:px-6 py-10 sm:py-14" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl space-y-6">
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl font-black tracking-tight">How much is your stack worth?</h2>
@@ -239,25 +246,29 @@ export default async function HomePage() {
             platinum:  platinum.price,
             palladium: palladium.price,
           }} />
-          <p className="text-center text-xs text-gray-600">
-            <Link href="/login" className="hover:text-gray-400 transition-colors underline underline-offset-2">Sign in to track your full portfolio →</Link>
-          </p>
+          {!isLoggedIn && (
+            <p className="text-center text-xs text-gray-600">
+              <Link href="/login" className="hover:text-gray-400 transition-colors underline underline-offset-2">Sign in to track your full portfolio →</Link>
+            </p>
+          )}
         </div>
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────── */}
-      <section className="border-t px-6 py-20 text-center space-y-6" style={{ borderColor: "var(--border)" }}>
-        <p className="text-3xl font-black tracking-tight">Ready to track your stack?</p>
-        <p className="text-sm text-gray-500">Free to start. No credit card required.</p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/login" className="btn-gold px-10">
-            Get started free
-          </Link>
-          <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-            See pricing →
-          </Link>
-        </div>
-      </section>
+      {!isLoggedIn && (
+        <section className="border-t px-6 py-20 text-center space-y-6" style={{ borderColor: "var(--border)" }}>
+          <p className="text-3xl font-black tracking-tight">Ready to track your stack?</p>
+          <p className="text-sm text-gray-500">Free to start. No credit card required.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/login" className="btn-gold px-10">
+              Get started free
+            </Link>
+            <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+              See pricing →
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* ── FOOTER ───────────────────────────────────────────────── */}
       <footer className="border-t px-6 py-8" style={{ borderColor: "var(--border)" }}>
@@ -267,7 +278,10 @@ export default async function HomePage() {
             <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
-            <Link href="/login" className="hover:text-gray-300 transition-colors">Sign in</Link>
+            {isLoggedIn
+              ? <Link href="/dashboard" className="hover:text-gray-300 transition-colors">Dashboard</Link>
+              : <Link href="/login" className="hover:text-gray-300 transition-colors">Sign in</Link>
+            }
           </div>
           <span>© {new Date().getFullYear()} Lode</span>
         </div>

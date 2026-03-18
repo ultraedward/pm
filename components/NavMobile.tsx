@@ -28,6 +28,9 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
 
   const links = isLoggedIn ? loggedInLinks : loggedOutLinks;
 
+  // Logged-in users navigate via the bottom tab bar
+  if (isLoggedIn) return null;
+
   return (
     <div className="sm:hidden">
       {/* Hamburger button */}
@@ -80,7 +83,7 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
 
           {isLoggedIn && isPro && (
             <div className="px-4 pt-2">
-              <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
+              <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-400">
                 PRO
               </span>
             </div>

@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +37,10 @@ export default function RootLayout({
     <html lang="en" className={`bg-surface text-white ${inter.variable}`}>
       <body className="min-h-screen bg-surface text-white antialiased font-sans">
         <Navbar />
-        {children}
+        <div className="sm:pb-0 pb-20">
+          {children}
+        </div>
+        <BottomNav />
       </body>
     </html>
   );

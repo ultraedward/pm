@@ -223,7 +223,7 @@ export default async function HoldingsPage() {
     .filter((s): s is NonNullable<typeof s> => s !== null);
 
   return (
-    <main className="min-h-screen bg-surface p-8 text-white">
+    <main className="min-h-screen bg-surface px-4 py-6 sm:p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
@@ -234,7 +234,7 @@ export default async function HoldingsPage() {
           </div>
           <Link
             href="/dashboard"
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+            className="rounded-full border border-white/10 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
           >
             ← Dashboard
           </Link>
@@ -247,7 +247,7 @@ export default async function HoldingsPage() {
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
               <polyline
                 fill="none"
-                stroke="#22c55e"
+                stroke="#D4AF37"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -311,7 +311,7 @@ export default async function HoldingsPage() {
             <select
               name="metal"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors"
             >
               <option value="">Select Metal</option>
               <option value="gold">Gold</option>
@@ -326,7 +326,7 @@ export default async function HoldingsPage() {
               step="0.01"
               placeholder="Ounces"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
 
             <input
@@ -335,14 +335,14 @@ export default async function HoldingsPage() {
               step="0.01"
               placeholder="Price per oz"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
 
             <input
               name="purchaseDate"
               type="date"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors"
             />
 
             <button
@@ -379,7 +379,7 @@ export default async function HoldingsPage() {
                     <p className="text-sm font-bold tabular-nums">
                       ${s.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
-                    <p className={`text-xs tabular-nums font-medium ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+                    <p className={`text-xs tabular-nums font-medium ${isUp ? "text-amber-400" : "text-red-400"}`}>
                       {isUp ? "+" : ""}${s.gainLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({isUp ? "+" : ""}{s.gainPct.toFixed(2)}%)
                     </p>
                   </div>
@@ -418,12 +418,12 @@ export default async function HoldingsPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-black tabular-nums">${value.toFixed(2)}</p>
-                      <p className={`text-sm font-medium tabular-nums mt-0.5 ${gainLoss >= 0 ? "text-green-400" : "text-red-400"}`}>
+                      <p className={`text-sm font-medium tabular-nums mt-0.5 ${gainLoss >= 0 ? "text-amber-400" : "text-red-400"}`}>
                         {gainLoss >= 0 ? "+" : ""}${gainLoss.toFixed(2)} ({percent.toFixed(2)}%)
                       </p>
                       <div className="mt-2 h-1 w-24 ml-auto overflow-hidden rounded-full bg-white/5">
                         <div
-                          className={`h-full rounded-full ${percent >= 0 ? "bg-green-500" : "bg-red-500"}`}
+                          className={`h-full rounded-full ${percent >= 0 ? "bg-amber-500" : "bg-red-500"}`}
                           style={{ width: `${Math.min(Math.abs(percent), 100)}%` }}
                         />
                       </div>

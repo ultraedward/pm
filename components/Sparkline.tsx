@@ -9,7 +9,7 @@ import {
 
 type SparklineProps = {
   data: { value: number }[];
-  isPositive: boolean;
+  color: string;
 };
 
 function CustomTooltip({ active, payload }: any) {
@@ -25,9 +25,8 @@ function CustomTooltip({ active, payload }: any) {
   return null;
 }
 
-export function Sparkline({ data, isPositive }: SparklineProps) {
-  const color = isPositive ? "#22c55e" : "#ef4444";
-  const gradientId = `spark-${isPositive ? "up" : "down"}`;
+export function Sparkline({ data, color }: SparklineProps) {
+  const gradientId = `spark-${color.replace("#", "")}`;
 
   return (
     <div className="h-20 w-full">

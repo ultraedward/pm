@@ -47,7 +47,7 @@ export function CreateAlertForm() {
   }
 
   const inputClass =
-    "w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors";
+    "w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors";
 
   return (
     <form onSubmit={submit} className="rounded-2xl border p-6 space-y-6" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}>

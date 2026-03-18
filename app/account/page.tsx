@@ -62,7 +62,7 @@ export default async function AccountPage() {
               <form action="/api/billing/portal" method="POST">
                 <button
                   type="submit"
-                  className="rounded-full border border-white/10 px-5 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 transition-colors"
+                  className="rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 transition-colors min-h-[44px]"
                 >
                   Manage billing
                 </button>
@@ -70,7 +70,7 @@ export default async function AccountPage() {
             ) : (
               <Link
                 href="/pricing"
-                className="rounded-full bg-amber-500 px-5 py-2 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+                className="rounded-full bg-amber-500 px-5 py-3 text-sm font-bold text-black hover:bg-amber-400 transition-colors min-h-[44px] flex items-center"
               >
                 Upgrade to Pro
               </Link>

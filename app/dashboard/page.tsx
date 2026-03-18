@@ -1,7 +1,7 @@
 // /app/dashboard/page.tsx
 
 import Link from "next/link";
-import { QuickCalculator } from "@/components/QuickCalculator";
+import { MeltCalculator } from "@/components/MeltCalculator";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
 
   const gainLoss = totalValue - totalInvested;
   const pctReturn = totalInvested > 0 ? (gainLoss / totalInvested) * 100 : 0;
-  const gainColor = gainLoss >= 0 ? "text-green-400" : "text-red-400";
+  const gainColor = gainLoss >= 0 ? "text-amber-400" : "text-red-400";
 
   // 30-day portfolio equity sparkline (gold + silver only — most likely to have history)
   const goldOz    = holdings.filter((h) => h.metal === "gold").reduce((s, h) => s + Number(h.ounces), 0);
@@ -145,10 +145,10 @@ export default async function DashboardPage() {
   const lastValue  = portfolioHistory[portfolioHistory.length - 1] ?? totalValue;
   const change30d  = lastValue - firstValue;
   const pct30d     = firstValue > 0 ? (change30d / firstValue) * 100 : 0;
-  const changeColor30d = change30d >= 0 ? "text-green-400" : "text-red-400";
+  const changeColor30d = change30d >= 0 ? "text-amber-400" : "text-red-400";
 
   return (
-    <main className="min-h-screen bg-surface p-8 text-white">
+    <main className="min-h-screen bg-surface px-4 py-6 sm:p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
           </h1>
           <Link
             href="/dashboard/holdings"
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+            className="rounded-full border border-white/10 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
           >
             Manage Holdings
           </Link>
@@ -181,7 +181,7 @@ export default async function DashboardPage() {
                     {price > 0 ? fmtMoney(price) : <span className="text-white/20">—</span>}
                   </p>
                   {chg !== null && (
-                    <p className={`text-xs font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+                    <p className={`text-xs font-semibold tabular-nums ${isUp ? "text-amber-400" : "text-red-400"}`}>
                       {isUp ? "+" : ""}{chg.toFixed(2)}%
                       <span className="ml-1 font-normal text-gray-600">24H</span>
                     </p>
@@ -228,8 +228,8 @@ export default async function DashboardPage() {
             <svg width="100%" height="80" viewBox="0 0 300 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>
               <defs>
                 <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={change30d >= 0 ? "#22c55e" : "#ef4444"} stopOpacity="0.2" />
-                  <stop offset="100%" stopColor={change30d >= 0 ? "#22c55e" : "#ef4444"} stopOpacity="0" />
+                  <stop offset="0%" stopColor={change30d >= 0 ? "#F59E0B" : "#ef4444"} stopOpacity="0.2" />
+                  <stop offset="100%" stopColor={change30d >= 0 ? "#F59E0B" : "#ef4444"} stopOpacity="0" />
                 </linearGradient>
               </defs>
               {/* Area fill */}
@@ -240,7 +240,7 @@ export default async function DashboardPage() {
               {/* Line */}
               <polyline
                 fill="none"
-                stroke={change30d >= 0 ? "#22c55e" : "#ef4444"}
+                stroke={change30d >= 0 ? "#F59E0B" : "#ef4444"}
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -252,8 +252,8 @@ export default async function DashboardPage() {
 
         {/* Quick Calculator */}
         <div className="rounded-2xl border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
-          <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Value Calculator</p>
-          <QuickCalculator spots={spots} />
+          <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Melt Calculator</p>
+          <MeltCalculator spots={spots} />
         </div>
 
         {/* Nav links — Charts and Holdings only; Alerts is already in top Navbar */}

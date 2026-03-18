@@ -76,7 +76,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
 
         // Dynamic border based on state
         const borderStyle = isTriggered
-          ? "rgba(52,211,153,0.35)"   // emerald glow
+          ? "rgba(245,158,11,0.35)"    // amber glow
           : approaching
             ? "rgba(245,158,11,0.35)" // amber glow
             : "var(--border)";
@@ -101,7 +101,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {isTriggered && (
-                  <span className="text-xs px-2.5 py-1 rounded-full font-semibold text-emerald-400 border border-emerald-400/20 bg-emerald-400/5">
+                  <span className="text-xs px-2.5 py-1 rounded-full font-semibold text-amber-400 border border-amber-400/20 bg-amber-400/5">
                     At threshold
                   </span>
                 )}
@@ -112,7 +112,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
                 )}
                 <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
                   alert.active
-                    ? "text-emerald-400 border border-emerald-400/20 bg-emerald-400/5"
+                    ? "text-amber-400 border border-amber-400/20 bg-amber-400/5"
                     : "text-gray-500 border border-white/10 bg-white/5"
                 }`}>
                   {alert.active ? "Active" : "Paused"}
@@ -136,7 +136,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
                     </span>
                   )}
                   {isTriggered && (
-                    <span className="text-emerald-400 font-semibold">Threshold reached</span>
+                    <span className="text-amber-400 font-semibold">Threshold reached</span>
                   )}
                 </div>
 
@@ -173,7 +173,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               <button
                 onClick={() => handleToggle(alert.id)}
                 disabled={isLoading}
-                className="rounded-full border px-4 py-1.5 text-xs font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition disabled:opacity-40"
+                className="rounded-full border px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition disabled:opacity-40 min-h-[44px]"
                 style={{ borderColor: "var(--border)" }}
               >
                 {isLoading ? "…" : alert.active ? "Pause" : "Resume"}
@@ -182,7 +182,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               {triggerCount > 0 && (
                 <button
                   onClick={() => setOpenId(isOpen ? null : alert.id)}
-                  className="rounded-full border px-4 py-1.5 text-xs font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition"
+                  className="rounded-full border px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition min-h-[44px]"
                   style={{ borderColor: "var(--border)" }}
                 >
                   {isOpen ? "Hide history" : `History (${triggerCount})`}
@@ -192,11 +192,11 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               {/* Spacer */}
               <div className="flex-1" />
 
-              {/* Delete — less prominent, right-aligned */}
+              {/* Delete — right-aligned with proper touch target */}
               <button
                 onClick={() => handleDelete(alert.id)}
                 disabled={isLoading}
-                className="text-xs font-medium text-gray-600 hover:text-red-400 transition disabled:opacity-40"
+                className="px-3 py-2.5 text-xs font-medium text-gray-600 hover:text-red-400 transition disabled:opacity-40 min-h-[44px]"
               >
                 {isLoading ? "…" : "Delete"}
               </button>
