@@ -52,7 +52,7 @@ export default function AlertForm() {
   return (
     <div className="space-y-4">
       {error && <p className="text-red-600">{error}</p>}
-      {success && <p className="text-green-600">Alert created</p>}
+      {success && <p className="text-amber-400">Alert created</p>}
 
       <div>
         <label className="block text-sm font-medium">Metal</label>
