@@ -14,6 +14,7 @@ const FREE_FEATURES = [
   "Price charts — 30-day history per metal",
   "3 price alerts with email notifications",
   "Gold coin value calculator",
+  "Weekly portfolio digest email",
 ];
 
 const PRO_EXCLUSIVE = [
