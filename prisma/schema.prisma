@@ -22,6 +22,7 @@ model User {
   accounts               Account[]
   alerts                 Alert[]
   holdings               Holding[]
+  predictions            Prediction[]
   sessions               Session[]
 }
 
@@ -96,6 +97,22 @@ model Price {
 
   @@unique([metal, timestamp], name: "metal_timestamp")
   @@index([metal, timestamp(sort: Desc)])
+}
+
+model Prediction {
+  id          String   @id @default(cuid())
+  userId      String
+  metal       String   @default("gold")
+  direction   String   // "up" | "down"
+  date        String   // YYYY-MM-DD UTC — the day the prediction was made
+  basePrice   Float    // spot price when prediction was made
+  resultPrice Float?   // spot price the following day
+  correct     Boolean? // null until evaluated by cron
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date, metal])
+  @@index([userId])
 }
 
 model Holding {

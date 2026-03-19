@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { updateMetalsPrices } from "@/lib/priceEngine";
 import { runAlertEngine } from "@/lib/alerts/engine";
+import { evaluatePredictions } from "@/lib/predictions/evaluate";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +17,9 @@ export async function GET(req: Request) {
   try {
     const prices = await updateMetalsPrices();
 
-    // Run alert engine after every price update
+    // Run alert engine + evaluate predictions after every price update
     await runAlertEngine();
+    await evaluatePredictions();
 
     return NextResponse.json({ success: true, ...prices });
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MeltCalculator } from "@/components/MeltCalculator";
+import { PredictionCard } from "@/components/PredictionCard";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -208,6 +209,9 @@ export default async function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Daily Prediction */}
+        <PredictionCard goldSpot={spots.gold} />
 
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
