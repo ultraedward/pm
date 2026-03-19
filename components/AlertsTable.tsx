@@ -88,10 +88,10 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
             style={{ borderColor: borderStyle }}
           >
             {/* Row 1: Metal + direction + status */}
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
-                <span className="text-base font-black tracking-tight capitalize truncate">
+                <span className="text-base font-black tracking-tight capitalize">
                   {alert.metal}
                 </span>
                 <span className="text-sm text-gray-500 font-medium">
@@ -99,7 +99,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
                   <span className="tabular-nums text-gray-300">${alert.price.toLocaleString()}</span>
                 </span>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2">
                 {isTriggered && (
                   <span className="text-xs px-2.5 py-1 rounded-full font-semibold text-amber-400 border border-amber-400/20 bg-amber-400/5">
                     At threshold

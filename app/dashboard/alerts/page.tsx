@@ -46,7 +46,7 @@ export default async function DashboardAlertsPage() {
 
         {/* Plan Banner */}
         {!plan.isPro && (
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm flex items-center justify-between gap-4">
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-gray-300">
               <span className="font-semibold text-white">Free plan —</span>{" "}
               {plan.remaining === 0
@@ -55,7 +55,7 @@ export default async function DashboardAlertsPage() {
             </span>
             <Link
               href="/pricing"
-              className="shrink-0 rounded-full bg-amber-500/20 px-4 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-500/30 transition-colors"
+              className="self-start sm:self-auto shrink-0 rounded-full bg-amber-500/20 px-4 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-500/30 transition-colors"
             >
               Upgrade for unlimited →
             </Link>

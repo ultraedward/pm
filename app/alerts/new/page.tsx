@@ -17,7 +17,7 @@ export default async function NewAlertPage() {
       <div className="mx-auto max-w-xl space-y-8">
         <div>
           <Link
-            href="/alerts"
+            href="/dashboard/alerts"
             className="text-xs font-medium uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
           >
             ← Alerts

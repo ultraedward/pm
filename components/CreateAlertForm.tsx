@@ -43,7 +43,7 @@ export function CreateAlertForm() {
       return;
     }
 
-    router.push("/alerts");
+    router.push("/dashboard/alerts");
   }
 
   const inputClass =
