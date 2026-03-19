@@ -9,10 +9,16 @@ type CoinSpec = { id: string; label: string; oz: number };
 
 const COIN_SPECS: Record<Metal, CoinSpec[]> = {
   gold: [
-    { id: "eagle",   label: "American Eagle",  oz: 1.0    },
-    { id: "maple",   label: "Maple Leaf",       oz: 1.0    },
-    { id: "kruger",  label: "Krugerrand",       oz: 1.0    },
-    { id: "buffalo", label: "Buffalo",          oz: 1.0    },
+    { id: "eagle_1",    label: "American Eagle 1 oz",     oz: 1.0    },
+    { id: "eagle_half", label: "American Eagle ½ oz",     oz: 0.5    },
+    { id: "eagle_qtr",  label: "American Eagle ¼ oz",     oz: 0.25   },
+    { id: "eagle_10th", label: "American Eagle 1/10 oz",  oz: 0.1    },
+    { id: "maple_1",    label: "Maple Leaf 1 oz",         oz: 1.0    },
+    { id: "maple_half", label: "Maple Leaf ½ oz",         oz: 0.5    },
+    { id: "maple_qtr",  label: "Maple Leaf ¼ oz",         oz: 0.25   },
+    { id: "maple_10th", label: "Maple Leaf 1/10 oz",      oz: 0.1    },
+    { id: "kruger",     label: "Krugerrand 1 oz",         oz: 1.0    },
+    { id: "buffalo",    label: "Buffalo 1 oz",            oz: 1.0    },
   ],
   silver: [
     { id: "eagle",   label: "American Eagle",  oz: 1.0       },
@@ -116,7 +122,7 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-amber-500/70 group-hover:text-amber-400 transition-colors">Upgrade to Pro to unlock →</p>
+                <p className="text-xs text-amber-500/70 group-hover:text-amber-400 transition-colors">Unlock with Pro →</p>
               </a>
             );
           }
@@ -132,6 +138,9 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
                   <span className="text-xs font-bold uppercase tracking-widest text-gray-500">{label}</span>
+                  {metal === "silver" && (
+                    <span className="text-[10px] text-gray-600">· pre-1965</span>
+                  )}
                 </div>
                 {hasValue && (
                   <span className="text-xs tabular-nums font-semibold" style={{ color: "var(--gold-bright)" }}>
