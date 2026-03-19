@@ -59,7 +59,7 @@ export default function TermsPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">9. Contact</h2>
-            <p>Questions about these terms can be directed to <a href="mailto:ultra.edward@gmail.com" className="text-amber-500 hover:text-amber-400 transition-colors">ultra.edward@gmail.com</a>.</p>
+            <p>Questions about these terms can be directed to <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">hello@lode.rocks</a>.</p>
           </section>
 
         </div>

@@ -97,6 +97,18 @@ export default async function AccountPage() {
           </div>
         </div>
 
+        {/* Feedback */}
+        <div className="space-y-3 border-t pt-8" style={{ borderColor: "var(--border)" }}>
+          <p className="label">Feedback</p>
+          <p className="text-sm text-gray-500">Have a suggestion or found a bug? We&apos;d love to hear from you.</p>
+          <a
+            href="mailto:hello@lode.rocks?subject=Lode Feedback"
+            className="inline-block rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] leading-[1.25rem]"
+          >
+            Send feedback →
+          </a>
+        </div>
+
         {/* Sign out */}
         <div className="border-t pt-8" style={{ borderColor: "var(--border)" }}>
           <SignOutButton />
