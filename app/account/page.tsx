@@ -97,27 +97,6 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* Emails */}
-        <div className="space-y-3 border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <p className="label">Emails</p>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between py-2">
-              <div>
-                <p className="text-sm font-medium text-white">Weekly digest</p>
-                <p className="text-xs text-gray-500 mt-0.5">Spot prices &amp; portfolio summary every Monday</p>
-              </div>
-              <span className="text-xs font-semibold text-amber-400">On</span>
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <div>
-                <p className="text-sm font-medium text-white">Price alerts</p>
-                <p className="text-xs text-gray-500 mt-0.5">Email when a metal hits your target</p>
-              </div>
-              <span className="text-xs font-semibold text-amber-400">On</span>
-            </div>
-          </div>
-        </div>
-
         {/* Feedback */}
         <div className="space-y-3 border-t pt-8" style={{ borderColor: "var(--border)" }}>
           <p className="label">Feedback</p>
