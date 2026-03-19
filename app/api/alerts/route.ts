@@ -38,12 +38,12 @@ export async function POST(req: Request) {
         },
       });
 
-    // 🔥 FREE LIMIT: 1 alert max
-    if (!isPro && existingAlerts >= 1) {
+    // FREE LIMIT: 3 alerts max
+    if (!isPro && existingAlerts >= 3) {
       return NextResponse.json(
         {
           error:
-            "Free plan allows only 1 active alert. Upgrade to Pro for unlimited alerts.",
+            "Free plan allows up to 3 active alerts. Upgrade to Pro for unlimited alerts.",
         },
         { status: 403 }
       );

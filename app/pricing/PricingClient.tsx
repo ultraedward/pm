@@ -19,7 +19,6 @@ const FREE_FEATURES = [
 const PRO_EXCLUSIVE = [
   "Unlimited price alerts — never miss a target price",
   "Full coin value calculator — silver, platinum & palladium",
-  "Priority support via hello@lode.rocks",
 ];
 
 export function PricingClient({ isPro, isLoggedIn }: Props) {
