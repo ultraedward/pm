@@ -34,6 +34,7 @@ export default async function DashboardAlertsPage() {
           <div>
             <p className="label mb-1">Alerts</p>
             <h1 className="text-3xl font-black tracking-tight">Price Alerts</h1>
+            <p className="text-sm text-gray-500 mt-1">Get an email the moment a metal hits your target price.</p>
           </div>
           <Link
             href="/alerts/new"

@@ -195,16 +195,26 @@ export default async function DashboardPage() {
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-5">
-            <p className="text-xl font-black tracking-tight text-white">No holdings yet</p>
-            <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-              Add your gold, silver, platinum, or palladium positions to track portfolio value as prices update.
-            </p>
-            <Link
-              href="/dashboard/holdings"
-              className="inline-block btn-gold px-7 py-2.5"
-            >
-              Add a holding
-            </Link>
+            <div className="space-y-2">
+              <p className="text-xl font-black tracking-tight text-white">Start tracking your stack</p>
+              <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
+                Add your gold, silver, platinum, or palladium and see your total portfolio value update in real time.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/dashboard/holdings"
+                className="inline-block btn-gold px-7 py-2.5"
+              >
+                Add your first holding
+              </Link>
+              <Link
+                href="/dashboard/alerts"
+                className="inline-block rounded-full border border-white/10 px-7 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+              >
+                Set a price alert
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="rounded-2xl border border-white/5 bg-gray-950 px-6 py-7">
@@ -250,9 +260,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Quick Calculator */}
+        {/* Coin Value Calculator */}
         <div className="rounded-2xl border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
-          <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Melt Calculator</p>
+          <div>
+            <p className="text-xs text-gray-600 font-medium uppercase tracking-widest mb-1">Coin Value Calculator</p>
+            <p className="text-sm text-gray-500">Enter how many coins you have to see what they&apos;re worth at today&apos;s spot price.</p>
+          </div>
           <MeltCalculator spots={spots} />
         </div>
 

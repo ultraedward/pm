@@ -163,7 +163,7 @@ export function MeltCalculator({ spots }: Props) {
               );
             })}
             <div className="flex items-center justify-between px-5 py-4">
-              <span className="text-sm font-bold text-white">Total melt value</span>
+              <span className="text-sm font-bold text-white">Total coin value</span>
               <span className="text-2xl font-black tabular-nums tracking-tightest" style={{ color: "var(--gold-bright)" }}>
                 {fmt(grandTotal)}
               </span>
