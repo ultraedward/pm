@@ -193,6 +193,22 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        {/* Gold:Silver Ratio */}
+        {spots.gold > 0 && spots.silver > 0 && (
+          <div className="flex items-center justify-between px-5 py-3 rounded-xl border border-white/5 bg-gray-950">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Gold:Silver Ratio</p>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <p className="text-lg font-black tabular-nums tracking-tightest">
+                {(spots.gold / spots.silver).toFixed(1)}
+              </p>
+              <p className="text-xs text-gray-600">oz silver per oz gold</p>
+            </div>
+          </div>
+        )}
+
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-5">
