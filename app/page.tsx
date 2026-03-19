@@ -265,7 +265,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
-              Live spot prices, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
+              Daily spot prices, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
@@ -300,7 +300,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl space-y-6">
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl font-black tracking-tight">How much is your stack worth?</h2>
-            <p className="text-sm text-gray-500">Based on live spot prices — no account needed.</p>
+            <p className="text-sm text-gray-500">Based on today&apos;s spot prices — no account needed.</p>
           </div>
           <QuickCalculator spots={{
             gold:      gold.price,
