@@ -55,7 +55,7 @@ export default async function AccountPage() {
                   ? dbUser.stripeCurrentPeriodEnd
                     ? `Renews ${new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}`
                     : "Unlimited alerts"
-                  : "1 alert included"}
+                  : "3 alerts included"}
               </p>
             </div>
             {isPro ? (
@@ -86,7 +86,7 @@ export default async function AccountPage() {
               <p className="text-2xl font-black tabular-nums">{alertCount}</p>
               <p className="text-sm text-gray-500">{alertCount === 1 ? "Alert" : "Alerts"}</p>
               <p className="text-xs text-gray-700 group-hover:text-gray-500 transition-colors">
-                {isPro ? "Unlimited" : `${Math.max(0, 1 - alertCount)} of 1 remaining`}
+                {isPro ? "Unlimited" : `${Math.max(0, 3 - alertCount)} of 3 remaining`}
               </p>
             </Link>
             <Link href="/dashboard/holdings" className="group space-y-1 py-3 border-b" style={{ borderColor: "var(--border)" }}>
