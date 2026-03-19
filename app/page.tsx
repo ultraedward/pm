@@ -9,16 +9,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Gold & Silver Spot Prices Today — Live Precious Metals Tracker",
+  title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
   description:
-    "Track live gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+    "Track daily gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
   alternates: {
     canonical: "https://lode.rocks",
   },
   openGraph: {
-    title: "Gold & Silver Spot Prices Today — Live Precious Metals Tracker",
+    title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Track live gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+      "Track daily gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
     url: "https://lode.rocks",
   },
 };
@@ -222,7 +222,7 @@ export default async function HomePage() {
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "3 price alerts, portfolio tracker, live spot prices",
+            "description": "3 price alerts, portfolio tracker, daily spot prices",
           },
           {
             "@type": "Offer",

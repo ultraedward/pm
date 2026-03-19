@@ -11,7 +11,7 @@ export default function NotFound() {
         <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">404</p>
         <h1 className="text-6xl font-black tracking-tightest text-white">Page not found</h1>
         <p className="text-gray-400 max-w-sm mx-auto">
-          That route doesn&apos;t exist. Head back to track live spot prices and manage your portfolio.
+          That route doesn&apos;t exist. Head back to check today&apos;s spot prices and manage your portfolio.
         </p>
         <Link href="/" className="btn-gold inline-block">Back to home</Link>
       </div>
