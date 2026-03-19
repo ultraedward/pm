@@ -30,18 +30,20 @@ export default async function DashboardAlertsPage() {
       <div className="mx-auto max-w-4xl space-y-6">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="label mb-1">Alerts</p>
-            <h1 className="text-3xl font-black tracking-tight">Price Alerts</h1>
-            <p className="text-sm text-gray-500 mt-1">Get an email the moment a metal hits your target price.</p>
+        <div>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="label mb-1">Alerts</p>
+              <h1 className="text-3xl font-black tracking-tight">Price Alerts</h1>
+            </div>
+            <Link
+              href="/alerts/new"
+              className="btn-gold shrink-0 px-5 py-2 text-sm"
+            >
+              + New alert
+            </Link>
           </div>
-          <Link
-            href="/alerts/new"
-            className="btn-gold px-5 py-2 text-sm"
-          >
-            + New alert
-          </Link>
+          <p className="text-sm text-gray-500 mt-2">Get an email when a metal hits your target price — checked daily.</p>
         </div>
 
         {/* Plan Banner */}
@@ -69,7 +71,7 @@ export default async function DashboardAlertsPage() {
           <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-12 text-center space-y-4">
             <p className="text-xl font-black tracking-tight">No alerts yet</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-              Get notified by email the moment gold, silver, platinum, or palladium crosses your target price.
+              Get an email when gold, silver, platinum, or palladium crosses your target price — checked daily.
             </p>
             <div className="flex justify-center gap-3 pt-1">
               <Link href="/alerts/new" className="btn-gold px-6 py-2.5 text-sm">
