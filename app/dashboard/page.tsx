@@ -64,7 +64,7 @@ export default async function DashboardPage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { id: true, name: true },
+    select: { id: true, name: true, subscriptionStatus: true },
   });
 
   if (!user) redirect("/login");
@@ -119,6 +119,7 @@ export default async function DashboardPage() {
     totalValue += ounces * (spot || purchasePrice);
   }
 
+  const isPro = user.subscriptionStatus === "active";
   const gainLoss = totalValue - totalInvested;
   const pctReturn = totalInvested > 0 ? (gainLoss / totalInvested) * 100 : 0;
   const gainColor = gainLoss >= 0 ? "text-amber-400" : "text-red-400";
@@ -266,7 +267,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-gray-600 font-medium uppercase tracking-widest mb-1">Coin Value Calculator</p>
             <p className="text-sm text-gray-500">Enter how many coins you have to see what they&apos;re worth at today&apos;s spot price.</p>
           </div>
-          <MeltCalculator spots={spots} />
+          <MeltCalculator spots={spots} isPro={isPro} />
         </div>
 
         {/* Nav links — Charts and Holdings only; Alerts is already in top Navbar */}
