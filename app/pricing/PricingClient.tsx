@@ -9,16 +9,17 @@ type Props = {
 };
 
 const FREE_FEATURES = [
-  "3 price alerts",
-  "Gold, silver, platinum & palladium",
-  "Email notifications",
-  "Portfolio tracker",
-  "Price charts",
+  "Live spot prices — gold, silver, platinum & palladium",
+  "Portfolio tracker — track your holdings & P&L",
+  "Price charts — 30-day history per metal",
+  "3 price alerts with email notifications",
+  "Gold coin value calculator",
 ];
 
 const PRO_EXCLUSIVE = [
-  "Unlimited price alerts",
-  "Everything in Free",
+  "Unlimited price alerts — never miss a target price",
+  "Full coin value calculator — silver, platinum & palladium",
+  "Priority support via hello@lode.rocks",
 ];
 
 export function PricingClient({ isPro, isLoggedIn }: Props) {
