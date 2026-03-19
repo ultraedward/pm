@@ -1,11 +1,27 @@
 export const revalidate = 60;
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Sparkline } from "@/components/Sparkline";
 import { QuickCalculator } from "@/components/QuickCalculator";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Gold & Silver Spot Prices Today — Live Precious Metals Tracker",
+  description:
+    "Track live gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+  alternates: {
+    canonical: "https://lode.rocks",
+  },
+  openGraph: {
+    title: "Gold & Silver Spot Prices Today — Live Precious Metals Tracker",
+    description:
+      "Track live gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+    url: "https://lode.rocks",
+  },
+};
 
 // ─── types ────────────────────────────────────────────────────────────────────
 
@@ -178,8 +194,54 @@ export default async function HomePage() {
     .filter(Boolean)
     .sort((a, b) => b!.getTime() - a!.getTime())[0] ?? null;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://lode.rocks/#website",
+        "url": "https://lode.rocks",
+        "name": "Lode",
+        "description": "Live precious metals spot prices, portfolio tracker, and price alerts for gold, silver, platinum, and palladium.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://lode.rocks/?q={search_term_string}",
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://lode.rocks/#app",
+        "name": "Lode — Precious Metals Tracker",
+        "url": "https://lode.rocks",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Free",
+            "price": "0",
+            "priceCurrency": "USD",
+            "description": "3 price alerts, portfolio tracker, live spot prices",
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro",
+            "price": "3.00",
+            "priceCurrency": "USD",
+            "description": "Unlimited price alerts, everything in Free",
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ── HERO + LIVE PRICES ───────────────────────────────────── */}
       <section className="relative px-4 sm:px-6 pt-14 pb-12 sm:pt-24 sm:pb-20">

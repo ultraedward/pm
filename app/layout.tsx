@@ -11,20 +11,47 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Lode — Spot Prices, Alerts & Portfolio Tracker",
+  metadataBase: new URL("https://lode.rocks"),
+  title: {
+    default: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
+    template: "%s | Lode",
+  },
   description:
-    "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
+    "Live spot prices for gold, silver, platinum, and palladium. Track your precious metals portfolio, set price alerts, and calculate coin melt values. Free to start.",
+  keywords: [
+    "gold spot price",
+    "silver spot price",
+    "platinum price today",
+    "palladium price",
+    "precious metals tracker",
+    "gold price alert",
+    "silver price alert",
+    "coin melt value calculator",
+    "gold portfolio tracker",
+    "precious metals portfolio",
+    "XAU price",
+    "XAG price",
+  ],
   openGraph: {
-    title: "Lode — Spot Prices, Alerts & Portfolio Tracker",
+    title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
+      "Live spot prices for gold, silver, platinum, and palladium. Track your precious metals portfolio, set price alerts, and calculate coin melt values. Free to start.",
     type: "website",
+    url: "https://lode.rocks",
+    siteName: "Lode",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lode — Spot Prices, Alerts & Portfolio Tracker",
+    title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Daily spot prices for gold, silver, platinum, and palladium. Set price alerts and track your holdings in one place. Free to start.",
+      "Live spot prices for gold, silver, platinum, and palladium. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
+  },
+  alternates: {
+    canonical: "https://lode.rocks",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
