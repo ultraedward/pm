@@ -1,87 +1,121 @@
+/**
+ * Backfills daily price history for all 4 metals using Stooq (free, no API key).
+ * Fetches the full date range in one request per metal (4 total).
+ *
+ * Usage:
+ *   npm run timeseries
+ *   npm run timeseries -- --days=60
+ */
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const API_KEY = process.env.METALS_API_KEY;
 
-if (!API_KEY) throw new Error("METALS_API_KEY missing");
-
-const METALS = [
-  { symbol: "XAU" as const, name: "gold" },
-  { symbol: "XAG" as const, name: "silver" },
-  { symbol: "XPT" as const, name: "platinum" },
-  { symbol: "XPD" as const, name: "palladium" },
+const METALS: { name: string; symbol: string }[] = [
+  { name: "gold",      symbol: "xauusd" },
+  { name: "silver",    symbol: "xagusd" },
+  { name: "platinum",  symbol: "xptusd" },
+  { name: "palladium", symbol: "xpdusd" },
 ];
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
+function toStooqDate(d: Date): string {
+  return d.toISOString().split("T")[0].replace(/-/g, "");
 }
 
-async function fetchHistoricalPrice(symbol: string, date: string): Promise<number | null> {
+/**
+ * Fetch daily closing prices from Stooq for a given symbol and date range.
+ * Returns a Map of YYYY-MM-DD → close price.
+ */
+async function fetchHistory(
+  symbol: string,
+  days: number
+): Promise<Map<string, number>> {
+  const end = new Date();
+  const start = new Date();
+  start.setUTCDate(start.getUTCDate() - days);
+
   const url =
-    `https://metals-api.com/api/${date}` +
-    `?access_key=${API_KEY}` +
-    `&base=USD` +
-    `&symbols=${symbol}`;
+    `https://stooq.com/q/d/l/` +
+    `?s=${symbol}` +
+    `&d1=${toStooqDate(start)}` +
+    `&d2=${toStooqDate(end)}` +
+    `&i=d`;
 
-  const res = await fetch(url);
-  const data = await res.json();
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0" },
+  });
 
-  if (!data.success) {
-    console.warn(`  ⚠ API error for ${symbol} on ${date}:`, data.error?.info ?? data);
-    return null;
+  if (!res.ok) {
+    throw new Error(`Stooq returned HTTP ${res.status} for ${symbol}`);
   }
 
-  const rate = data.rates?.[symbol];
-  if (!rate) return null;
+  const text = await res.text();
 
-  // metals-api returns how many oz per USD → invert to get USD per oz
-  return 1 / rate;
+  // Stooq returns "No data" when symbol isn't found
+  if (text.trim().startsWith("No data") || text.trim() === "") {
+    throw new Error(`No data returned for symbol "${symbol}" — check the symbol name`);
+  }
+
+  // Parse CSV: Date,Open,High,Low,Close,Volume
+  const lines = text.trim().split("\n").slice(1); // skip header
+  const map = new Map<string, number>();
+
+  for (const line of lines) {
+    const cols = line.split(",");
+    if (cols.length < 5) continue;
+    const date = cols[0].trim();
+    const close = parseFloat(cols[4].trim());
+    if (!isNaN(close) && close > 0) {
+      map.set(date, Number(close.toFixed(2)));
+    }
+  }
+
+  return map;
 }
 
 async function main() {
-  const DAYS = 30;
-  console.log(`Backfilling last ${DAYS} days for all 4 metals...\n`);
+  const daysArg = process.argv.find((a) => a.startsWith("--days="));
+  const DAYS = daysArg ? parseInt(daysArg.split("=")[1], 10) : 30;
 
-  for (let i = DAYS - 1; i >= 0; i--) {
-    const day = new Date();
-    day.setUTCDate(day.getUTCDate() - i);
-    day.setUTCHours(0, 0, 0, 0);
-    const dateStr = day.toISOString().split("T")[0];
+  console.log(`\nBackfilling last ${DAYS} days for all 4 metals via Stooq...\n`);
 
-    process.stdout.write(`${dateStr} `);
+  let totalUpserted = 0;
 
-    for (const { symbol, name } of METALS) {
-      const price = await fetchHistoricalPrice(symbol, dateStr);
+  for (const { name, symbol } of METALS) {
+    process.stdout.write(`Fetching ${name} (${symbol})... `);
 
-      if (price === null) {
-        process.stdout.write(`  ${name}: skip  `);
-        continue;
-      }
-
-      await prisma.price.upsert({
-        where: { metal_timestamp: { metal: name, timestamp: day } },
-        update: { price },
-        create: { metal: name, price, timestamp: day },
-      });
-
-      process.stdout.write(`  ${name}: $${price.toFixed(2)}`);
-
-      // Small delay to avoid rate limiting
-      await sleep(250);
+    let history: Map<string, number>;
+    try {
+      history = await fetchHistory(symbol, DAYS);
+    } catch (err) {
+      console.error(`\n  ✗ ${(err as Error).message}`);
+      continue;
     }
 
-    process.stdout.write("\n");
+    console.log(`${history.size} trading days`);
+
+    for (const [dateStr, price] of history) {
+      const timestamp = new Date(`${dateStr}T00:00:00.000Z`);
+
+      await prisma.price.upsert({
+        where: { metal_timestamp: { metal: name, timestamp } },
+        update: { price },
+        create: { metal: name, price, timestamp },
+      });
+
+      process.stdout.write(`  ${dateStr}  $${price.toFixed(2)}\n`);
+      totalUpserted++;
+    }
   }
 
-  console.log("\n✅ Done.");
+  console.log(`\n✅ Done. Upserted ${totalUpserted} rows across all metals.`);
   await prisma.$disconnect();
 }
 
 main().catch(async (err) => {
-  console.error("ERROR:", err);
+  console.error("\nERROR:", err);
   await prisma.$disconnect();
   process.exit(1);
 });
