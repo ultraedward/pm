@@ -265,7 +265,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
-              Spot prices updated every 15 minutes, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
+              Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
