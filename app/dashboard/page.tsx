@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -22,9 +23,11 @@ const METAL_DOTS: Record<Metal, string> = {
 
 const METALS: Metal[] = ["gold", "silver", "platinum", "palladium"];
 
-async function getLatestPrice(metal: Metal) {
+/** Returns the most recent DB price that is at least 20 hours old — used for 24H % change. */
+async function getPrevDayPrice(metal: Metal) {
+  const cutoff = new Date(Date.now() - 20 * 60 * 60 * 1000);
   return prisma.price.findFirst({
-    where: { metal },
+    where: { metal, timestamp: { lte: cutoff } },
     orderBy: { timestamp: "desc" },
   });
 }
@@ -70,17 +73,19 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  // Fetch latest prices + history for all 4 metals in parallel
+  // Fetch live spot prices + prev-day DB rows (for 24H delta) + history in parallel
   const [
     holdings,
-    goldRow, silverRow, platinumRow, palladiumRow,
+    liveSpots,
+    goldPrev, silverPrev, platinumPrev, palladiumPrev,
     goldHistory, silverHistory, platinumHistory, palladiumHistory,
   ] = await Promise.all([
     prisma.holding.findMany({ where: { userId: user.id } }),
-    getLatestPrice("gold"),
-    getLatestPrice("silver"),
-    getLatestPrice("platinum"),
-    getLatestPrice("palladium"),
+    fetchAllSpotPrices(),
+    getPrevDayPrice("gold"),
+    getPrevDayPrice("silver"),
+    getPrevDayPrice("platinum"),
+    getPrevDayPrice("palladium"),
     getRecentPrices("gold"),
     getRecentPrices("silver"),
     getRecentPrices("platinum"),
@@ -88,18 +93,18 @@ export default async function DashboardPage() {
   ]);
 
   const spots: Record<Metal, number> = {
-    gold:      goldRow?.price      ?? 0,
-    silver:    silverRow?.price    ?? 0,
-    platinum:  platinumRow?.price  ?? 0,
-    palladium: palladiumRow?.price ?? 0,
+    gold:      liveSpots.gold      ?? goldHistory[goldHistory.length - 1]?.price      ?? 0,
+    silver:    liveSpots.silver    ?? silverHistory[silverHistory.length - 1]?.price    ?? 0,
+    platinum:  liveSpots.platinum  ?? platinumHistory[platinumHistory.length - 1]?.price  ?? 0,
+    palladium: liveSpots.palladium ?? palladiumHistory[palladiumHistory.length - 1]?.price ?? 0,
   };
 
-  // 24h % change — compare latest to previous data point
+  // 24H % change — live price vs yesterday's DB snapshot
   const prevSpots: Record<Metal, number> = {
-    gold:      goldHistory.length >= 2      ? goldHistory[goldHistory.length - 2].price      : 0,
-    silver:    silverHistory.length >= 2    ? silverHistory[silverHistory.length - 2].price    : 0,
-    platinum:  platinumHistory.length >= 2  ? platinumHistory[platinumHistory.length - 2].price  : 0,
-    palladium: palladiumHistory.length >= 2 ? palladiumHistory[palladiumHistory.length - 2].price : 0,
+    gold:      goldPrev?.price      ?? 0,
+    silver:    silverPrev?.price    ?? 0,
+    platinum:  platinumPrev?.price  ?? 0,
+    palladium: palladiumPrev?.price ?? 0,
   };
   const pctChange: Record<Metal, number | null> = {
     gold:      prevSpots.gold > 0      ? ((spots.gold - prevSpots.gold) / prevSpots.gold) * 100           : null,

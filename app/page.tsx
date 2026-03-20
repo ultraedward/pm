@@ -1,4 +1,5 @@
-export const revalidate = 60;
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { Sparkline } from "@/components/Sparkline";
 import { QuickCalculator } from "@/components/QuickCalculator";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
@@ -38,7 +40,7 @@ type Metal = "gold" | "silver" | "platinum" | "palladium";
 
 // ─── data ────────────────────────────────────────────────────────────────────
 
-async function getMetalData(metal: Metal): Promise<MetalData> {
+async function getMetalData(metal: Metal, livePrice: number | null): Promise<MetalData> {
   try {
     const rows = await prisma.price.findMany({
       where: {
@@ -48,38 +50,30 @@ async function getMetalData(metal: Metal): Promise<MetalData> {
       orderBy: { timestamp: "asc" },
     });
 
-    if (!rows.length) return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt: null };
+    const price = livePrice ?? (rows.length ? rows[rows.length - 1].price : 0);
+    const updatedAt = livePrice ? new Date() : (rows.length ? rows[rows.length - 1].timestamp : null);
 
-    const latest = rows[rows.length - 1];
+    if (!rows.length) return { price, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt };
 
-    // 24H % change — compare latest to the previous available data point
-    const prev = rows.length >= 2 ? rows[rows.length - 2] : null;
-    const percentChange =
-      prev?.price
-        ? ((latest.price - prev.price) / prev.price) * 100
-        : null;
+    // 24H % change — live price vs the most recent DB snapshot ≥20h old
+    const cutoff = new Date(Date.now() - 20 * 60 * 60 * 1000);
+    const prevRow = [...rows].reverse().find((r) => r.timestamp <= cutoff);
+    const percentChange = prevRow?.price ? ((price - prevRow.price) / prevRow.price) * 100 : null;
 
-    // 30D sparkline — last 30 data points
+    // 30D sparkline — last 30 DB data points
     const history30D = rows.slice(-30).map((r) => ({
       price: r.price,
       timestamp: r.timestamp.toISOString(),
     }));
 
-    // 52W high / low
+    // 52W high / low (from DB history)
     const prices = rows.map((r) => r.price);
     const week52High = Math.max(...prices);
     const week52Low  = Math.min(...prices);
 
-    return {
-      price: latest.price,
-      percentChange,
-      history30D,
-      week52High,
-      week52Low,
-      updatedAt: latest.timestamp,
-    };
+    return { price, percentChange, history30D, week52High, week52Low, updatedAt };
   } catch {
-    return { price: 0, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt: null };
+    return { price: livePrice ?? 0, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt: livePrice ? new Date() : null };
   }
 }
 
@@ -178,9 +172,16 @@ function fmtUpdated(date: Date | null): string {
 }
 
 export default async function HomePage() {
-  const [session, [gold, silver, platinum, palladium]] = await Promise.all([
+  const [session, liveSpots] = await Promise.all([
     getServerSession(authOptions),
-    Promise.all(METALS.map((m) => getMetalData(m))),
+    fetchAllSpotPrices(),
+  ]);
+
+  const [gold, silver, platinum, palladium] = await Promise.all([
+    getMetalData("gold",      liveSpots.gold),
+    getMetalData("silver",    liveSpots.silver),
+    getMetalData("platinum",  liveSpots.platinum),
+    getMetalData("palladium", liveSpots.palladium),
   ]);
 
   const isLoggedIn = !!session?.user?.email;
