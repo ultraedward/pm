@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "backfill": "ts-node scripts/backfill-prices.ts",
-    "timeseries": "ts-node scripts/backfill-timeseries.ts"
+    "timeseries": "ts-node scripts/backfill-timeseries.ts",
+    "screenshot": "node scripts/screenshot.js",
+    "screenshot:local": "SCREENSHOT_URL=http://localhost:3000 node scripts/screenshot.js",
+    "check-data": "ts-node scripts/check-gold-data.ts",
+    "dedup": "ts-node scripts/dedup-prices.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -18,6 +22,7 @@
     "next": "14.2.35",
     "next-auth": "^4.24.13",
     "nodemailer": "^7.0.13",
+    "puppeteer": "^24.40.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.15.4",

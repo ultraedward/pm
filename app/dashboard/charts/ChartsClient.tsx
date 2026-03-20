@@ -69,6 +69,28 @@ function fmtPrice(value: number) {
   return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+function fmtPct(value: number) {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+/** Normalise merged data to % change from the first point of each metal. */
+function normaliseToPct(merged: MergedPoint[]): MergedPoint[] {
+  const baseline: Partial<Record<string, number>> = {};
+  for (const metal of METALS) {
+    const first = merged.find((p) => p[metal] !== undefined);
+    if (first) baseline[metal] = first[metal] as number;
+  }
+  return merged.map((pt) => {
+    const out: MergedPoint = { label: pt.label };
+    for (const metal of METALS) {
+      if (pt[metal] !== undefined && baseline[metal]) {
+        out[metal] = ((pt[metal] as number) / baseline[metal]! - 1) * 100;
+      }
+    }
+    return out;
+  });
+}
+
 export function ChartsClient() {
   const [range, setRange]                 = useState<Range>("30d");
   const [data, setData]                   = useState<ChartResponse | null>(null);
@@ -99,8 +121,11 @@ export function ChartsClient() {
     });
   }
 
-  const hasAnyData     = data && Object.values(data).some((arr) => Array.isArray(arr) && arr.length > 0);
-  const merged         = data && hasAnyData ? mergeData(data, range) : [];
+  const hasAnyData      = data && Object.values(data).some((arr) => Array.isArray(arr) && arr.length > 0);
+  const rawMerged       = data && hasAnyData ? mergeData(data, range) : [];
+  // Use % change mode when more than one metal is visible (prices differ too much to share a Y-axis)
+  const multiMode       = visibleMetals.size > 1;
+  const merged          = multiMode ? normaliseToPct(rawMerged) : rawMerged;
   const availableMetals = data ? METALS.filter((m) => (data[m]?.length ?? 0) > 0) : [];
 
   return (
@@ -168,6 +193,11 @@ export function ChartsClient() {
 
       {!loading && merged.length > 0 && (
         <div className="rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+          {multiMode && (
+            <p className="text-xs text-gray-500 mb-4">
+              Showing % change from start of period. Select a single metal for price view.
+            </p>
+          )}
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={merged} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
@@ -182,8 +212,8 @@ export function ChartsClient() {
                 tick={{ fill: "#6b7280", fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(v) => `$${v.toLocaleString()}`}
-                width={70}
+                tickFormatter={multiMode ? (v) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%` : (v) => `$${v.toLocaleString()}`}
+                width={multiMode ? 55 : 70}
               />
               <Tooltip
                 contentStyle={{
@@ -193,7 +223,10 @@ export function ChartsClient() {
                   color: "#f9fafb",
                   fontSize: "13px",
                 }}
-                formatter={(value: number, name: string) => [fmtPrice(value), name.charAt(0).toUpperCase() + name.slice(1)]}
+                formatter={(value: number, name: string) => [
+                  multiMode ? fmtPct(value) : fmtPrice(value),
+                  name.charAt(0).toUpperCase() + name.slice(1),
+                ]}
                 labelStyle={{ color: "#6b7280", marginBottom: "6px", fontSize: "11px" }}
               />
               <Legend
