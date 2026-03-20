@@ -37,7 +37,7 @@ export default function PrivacyPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">4. Third-Party Services</h2>
-            <p>We use the following third-party services to operate the platform: Google OAuth for authentication, Stripe for billing, Neon for database hosting, Vercel for application hosting, and Metals-API for spot price data. Each service operates under its own privacy policy.</p>
+            <p>We use the following third-party services to operate the platform: Google OAuth for authentication, Stripe for billing, Neon for database hosting, Vercel for application hosting, and Stooq for spot price data. Each service operates under its own privacy policy.</p>
           </section>
 
           <section className="space-y-3">

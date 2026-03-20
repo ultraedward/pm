@@ -219,7 +219,7 @@ export default async function DashboardPage() {
             <div className="space-y-2">
               <p className="text-xl font-black tracking-tight text-white">Start tracking your stack</p>
               <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-                Add your gold, silver, platinum, or palladium and see your total portfolio value updated daily.
+                Add your gold, silver, platinum, or palladium and see your total portfolio value at current spot prices.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

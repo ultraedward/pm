@@ -1,48 +1,48 @@
-// deploy trigger
-
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// 5-minute in-memory cache — avoids hammering Stooq on every page load
+const CACHE_TTL = 5 * 60 * 1000;
+let cache: { data: Awaited<ReturnType<typeof fetchAllSpotPrices>>; ts: number } | null = null;
+
 export async function GET() {
   try {
-    const [goldRow, silverRow, platinumRow, palladiumRow] = await Promise.all([
-      prisma.price.findFirst({ where: { metal: "gold" },      orderBy: { timestamp: "desc" }, select: { price: true } }),
-      prisma.price.findFirst({ where: { metal: "silver" },    orderBy: { timestamp: "desc" }, select: { price: true } }),
-      prisma.price.findFirst({ where: { metal: "platinum" },  orderBy: { timestamp: "desc" }, select: { price: true } }),
-      prisma.price.findFirst({ where: { metal: "palladium" }, orderBy: { timestamp: "desc" }, select: { price: true } }),
-    ]);
+    const now = Date.now();
 
-    return NextResponse.json({
-      ok: true,
-      gold:      goldRow?.price      ?? null,
-      silver:    silverRow?.price    ?? null,
-      platinum:  platinumRow?.price  ?? null,
-      palladium: palladiumRow?.price ?? null,
-      source: "database"
-    });
-  } catch (error: any) {
-    const message = error?.message ?? "Unknown server error while loading current prices";
+    if (cache && now - cache.ts < CACHE_TTL) {
+      return NextResponse.json({ ok: true, ...cache.data, source: "cache" });
+    }
 
-    console.error("Current prices API error:", {
-      message,
-      stack: error?.stack ?? null
-    });
+    const prices = await fetchAllSpotPrices();
+
+    if (prices.gold === null || prices.silver === null) {
+      // Fall through to stale cache if we have one, even if expired
+      if (cache) {
+        return NextResponse.json({ ok: true, ...cache.data, source: "stale_cache" });
+      }
+      return NextResponse.json(
+        { ok: false, gold: null, silver: null, platinum: null, palladium: null, error: "fetch_failed" },
+        { status: 503 }
+      );
+    }
+
+    cache = { data: prices, ts: now };
+
+    return NextResponse.json({ ok: true, ...prices, source: "live" });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Current prices API error:", message);
+
+    if (cache) {
+      return NextResponse.json({ ok: true, ...cache.data, source: "stale_cache" });
+    }
 
     return NextResponse.json(
-      {
-        ok: false,
-        gold: null,
-        silver: null,
-        platinum: null,
-        palladium: null,
-        error: "current_prices_query_failed",
-        message,
-        details: "This route now reads directly from Prisma and no longer depends on the price engine."
-      },
-      { status: 200 }
+      { ok: false, gold: null, silver: null, platinum: null, palladium: null, error: message },
+      { status: 503 }
     );
   }
 }

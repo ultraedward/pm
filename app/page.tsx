@@ -11,14 +11,14 @@ import { authOptions } from "@/lib/auth";
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
   description:
-    "Track daily gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+    "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
   alternates: {
     canonical: "https://lode.rocks",
   },
   openGraph: {
     title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Track daily gold, silver, platinum, and palladium spot prices. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+      "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
     url: "https://lode.rocks",
   },
 };
@@ -167,7 +167,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 function fmtUpdated(date: Date | null): string {
-  if (!date) return "Updated daily";
+  if (!date) return "Updating…";
   const diffMs  = Date.now() - date.getTime();
   const diffH   = diffMs / 1000 / 60 / 60;
   if (diffH < 1)  return "Updated just now";
@@ -202,7 +202,7 @@ export default async function HomePage() {
         "@id": "https://lode.rocks/#website",
         "url": "https://lode.rocks",
         "name": "Lode",
-        "description": "Live precious metals spot prices, portfolio tracker, and price alerts for gold, silver, platinum, and palladium.",
+        "description": "Precious metals spot prices updated every 15 minutes — portfolio tracker and price alerts for gold, silver, platinum, and palladium.",
         "potentialAction": {
           "@type": "SearchAction",
           "target": "https://lode.rocks/?q={search_term_string}",
@@ -222,7 +222,7 @@ export default async function HomePage() {
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "3 price alerts, portfolio tracker, daily spot prices",
+            "description": "3 price alerts, portfolio tracker, spot prices updated every 15 minutes",
           },
           {
             "@type": "Offer",
@@ -265,7 +265,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
-              Daily spot prices, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
+              Spot prices updated every 15 minutes, price alerts, and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">

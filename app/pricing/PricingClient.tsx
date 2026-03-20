@@ -9,7 +9,7 @@ type Props = {
 };
 
 const FREE_FEATURES = [
-  "Daily spot prices — gold, silver, platinum & palladium",
+  "Spot prices updated every 15 min — gold, silver, platinum & palladium",
   "Portfolio tracker — track your holdings & P&L",
   "Price charts — 30-day history per metal",
   "3 price alerts with email notifications",
