@@ -6,6 +6,7 @@ type Prediction = {
   id: string;
   direction: string;
   correct: boolean | null;
+  voided: boolean;
   basePrice: number;
   resultPrice: number | null;
 };
@@ -76,28 +77,37 @@ export function PredictionCard({ goldSpot }: { goldSpot: number }) {
       </div>
 
       {/* Yesterday's result */}
-      {yesterday && yesterday.correct !== null && (
-        <div
-          className={`rounded-xl px-4 py-2.5 text-xs font-medium flex items-center justify-between ${
-            yesterday.correct
-              ? "bg-amber-500/10 border border-amber-500/20 text-amber-400"
-              : "bg-white/5 border border-white/10 text-gray-500"
-          }`}
-        >
-          <span>
-            {yesterday.correct ? "✓ Correct yesterday" : "✗ Wrong yesterday"} —
-            Gold {yesterday.direction === "up" ? "went up" : "went down"}{" "}
-            {yesterday.resultPrice && yesterday.basePrice
-              ? `${yesterday.resultPrice > yesterday.basePrice ? "+" : ""}${(
-                  ((yesterday.resultPrice - yesterday.basePrice) / yesterday.basePrice) * 100
-                ).toFixed(2)}%`
-              : ""}
-          </span>
-          {yesterday.resultPrice && (
-            <span className="tabular-nums">{fmt(yesterday.resultPrice)}</span>
-          )}
-        </div>
-      )}
+      {yesterday && yesterday.correct !== null && (() => {
+        const isFlat = yesterday.voided;
+        return (
+          <div
+            className={`rounded-xl px-4 py-2.5 text-xs font-medium flex items-center justify-between ${
+              isFlat
+                ? "bg-white/5 border border-white/10 text-gray-500"
+                : yesterday.correct
+                ? "bg-amber-500/10 border border-amber-500/20 text-amber-400"
+                : "bg-white/5 border border-white/10 text-gray-500"
+            }`}
+          >
+            <span>
+              {isFlat
+                ? "➖ Flat day — gold didn't move"
+                : yesterday.correct
+                ? "✓ Correct yesterday"
+                : "✗ Wrong yesterday"}{" "}
+              {!isFlat && `— Gold ${yesterday.direction === "up" ? "went up" : "went down"} `}
+              {!isFlat && yesterday.resultPrice && yesterday.basePrice
+                ? `${yesterday.resultPrice > yesterday.basePrice ? "+" : ""}${(
+                    ((yesterday.resultPrice - yesterday.basePrice) / yesterday.basePrice) * 100
+                  ).toFixed(2)}%`
+                : ""}
+            </span>
+            {yesterday.resultPrice && (
+              <span className="tabular-nums">{fmt(yesterday.resultPrice)}</span>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Today's question */}
       <div className="space-y-3">

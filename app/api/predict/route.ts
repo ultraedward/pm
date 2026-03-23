@@ -21,21 +21,25 @@ export async function GET() {
     }),
   ]);
 
-  // Calculate streak — consecutive correct from most recent
+  // Exclude voided (flat day) predictions from stats and streak
+  const scoredPredictions = allPredictions.filter((p) => !p.voided);
+
+  // Calculate streak — consecutive correct from most recent (skipping voided)
   let streak = 0;
-  for (const p of allPredictions) {
+  for (const p of scoredPredictions) {
     if (p.correct === true) streak++;
     else break;
   }
 
-  const total = allPredictions.length;
-  const correct = allPredictions.filter((p) => p.correct === true).length;
+  const total = scoredPredictions.length;
+  const correct = scoredPredictions.filter((p) => p.correct === true).length;
   const winRate = total > 0 ? Math.round((correct / total) * 100) : null;
 
   // Yesterday's result (so we can show it alongside today's prompt)
   const yesterday = new Date();
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
   const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  // Look in all predictions (including voided) so we can show the flat day message
   const yesterdayPrediction = allPredictions.find((p) => p.date === yesterdayStr) ?? null;
 
   return NextResponse.json({

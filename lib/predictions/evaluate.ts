@@ -26,6 +26,15 @@ export async function evaluatePredictions() {
   if (!todayPrice) return;
 
   for (const p of pending) {
+    // If price is unchanged, it's a flat day — void the round (excluded from stats)
+    if (todayPrice.price === p.basePrice) {
+      await prisma.prediction.update({
+        where: { id: p.id },
+        data: { correct: false, voided: true, resultPrice: todayPrice.price },
+      });
+      continue;
+    }
+
     const priceWentUp = todayPrice.price > p.basePrice;
     const correct =
       (p.direction === "up" && priceWentUp) ||
