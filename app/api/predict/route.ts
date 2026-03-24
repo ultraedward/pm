@@ -33,7 +33,8 @@ export async function GET() {
 
   const total = scoredPredictions.length;
   const correct = scoredPredictions.filter((p) => p.correct === true).length;
-  const winRate = total > 0 ? Math.round((correct / total) * 100) : null;
+  // Only show win rate after 5+ scored games to avoid harsh 0% for new users
+  const winRate = total >= 5 ? Math.round((correct / total) * 100) : null;
 
   // Yesterday's result (so we can show it alongside today's prompt)
   const yesterday = new Date();

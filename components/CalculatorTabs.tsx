@@ -8,17 +8,16 @@ type Metal = "gold" | "silver" | "platinum" | "palladium";
 
 type Props = {
   spots: Record<Metal, number>;
-  goldSpot: number;
 };
 
 const TABS = [
-  { id: "oz",   label: "By troy oz",       sub: "Coins & bars"   },
-  { id: "gram", label: "By weight",         sub: "Jewelry & scrap" },
+  { id: "oz",   label: "Coins & bars",     sub: "By troy oz"      },
+  { id: "gram", label: "Jewelry & scrap",  sub: "By weight & karat" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
-export function CalculatorTabs({ spots, goldSpot }: Props) {
+export function CalculatorTabs({ spots }: Props) {
   const [tab, setTab] = useState<TabId>("oz");
 
   return (
@@ -45,8 +44,10 @@ export function CalculatorTabs({ spots, goldSpot }: Props) {
       </div>
 
       {/* Panel */}
-      {tab === "oz"   && <QuickCalculator spots={spots} />}
-      {tab === "gram" && <GramCalculator goldSpot={goldSpot} />}
+      {tab === "oz" && <QuickCalculator spots={spots} />}
+      {tab === "gram" && (
+        <GramCalculator spots={{ gold: spots.gold, silver: spots.silver }} />
+      )}
     </div>
   );
 }

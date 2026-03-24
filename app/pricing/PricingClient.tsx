@@ -10,16 +10,19 @@ type Props = {
 
 const FREE_FEATURES = [
   "Spot prices updated every 15 min — gold, silver, platinum & palladium",
+  "Gold:silver ratio — live and always visible",
   "Portfolio tracker — track your holdings & P&L",
   "Price charts — 30-day history per metal",
   "3 price alerts with email notifications",
   "Gold coin value calculator",
+  "Jewelry & scrap calculator — gold & silver, by gram, dwt, or troy oz",
+  "Daily gold prediction game",
   "Weekly portfolio digest email",
 ];
 
 const PRO_EXCLUSIVE = [
   "Unlimited price alerts — never miss a target price",
-  "Full coin value calculator — silver, platinum & palladium",
+  "Full coin value calculator — silver, platinum & palladium coins",
 ];
 
 export function PricingClient({ isPro, isLoggedIn }: Props) {
