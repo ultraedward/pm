@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MeltCalculator } from "@/components/MeltCalculator";
+import { GramCalculator } from "@/components/GramCalculator";
 import { PredictionCard } from "@/components/PredictionCard";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -293,6 +294,15 @@ export default async function DashboardPage() {
             <p className="text-sm text-gray-500">Enter how many coins you have to see what they&apos;re worth at today&apos;s spot price.</p>
           </div>
           <MeltCalculator spots={spots} isPro={isPro} />
+        </div>
+
+        {/* Gram / Jewelry Calculator */}
+        <div className="rounded-2xl border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+          <div>
+            <p className="text-xs text-gray-600 font-medium uppercase tracking-widest mb-1">Jewelry &amp; Scrap Calculator</p>
+            <p className="text-sm text-gray-500">Enter a weight in grams, pennyweights, or troy oz and pick a karat to get the gold melt value.</p>
+          </div>
+          <GramCalculator goldSpot={spots.gold} />
         </div>
 
         {/* Nav links — Charts and Holdings only; Alerts is already in top Navbar */}
