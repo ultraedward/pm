@@ -16,13 +16,13 @@ export function SiteFooter() {
         >
           Lode
         </Link>
-        <div className="flex gap-8">
-          <Link href="/"        className="hover:text-gray-300 transition-colors">Home</Link>
-          <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
+        <div className="flex gap-6">
+          <Link href="/"        className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
+          <Link href="/pricing" className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
           <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
           <Link href="/terms"   className="hover:text-gray-300 transition-colors">Terms</Link>
         </div>
-        <span>© {new Date().getFullYear()} Lode</span>
+        <span className="hidden sm:block">© {new Date().getFullYear()} Lode</span>
       </div>
     </footer>
   );
