@@ -2,6 +2,7 @@ const BASE = "https://lode.rocks";
 
 const PUBLIC_ROUTES = [
   { url: "/",        priority: "1.0", changefreq: "daily"   },
+  { url: "/gram",    priority: "0.9", changefreq: "weekly"  },
   { url: "/pricing", priority: "0.8", changefreq: "weekly"  },
   { url: "/login",   priority: "0.5", changefreq: "monthly" },
   { url: "/privacy", priority: "0.3", changefreq: "yearly"  },

@@ -156,6 +156,7 @@ export default async function GramPage() {
             <Link href="/" className="hover:text-gray-300 transition-colors">Home</Link>
             <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
           </div>
           <span>© {new Date().getFullYear()} Lode</span>
         </div>
