@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/entitlements";
 
 const FREE_ALERT_LIMIT = 3;
 
@@ -7,12 +8,14 @@ export async function canCreateAlert(userId: string) {
     where: { id: userId },
     select: {
       subscriptionStatus: true,
+      proUntil: true,
     },
   });
 
-  const isPro =
-    user?.subscriptionStatus === "active" ||
-    user?.subscriptionStatus === "trialing";
+  const isPro = hasProAccess({
+    stripeStatus: user?.subscriptionStatus,
+    proUntil: user?.proUntil,
+  });
 
   if (isPro) {
     return {

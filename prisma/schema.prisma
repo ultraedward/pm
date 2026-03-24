@@ -20,6 +20,7 @@ model User {
   subscriptionStatus     String?
   emailVerified          DateTime?
   stripeCurrentPeriodEnd DateTime?
+  proUntil               DateTime? // gifted pro access — null means not gifted
   accounts               Account[]
   alerts                 Alert[]
   holdings               Holding[]

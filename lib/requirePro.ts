@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/requireUser";
 import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/entitlements";
 
 /**
  * Requires the current user to have an active Pro subscription.
@@ -11,12 +12,13 @@ export async function requirePro() {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { subscriptionStatus: true },
+    select: { subscriptionStatus: true, proUntil: true },
   });
 
-  const isPro =
-    dbUser?.subscriptionStatus === "active" ||
-    dbUser?.subscriptionStatus === "trialing";
+  const isPro = hasProAccess({
+    stripeStatus: dbUser?.subscriptionStatus,
+    proUntil: dbUser?.proUntil,
+  });
 
   if (!isPro) {
     redirect("/pricing");
