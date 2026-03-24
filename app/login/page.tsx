@@ -46,6 +46,12 @@ export default function LoginPage() {
             <a href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</a>.
             {" "}Your account is created on first sign-in.
           </p>
+          <p className="text-xs text-gray-700">
+            Just need a quick calculation?{" "}
+            <a href="/gram" className="hover:text-gray-400 transition-colors underline underline-offset-2">
+              Try the melt value calculator →
+            </a>
+          </p>
         </div>
       </div>
     </main>

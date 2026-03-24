@@ -68,7 +68,7 @@ export default async function GramPage() {
             <span style={{ color: "var(--gold-bright)" }}>Price Per Gram</span>
           </h1>
           <p className="text-base text-gray-400 max-w-md mx-auto">
-            Calculate the melt value of jewelry, coins, or scrap — by gram, pennyweight, or troy oz. Live spot prices updated every 15 minutes.
+            Calculate the melt value of jewelry, coins, or scrap — by gram, pennyweight, or troy oz.
           </p>
           <div className="flex items-center justify-center gap-6 text-xs text-gray-600 pt-1">
             <span>Gold spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(goldSpot)} / ozt</span></span>

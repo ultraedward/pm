@@ -173,6 +173,12 @@ export default async function DashboardPage() {
 
         {/* Daily spot prices */}
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+          <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Spot Prices</p>
+            <Link href="/gram" className="text-xs text-gray-600 hover:text-amber-400 transition-colors">
+              Melt value calculator →
+            </Link>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)]">
             {METALS.map((metal) => {
               const price = spots[metal];
