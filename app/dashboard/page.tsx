@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -173,11 +174,8 @@ export default async function DashboardPage() {
 
         {/* Daily spot prices */}
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+          <div className="px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
             <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Spot Prices</p>
-            <Link href="/gram" className="text-xs text-gray-600 hover:text-amber-400 transition-colors">
-              Melt value calculator →
-            </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)]">
             {METALS.map((metal) => {
@@ -295,11 +293,12 @@ export default async function DashboardPage() {
         {/* Unified calculator — coins/bars + jewelry/scrap */}
         <DashboardCalculatorTabs spots={spots} isPro={isPro} />
 
-        {/* Nav links — Charts and Holdings only; Alerts is already in top Navbar */}
-        <div className="grid grid-cols-2 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+        {/* Nav links */}
+        <div className="grid grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
           {[
             { href: "/dashboard/charts",   label: "Price Charts",  sub: "30-day history"    },
             { href: "/dashboard/holdings", label: "Holdings",      sub: "Portfolio detail"   },
+            { href: "/gram",               label: "Calculator",    sub: "Melt value"         },
           ].map(({ href, label, sub }) => (
             <Link
               key={href}
@@ -313,6 +312,7 @@ export default async function DashboardPage() {
         </div>
 
       </div>
+      <SiteFooter />
     </main>
   );
 }
