@@ -262,7 +262,7 @@ export default async function HomePage() {
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
               Track every
               <br />
-              <span style={{ color: "var(--gold-bright)" }}>ounce 🥇</span>
+              <span style={{ color: "var(--gold-bright)" }}>ounce</span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">

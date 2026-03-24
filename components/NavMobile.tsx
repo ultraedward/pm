@@ -14,11 +14,9 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
   const pathname = usePathname();
 
   const loggedInLinks = [
-    { href: "/dashboard",        label: "Dashboard"  },
-    { href: "/dashboard/charts", label: "Charts"     },
-    { href: "/alerts",           label: "Alerts"     },
-    { href: "/gram",             label: "Calculator" },
-    { href: "/account",          label: "Account"    },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/alerts",    label: "Alerts"    },
+    { href: "/account",   label: "Account"   },
     ...(!isPro ? [{ href: "/pricing", label: "Upgrade to Pro" }] : []),
   ];
 
