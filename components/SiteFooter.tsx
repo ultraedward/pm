@@ -18,7 +18,6 @@ export function SiteFooter() {
         </Link>
         <div className="flex gap-8">
           <Link href="/"        className="hover:text-gray-300 transition-colors">Home</Link>
-          <Link href="/gram"    className="hover:text-gray-300 transition-colors">Calculator</Link>
           <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
           <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
           <Link href="/terms"   className="hover:text-gray-300 transition-colors">Terms</Link>
