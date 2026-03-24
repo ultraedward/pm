@@ -4,6 +4,7 @@ import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
 import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
 import { AlertsTable } from "@/components/AlertsTable";
 import { prisma } from "@/lib/prisma";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,7 @@ export default async function DashboardAlertsPage() {
           </div>
         )}
       </div>
+      <SiteFooter />
     </main>
   );
 }

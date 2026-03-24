@@ -1,5 +1,7 @@
+import { SiteFooter } from "@/components/SiteFooter";
+
 export const metadata = {
-  title: "Terms of Service — Precious Metals",
+  title: "Terms of Service — Lode",
 };
 
 const LAST_UPDATED = "March 12, 2026";
@@ -39,7 +41,7 @@ export default function TermsPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">5. Subscriptions and Billing</h2>
-            <p>The Free plan is provided at no charge with a limit of 1 active price alert. The Pro plan is billed monthly at $7.00 USD via Stripe. You may cancel at any time from your account page. Cancellations take effect at the end of the current billing period. We do not offer refunds for partial billing periods.</p>
+            <p>The Free plan is provided at no charge and includes up to 3 active price alerts. The Pro plan is billed monthly at $3.00 USD (or $25.00 USD annually) via Stripe. You may cancel at any time from your account page. Cancellations take effect at the end of the current billing period. We do not offer refunds for partial billing periods.</p>
           </section>
 
           <section className="space-y-3">
@@ -64,6 +66,7 @@ export default function TermsPage() {
 
         </div>
       </div>
+      <SiteFooter />
     </main>
   );
 }

@@ -161,10 +161,14 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
         <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
           <Link href="/" className="font-bold text-gray-400 tracking-widest uppercase hover:text-white transition-colors">Lode</Link>
           <div className="flex gap-8">
-            <Link href="/" className="hover:text-gray-300 transition-colors">Home</Link>
-            <Link href="/gram" className="hover:text-gray-300 transition-colors">Calculator</Link>
+            <Link href="/"        className="hover:text-gray-300 transition-colors">Home</Link>
+            <Link href="/gram"    className="hover:text-gray-300 transition-colors">Calculator</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
+            <Link href="/terms"   className="hover:text-gray-300 transition-colors">Terms</Link>
+            {isLoggedIn
+              ? <Link href="/dashboard" className="hover:text-gray-300 transition-colors">Dashboard</Link>
+              : <Link href="/login"     className="hover:text-gray-300 transition-colors">Sign in</Link>
+            }
           </div>
           <span>© {new Date().getFullYear()} Lode</span>
         </div>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/requireUser";
 import { prisma } from "@/lib/prisma";
 import { SignOutButton } from "@/components/SignOutButton";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -136,6 +137,7 @@ export default async function AccountPage() {
         </div>
 
       </div>
+      <SiteFooter />
     </main>
   );
 }

@@ -1,5 +1,7 @@
+import { SiteFooter } from "@/components/SiteFooter";
+
 export const metadata = {
-  title: "Privacy Policy — Precious Metals",
+  title: "Privacy Policy — Lode",
 };
 
 const LAST_UPDATED = "March 12, 2026";
@@ -57,6 +59,7 @@ export default function PrivacyPage() {
 
         </div>
       </div>
+      <SiteFooter />
     </main>
   );
 }

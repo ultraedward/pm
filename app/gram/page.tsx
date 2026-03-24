@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { GramCalculator } from "@/components/GramCalculator";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Gold & Silver Price Per Gram Calculator — Lode",
@@ -149,18 +150,7 @@ export default async function GramPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────── */}
-      <footer className="border-t px-6 py-8" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
-          <Link href="/" className="font-bold text-gray-400 tracking-widest uppercase hover:text-white transition-colors">Lode</Link>
-          <div className="flex gap-8">
-            <Link href="/" className="hover:text-gray-300 transition-colors">Home</Link>
-            <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
-            <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
-          </div>
-          <span>© {new Date().getFullYear()} Lode</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

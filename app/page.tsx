@@ -338,7 +338,7 @@ export default async function HomePage() {
       {/* ── FOOTER ───────────────────────────────────────────────── */}
       <footer className="border-t px-6 py-8" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
-          <span className="font-bold text-gray-400 tracking-widest uppercase">Lode</span>
+          <Link href="/" className="font-bold text-gray-400 tracking-widest uppercase hover:text-white transition-colors">Lode</Link>
           <div className="flex gap-8">
             <Link href="/gram" className="hover:text-gray-300 transition-colors">Calculator</Link>
             <Link href="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
