@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { GramCalculator } from "@/components/GramCalculator";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Gold & Silver Price Per Gram Calculator — Lode",
@@ -53,6 +54,8 @@ export default async function GramPage() {
   const TROY_PER_GRAM = 1 / 31.1035;
 
   return (
+    <>
+    <Navbar />
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative px-4 sm:px-6 pt-14 pb-8 sm:pt-20 sm:pb-12">
@@ -161,5 +164,6 @@ export default async function GramPage() {
         </div>
       </footer>
     </main>
+    </>
   );
 }

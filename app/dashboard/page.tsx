@@ -210,13 +210,10 @@ export default async function DashboardPage() {
               <p className="text-lg font-black tabular-nums tracking-tightest">
                 {(spots.gold / spots.silver).toFixed(1)}
               </p>
-              <p className="text-xs text-gray-600">oz silver per oz gold</p>
+              <p className="text-xs text-gray-600">oz of silver to buy 1 oz of gold</p>
             </div>
           </div>
         )}
-
-        {/* Daily Prediction */}
-        <PredictionCard goldSpot={spots.gold} />
 
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
@@ -252,11 +249,11 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* 30d equity chart — only shown when there are holdings */}
+        {/* 30d portfolio chart — only shown when there are holdings */}
         {holdings.length > 0 && portfolioSpark && (
           <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
             <div className="flex justify-between items-start">
-              <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">30-Day Equity</p>
+              <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Portfolio value · 30 days</p>
               <p className={`text-sm font-semibold tabular-nums ${changeColor30d}`}>
                 {change30d >= 0 ? "+" : ""}{fmtMoney(change30d)} ({fmtPct(pct30d)})
               </p>
@@ -285,6 +282,9 @@ export default async function DashboardPage() {
             </svg>
           </div>
         )}
+
+        {/* Daily Prediction */}
+        <PredictionCard goldSpot={spots.gold} />
 
         {/* Unified calculator — coins/bars + jewelry/scrap */}
         <DashboardCalculatorTabs spots={spots} isPro={isPro} />

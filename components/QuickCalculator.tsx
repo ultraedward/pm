@@ -56,16 +56,19 @@ export function QuickCalculator({ spots }: Props) {
               </div>
 
               {/* Oz input */}
-              <input
-                type="number"
-                inputMode="decimal"
-                step="0.001"
-                min="0"
-                placeholder="0"
-                value={oz[metal]}
-                onChange={(e) => setOz((prev) => ({ ...prev, [metal]: e.target.value }))}
-                className="w-full bg-transparent text-2xl font-black tracking-tightest tabular-nums text-white placeholder:text-white/15 focus:outline-none"
-              />
+              <div className="flex items-baseline gap-1.5">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.001"
+                  min="0"
+                  placeholder="0"
+                  value={oz[metal]}
+                  onChange={(e) => setOz((prev) => ({ ...prev, [metal]: e.target.value }))}
+                  className="w-full bg-transparent text-2xl font-black tracking-tightest tabular-nums text-white placeholder:text-white/15 focus:outline-none"
+                />
+                <span className="text-xs text-gray-700 shrink-0">oz</span>
+              </div>
 
               {/* Spot price */}
               {spots[metal] > 0 && (

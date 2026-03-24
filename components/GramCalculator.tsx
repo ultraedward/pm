@@ -77,8 +77,43 @@ export function GramCalculator({ spots }: Props) {
   const currentKarat = metal === "gold" ? goldKarat : silverPurity;
 
   return (
-    <div className="space-y-5">
-      {/* Metal toggle */}
+    <div className="space-y-4">
+
+      {/* ── Result — always visible at top, updates live ─────────── */}
+      <div
+        className={`rounded-xl border px-5 py-4 transition-all duration-200 ${
+          hasValue
+            ? "border-amber-500/20 bg-amber-500/5"
+            : "border-white/5 bg-white/[0.02]"
+        }`}
+      >
+        {hasValue ? (
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <p className="text-xs text-gray-500">
+                {weightNum} {UNIT_LABELS[unit]} ·{" "}
+                {isCustom ? `${customPct || 0}% pure` : purityObj.label}{" "}
+                · {(pureOz * 31.1035).toFixed(3)}g pure {metal}
+              </p>
+              <p className="text-[10px] text-gray-700 tabular-nums">
+                Spot {fmt(spotPrice)} / troy oz
+              </p>
+            </div>
+            <p
+              className="text-3xl font-black tabular-nums tracking-tighter shrink-0"
+              style={{ color: "var(--gold-bright, #D4AF37)" }}
+            >
+              {fmt(value)}
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-600 text-center py-1">
+            Enter a weight below to see the melt value
+          </p>
+        )}
+      </div>
+
+      {/* ── Metal toggle ─────────────────────────────────────────── */}
       <div
         className="flex rounded-xl border overflow-hidden"
         style={{ borderColor: "rgba(255,255,255,0.08)" }}
@@ -98,7 +133,7 @@ export function GramCalculator({ spots }: Props) {
         ))}
       </div>
 
-      {/* Weight input */}
+      {/* ── Weight input + unit toggle ───────────────────────────── */}
       <div className="space-y-2">
         <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Weight</p>
         <input
@@ -112,7 +147,6 @@ export function GramCalculator({ spots }: Props) {
           className="w-full bg-transparent rounded-xl border px-4 py-3 text-2xl font-black tabular-nums text-white placeholder:text-white/15 focus:outline-none focus:border-amber-500/40 transition-colors"
           style={{ borderColor: "rgba(255,255,255,0.08)" }}
         />
-        {/* Horizontal unit toggle */}
         <div
           className="flex rounded-lg border overflow-hidden"
           style={{ borderColor: "rgba(255,255,255,0.08)" }}
@@ -133,7 +167,7 @@ export function GramCalculator({ spots }: Props) {
         </div>
       </div>
 
-      {/* Purity selector */}
+      {/* ── Purity selector ──────────────────────────────────────── */}
       <div className="space-y-2">
         <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Purity</p>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
@@ -156,7 +190,6 @@ export function GramCalculator({ spots }: Props) {
           ))}
         </div>
 
-        {/* Custom purity input */}
         {isCustom && (
           <div className="flex items-center gap-2 mt-1">
             <input
@@ -175,47 +208,6 @@ export function GramCalculator({ spots }: Props) {
           </div>
         )}
       </div>
-
-      {/* Result */}
-      <div
-        className={`rounded-xl border px-5 py-4 transition-all ${
-          hasValue
-            ? "border-amber-500/20 bg-amber-500/5"
-            : "border-white/5 bg-white/[0.02]"
-        }`}
-      >
-        {hasValue ? (
-          <div className="flex items-end justify-between gap-4">
-            <div className="space-y-0.5">
-              <p className="text-xs text-gray-600">
-                {weightNum} {UNIT_LABELS[unit]} ·{" "}
-                {isCustom ? `${customPct || 0}% pure` : purityObj.label}{" "}
-                · {pureOz.toFixed(4)} ozt pure {metal}
-              </p>
-              <p className="text-xs text-gray-700 tabular-nums">
-                Spot {fmt(spotPrice)} / ozt
-              </p>
-            </div>
-            <p
-              className="text-3xl font-black tabular-nums tracking-tighter shrink-0"
-              style={{ color: "var(--gold-bright, #D4AF37)" }}
-            >
-              {fmt(value)}
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-700 text-center">
-            Enter a weight and select a purity to see the melt value
-          </p>
-        )}
-      </div>
-
-      {/* Spot reference */}
-      {spotPrice > 0 && (
-        <p className="text-[10px] tabular-nums text-gray-700 text-right">
-          {metal === "gold" ? "Gold" : "Silver"} spot: {fmt(spotPrice)} / troy oz
-        </p>
-      )}
     </div>
   );
 }
