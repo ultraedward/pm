@@ -29,6 +29,7 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
           <Link href="/dashboard"        className={linkClass("/dashboard")}>Dashboard</Link>
           <Link href="/dashboard/charts" className={linkClass("/dashboard/charts")}>Charts</Link>
           <Link href="/alerts"           className={linkClass("/alerts")}>Alerts</Link>
+          <Link href="/gram"             className={linkClass("/gram")}>Calculator</Link>
           <Link href="/account"          className={linkClass("/account")}>Account</Link>
           {isPro ? (
             <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-medium uppercase tracking-widest text-amber-400 border border-amber-500/20">
@@ -42,6 +43,7 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
         </>
       ) : (
         <>
+          <Link href="/gram"    className={linkClass("/gram")}>Calculator</Link>
           <Link href="/pricing" className={linkClass("/pricing")}>Pricing</Link>
           <Link href="/login" className="rounded-full border border-white/20 px-4 py-1.5 text-xs font-medium text-white hover:bg-white/10 transition-colors">
             Sign in
