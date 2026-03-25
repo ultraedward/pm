@@ -273,11 +273,6 @@ export default async function HomePage() {
               <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
                 {isLoggedIn ? "Go to dashboard" : "Get started"}
               </Link>
-              {!isLoggedIn && (
-                <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-                  See pricing →
-                </Link>
-              )}
             </div>
           </div>
 
@@ -326,9 +321,6 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/login" className="btn-gold px-10">
               Get started
-            </Link>
-            <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-              See pricing →
             </Link>
           </div>
         </section>
