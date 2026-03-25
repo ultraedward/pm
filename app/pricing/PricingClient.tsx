@@ -64,7 +64,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
               <span className="text-5xl font-black">$0</span>
               <span className="text-gray-500 mb-1">/month</span>
             </div>
-            <p className="text-sm text-gray-500 mt-2">No credit card required.</p>
+            <p className="text-sm text-gray-500 mt-2">Free forever.</p>
           </div>
 
           <ul className="space-y-3 text-sm text-gray-300">
