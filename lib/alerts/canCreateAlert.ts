@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { hasProAccess } from "@/lib/entitlements";
 
-const FREE_ALERT_LIMIT = 3;
+const FREE_ALERT_LIMIT = 1;
 
 export async function canCreateAlert(userId: string) {
   const user = await prisma.user.findUnique({

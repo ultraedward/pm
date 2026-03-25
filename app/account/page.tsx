@@ -56,7 +56,7 @@ export default async function AccountPage() {
                   ? dbUser.stripeCurrentPeriodEnd
                     ? `Renews ${new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}`
                     : "Unlimited alerts"
-                  : "3 alerts included"}
+                  : "1 alert included"}
               </p>
             </div>
             {isPro ? (

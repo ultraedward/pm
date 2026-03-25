@@ -53,8 +53,8 @@ export default async function DashboardAlertsPage() {
             <span className="text-gray-300">
               <span className="font-semibold text-white">Free plan —</span>{" "}
               {plan.remaining === 0
-                ? "All 3 free alerts used."
-                : `${plan.remaining} of 3 free alert${plan.remaining !== 1 ? "s" : ""} remaining.`}
+                ? "Free alert used."
+                : "1 free alert remaining."}
             </span>
             <Link
               href="/pricing"
