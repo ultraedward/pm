@@ -262,14 +262,9 @@ export default async function HomePage() {
 
             {/* Left: text */}
             <div className="flex-1 text-center sm:text-left space-y-6">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tightest leading-none">
-                Know your
-                <br />
-                <span style={{ color: "var(--gold-bright)" }}>stack.</span>
-              </h1>
-              <p className="text-base sm:text-lg text-gray-400 max-w-sm mx-auto sm:mx-0 leading-relaxed">
+              <h1 className="text-base sm:text-lg text-gray-400 max-w-sm mx-auto sm:mx-0 leading-relaxed">
                 Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
-              </p>
+              </h1>
               <div className="flex items-center justify-center sm:justify-start gap-4 pt-1">
                 <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
                   {isLoggedIn ? "Go to dashboard" : "Get started"}
