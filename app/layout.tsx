@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 
@@ -68,6 +69,7 @@ export default function RootLayout({
           {children}
         </div>
         <BottomNav />
+        <Analytics />
       </body>
     </html>
   );
