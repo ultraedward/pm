@@ -247,88 +247,31 @@ export default async function HomePage() {
       {/* ── HERO + LIVE PRICES ───────────────────────────────────── */}
       <section className="relative px-4 sm:px-6 pt-14 pb-12 sm:pt-24 sm:pb-20">
 
-        {/* Ambient glow — shifted right to sit behind bars */}
+        {/* Ambient glow */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
-            className="absolute right-0 top-0 h-[560px] w-[560px] -translate-y-1/4 translate-x-1/3 rounded-full opacity-20 blur-3xl"
+            className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 blur-3xl"
             style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
           />
         </div>
 
         <div className="relative z-10 mx-auto max-w-6xl">
 
-          {/* Headline + Gold Bar Art */}
-          <div className="flex flex-col sm:flex-row items-center gap-10 sm:gap-16 mb-14">
-
-            {/* Left: text */}
-            <div className="flex-1 text-center sm:text-left space-y-6">
-              <h1 className="text-base sm:text-lg text-gray-400 max-w-sm mx-auto sm:mx-0 leading-relaxed">
-                Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
-              </h1>
-              <div className="flex items-center justify-center sm:justify-start gap-4 pt-1">
-                <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
-                  {isLoggedIn ? "Go to dashboard" : "Get started"}
-                </Link>
-              </div>
+          {/* Headline */}
+          <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
+              Track every
+              <br />
+              <span style={{ color: "var(--gold-bright)" }}>ounce</span>
+            </h1>
+            <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
+              Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
+            </p>
+            <div className="flex items-center justify-center gap-4 pt-1">
+              <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
+                {isLoggedIn ? "Go to dashboard" : "Get started"}
+              </Link>
             </div>
-
-            {/* Right: gold bar stack illustration */}
-            <div className="flex-1 flex justify-center sm:justify-end">
-              <svg
-                viewBox="-15 -30 260 230"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-64 sm:w-80 md:w-96"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="gbTop" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FFE878" />
-                    <stop offset="100%" stopColor="#D4AF37" />
-                  </linearGradient>
-                  <linearGradient id="gbFront" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#D4AF37" />
-                    <stop offset="100%" stopColor="#7A5410" />
-                  </linearGradient>
-                  <linearGradient id="gbSide" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#A87E18" />
-                    <stop offset="100%" stopColor="#4A3008" />
-                  </linearGradient>
-                  <radialGradient id="gbGlow" cx="50%" cy="100%" r="60%">
-                    <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
-                  </radialGradient>
-                </defs>
-
-                {/* Ground glow */}
-                <ellipse cx="105" cy="190" rx="120" ry="28" fill="url(#gbGlow)" />
-
-                {/* ── Bar 3 (bottom) y=128 ── */}
-                <polygon points="0,128 200,128 200,178 0,178" fill="url(#gbFront)" opacity="0.6" />
-                <polygon points="0,128 200,128 225,116 25,116" fill="url(#gbTop)" opacity="0.6" />
-                <polygon points="200,128 225,116 225,166 200,178" fill="url(#gbSide)" opacity="0.6" />
-                <line x1="0" y1="128" x2="200" y2="128" stroke="#FFE070" strokeWidth="1" opacity="0.35" />
-                <text x="100" y="157" textAnchor="middle" fontSize="9" fontWeight="700" letterSpacing="5" fill="#D4AF37" opacity="0.2" fontFamily="monospace">GOLD</text>
-
-                {/* ── Bar 2 (middle) y=64 ── */}
-                <polygon points="0,64 200,64 200,114 0,114" fill="url(#gbFront)" opacity="0.8" />
-                <polygon points="0,64 200,64 225,52 25,52" fill="url(#gbTop)" opacity="0.8" />
-                <polygon points="200,64 225,52 225,102 200,114" fill="url(#gbSide)" opacity="0.8" />
-                <line x1="0" y1="64" x2="200" y2="64" stroke="#FFE070" strokeWidth="1.5" opacity="0.5" />
-                <text x="100" y="93" textAnchor="middle" fontSize="9" fontWeight="700" letterSpacing="5" fill="#D4AF37" opacity="0.25" fontFamily="monospace">GOLD</text>
-
-                {/* ── Bar 1 (top) y=0 ── */}
-                <polygon points="0,0 200,0 200,50 0,50" fill="url(#gbFront)" />
-                <polygon points="0,0 200,0 225,-12 25,-12" fill="url(#gbTop)" />
-                <polygon points="200,0 225,-12 225,38 200,50" fill="url(#gbSide)" />
-                {/* Shine line across top edge */}
-                <line x1="2" y1="0" x2="198" y2="0" stroke="#FFF0A0" strokeWidth="2" opacity="0.7" />
-                {/* Engraved border on front face */}
-                <rect x="12" y="8" width="176" height="34" rx="2" fill="none" stroke="#D4AF37" strokeWidth="0.75" opacity="0.35" />
-                <text x="100" y="29" textAnchor="middle" fontSize="9" fontWeight="700" letterSpacing="5" fill="#D4AF37" opacity="0.5" fontFamily="monospace">GOLD</text>
-              </svg>
-            </div>
-
           </div>
 
           {/* Price panel */}
