@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Lode",
   },
   description:
-    "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values. Free to start.",
+    "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
   keywords: [
     "gold spot price",
     "silver spot price",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values. Free to start.",
+      "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
     type: "website",
     url: "https://lode.rocks",
     siteName: "Lode",

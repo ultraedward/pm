@@ -23,7 +23,7 @@ export default async function PricingPage() {
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-black tracking-tight">Pricing</h1>
           <p className="text-gray-400 max-w-md mx-auto">
-            Free to start. Upgrade for unlimited alerts.
+            One free tier, one pro tier. No surprises.
           </p>
         </div>
 

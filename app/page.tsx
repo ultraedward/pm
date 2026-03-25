@@ -323,7 +323,6 @@ export default async function HomePage() {
       {!isLoggedIn && (
         <section className="border-t px-6 py-20 text-center space-y-6" style={{ borderColor: "var(--border)" }}>
           <p className="text-3xl font-black tracking-tight">Ready to track your stack?</p>
-          <p className="text-sm text-gray-500">Free to start.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/login" className="btn-gold px-10">
               Get started free
