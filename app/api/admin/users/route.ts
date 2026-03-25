@@ -16,7 +16,7 @@ export async function GET(req: Request) {
       email: true,
       createdAt: true,
       subscriptionStatus: true,
-      _count: { select: { alerts: true, holdings: true } },
+      _count: { select: { alerts: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -31,7 +31,6 @@ export async function GET(req: Request) {
       joined: u.createdAt,
       plan: u.subscriptionStatus === "active" ? "pro" : "free",
       alerts: u._count.alerts,
-      holdings: u._count.holdings,
     })),
   });
 }
