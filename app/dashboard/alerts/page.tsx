@@ -78,12 +78,6 @@ export default async function DashboardAlertsPage() {
               <Link href="/alerts/new" className="btn-gold px-6 py-2.5 text-sm">
                 Set your first alert
               </Link>
-              <Link
-                href="/pricing"
-                className="rounded-full border border-white/10 px-6 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-              >
-                View plans
-              </Link>
             </div>
           </div>
         )}
