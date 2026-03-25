@@ -131,7 +131,7 @@ export default async function OGImage() {
               textTransform: "uppercase",
             }}
           >
-            Start tracking free
+            Track your metals
           </span>
           <span style={{ fontSize: "15px", color: "#000000" }}>→</span>
         </div>

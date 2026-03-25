@@ -143,9 +143,8 @@ export default async function GramPage() {
       {/* ── CTA ──────────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-2xl font-black tracking-tight">Track your full stack on Lode</p>
-        <p className="text-sm text-gray-500">Portfolio tracker, price alerts, and live spot prices — free to start.</p>
         <Link href="/login" className="btn-gold px-10 inline-block">
-          Get started free
+          Sign in to track
         </Link>
       </section>
 

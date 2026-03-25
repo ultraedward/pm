@@ -13,14 +13,14 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
   description:
-    "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+    "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Precious metals portfolio tracker.",
   alternates: {
     canonical: "https://lode.rocks",
   },
   openGraph: {
     title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Free precious metals portfolio tracker.",
+      "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Precious metals portfolio tracker.",
     url: "https://lode.rocks",
   },
 };
@@ -271,7 +271,7 @@ export default async function HomePage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
               <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
-                {isLoggedIn ? "Go to dashboard" : "Start tracking free"}
+                {isLoggedIn ? "Go to dashboard" : "Get started"}
               </Link>
               {!isLoggedIn && (
                 <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
@@ -325,7 +325,7 @@ export default async function HomePage() {
           <p className="text-3xl font-black tracking-tight">Ready to track your stack?</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/login" className="btn-gold px-10">
-              Get started free
+              Get started
             </Link>
             <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
               See pricing →

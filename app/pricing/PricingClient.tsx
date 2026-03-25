@@ -91,7 +91,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
                 href="/login"
                 className="block rounded-full border border-white/10 py-2.5 text-center text-sm text-white hover:bg-white/5 transition-colors"
               >
-                Get started free
+                Get started
               </Link>
             )}
           </div>
