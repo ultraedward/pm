@@ -69,7 +69,10 @@ export default function RootLayout({
           {children}
         </div>
         <BottomNav />
-        <Analytics />
+        <Analytics beforeSend={(event) => {
+          if (typeof window !== "undefined" && window.localStorage.getItem("lode_owner") === "true") return null;
+          return event;
+        }} />
       </body>
     </html>
   );
