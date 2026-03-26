@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 
@@ -69,10 +69,7 @@ export default function RootLayout({
           {children}
         </div>
         <BottomNav />
-        <Analytics beforeSend={(event) => {
-          if (typeof window !== "undefined" && window.localStorage.getItem("lode_owner") === "true") return null;
-          return event;
-        }} />
+        <AnalyticsProvider />
       </body>
     </html>
   );
