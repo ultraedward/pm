@@ -259,11 +259,7 @@ export default async function HomePage() {
 
           {/* Headline */}
           <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tightest leading-none">
-              Track every
-              <br />
-              <span style={{ color: "var(--gold-bright)" }}>ounce</span>
-            </h1>
+            <div className="text-7xl sm:text-8xl leading-none select-none" aria-hidden="true">🪙</div>
             <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
               Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
