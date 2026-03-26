@@ -258,12 +258,22 @@ export default async function HomePage() {
         <div className="relative z-10 mx-auto max-w-6xl">
 
           {/* Headline */}
-          <div className="max-w-3xl mx-auto text-center space-y-6 mb-14">
-            <div className="text-7xl sm:text-8xl leading-none select-none" aria-hidden="true">🪙</div>
-            <p className="text-base sm:text-lg text-gray-400 max-w-md mx-auto leading-relaxed">
+          <div className="max-w-3xl mx-auto text-center space-y-8 mb-14">
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Gold · XAU</p>
+              <p className="text-7xl sm:text-8xl md:text-9xl font-black tracking-tighter leading-none" style={{ color: "var(--gold-bright)" }}>
+                ${Math.round(gold.price).toLocaleString("en-US")}
+              </p>
+              {gold.percentChange !== null && (
+                <p className={`text-sm font-bold tracking-wide ${gold.percentChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {gold.percentChange >= 0 ? "+" : ""}{gold.percentChange.toFixed(2)}% today
+                </p>
+              )}
+            </div>
+            <p className="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
               Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
             </p>
-            <div className="flex items-center justify-center gap-4 pt-1">
+            <div className="flex items-center justify-center gap-4">
               <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
                 {isLoggedIn ? "Go to dashboard" : "Get started"}
               </Link>
