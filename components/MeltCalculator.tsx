@@ -122,7 +122,6 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-amber-500/70 group-hover:text-amber-400 transition-colors">Unlock with Pro →</p>
               </a>
             );
           }
