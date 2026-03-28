@@ -271,11 +271,11 @@ export default async function HomePage() {
               )}
             </div>
             <p className="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
-              Price alerts and portfolio tracking for gold, silver, platinum, and palladium.
+              Find out what your gold and silver is actually worth.
             </p>
             <div className="flex items-center justify-center gap-4">
-              <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold px-10">
-                {isLoggedIn ? "Go to dashboard" : "Get started"}
+              <Link href={isLoggedIn ? "/dashboard" : "#calculator"} className="btn-gold px-10">
+                {isLoggedIn ? "Go to dashboard" : "Calculate melt value"}
               </Link>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── CALCULATOR ───────────────────────────────────────────── */}
-      <section className="border-t px-4 sm:px-6 py-10 sm:py-14" style={{ borderColor: "var(--border)" }}>
+      <section id="calculator" className="border-t px-4 sm:px-6 py-10 sm:py-14" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl space-y-6">
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <h2 className="text-2xl font-black tracking-tight">What&apos;s it worth at today&apos;s spot price?</h2>
