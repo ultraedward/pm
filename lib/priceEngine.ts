@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { fetchStooqSpotPrice } from "@/lib/prices/fetchSpotPrices";
+import { fetchYahooFinancePrice } from "@/lib/prices/fetchYahooFinance";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 
@@ -27,16 +27,16 @@ export async function updateMetalsPrices() {
       };
     }
 
-    // Fetch all 4 metals from Stooq in parallel — free, no API key
+    // Fetch all 4 metals from Yahoo Finance (futures, free, no API key)
     const [gold, silver, platinum, palladium] = await Promise.all([
-      fetchStooqSpotPrice("gold"),
-      fetchStooqSpotPrice("silver"),
-      fetchStooqSpotPrice("platinum"),
-      fetchStooqSpotPrice("palladium"),
+      fetchYahooFinancePrice("gold"),
+      fetchYahooFinancePrice("silver"),
+      fetchYahooFinancePrice("platinum"),
+      fetchYahooFinancePrice("palladium"),
     ]);
 
     if (gold === null || silver === null) {
-      throw new Error("Stooq: failed to fetch gold or silver price");
+      throw new Error("Yahoo Finance: failed to fetch gold or silver price");
     }
 
     const timestamp = new Date();
@@ -84,7 +84,7 @@ export async function updateMetalsPrices() {
       `;
     }
 
-    return { ok: true, gold, silver, platinum, palladium, source: "stooq" };
+    return { ok: true, gold, silver, platinum, palladium, source: "yahoo" };
   } catch (error) {
     console.error("Price engine failure:", error);
     return { ok: false, gold: null, silver: null, platinum: null, palladium: null, source: "error" };
