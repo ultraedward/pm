@@ -78,17 +78,14 @@ export default async function GramPage() {
         </div>
       </section>
 
-      {/* ── Calculator ───────────────────────────────────────────── */}
+      {/* ── Calculator + Reference tables ────────────────────────── */}
       <section className="px-4 sm:px-6 pb-12">
         <div className="mx-auto max-w-2xl">
           <GramCalculator spots={{ gold: goldSpot, silver: silverSpot }} />
         </div>
-      </section>
 
-      {/* ── Reference tables ─────────────────────────────────────── */}
-      <section className="border-t px-4 sm:px-6 py-12" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-4xl space-y-10">
-          <h2 className="text-xl font-black tracking-tight text-center">Gold price per gram — today&apos;s rates</h2>
+        <div className="mx-auto max-w-4xl space-y-6 mt-12">
+          <h2 className="text-xl font-black tracking-tight text-center">Price per gram — today&apos;s rates</h2>
 
           <div className="grid sm:grid-cols-2 gap-6">
             {/* Gold table */}
