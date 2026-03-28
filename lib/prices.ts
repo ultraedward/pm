@@ -23,7 +23,28 @@ const FALLBACK_PRICES: PriceMap = {
 };
 
 export async function getLivePrices(): Promise<PriceMap> {
-  // 1️⃣ Try metals.dev (reliable, uses METALS_API_KEY while subscription is active)
+  // 1️⃣ Yahoo Finance first — free, unlimited, no API key needed
+  try {
+    const [gold, silver, platinum, palladium] = await Promise.all([
+      fetchYahooFinancePrice("gold"),
+      fetchYahooFinancePrice("silver"),
+      fetchYahooFinancePrice("platinum"),
+      fetchYahooFinancePrice("palladium"),
+    ]);
+
+    if (typeof gold === "number" && typeof silver === "number" && gold > 0 && silver > 0) {
+      return {
+        Gold: gold,
+        Silver: silver,
+        Platinum: platinum ?? FALLBACK_PRICES.Platinum,
+        Palladium: palladium ?? FALLBACK_PRICES.Palladium,
+      };
+    }
+  } catch {
+    // fall through to metals.dev
+  }
+
+  // 2️⃣ metals.dev as emergency fallback only — preserves the 200-call/month quota
   if (process.env.METALS_API_KEY) {
     try {
       const res = await fetch(
@@ -45,29 +66,8 @@ export async function getLivePrices(): Promise<PriceMap> {
         };
       }
     } catch {
-      // fall through to Yahoo Finance
+      // fall through to hardcoded fallback
     }
-  }
-
-  // 2️⃣ Fall back to Yahoo Finance (free, no key — works server-side without CORS)
-  try {
-    const [gold, silver, platinum, palladium] = await Promise.all([
-      fetchYahooFinancePrice("gold"),
-      fetchYahooFinancePrice("silver"),
-      fetchYahooFinancePrice("platinum"),
-      fetchYahooFinancePrice("palladium"),
-    ]);
-
-    if (typeof gold === "number" && typeof silver === "number" && gold > 0 && silver > 0) {
-      return {
-        Gold: gold,
-        Silver: silver,
-        Platinum: platinum ?? FALLBACK_PRICES.Platinum,
-        Palladium: palladium ?? FALLBACK_PRICES.Palladium,
-      };
-    }
-  } catch {
-    // fall through to hardcoded fallback
   }
 
   // 3️⃣ Last resort: stale hardcoded prices (better than $0)
