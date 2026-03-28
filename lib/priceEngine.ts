@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { fetchYahooFinancePrice } from "@/lib/prices/fetchYahooFinance";
+import { getLivePrices } from "@/lib/prices";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 
@@ -27,27 +27,17 @@ export async function updateMetalsPrices() {
       };
     }
 
-    // Fetch all 4 metals from Yahoo Finance (futures, free, no API key)
-    const [gold, silver, platinum, palladium] = await Promise.all([
-      fetchYahooFinancePrice("gold"),
-      fetchYahooFinancePrice("silver"),
-      fetchYahooFinancePrice("platinum"),
-      fetchYahooFinancePrice("palladium"),
-    ]);
-
-    if (gold === null || silver === null) {
-      throw new Error("Yahoo Finance: failed to fetch gold or silver price");
-    }
+    // Fetch prices: metals.dev → Yahoo Finance → hardcoded fallback
+    const { Gold: gold, Silver: silver, Platinum: platinum, Palladium: palladium } = await getLivePrices();
 
     const timestamp = new Date();
 
     const priceData: { metal: string; price: number; timestamp: Date }[] = [
-      { metal: "gold",   price: gold,   timestamp },
-      { metal: "silver", price: silver, timestamp },
+      { metal: "gold",      price: gold,      timestamp },
+      { metal: "silver",    price: silver,    timestamp },
+      { metal: "platinum",  price: platinum,  timestamp },
+      { metal: "palladium", price: palladium, timestamp },
     ];
-
-    if (platinum  !== null) priceData.push({ metal: "platinum",  price: platinum,  timestamp });
-    if (palladium !== null) priceData.push({ metal: "palladium", price: palladium, timestamp });
 
     await prisma.price.createMany({ data: priceData });
 
@@ -84,7 +74,7 @@ export async function updateMetalsPrices() {
       `;
     }
 
-    return { ok: true, gold, silver, platinum, palladium, source: "yahoo" };
+    return { ok: true, gold, silver, platinum, palladium, source: "live" };
   } catch (error) {
     console.error("Price engine failure:", error);
     return { ok: false, gold: null, silver: null, platinum: null, palladium: null, source: "error" };
