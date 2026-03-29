@@ -24,6 +24,18 @@ const BLOCKED_IN_PROD = [
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Maintenance mode — set MAINTENANCE_MODE=true in Vercel env vars to enable
+  if (process.env.MAINTENANCE_MODE === "true") {
+    if (
+      pathname !== "/maintenance" &&
+      !pathname.startsWith("/_next") &&
+      !pathname.startsWith("/api/") &&
+      !pathname.match(/\.(ico|png|jpg|svg|webp)$/)
+    ) {
+      return NextResponse.rewrite(new URL("/maintenance", req.url));
+    }
+  }
+
   if (process.env.NODE_ENV === "production") {
     for (const path of BLOCKED_IN_PROD) {
       if (pathname === path || pathname.startsWith(path + "/")) {
