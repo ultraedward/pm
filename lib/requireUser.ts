@@ -7,7 +7,7 @@ export async function requireUser() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
-    redirect("/api/auth/signin?callbackUrl=/alerts");
+    redirect("/api/auth/signin?callbackUrl=/dashboard/alerts");
   }
 
   const user = await prisma.user.findUnique({

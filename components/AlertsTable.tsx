@@ -12,7 +12,7 @@ type Trigger = {
 type Alert = {
   id: string;
   metal: string;
-  price: number;
+  price: number | null;
   direction: string;
   active: boolean;
   triggers: Trigger[];
@@ -63,10 +63,10 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
         const dot           = METAL_DOTS[alert.metal] ?? "#888";
 
         const current     = spots[alert.metal];
-        const target      = alert.price;
-        const diff        = current ? Math.abs(target - current) : null;
+        const target      = alert.price ?? null;
+        const diff        = current && target !== null ? Math.abs(target - current) : null;
         const pct         = current && diff !== null ? (diff / current) * 100 : null;
-        const isTriggered = current
+        const isTriggered = current && target !== null
           ? (alert.direction === "above" ? current >= target : current <= target)
           : false;
         const approaching = pct !== null && pct < 5 && !isTriggered;
@@ -96,7 +96,9 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
                 </span>
                 <span className="text-sm text-gray-500 font-medium">
                   {alert.direction === "above" ? "↑ above" : "↓ below"}{" "}
-                  <span className="tabular-nums text-gray-300">${alert.price.toLocaleString()}</span>
+                  {alert.price !== null && (
+                    <span className="tabular-nums text-gray-300">${alert.price.toLocaleString()}</span>
+                  )}
                 </span>
               </div>
               <div className="flex items-center gap-2">

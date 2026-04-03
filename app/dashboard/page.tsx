@@ -34,11 +34,12 @@ async function getPrevDayPrice(metal: Metal) {
 }
 
 async function getRecentPrices(metal: Metal) {
-  return prisma.price.findMany({
+  const rows = await prisma.price.findMany({
     where: { metal },
-    orderBy: { timestamp: "asc" },
+    orderBy: { timestamp: "desc" },
     take: 30,
   });
+  return rows.reverse(); // return in ascending order for the sparkline
 }
 
 function fmtMoney(n: number) {
