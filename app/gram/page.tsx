@@ -8,16 +8,28 @@ import { GramCalculator } from "@/components/GramCalculator";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Gold & Silver Price Per Gram Calculator — Lode",
+  title: "Silver Price Per Gram Calculator — Live Spot Price | Lode",
   description:
-    "Calculate the melt value of gold or silver jewelry and scrap by weight. Supports grams, pennyweights, and troy oz. Covers 24k, 22k, 18k, 14k, 10k, 9k gold and 999, 925 sterling, 800 silver — live spot prices.",
+    "Instant silver price per gram — updated with live spot prices. Calculate the melt value of sterling, coin silver, and fine .999 silver by gram, pennyweight, or troy oz. Also covers 24k–9k gold.",
   alternates: {
     canonical: "https://lode.rocks/gram",
   },
+  keywords: [
+    "silver price per gram",
+    "silver price per gram calculator",
+    "gold price per gram",
+    "gold price per gram calculator",
+    "silver melt value calculator",
+    "gold melt value",
+    "sterling silver price per gram",
+    "14k gold price per gram",
+    "18k gold price per gram",
+    "precious metals calculator",
+  ],
   openGraph: {
-    title: "Gold & Silver Price Per Gram Calculator",
+    title: "Silver Price Per Gram Calculator — Live Spot Price",
     description:
-      "Enter a weight and karat to instantly calculate the melt value of gold or silver jewelry and scrap at today's live spot price.",
+      "Instantly see the silver price per gram for .999, sterling 925, coin 900, and more — plus 24k through 9k gold. Live spot prices updated every 15 minutes.",
     url: "https://lode.rocks/gram",
   },
 };
@@ -53,8 +65,81 @@ export default async function GramPage() {
 
   const TROY_PER_GRAM = 1 / 31.1035;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://lode.rocks/gram#app",
+        "name": "Silver & Gold Price Per Gram Calculator",
+        "url": "https://lode.rocks/gram",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "description":
+          "Calculate the live melt value of silver and gold by weight. Supports grams, pennyweights, and troy ounces. Covers sterling .925, fine .999, coin .900 silver, and 24k through 9k gold.",
+        "featureList": [
+          "Live silver price per gram",
+          "Live gold price per gram",
+          "Sterling silver melt value",
+          "14k, 18k, 24k gold melt value",
+          "Gram, pennyweight, and troy oz support",
+        ],
+        "isPartOf": { "@id": "https://lode.rocks/#website" },
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the silver price per gram today?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `Silver is currently ${silverSpot > 0 ? `$${(silverSpot / 31.1035).toFixed(4)} per gram` : "available on this page — updated with live spot prices every 15 minutes"}. Fine .999 silver is calculated by dividing the troy ounce spot price by 31.1035 grams per troy oz.`,
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "How much is sterling silver worth per gram?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `Sterling silver is 92.5% pure silver. At today's spot price${silverSpot > 0 ? `, sterling silver is worth approximately $${(silverSpot * 0.925 / 31.1035).toFixed(4)} per gram` : " — use the calculator above for the current value"}. Multiply the fine silver price per gram by 0.925 to get the sterling melt value.`,
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "How do I calculate the melt value of silver jewelry?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "To calculate silver melt value: (1) weigh the item in grams, (2) identify the purity — .999 fine, .925 sterling, .900 coin silver, or .800 European silver, (3) multiply grams × purity × (spot price ÷ 31.1035). The calculator above does this automatically with live spot prices.",
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "What is the gold price per gram for 14k gold?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": `14k gold is 58.3% pure (14 ÷ 24). ${goldSpot > 0 ? `At today's spot price, 14k gold is worth approximately $${(goldSpot * (14/24) / 31.1035).toFixed(2)} per gram.` : "Use the calculator above to see the current 14k gold price per gram based on live spot prices."}`,
+            },
+          },
+          {
+            "@type": "Question",
+            "name": "How many grams are in a troy ounce of silver?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "There are exactly 31.1035 grams in one troy ounce. Troy ounces are the standard unit for precious metals pricing. To convert a spot price quoted per troy oz to price per gram, divide by 31.1035.",
+            },
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative px-4 sm:px-6 pt-14 pb-8 sm:pt-20 sm:pb-12">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -65,11 +150,11 @@ export default async function GramPage() {
         </div>
         <div className="relative z-10 mx-auto max-w-2xl text-center space-y-4">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-tight">
-            Gold & Silver<br />
+            Silver & Gold<br />
             <span style={{ color: "var(--gold-bright)" }}>Price Per Gram</span>
           </h1>
           <p className="text-base text-gray-400 max-w-md mx-auto">
-            Calculate the melt value of jewelry, coins, or scrap — by gram, pennyweight, or troy oz.
+            Live silver price per gram — plus 24k–9k gold. Calculate melt value by gram, pennyweight, or troy oz.
           </p>
           <div className="flex items-center justify-center gap-6 text-xs text-gray-600 pt-1">
             <span>Gold spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(goldSpot)} / ozt</span></span>
