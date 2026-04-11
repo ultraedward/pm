@@ -10,10 +10,10 @@ module.exports = {
         sans: ["var(--font-inter)", "system-ui", "-apple-system", "sans-serif"],
       },
       letterSpacing: {
-        tightest: "-0.04em",
+        tightest: "-0.05em",
       },
       colors: {
-        surface: "#000000",
+        surface: "#050505",
       },
     },
   },

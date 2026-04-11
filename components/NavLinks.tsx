@@ -12,14 +12,11 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
   const pathname = usePathname();
 
   function linkClass(href: string) {
-    // Exact match, except /dashboard which owns anything under it that isn't its own sub-route in the nav
     const isActive =
       pathname === href ||
       (href === "/dashboard" && pathname === "/dashboard") ||
       (href !== "/dashboard" && href !== "/" && pathname.startsWith(href));
-    return `text-xs font-medium uppercase tracking-widest transition-colors ${
-      isActive ? "text-white" : "text-gray-500 hover:text-white"
-    }`;
+    return `label transition-colors ${isActive ? "!text-white" : "hover:!text-white"}`;
   }
 
   return (
@@ -29,7 +26,7 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
           <Link href="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
           <Link href="/alerts"    className={linkClass("/alerts")}>Alerts</Link>
           {isPro ? (
-            <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-medium uppercase tracking-widest text-amber-400 border border-amber-500/20">
+            <span className="px-3 py-1 label border" style={{ color: "var(--gold)", borderColor: "rgba(255,194,0,0.25)" }}>
               Pro
             </span>
           ) : (
@@ -55,7 +52,7 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
         <>
           <Link href="/gram"    className={linkClass("/gram")}>Calculator</Link>
           <Link href="/pricing" className={linkClass("/pricing")}>Pricing</Link>
-          <Link href="/login" className="rounded-full border border-white/20 px-4 py-1.5 text-xs font-medium text-white hover:bg-white/10 transition-colors">
+          <Link href="/login" className="border px-4 py-1.5 label hover:!text-white hover:border-white/40 transition-colors" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
             Sign in
           </Link>
         </>

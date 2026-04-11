@@ -21,11 +21,11 @@ export default async function Navbar() {
   const isLoggedIn = !!session?.user;
 
   return (
-    <nav className="sticky top-0 z-40 border-b bg-black/80 backdrop-blur-md" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+    <nav className="sticky top-0 z-40 border-b" style={{ borderColor: "rgba(255,255,255,0.05)", backgroundColor: "rgba(5,5,5,0.92)", backdropFilter: "blur(12px)" }}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 
         {/* Logo */}
-        <Link href="/" className="text-sm font-black uppercase tracking-widest hover:text-amber-400 transition-colors">
+        <Link href="/" className="font-black uppercase text-white hover:opacity-60 transition-opacity" style={{ letterSpacing: "0.3em", fontSize: "13px" }}>
           Lode
         </Link>
 

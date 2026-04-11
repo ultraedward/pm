@@ -25,21 +25,25 @@ export function CalculatorTabs({ spots }: Props) {
     <div className="space-y-4">
       {/* Tab bar */}
       <div
-        className="flex rounded-xl border overflow-hidden w-fit mx-auto"
-        style={{ borderColor: "var(--border)" }}
+        className="flex border overflow-hidden w-fit"
+        style={{ borderColor: "var(--border-strong)" }}
       >
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-6 py-2.5 text-sm font-semibold transition-colors flex flex-col items-center gap-0.5 ${
+            className={`px-6 py-3 transition-colors flex flex-col items-start gap-0.5 ${
               tab === t.id
-                ? "bg-amber-500/15 text-amber-400"
-                : "text-gray-500 hover:text-gray-300"
+                ? "text-white"
+                : "hover:text-gray-300"
             }`}
+            style={{
+              background: tab === t.id ? "rgba(255,255,255,0.05)" : "transparent",
+              borderRight: "1px solid var(--border)",
+            }}
           >
-            <span>{t.label}</span>
-            <span className="text-[10px] font-normal opacity-70">{t.sub}</span>
+            <span className="label" style={{ color: tab === t.id ? "rgba(255,255,255,0.9)" : undefined }}>{t.label}</span>
+            <span className="text-[9px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{t.sub}</span>
           </button>
         ))}
       </div>
