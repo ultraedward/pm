@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Gold Price Alerts — Get Notified When Gold Hits Your Target | Lode",
+  title: "Gold Price Alerts — Get Notified When Gold Hits Your Target",
   description:
     "Set custom gold price alerts and get email notifications the moment spot price hits your target. Also covers silver, platinum, and palladium. No app required — works in any inbox.",
   keywords: [

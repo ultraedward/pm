@@ -22,7 +22,7 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">1. Information We Collect</h2>
             <p>When you sign in with Google, we receive your name and email address from Google OAuth. We store this information to identify your account and send you price alert notifications.</p>
-            <p>Portfolio holdings entered on the portfolio tracker page are stored locally in your browser using localStorage and are never sent to our servers unless you choose to create an account. If you sign in, your holdings and price alert data are stored in our database and used solely to provide the service.</p>
+            <p>Portfolio holdings you enter without signing in are stored only in your browser (localStorage) and never transmitted to our servers. If you create an account, your holdings are stored in our database solely to enable cross-device access — we have no other use for them. Price alert targets are stored in our database regardless of account status, only to trigger the notifications you configure.</p>
             <p>We use Stripe for payment processing. We do not store your credit card information — Stripe handles all payment data under their own privacy policy.</p>
           </section>
 

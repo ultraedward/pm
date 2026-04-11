@@ -36,7 +36,7 @@ export function QuickCalculator({ spots }: Props) {
   return (
     <div className="space-y-3">
       {/* Input tiles — match the visual weight of the price panel */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)] rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(212,175,55,0.12)" }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09] rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
         {METALS.map((metal) => {
           const { label, dot } = METAL_META[metal];
           const active = parseFloat(oz[metal]) > 0;
@@ -85,7 +85,7 @@ export function QuickCalculator({ spots }: Props) {
       {hasAny && (
         <div
           className="rounded-xl border overflow-hidden"
-          style={{ borderColor: "rgba(212,175,55,0.2)" }}
+          style={{ borderColor: "var(--border)" }}
         >
           <div className="divide-y divide-white/5">
             {values.filter((v) => v.value > 0).map(({ metal, value }) => {

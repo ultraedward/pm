@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Coin Melt Value Calculator — Silver Eagles, Junk Silver & More | Lode",
+  title: "Coin Melt Value Calculator — Silver Eagles, Junk Silver & More",
   description:
     "Calculate the melt value of silver and gold coins at live spot prices. Covers American Silver Eagles, Maple Leafs, pre-1965 junk silver (dimes, quarters, halves), Morgan dollars, and gold Eagles.",
   keywords: [

@@ -102,7 +102,7 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
                 key={metal}
                 href="/pricing"
                 className="rounded-2xl border bg-black/20 px-5 py-5 flex flex-col gap-3 relative overflow-hidden cursor-pointer hover:border-amber-500/20 transition-colors group"
-                style={{ borderColor: "rgba(212,175,55,0.08)" }}
+                style={{ borderColor: "rgba(255,255,255,0.06)" }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
             <div
               key={metal}
               className="rounded-2xl border bg-black/20 px-5 py-5 flex flex-col gap-4"
-              style={{ borderColor: "rgba(212,175,55,0.12)" }}
+              style={{ borderColor: "var(--border)" }}
             >
               {/* Tile header */}
               <div className="flex items-center justify-between">
@@ -186,7 +186,7 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
       {hasAny && (
         <div
           className="rounded-xl border overflow-hidden"
-          style={{ borderColor: "rgba(212,175,55,0.2)" }}
+          style={{ borderColor: "var(--border)" }}
         >
           <div className="divide-y divide-white/5">
             {metalTotals.filter((m) => m.value > 0).map(({ metal, totalOz, value }) => {

@@ -8,7 +8,7 @@ import { GramCalculator } from "@/components/GramCalculator";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Silver Price Per Gram Calculator — Live Spot Price | Lode",
+  title: "Silver & Gold Price Per Gram Calculator — Live Spot",
   description:
     "Instant silver price per gram — updated with live spot prices. Calculate the melt value of sterling, coin silver, and fine .999 silver by gram, pennyweight, or troy oz. Also covers 24k–9k gold.",
   alternates: {

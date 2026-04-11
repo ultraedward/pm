@@ -54,7 +54,7 @@ export function PredictionCard({ goldSpot }: { goldSpot: number }) {
   return (
     <div
       className="rounded-2xl border p-5 space-y-4"
-      style={{ borderColor: "rgba(212,175,55,0.12)", background: "rgba(0,0,0,0.2)" }}
+      style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between">

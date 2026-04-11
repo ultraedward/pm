@@ -31,7 +31,7 @@ export function DashboardCalculatorTabs({ spots, isPro }: Props) {
       {/* Tab bar */}
       <div
         className="flex rounded-xl border overflow-hidden w-fit"
-        style={{ borderColor: "rgba(212,175,55,0.15)" }}
+        style={{ borderColor: "var(--border)" }}
       >
         {TABS.map((t) => (
           <button

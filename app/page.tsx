@@ -251,7 +251,7 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 blur-3xl"
-            style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(circle, #FFC200 0%, transparent 70%)" }}
           />
         </div>
 
@@ -270,7 +270,7 @@ export default async function HomePage() {
                 </p>
               )}
             </div>
-            <p className="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
+            <p className="text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
               Find out what your gold and silver is actually worth.
             </p>
             <div className="flex items-center justify-center gap-4">
@@ -282,7 +282,7 @@ export default async function HomePage() {
 
           {/* Price panel */}
           <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09]">
               {prices.map(([metal, data]) => (
                 <PriceTile key={metal} metal={metal} data={data} />
               ))}

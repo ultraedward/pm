@@ -178,7 +178,7 @@ export default async function DashboardPage() {
           <div className="px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
             <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Spot Prices</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[rgba(212,175,55,0.12)]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09]">
             {METALS.map((metal) => {
               const price = spots[metal];
               const chg = pctChange[metal];
