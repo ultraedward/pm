@@ -47,9 +47,6 @@ export const metadata: Metadata = {
     description:
       "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
   },
-  alternates: {
-    canonical: "https://lode.rocks",
-  },
   verification: {
     google: "9e0574274bbeb821",
   },

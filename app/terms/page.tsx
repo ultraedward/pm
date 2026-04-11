@@ -2,6 +2,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
   title: "Terms of Service — Lode",
+  alternates: {
+    canonical: "https://lode.rocks/terms",
+  },
 };
 
 const LAST_UPDATED = "March 12, 2026";

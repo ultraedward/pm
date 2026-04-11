@@ -7,6 +7,8 @@ Allow: /pricing
 Disallow: /dashboard
 Disallow: /account
 Disallow: /alerts
+Disallow: /login
+Disallow: /maintenance
 Disallow: /api/
 
 Sitemap: https://lode.rocks/sitemap.xml
