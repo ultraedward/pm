@@ -24,7 +24,7 @@ export default async function NewAlertPage() {
           </Link>
           <h1 className="mt-3 text-3xl font-black tracking-tight">New Alert</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Get notified by email the moment your target price is hit.
+            Get an email when your target price is hit — checked daily.
           </p>
         </div>
         <CreateAlertForm />
