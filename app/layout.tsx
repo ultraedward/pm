@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.lode.rocks"),
+  metadataBase: new URL("https://lode.rocks"),
   title: {
     default: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     template: "%s | Lode",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     description:
       "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
     type: "website",
-    url: "https://www.lode.rocks",
+    url: "https://lode.rocks",
     siteName: "Lode",
   },
   twitter: {
@@ -48,7 +48,10 @@ export const metadata: Metadata = {
       "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
   },
   alternates: {
-    canonical: "https://www.lode.rocks",
+    canonical: "https://lode.rocks",
+  },
+  verification: {
+    google: "9e0574274bbeb821",
   },
   robots: {
     index: true,
