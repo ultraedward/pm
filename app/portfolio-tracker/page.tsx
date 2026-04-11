@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
+import LocalPortfolioTracker from "@/components/LocalPortfolioTracker";
 
 export const metadata: Metadata = {
-  title: "Precious Metals Portfolio Tracker — Track Gold & Silver Holdings | Lode",
+  title: "Precious Metals Portfolio Tracker — Track Gold & Silver Holdings",
   description:
-    "Track your gold, silver, platinum, and palladium holdings at live spot prices. See total portfolio value, P&L, and allocation — updated every 15 minutes. No spreadsheets needed.",
+    "Track your gold, silver, platinum, and palladium holdings at live spot prices. See total portfolio value, P&L, and allocation — no account needed. Your data stays on your device.",
   keywords: [
     "precious metals portfolio tracker",
     "gold portfolio tracker",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Precious Metals Portfolio Tracker — Track Gold & Silver at Live Spot",
     description:
-      "Log your oz, see your total value and P&L at current spot prices. Covers gold, silver, platinum, and palladium. Always up to date — no manual price lookups.",
+      "Log your oz, see your total value and P&L at current spot prices. No account needed — your data stays on your device.",
     url: "https://lode.rocks/portfolio-tracker",
   },
 };
@@ -40,7 +41,7 @@ const jsonLd = {
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "description":
-        "Track gold, silver, platinum, and palladium holdings at live spot prices. See total value, P&L, and allocation without manual lookups.",
+        "Track gold, silver, platinum, and palladium holdings at live spot prices. See total value, P&L, and allocation. No account needed — data stays on your device.",
       "featureList": [
         "Gold portfolio tracker",
         "Silver holdings tracker",
@@ -48,6 +49,8 @@ const jsonLd = {
         "P&L at current prices",
         "Multi-metal portfolio",
         "Platinum and palladium support",
+        "No account required",
+        "Private — data stays on your device",
       ],
     },
     {
@@ -55,10 +58,26 @@ const jsonLd = {
       "mainEntity": [
         {
           "@type": "Question",
+          "name": "Do I need an account to use the portfolio tracker?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The portfolio tracker works without any account. Your holdings are saved in your browser and never sent to our servers. If you want to sync across multiple devices, you can optionally create a free account.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Where is my holdings data stored?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Your holdings are stored locally in your browser using localStorage. Nothing is transmitted to Lode's servers unless you choose to create an account. This means your stack is completely private by default.",
+          },
+        },
+        {
+          "@type": "Question",
           "name": "How does the precious metals portfolio tracker work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium — and Lode values them at live spot prices updated every 15 minutes. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup.",
+            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at live spot prices updated every 15 minutes. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup.",
           },
         },
         {
@@ -67,14 +86,6 @@ const jsonLd = {
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Yes. You can log any holding by troy ounce weight. Whether you hold American Eagles, Maple Leafs, generic silver rounds, or gold bars — as long as you know the total weight in troy ounces, Lode will value them at spot.",
-          },
-        },
-        {
-          "@type": "Question",
-          "name": "Does the portfolio tracker update automatically?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Spot prices are refreshed every 15 minutes. Every time you visit your dashboard, your portfolio value reflects the latest market prices — no manual updates needed.",
           },
         },
         {
@@ -92,6 +103,11 @@ const jsonLd = {
 
 const FEATURES = [
   {
+    icon: "🔒",
+    title: "No account needed",
+    body: "Your holdings are stored in your browser. Nothing is sent to our servers — your stack stays private by default.",
+  },
+  {
     icon: "💼",
     title: "Total value at a glance",
     body: "See your full stack valued at live spot — gold, silver, platinum, palladium combined into one number.",
@@ -102,21 +118,10 @@ const FEATURES = [
     body: "Log your cost basis and see exactly how much your holdings are up or down at today's prices.",
   },
   {
-    icon: "🔄",
-    title: "Auto-updated every 15 minutes",
-    body: "No refreshing, no manual price lookups. Spot prices update in the background while you get on with your day.",
-  },
-  {
     icon: "🥇",
-    title: "Four metals, one dashboard",
-    body: "Gold, silver, platinum, and palladium — log oz in any combination and see your total allocation at a glance.",
+    title: "Four metals, one view",
+    body: "Gold, silver, platinum, and palladium — log oz in any combination and see your allocation at a glance.",
   },
-];
-
-const HOW_IT_WORKS = [
-  { step: "1", title: "Sign in", body: "Create a free account in 30 seconds using Google or email." },
-  { step: "2", title: "Log your holdings", body: "Enter your troy ounce position for each metal you hold." },
-  { step: "3", title: "See live portfolio value", body: "Your dashboard shows total value, P&L, and allocation — updated every 15 minutes." },
 ];
 
 export default function PortfolioTrackerPage() {
@@ -128,27 +133,24 @@ export default function PortfolioTrackerPage() {
       />
 
       {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 pt-14 pb-12 sm:pt-20 sm:pb-16">
+      <section className="relative px-4 sm:px-6 pt-14 pb-10 sm:pt-20 sm:pb-14">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute left-1/2 top-0 h-96 w-[600px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-10 blur-3xl"
             style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
           />
         </div>
-        <div className="relative z-10 mx-auto max-w-2xl text-center space-y-5">
+        <div className="relative z-10 mx-auto max-w-2xl text-center space-y-4">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Portfolio Tracker · Gold · Silver · Platinum · Palladium</p>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-tight">
             Precious Metals<br />
             <span style={{ color: "var(--gold-bright)" }}>Portfolio Tracker</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
-            Log your gold, silver, platinum, and palladium holdings. See total value and P&L at live spot prices —
-            updated every 15 minutes, no spreadsheets required.
+            Log your holdings, see total value and P&L at live spot prices.
+            No account needed — your data stays on your device.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link href="/login" className="btn-gold px-10">
-              Track my stack
-            </Link>
+          <div className="flex items-center justify-center gap-2 pt-1">
             <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
               View live spot prices →
             </Link>
@@ -156,24 +158,10 @@ export default function PortfolioTrackerPage() {
         </div>
       </section>
 
-      {/* ── How it works ──────────────────────────────────────── */}
-      <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-3xl space-y-10">
-          <h2 className="text-2xl font-black tracking-tight text-center">How it works</h2>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {HOW_IT_WORKS.map(({ step, title, body }) => (
-              <div key={step} className="flex flex-col gap-3">
-                <div
-                  className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-black"
-                  style={{ background: "rgba(212,175,55,0.15)", color: "var(--gold-bright)" }}
-                >
-                  {step}
-                </div>
-                <p className="font-bold text-white">{title}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
-              </div>
-            ))}
-          </div>
+      {/* ── Live tracker ──────────────────────────────────────── */}
+      <section className="px-4 sm:px-6 pb-14">
+        <div className="mx-auto max-w-2xl">
+          <LocalPortfolioTracker />
         </div>
       </section>
 
@@ -216,10 +204,10 @@ export default function PortfolioTrackerPage() {
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-2xl font-black tracking-tight">Know exactly what your stack is worth — right now</p>
         <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          Free account, live spot prices, no spreadsheets. Takes 30 seconds to set up.
+          No account, no spreadsheets. Your holdings stay on your device.
         </p>
         <Link href="/login" className="btn-gold px-10 inline-block">
-          Track my stack
+          Create free account
         </Link>
       </section>
 
