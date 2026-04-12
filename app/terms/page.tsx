@@ -1,7 +1,7 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "Terms of Service — Lode",
+  title: "Terms of Service",
   alternates: {
     canonical: "https://lode.rocks/terms",
   },

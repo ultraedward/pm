@@ -1,7 +1,7 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "Privacy Policy — Lode",
+  title: "Privacy Policy",
   alternates: {
     canonical: "https://lode.rocks/privacy",
   },

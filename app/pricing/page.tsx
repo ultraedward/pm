@@ -5,14 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { PricingClient } from "./PricingClient";
 
 export const metadata: Metadata = {
-  title: "Pricing — Lode",
+  title: "Pricing",
   description:
     "Lode is free forever with 1 price alert and full portfolio tracking. Upgrade to Pro for unlimited alerts.",
   alternates: {
     canonical: "https://lode.rocks/pricing",
   },
   openGraph: {
-    title: "Pricing — Lode",
+    title: "Pricing",
     description:
       "Lode is free forever with 1 price alert and full portfolio tracking. Upgrade to Pro for unlimited alerts.",
     url: "https://lode.rocks/pricing",
