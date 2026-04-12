@@ -109,7 +109,7 @@ export default async function AccountPage() {
               </div>
               {isPro
                 ? <span className="text-xs font-semibold text-amber-400">On</span>
-                : <Link href="/pricing" className="text-xs font-semibold text-gray-600 hover:text-amber-400 transition-colors">Pro only</Link>
+                : <Link href="/pricing" className="text-xs font-semibold text-gray-600 hover:text-amber-400 transition-colors">Pro</Link>
               }
             </div>
             <div className="flex items-center justify-between py-2">
