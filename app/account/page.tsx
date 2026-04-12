@@ -104,10 +104,13 @@ export default async function AccountPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between py-2">
               <div>
-                <p className="text-sm font-medium text-white">Weekly digest</p>
+                <p className={`text-sm font-medium ${isPro ? "text-white" : "text-gray-600"}`}>Weekly digest</p>
                 <p className="text-xs text-gray-500 mt-0.5">Spot prices &amp; portfolio summary every Monday</p>
               </div>
-              <span className="text-xs font-semibold text-amber-400">On</span>
+              {isPro
+                ? <span className="text-xs font-semibold text-amber-400">On</span>
+                : <Link href="/pricing" className="text-xs font-semibold text-gray-600 hover:text-amber-400 transition-colors">Pro only</Link>
+              }
             </div>
             <div className="flex items-center justify-between py-2">
               <div>

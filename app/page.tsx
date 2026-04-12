@@ -227,7 +227,7 @@ export default async function HomePage() {
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "3 price alerts, portfolio tracker, spot prices updated every 15 minutes",
+            "description": "1 price alert, portfolio tracker, spot prices updated every 15 minutes",
           },
           {
             "@type": "Offer",
