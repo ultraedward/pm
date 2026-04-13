@@ -13,8 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/gram`,
-      lastModified: new Date(),
-      changeFrequency: "hourly",
+      lastModified: new Date("2026-04-13"),
+      changeFrequency: "daily",
       priority: 0.9,
     },
     {
