@@ -13,7 +13,7 @@ const FREE_FEATURES = [
   "Gold:silver ratio",
   "Portfolio tracker — holdings & P&L",
   "30-day price charts",
-  "1 price alert with email notification",
+  "1 price alert",
   "Melt value calculator — coins, jewelry & scrap",
   "Daily gold prediction game",
 ];
@@ -22,7 +22,7 @@ const PRO_EXCLUSIVE = [
   "Everything in Free",
   "Unlimited price alerts — never miss a target price",
   "Weekly portfolio digest email",
-  "Full coin calculator — silver, platinum & palladium",
+  "Coin-by-coin calculator — silver, platinum & palladium",
 ];
 
 export function PricingClient({ isPro, isLoggedIn }: Props) {

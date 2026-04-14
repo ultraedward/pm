@@ -126,14 +126,12 @@ export default function CoinMeltCalculatorPage() {
           />
         </div>
         <div className="relative z-10 mx-auto max-w-2xl text-center space-y-5">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Melt Calculator · Coins · Junk Silver · Bullion</p>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-tight">
             Coin Melt Value<br />
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
-            Find the silver and gold melt value of Eagles, Maple Leafs, junk silver dimes, quarters, halves, and dollars —
-            all calculated at live spot prices.
+            Melt value for common silver and gold coins at live spot prices.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link href="/#calculator" className="btn-gold px-10">
@@ -192,7 +190,7 @@ export default function CoinMeltCalculatorPage() {
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-2xl font-black tracking-tight">Know what your stack is worth — right now</p>
         <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          Live spot prices, coin melt calculator, portfolio tracker, and price alerts — all in one place.
+          Live spot prices, coin melt calculator, portfolio tracker, and price alerts.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/#calculator" className="btn-gold px-10">

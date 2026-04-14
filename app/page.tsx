@@ -253,7 +253,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl">
 
           {/* Eyebrow */}
-          <p className="label mb-5">Gold · XAU · Live spot price</p>
+          <p className="label mb-5">Gold · Live spot price</p>
 
           {/* Giant price — viewport-scaled */}
           <div
@@ -280,7 +280,7 @@ export default async function HomePage() {
           {/* CTA */}
           <div className="mt-10">
             <Link href={isLoggedIn ? "/dashboard" : "#calculator"} className="btn-gold">
-              {isLoggedIn ? "Go to dashboard" : "Calculate melt value"}
+              {isLoggedIn ? "Go to dashboard" : "Get started free"}
             </Link>
           </div>
         </div>
@@ -321,7 +321,7 @@ export default async function HomePage() {
           />
           {!isLoggedIn && (
             <p className="text-xs" style={{ color: "var(--text-dim)" }}>
-              <Link href="/login" className="hover:text-white transition-colors underline underline-offset-4">Sign in to track your full portfolio →</Link>
+              <Link href="/login" className="hover:text-white transition-colors underline underline-offset-4">Track your portfolio →</Link>
             </p>
           )}
         </div>

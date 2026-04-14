@@ -46,7 +46,7 @@ export default async function PricingPage() {
         <PricingClient isPro={isPro} isLoggedIn={!!session?.user?.email} />
 
         <p className="text-center text-sm text-gray-600">
-          Cancel or change plans at any time.
+          Cancel anytime.
         </p>
 
       </div>
