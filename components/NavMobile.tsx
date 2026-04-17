@@ -32,7 +32,15 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
   if (isLoggedIn) return null;
 
   return (
-    <div className="sm:hidden">
+    <div className="sm:hidden flex items-center gap-3">
+      {/* Sign up CTA — always visible on mobile */}
+      <Link
+        href="/login"
+        className="btn-gold px-3 py-1.5 text-xs"
+      >
+        Sign up free
+      </Link>
+
       {/* Hamburger button */}
       <button
         onClick={() => setOpen((o) => !o)}
