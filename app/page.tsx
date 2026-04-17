@@ -279,7 +279,7 @@ export default async function HomePage() {
 
           {/* CTA */}
           <div className="mt-10">
-            <Link href={isLoggedIn ? "/dashboard" : "#calculator"} className="btn-gold">
+            <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
               {isLoggedIn ? "Go to dashboard" : "Get started free"}
             </Link>
           </div>
