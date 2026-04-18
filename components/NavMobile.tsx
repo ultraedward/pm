@@ -22,6 +22,7 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
 
   const loggedOutLinks = [
     { href: "/gram",    label: "Calculator" },
+    { href: "/compare", label: "Compare"    },
     { href: "/pricing", label: "Pricing"    },
     { href: "/login",   label: "Sign in"    },
   ];

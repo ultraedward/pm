@@ -258,11 +258,10 @@ export default async function HoldingsPage() {
           <p className="text-xs text-gray-600">Last 30 price updates</p>
         </div>
 
-        {/* Allocation */}
+        {/* Allocation — stacked percentage bars */}
         {totalValue > 0 && (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-6">
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
             <p className="label">Allocation</p>
-
             <div className="space-y-3">
               {[
                 { label: "Gold",      pct: goldPercent,      dot: "#D4AF37" },
@@ -280,25 +279,6 @@ export default async function HoldingsPage() {
                   </div>
                 </div>
               ) : null)}
-            </div>
-
-            <div className="flex justify-center pt-2">
-              <div className="relative h-36 w-36">
-                <div
-                  className="h-full w-full rounded-full"
-                  style={{
-                    background: `conic-gradient(
-                      #D4AF37 0% ${goldPercent}%,
-                      #C0C0C0 ${goldPercent}% ${goldPercent + silverPercent}%,
-                      #E5E4E2 ${goldPercent + silverPercent}% ${goldPercent + silverPercent + platinumPercent}%,
-                      #9FA8C7 ${goldPercent + silverPercent + platinumPercent}% 100%
-                    )`,
-                  }}
-                />
-                <div className="absolute inset-4 flex items-center justify-center rounded-full bg-gray-950 text-xs text-gray-500 text-center leading-snug">
-                  {goldPercent.toFixed(0)}%<br />gold
-                </div>
-              </div>
             </div>
           </div>
         )}

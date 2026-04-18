@@ -25,6 +25,7 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
         <>
           <Link href="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
           <Link href="/alerts"    className={linkClass("/alerts")}>Alerts</Link>
+          <Link href="/compare"   className={linkClass("/compare")}>Compare</Link>
           {isPro ? (
             <span className="px-3 py-1 label border" style={{ color: "var(--gold)", borderColor: "rgba(255,194,0,0.25)" }}>
               Pro
@@ -51,6 +52,7 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
       ) : (
         <>
           <Link href="/gram"    className={linkClass("/gram")}>Calculator</Link>
+          <Link href="/compare" className={linkClass("/compare")}>Compare</Link>
           <Link href="/pricing" className={linkClass("/pricing")}>Pricing</Link>
           <Link href="/login" className="label hover:!text-white transition-colors">
             Sign in

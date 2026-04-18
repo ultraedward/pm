@@ -12,7 +12,9 @@
     "screenshot": "node scripts/screenshot.js",
     "screenshot:local": "SCREENSHOT_URL=http://localhost:3000 node scripts/screenshot.js",
     "check-data": "ts-node scripts/check-gold-data.ts",
-    "dedup": "ts-node scripts/dedup-prices.ts"
+    "dedup": "ts-node scripts/dedup-prices.ts",
+    "verify-slugs": "TS_NODE_PROJECT=scripts/tsconfig.json ts-node scripts/verify-compare-slugs.ts",
+    "verify-slugs:open": "TS_NODE_PROJECT=scripts/tsconfig.json ts-node scripts/verify-compare-slugs.ts -- --open"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

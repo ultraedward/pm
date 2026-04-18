@@ -69,14 +69,6 @@ const jsonLd = {
         },
         {
           "@type": "Question",
-          "name": "How often are spot prices checked for alerts?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Lode checks spot prices every 15 minutes. When a price crosses your target threshold, the alert email is sent within the next check cycle — typically within 15 minutes of the price move.",
-          },
-        },
-        {
-          "@type": "Question",
           "name": "Do I need to install an app to get gold price alerts?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -92,29 +84,13 @@ const FEATURES = [
   {
     icon: "🔔",
     title: "Above or below — your choice",
-    body: "Alert when gold breaks above a resistance level or falls below a buy-the-dip target. Both directions supported.",
+    body: "Alert when a metal breaks above resistance or falls below a buy target. Both directions, any metal.",
   },
   {
     icon: "📬",
-    title: "Email delivery, no app needed",
-    body: "Alerts land in your inbox. No push notification permissions, no app download, no browser tabs to keep open.",
+    title: "Email-only, no app",
+    body: "Alerts land in your inbox within 15 minutes of the price move. No permissions, no downloads.",
   },
-  {
-    icon: "⏱️",
-    title: "Checked every 15 minutes",
-    body: "Spot prices are pulled from live market feeds and checked every 15 minutes — so you hear about moves within the hour.",
-  },
-  {
-    icon: "🥈",
-    title: "All four metals covered",
-    body: "Gold, silver, platinum, and palladium. Set as many alerts as you need across any combination of metals.",
-  },
-];
-
-const HOW_IT_WORKS = [
-  { step: "1", title: "Create a free account", body: "Sign in with your Google or email account — takes under 30 seconds." },
-  { step: "2", title: "Set your target price", body: "Pick a metal, enter a price target, choose above or below. Done." },
-  { step: "3", title: "Get notified", body: "Lode emails you the moment spot price crosses your threshold — while you sleep, work, or stack." },
 ];
 
 export default function GoldPriceAlertsPage() {
@@ -150,27 +126,6 @@ export default function GoldPriceAlertsPage() {
             <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
               View live spot prices →
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How it works ──────────────────────────────────────── */}
-      <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-3xl space-y-10">
-          <h2 className="text-2xl font-black tracking-tight text-center">How it works</h2>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {HOW_IT_WORKS.map(({ step, title, body }) => (
-              <div key={step} className="flex flex-col gap-3">
-                <div
-                  className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-black"
-                  style={{ background: "rgba(212,175,55,0.15)", color: "var(--gold-bright)" }}
-                >
-                  {step}
-                </div>
-                <p className="font-bold text-white">{title}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

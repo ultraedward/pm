@@ -77,23 +77,7 @@ const jsonLd = {
           "name": "How does the precious metals portfolio tracker work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at live spot prices updated every 15 minutes. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup.",
-          },
-        },
-        {
-          "@type": "Question",
-          "name": "Can I track both coins and bars in the portfolio tracker?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. You can log any holding by troy ounce weight. Whether you hold American Eagles, Maple Leafs, generic silver rounds, or gold bars — as long as you know the total weight in troy ounces, Lode will value them at spot.",
-          },
-        },
-        {
-          "@type": "Question",
-          "name": "Which metals does the portfolio tracker support?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Lode tracks gold (XAU), silver (XAG), platinum (XPT), and palladium (XPD) holdings at live spot prices. You can hold positions in any or all four metals.",
+            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at live spot prices updated every 15 minutes. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup. Whether you hold American Eagles, Maple Leafs, generic rounds, or bars, log them by troy ounce weight.",
           },
         },
       ],
@@ -104,23 +88,13 @@ const jsonLd = {
 const FEATURES = [
   {
     icon: "🔒",
-    title: "No account needed",
-    body: "Your holdings are stored in your browser. Nothing is sent to our servers — your stack stays private by default.",
-  },
-  {
-    icon: "💼",
-    title: "Total value at a glance",
-    body: "See your full stack valued at live spot — gold, silver, platinum, palladium combined into one number.",
+    title: "Private by default",
+    body: "Holdings live in your browser — not our servers. No account required.",
   },
   {
     icon: "📈",
-    title: "P&L at current spot",
-    body: "Log your cost basis and see exactly how much your holdings are up or down at today's prices.",
-  },
-  {
-    icon: "🥇",
-    title: "Four metals, one view",
-    body: "Gold, silver, platinum, and palladium — log oz in any combination and see your allocation at a glance.",
+    title: "Live P&L at spot",
+    body: "Log your cost basis and see your gain or loss at today's spot price, updated every 15 minutes.",
   },
 ];
 

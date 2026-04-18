@@ -77,22 +77,6 @@ const jsonLd = {
             "text": "An American Silver Eagle contains exactly 1 troy ounce of fine (.999) silver. Its melt value equals the current silver spot price. Use the Lode calculator for the live figure updated every 15 minutes.",
           },
         },
-        {
-          "@type": "Question",
-          "name": "How do I calculate the melt value of gold coins?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Melt value = coin weight in troy oz × gold purity × spot price. A 1 oz American Gold Eagle is 91.67% pure (22k) and weighs 1.0909 troy oz total, so it contains exactly 1 troy oz of pure gold. A 1 oz Canadian Gold Maple Leaf is 99.99% pure and contains 1 troy oz of gold.",
-          },
-        },
-        {
-          "@type": "Question",
-          "name": "Does the melt value equal the coin's market value?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. Melt value is the base metal value only — the floor price for the raw silver or gold content. Numismatic coins, key dates, and graded specimens trade at significant premiums above melt. Bullion coins like Eagles and Maple Leafs typically trade a few percent above spot melt value due to dealer premiums.",
-          },
-        },
       ],
     },
   ],

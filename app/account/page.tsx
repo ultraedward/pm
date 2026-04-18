@@ -31,7 +31,7 @@ export default async function AccountPage() {
 
   return (
     <main className="min-h-screen bg-surface text-white">
-      <div className="mx-auto max-w-xl px-6 py-16 space-y-12">
+      <div className="mx-auto max-w-xl px-6 py-16 space-y-10">
 
         {/* Header */}
         <div>
@@ -40,10 +40,9 @@ export default async function AccountPage() {
           <p className="text-sm text-gray-500 mt-1">{dbUser.email}</p>
         </div>
 
-        {/* Plan */}
-        <div className="space-y-4 border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <p className="label">Plan</p>
-          <div className="flex items-center justify-between">
+        {/* Plan + usage — one card */}
+        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+          <div className="flex items-center justify-between px-6 py-5">
             <div>
               <p className="text-lg font-black tracking-tight">
                 {isPro ? "Pro" : "Free"}
@@ -56,7 +55,7 @@ export default async function AccountPage() {
                   ? dbUser.stripeCurrentPeriodEnd
                     ? `Renews ${new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}`
                     : "Unlimited alerts"
-                  : "1 alert included"}
+                  : `${Math.max(0, 1 - alertCount)} of 1 alert remaining`}
               </p>
             </div>
             {isPro ? (
@@ -73,70 +72,49 @@ export default async function AccountPage() {
                 href="/pricing"
                 className="rounded-full bg-amber-500 px-5 py-3 text-sm font-bold text-black hover:bg-amber-400 transition-colors min-h-[44px] flex items-center"
               >
-                Upgrade to Pro
+                Upgrade
               </Link>
             )}
           </div>
-        </div>
-
-        {/* Stats */}
-        <div className="space-y-4 border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <p className="label">Usage</p>
-          <div className="grid grid-cols-2 gap-x-8">
-            <Link href="/dashboard/alerts" className="group space-y-1 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+          <div className="grid grid-cols-2 divide-x border-t" style={{ borderColor: "var(--border)" }}>
+            <Link href="/dashboard/alerts" className="group px-6 py-4 hover:bg-white/5 transition-colors">
               <p className="text-2xl font-black tabular-nums">{alertCount}</p>
-              <p className="text-sm text-gray-500">{alertCount === 1 ? "Alert" : "Alerts"}</p>
-              <p className="text-xs text-gray-700 group-hover:text-gray-500 transition-colors">
-                {isPro ? "Unlimited" : `${Math.max(0, 1 - alertCount)} of 1 remaining`}
-              </p>
+              <p className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{alertCount === 1 ? "Alert" : "Alerts"} →</p>
             </Link>
-            <Link href="/dashboard/holdings" className="group space-y-1 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+            <Link href="/dashboard/holdings" className="group px-6 py-4 hover:bg-white/5 transition-colors">
               <p className="text-2xl font-black tabular-nums">{holdingCount}</p>
-              <p className="text-sm text-gray-500">{holdingCount === 1 ? "Holding" : "Holdings"}</p>
-              <p className="text-xs text-gray-700 group-hover:text-gray-500 transition-colors">View portfolio →</p>
+              <p className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{holdingCount === 1 ? "Holding" : "Holdings"} →</p>
             </Link>
           </div>
         </div>
 
-        {/* Emails */}
-        <div className="space-y-3 border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <p className="label">Emails</p>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between py-2">
-              <div>
-                <p className={`text-sm font-medium ${isPro ? "text-white" : "text-gray-600"}`}>Weekly digest</p>
-                <p className="text-xs text-gray-500 mt-0.5">Spot prices &amp; portfolio summary every Monday</p>
-              </div>
-              {isPro
-                ? <span className="text-xs font-semibold text-amber-400">On</span>
-                : <Link href="/pricing" className="text-xs font-semibold text-gray-600 hover:text-amber-400 transition-colors">Pro</Link>
-              }
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <div>
-                <p className="text-sm font-medium text-white">Price alerts</p>
-                <p className="text-xs text-gray-500 mt-0.5">Email when a metal hits your target</p>
-              </div>
+        {/* Email preferences — just two rows, no chrome */}
+        <div className="space-y-3">
+          <p className="label">Email</p>
+          <div className="divide-y rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+            <div className="flex items-center justify-between px-5 py-3">
+              <p className="text-sm text-white">Price alerts</p>
               <span className="text-xs font-semibold text-amber-400">On</span>
             </div>
+            <div className="flex items-center justify-between px-5 py-3">
+              <p className={`text-sm ${isPro ? "text-white" : "text-gray-500"}`}>Weekly digest</p>
+              {isPro
+                ? <span className="text-xs font-semibold text-amber-400">On</span>
+                : <Link href="/pricing" className="text-xs font-semibold text-gray-500 hover:text-amber-400 transition-colors">Pro</Link>
+              }
+            </div>
           </div>
         </div>
 
-        {/* Feedback */}
-        <div className="space-y-3 border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <p className="label">Feedback</p>
-          <p className="text-sm text-gray-500">Have a suggestion or found a bug? We&apos;d love to hear from you.</p>
+        {/* Footer row — sign out + feedback */}
+        <div className="flex items-center justify-between border-t pt-6" style={{ borderColor: "var(--border)" }}>
+          <SignOutButton />
           <a
             href="mailto:hello@lode.rocks?subject=Lode Feedback"
-            className="inline-block rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] leading-[1.25rem]"
+            className="text-xs text-gray-600 hover:text-gray-300 transition-colors"
           >
             Send feedback →
           </a>
-        </div>
-
-        {/* Sign out */}
-        <div className="border-t pt-8" style={{ borderColor: "var(--border)" }}>
-          <SignOutButton />
         </div>
 
       </div>

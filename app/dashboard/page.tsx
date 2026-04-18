@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { DashboardCalculatorTabs } from "@/components/DashboardCalculatorTabs";
-import { PredictionCard } from "@/components/PredictionCard";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -175,8 +174,13 @@ export default async function DashboardPage() {
 
         {/* Daily spot prices */}
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <div className="px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+          <div className="px-5 py-3 border-b flex items-center justify-between gap-4" style={{ borderColor: "var(--border)" }}>
             <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Spot Prices</p>
+            {spots.gold > 0 && spots.silver > 0 && (
+              <p className="text-[11px] text-gray-600 tabular-nums">
+                Gold:Silver <span className="text-gray-300 font-semibold">{(spots.gold / spots.silver).toFixed(1)}</span>
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09]">
             {METALS.map((metal) => {
@@ -203,22 +207,6 @@ export default async function DashboardPage() {
             })}
           </div>
         </div>
-
-        {/* Gold:Silver Ratio */}
-        {spots.gold > 0 && spots.silver > 0 && (
-          <div className="flex items-center justify-between px-5 py-3 rounded-xl border border-white/5 bg-gray-950">
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Gold:Silver Ratio</p>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <p className="text-lg font-black tabular-nums tracking-tightest">
-                {(spots.gold / spots.silver).toFixed(1)}
-              </p>
-              <p className="text-xs text-gray-600">oz of silver to buy 1 oz of gold</p>
-            </div>
-          </div>
-        )}
 
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
@@ -254,8 +242,8 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* 30d portfolio chart — only shown when there are holdings */}
-        {holdings.length > 0 && portfolioSpark && (
+        {/* 30d portfolio chart — only when there's enough history to be meaningful */}
+        {holdings.length > 0 && portfolioSpark && portfolioHistory.length >= 7 && (
           <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
             <div className="flex justify-between items-start">
               <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Portfolio value · 30 days</p>
@@ -287,9 +275,6 @@ export default async function DashboardPage() {
             </svg>
           </div>
         )}
-
-        {/* Daily Prediction */}
-        <PredictionCard goldSpot={spots.gold} />
 
         {/* Unified calculator — coins/bars + jewelry/scrap */}
         <DashboardCalculatorTabs spots={spots} isPro={isPro} />
