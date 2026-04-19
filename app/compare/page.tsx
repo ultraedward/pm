@@ -8,6 +8,50 @@ import { COMPARE_COINS } from "@/lib/compare/coins";
 import { DEALERS, buildDealerUrl } from "@/lib/compare/dealers";
 import CompareClient, { type DealerUrlMap } from "./CompareClient";
 
+// Structured data for /compare. We intentionally avoid Product/Offer schema
+// because Lode is not the seller — dealers are. Claiming Offer markup with
+// prices scraped from third parties risks misrepresentation and would be
+// disallowed by Google's product-structured-data policy. Instead we emit:
+//   1. WebPage — identifies the page + describes it
+//   2. BreadcrumbList — Home → Compare
+//   3. ItemList — the four coins we track, each as a neutral Thing
+// Together these help Google understand topic and hierarchy without
+// overclaiming inventory or fulfillment.
+const compareJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://lode.rocks/compare#page",
+      "url": "https://lode.rocks/compare",
+      "name": "Cheapest Place to Buy Bullion Right Now — Silver & Gold Eagle, Maple Leaf",
+      "description":
+        "Compare live dealer prices on the most-bought bullion coins across top US dealers.",
+      "isPartOf": { "@id": "https://lode.rocks/#site" },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "Compare", "item": "https://lode.rocks/compare" },
+      ],
+    },
+    {
+      "@type": "ItemList",
+      "name": "Bullion coins compared",
+      "itemListElement": COMPARE_COINS.map((coin, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "item": {
+          "@type": "Thing",
+          "name": coin.label,
+          "description": `${coin.oz} troy oz ${coin.metal} bullion coin — price compared across top US dealers.`,
+        },
+      })),
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Cheapest Place to Buy Bullion Right Now — Silver & Gold Eagle, Maple Leaf",
   description:
@@ -48,6 +92,10 @@ export default async function ComparePage() {
 
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(compareJsonLd) }}
+      />
       {/* ── Hero ──────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 pt-14 pb-4 sm:pt-20">
         <div className="mx-auto max-w-2xl space-y-4">

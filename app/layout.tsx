@@ -56,6 +56,31 @@ export const metadata: Metadata = {
   },
 };
 
+// Site-wide JSON-LD. Emitted once in the root layout so every page inherits
+// the Organization/WebSite graph — enables Google's sitelinks search box and
+// knowledge-panel signals without repeating boilerplate on every route.
+const siteJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://lode.rocks/#org",
+      "name": "Lode",
+      "url": "https://lode.rocks",
+      "email": "hello@lode.rocks",
+      "description":
+        "Gold, silver, platinum, and palladium spot prices updated every 15 minutes. Precious metals portfolio tracker, price alerts, and dealer price comparison.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://lode.rocks/#site",
+      "url": "https://lode.rocks",
+      "name": "Lode",
+      "publisher": { "@id": "https://lode.rocks/#org" },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -64,6 +89,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`bg-surface text-white ${inter.variable}`}>
       <body className="min-h-screen bg-surface text-white antialiased font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+        />
         <Navbar />
         <div className="sm:pb-0 pb-20">
           {children}

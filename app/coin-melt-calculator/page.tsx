@@ -180,8 +180,8 @@ export default function CoinMeltCalculatorPage() {
           <Link href="/#calculator" className="btn-gold px-10">
             Calculate melt value
           </Link>
-          <Link href="/login" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-            Track your full portfolio →
+          <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+            See where to buy at today&apos;s spot →
           </Link>
         </div>
       </section>
