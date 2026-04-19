@@ -41,8 +41,8 @@ export const DEALERS: Dealer[] = [
     name: "APMEX",
     short: "APMEX",
     product: "https://www.apmex.com/product/{slug}",
-    // APMEX uses Impact.com — enable once approved.
-    // affiliate: "https://apmex.pxf.io/c/{id}/1234/XYZ?u={url}",
+    // APMEX is on FlexOffers — enable once approved.
+    // affiliate: "https://track.flexlinkspro.com/a.ashx?foid=XXXXX&foc=1&fot=9999&fos=1&url={url}",
     affiliateId: AFF_IDS.apmex,
   },
   {
@@ -50,8 +50,8 @@ export const DEALERS: Dealer[] = [
     name: "JM Bullion",
     short: "JM",
     product: "https://www.jmbullion.com/{slug}/",
-    // JM Bullion runs on Sovrn/Commission Junction — enable once approved.
-    // affiliate: "https://www.anrdoezrs.net/click-{id}-12345?url={url}",
+    // JM Bullion is on Awin (merchant ID 22685) — enable once approved.
+    // affiliate: "https://www.awin1.com/cread.php?awinmid=22685&awinaffid={id}&ued={url}",
     affiliateId: AFF_IDS.jmbullion,
   },
   {
@@ -68,8 +68,8 @@ export const DEALERS: Dealer[] = [
     name: "Money Metals",
     short: "MM",
     product: "https://www.moneymetals.com/{slug}",
-    // Money Metals uses ShareASale — enable once approved.
-    // affiliate: "https://www.shareasale.com/r.cfm?b=123&u={id}&m=456&urllink={url}",
+    // Money Metals is on Awin (same account as JM Bullion) — enable once approved.
+    // affiliate: "https://www.awin1.com/cread.php?awinmid=XXXXX&awinaffid={id}&ued={url}",
     affiliateId: AFF_IDS.moneymetals,
   },
 ];
