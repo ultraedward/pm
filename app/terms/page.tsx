@@ -2,8 +2,16 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
   title: "Terms of Service",
+  description:
+    "Lode's terms of service — the rules governing use of our precious metals price tracker, portfolio tools, price alerts, and all other features.",
   alternates: {
     canonical: "https://lode.rocks/terms",
+  },
+  openGraph: {
+    title: "Terms of Service | Lode",
+    description:
+      "The terms governing your use of Lode's precious metals price tracker, portfolio tools, and price alerts.",
+    url: "https://lode.rocks/terms",
   },
 };
 

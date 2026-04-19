@@ -86,7 +86,7 @@ export default async function GramPage() {
           "14k, 18k, 24k gold melt value",
           "Gram, pennyweight, and troy oz support",
         ],
-        "isPartOf": { "@id": "https://lode.rocks/#website" },
+        "isPartOf": { "@id": "https://lode.rocks/#site" },
       },
       {
         "@type": "FAQPage",

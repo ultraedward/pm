@@ -203,24 +203,13 @@ export default async function HomePage() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "WebSite",
-        "@id": "https://lode.rocks/#website",
-        "url": "https://lode.rocks",
-        "name": "Lode",
-        "description": "Precious metals spot prices updated every 15 minutes — portfolio tracker and price alerts for gold, silver, platinum, and palladium.",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://lode.rocks/?q={search_term_string}",
-          "query-input": "required name=search_term_string",
-        },
-      },
-      {
         "@type": "WebApplication",
         "@id": "https://lode.rocks/#app",
         "name": "Lode — Precious Metals Tracker",
         "url": "https://lode.rocks",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
+        "isPartOf": { "@id": "https://lode.rocks/#site" },
         "offers": [
           {
             "@type": "Offer",

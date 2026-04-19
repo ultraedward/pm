@@ -7,6 +7,12 @@ export const metadata = {
   alternates: {
     canonical: "https://lode.rocks/contact",
   },
+  openGraph: {
+    title: "Contact | Lode",
+    description:
+      "Reach the Lode team at hello@lode.rocks — questions, feedback, partnerships, or press.",
+    url: "https://lode.rocks/contact",
+  },
 };
 
 export default function ContactPage() {

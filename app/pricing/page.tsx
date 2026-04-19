@@ -5,16 +5,16 @@ import { prisma } from "@/lib/prisma";
 import { PricingClient } from "./PricingClient";
 
 export const metadata: Metadata = {
-  title: "Pricing",
+  title: "Pricing — Free & Pro Plans",
   description:
-    "Lode is free forever with 1 price alert and full portfolio tracking. Upgrade to Pro for unlimited alerts.",
+    "Lode is free forever: 1 price alert, full portfolio tracking, and live spot prices. Upgrade to Pro for unlimited gold and silver price alerts.",
   alternates: {
     canonical: "https://lode.rocks/pricing",
   },
   openGraph: {
-    title: "Pricing",
+    title: "Pricing — Free & Pro Plans | Lode",
     description:
-      "Lode is free forever with 1 price alert and full portfolio tracking. Upgrade to Pro for unlimited alerts.",
+      "Lode is free forever: 1 price alert, portfolio tracker, and live spot prices. Upgrade to Pro for unlimited alerts at $3/month.",
     url: "https://lode.rocks/pricing",
   },
 };

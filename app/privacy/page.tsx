@@ -2,8 +2,16 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
   title: "Privacy Policy",
+  description:
+    "Lode's privacy policy — how we collect, use, and protect your data when you use our precious metals price tracker, portfolio tools, and price alerts.",
   alternates: {
     canonical: "https://lode.rocks/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy | Lode",
+    description:
+      "How Lode collects, uses, and protects your data when you use our precious metals tracker and price alerts.",
+    url: "https://lode.rocks/privacy",
   },
 };
 
