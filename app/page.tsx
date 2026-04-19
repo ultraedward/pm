@@ -309,7 +309,15 @@ export default async function HomePage() {
             <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
               What&apos;s it worth<br className="hidden sm:block" /> at today&apos;s spot?
             </h2>
-            <p className="text-sm mt-3" style={{ color: "var(--text-muted)" }}>Coins, bars, jewelry, or scrap. <Link href="/login" className="underline underline-offset-4 hover:text-white transition-colors">Sign up free</Link> to save your stack.</p>
+            <p className="text-sm mt-3" style={{ color: "var(--text-muted)" }}>
+              Coins, bars, jewelry, or scrap.
+              {!isLoggedIn && (
+                <>
+                  {" "}
+                  <Link href="/login" className="underline underline-offset-4 hover:text-white transition-colors">Sign up free</Link> to save your stack.
+                </>
+              )}
+            </p>
           </div>
           <CalculatorTabs
             spots={{
