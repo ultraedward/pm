@@ -24,7 +24,7 @@ export const COMPARE_COINS: CompareCoin[] = [
     oz: 1.0,
     slugs: {
       apmex: "23331/1-oz-american-silver-eagle-coin-bu-random-year",
-      jmbullion: "1-oz-american-silver-eagle-coin-random-date",
+      jmbullion: "american-silver-eagle-varied-year",
       sdbullion: "1-oz-american-silver-eagle-coins-random-year",
       moneymetals: "1-oz-american-silver-eagle-random-year/262",
     },
@@ -36,7 +36,7 @@ export const COMPARE_COINS: CompareCoin[] = [
     oz: 1.0,
     slugs: {
       apmex: "1/1-oz-american-gold-eagle-coin-bu-random-year",
-      jmbullion: "1-oz-american-gold-eagle-coin-random-year",
+      jmbullion: "1-oz-american-gold-eagle",
       sdbullion: "1-oz-american-gold-eagle-coin-random-year-bu",
       moneymetals: "1-oz-american-gold-eagle-coin/7",
     },
@@ -48,7 +48,7 @@ export const COMPARE_COINS: CompareCoin[] = [
     oz: 1.0,
     slugs: {
       apmex: "1090/1-oz-canadian-silver-maple-leaf-coin-bu-random-year",
-      jmbullion: "1-oz-canadian-silver-maple-leaf-random-year",
+      jmbullion: "canadian-silver-maple-leaf-varied-year",
       sdbullion: "canadian-silver-maple-leaf-coin-random-year",
       moneymetals: "1-oz-canadian-silver-maple-leaf-coin/16",
     },
@@ -60,7 +60,7 @@ export const COMPARE_COINS: CompareCoin[] = [
     oz: 1.0,
     slugs: {
       apmex: "201964/random-year-1-oz-gold-maple-leaf-99999-bu-w-assay-card",
-      jmbullion: "1-oz-canadian-gold-maple-leaf-random-year",
+      jmbullion: "1-oz-canadian-gold-maple-leaf-any-year",
       sdbullion: "1-oz-canadian-gold-maple-leaf-coin-random-year",
       // MM currently only lists the KC3 1 oz Gold Maple, no "random year" SKU.
       // Since all current RCM production is KC3, this is the right pick — but

@@ -55,6 +55,17 @@ const SUSPECT_PATHS: Record<Dealer["id"], RegExp[]> = {
   moneymetals: [/\/404/, /\/search/, /\/not-found/, /^https?:\/\/www\.moneymetals\.com\/?$/],
 };
 
+// Per-dealer <title> patterns that indicate a soft-404 — a page that returns
+// HTTP 200 but renders "not found" content. JM Bullion is the canonical
+// offender: they serve the generic site homepage title on bad product URLs
+// instead of a proper 404. Without this check, bad slugs look "verified."
+const SOFT_404_TITLES: Record<Dealer["id"], RegExp[]> = {
+  apmex:       [/Bullion Dealer Online/i, /Home \| APMEX/i],
+  jmbullion:   [/^Buy Gold (?:&amp;|&) Silver Bullion Online/i],
+  sdbullion:   [/^SD Bullion$/i],
+  moneymetals: [/^Money Metals Exchange$/i],
+};
+
 // Per-dealer search URL template — used when `--open` is set on ✗ rows so we
 // open the dealer's site search for that coin instead of the broken 404 URL.
 const SEARCH_URL: Record<Dealer["id"], (q: string) => string> = {
@@ -79,15 +90,20 @@ type Result = {
   reason: string;
 };
 
-async function get(url: string): Promise<{ status: number; finalUrl: string } | null> {
+async function get(url: string): Promise<{ status: number; finalUrl: string; title: string | null } | null> {
   try {
     const res = await fetch(url, {
       method: "GET",
       redirect: "follow",
       headers: BROWSER_HEADERS,
     });
-    await res.text().catch(() => undefined);
-    return { status: res.status, finalUrl: res.url };
+    const body = await res.text().catch(() => "");
+    // Extract <title> — only the first 2KB is enough, titles always appear
+    // near the top of the <head>. Keeps memory bounded on large pages.
+    const head = body.slice(0, 16_384);
+    const m = /<title[^>]*>([^<]*)<\/title>/i.exec(head);
+    const title = m ? m[1].trim() : null;
+    return { status: res.status, finalUrl: res.url, title };
   } catch {
     return null;
   }
@@ -95,6 +111,11 @@ async function get(url: string): Promise<{ status: number; finalUrl: string } | 
 
 function isSuspectFinalUrl(dealerId: Dealer["id"], finalUrl: string): boolean {
   return SUSPECT_PATHS[dealerId].some((re) => re.test(finalUrl));
+}
+
+function isSoft404Title(dealerId: Dealer["id"], title: string | null): boolean {
+  if (!title) return false;
+  return SOFT_404_TITLES[dealerId].some((re) => re.test(title));
 }
 
 async function check(coinId: string, coinLabel: string, dealer: Dealer, slug: string): Promise<Result> {
@@ -119,6 +140,10 @@ async function check(coinId: string, coinLabel: string, dealer: Dealer, slug: st
   // 200 + suspect redirect = bad
   if (r.status === 200 && isSuspectFinalUrl(dealer.id, r.finalUrl)) {
     return { ...base, finalUrl: r.finalUrl, status: r.status, verdict: "bad", reason: "redirected to search/home/404" };
+  }
+  // 200 + generic-site <title> = soft-404 (JM Bullion-style)
+  if (r.status === 200 && isSoft404Title(dealer.id, r.title)) {
+    return { ...base, finalUrl: r.finalUrl, status: r.status, verdict: "bad", reason: `soft-404 — page title "${r.title}" looks like the dealer's generic site title, not a product page` };
   }
   // 200 with no redirect = ok
   if (r.status === 200) {
