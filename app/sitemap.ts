@@ -23,6 +23,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    {
+      url: `${base}/compare`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 0.9,
+    },
     // Semi-static feature pages
     {
       url: `${base}/gold-price-alerts`,
@@ -42,7 +48,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    // Legal pages — rarely change
+    // Legal + contact pages — rarely change
+    {
+      url: `${base}/contact`,
+      lastModified: new Date("2026-04-18"),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
     {
       url: `${base}/terms`,
       lastModified: new Date("2026-03-12"),

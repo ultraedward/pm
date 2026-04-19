@@ -4,7 +4,7 @@ import Link from "next/link";
 
 /**
  * Consistent site-wide footer used on every page.
- * Links: Home | Calculator | Pricing | Privacy | Terms
+ * Links: Home | Pricing | Contact | Privacy | Terms
  */
 export function SiteFooter() {
   return (
@@ -19,6 +19,7 @@ export function SiteFooter() {
         <div className="flex gap-6">
           <Link href="/"        className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
           <Link href="/pricing" className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
+          <Link href="/contact" className="hover:text-gray-300 transition-colors">Contact</Link>
           <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
           <Link href="/terms"   className="hover:text-gray-300 transition-colors">Terms</Link>
         </div>
