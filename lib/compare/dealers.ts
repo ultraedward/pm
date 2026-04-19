@@ -59,8 +59,8 @@ export const DEALERS: Dealer[] = [
     name: "SD Bullion",
     short: "SD",
     product: "https://sdbullion.com/{slug}",
-    // SD Bullion affiliate: simple query-param pass-through.
-    // affiliate: "https://sdbullion.com/{slug}?aff={id}",
+    // SD Bullion is on Awin (merchant ID 78598) — same account as JM Bullion + Money Metals.
+    // affiliate: "https://www.awin1.com/cread.php?awinmid=78598&awinaffid={id}&ued={url}",
     affiliateId: AFF_IDS.sdbullion,
   },
   {
