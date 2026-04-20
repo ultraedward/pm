@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Gold Price Alerts — Get Notified When Gold Hits Your Target",
   description:
-    "Set custom gold price alerts and get email notifications the moment spot price hits your target. Also covers silver, platinum, and palladium. No app required — works in any inbox.",
+    "Set custom gold price alerts and get a daily email when spot price crosses your target. Also covers silver, platinum, and palladium. No app required — works in any inbox.",
   keywords: [
     "gold price alert",
     "gold price notification",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Gold Price Alerts — Get Notified When Gold Hits Your Target",
     description:
-      "Set custom price targets for gold, silver, platinum, or palladium and receive email alerts the moment spot price crosses your threshold.",
+      "Set custom price targets for gold, silver, platinum, or palladium. Daily email check — when spot crosses your threshold, the alert hits your inbox.",
     url: "https://lode.rocks/gold-price-alerts",
   },
 };
@@ -39,7 +39,7 @@ const jsonLd = {
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "description":
-        "Set custom price targets for gold, silver, platinum, and palladium. Receive email alerts the moment spot price hits your threshold.",
+        "Set custom price targets for gold, silver, platinum, and palladium. Once per day, Lode checks spot against your threshold and emails you if it crossed.",
       "featureList": [
         "Gold spot price alerts",
         "Silver price alerts",
@@ -56,7 +56,7 @@ const jsonLd = {
           "name": "How do gold price alerts work on Lode?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You set a target price — for example, 'alert me when gold drops below $2,800 per troy oz.' Lode checks spot prices every 15 minutes. The moment gold crosses your threshold, you receive an email notification. No app download required.",
+            "text": "You set a target price — for example, 'alert me when gold drops below $2,800 per troy oz.' Once per day, Lode checks the spot price against your targets. If your threshold was crossed, you get one email. No app, no repeat nagging.",
           },
         },
         {
@@ -72,7 +72,7 @@ const jsonLd = {
           "name": "Do I need to install an app to get gold price alerts?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No app needed. Lode sends alerts to your email inbox. Create a free account, set your target price, and the notification arrives in your email the moment spot price triggers your threshold.",
+            "text": "No app needed. Lode sends alerts to your email inbox. Create an account, set your target price, and once spot crosses it on a daily check, the notification lands in your email.",
           },
         },
       ],
@@ -89,7 +89,7 @@ const FEATURES = [
   {
     icon: "📬",
     title: "Email-only, no app",
-    body: "Alerts land in your inbox within 15 minutes of the price move. No permissions, no downloads.",
+    body: "Daily check after the trading day closes. If your threshold was crossed, the alert is in your inbox. No permissions, no downloads.",
   },
 ];
 
@@ -116,12 +116,11 @@ export default function GoldPriceAlertsPage() {
             <span style={{ color: "var(--gold-bright)" }}>Delivered to Your Inbox</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
-            Set a target price for gold, silver, platinum, or palladium. Get an email the moment spot price hits it —
-            no app, no noise, just the alert you asked for.
+            Set a target price for gold, silver, platinum, or palladium. Once a day, Lode checks spot against your target — if it crossed, you get one email. No app, no noise.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link href="/login" className="btn-gold px-10">
-              Set a free alert
+              Set an alert
             </Link>
             <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
               View live spot prices →
@@ -167,12 +166,12 @@ export default function GoldPriceAlertsPage() {
 
       {/* ── CTA ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
-        <p className="text-2xl font-black tracking-tight">Never miss a gold price move again</p>
+        <p className="text-2xl font-black tracking-tight">Set it once. Lode watches the close so you don&rsquo;t have to.</p>
         <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          Create a free account and set your first alert in under a minute.
+          Create an account and set your first alert in under a minute.
         </p>
         <Link href="/login" className="btn-gold px-10 inline-block">
-          Set a free alert
+          Set your first alert
         </Link>
       </section>
 

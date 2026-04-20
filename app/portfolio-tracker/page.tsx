@@ -77,7 +77,7 @@ const jsonLd = {
           "name": "How does the precious metals portfolio tracker work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at live spot prices updated every 15 minutes. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup. Whether you hold American Eagles, Maple Leafs, generic rounds, or bars, log them by troy ounce weight.",
+            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at live spot prices. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup. Whether you hold American Eagles, Maple Leafs, generic rounds, or bars, log them by troy ounce weight.",
           },
         },
       ],
@@ -94,7 +94,7 @@ const FEATURES = [
   {
     icon: "📈",
     title: "Live P&L at spot",
-    body: "Log your cost basis and see your gain or loss at today's spot price, updated every 15 minutes.",
+    body: "Log your cost basis and see your gain or loss at today's live spot price.",
   },
 ];
 

@@ -47,7 +47,7 @@ const jsonLd = {
         "Morgan and Peace dollar melt value",
         "Gold Eagle melt value",
         "Canadian Maple Leaf melt value",
-        "Live spot price updates every 15 minutes",
+        "Live spot price on every page load",
       ],
     },
     {
@@ -74,7 +74,7 @@ const jsonLd = {
           "name": "What is the melt value of an American Silver Eagle?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "An American Silver Eagle contains exactly 1 troy ounce of fine (.999) silver. Its melt value equals the current silver spot price. Use the Lode calculator for the live figure updated every 15 minutes.",
+            "text": "An American Silver Eagle contains exactly 1 troy ounce of fine (.999) silver. Its melt value equals the current silver spot price. Use the Lode calculator for the live figure.",
           },
         },
       ],

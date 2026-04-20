@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Silver Price Per Gram Calculator — Live Spot | Lode",
   description:
-    "Calculate the silver price per gram instantly with live spot prices — .999 fine, sterling 925, coin 900, European 800. Also covers 14k, 18k, and 24k gold price per gram. Updated every 15 minutes.",
+    "Calculate the silver price per gram instantly with live spot prices — .999 fine, sterling 925, coin 900, European 800. Also covers 14k, 18k, and 24k gold price per gram.",
   alternates: {
     canonical: "https://lode.rocks/gram",
   },
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Silver Price Per Gram Calculator — Live Spot | Lode",
     description:
-      "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900, and 14k–24k gold. Updated every 15 minutes.",
+      "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900, and 14k–24k gold.",
     url: "https://lode.rocks/gram",
   },
 };
@@ -96,7 +96,7 @@ export default async function GramPage() {
             "name": "What is the silver price per gram today?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `Silver is currently ${silverSpot > 0 ? `$${(silverSpot / 31.1035).toFixed(4)} per gram` : "available on this page — updated with live spot prices every 15 minutes"}. Fine .999 silver is calculated by dividing the troy ounce spot price by 31.1035 grams per troy oz.`,
+              "text": `Silver is currently ${silverSpot > 0 ? `$${(silverSpot / 31.1035).toFixed(4)} per gram` : "available on this page — calculated from live spot prices"}. Fine .999 silver is calculated by dividing the troy ounce spot price by 31.1035 grams per troy oz.`,
             },
           },
           {
@@ -140,7 +140,7 @@ export default async function GramPage() {
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto">
-            Enter any weight to see the live melt value of silver or gold — fine .999, sterling 925, coin 900, 14k, 18k, 24k, and more. Spot prices update every 15 minutes.
+            Enter any weight to see the live melt value of silver or gold — fine .999, sterling 925, coin 900, 14k, 18k, 24k, and more. Spot prices refresh on page load.
           </p>
           <div className="flex items-center justify-center gap-6 text-xs text-gray-600 pt-1">
             <span>Gold spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(goldSpot)} / ozt</span></span>
@@ -219,7 +219,7 @@ export default async function GramPage() {
               <p className="text-sm text-gray-400 leading-relaxed">
                 {silverSpot > 0
                   ? `Fine .999 silver is currently ${(silverSpot / 31.1035).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4, maximumFractionDigits: 4 })} per gram, based on a spot price of ${fmtSpot(silverSpot)} per troy ounce. Sterling silver (92.5% pure) is ${(silverSpot * 0.925 / 31.1035).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4, maximumFractionDigits: 4 })} per gram.`
-                  : "The current silver price per gram is shown in the calculator and reference table above, updated every 15 minutes from live spot prices."}
+                  : "The current silver price per gram is shown in the calculator and reference table above, calculated from the live spot price."}
               </p>
             </div>
 

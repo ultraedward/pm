@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Lode",
   },
   description:
-    "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
+    "Live gold, silver, platinum, and palladium spot prices. Track your precious metals portfolio, set daily email price alerts, and calculate coin melt values.",
   keywords: [
     "gold spot price",
     "silver spot price",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
+      "Live gold, silver, platinum, and palladium spot prices. Track your precious metals portfolio, set daily email price alerts, and calculate coin melt values.",
     type: "website",
     url: "https://lode.rocks",
     siteName: "Lode",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Track your precious metals portfolio, set price alerts, and calculate coin melt values.",
+      "Live gold, silver, platinum, and palladium spot prices. Track your precious metals portfolio, set daily email price alerts, and calculate coin melt values.",
   },
   verification: {
     google: "9e0574274bbeb821",
@@ -72,7 +72,7 @@ const siteJsonLd = {
       "url": "https://lode.rocks",
       "email": "hello@lode.rocks",
       "description":
-        "Gold, silver, platinum, and palladium spot prices updated every 15 minutes. Precious metals portfolio tracker, price alerts, and dealer price comparison.",
+        "Live gold, silver, platinum, and palladium spot prices. Precious metals portfolio tracker, daily email price alerts, and dealer-pricing comparison.",
     },
     {
       "@type": "WebSite",

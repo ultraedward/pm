@@ -13,14 +13,14 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
   description:
-    "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Precious metals portfolio tracker.",
+    "Live gold, silver, platinum, and palladium spot prices. Set daily email price alerts, calculate coin melt values, and track your precious metals portfolio.",
   alternates: {
     canonical: "https://lode.rocks",
   },
   openGraph: {
     title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Track gold, silver, platinum, and palladium spot prices — updated every 15 minutes. Set custom price alerts and calculate coin melt values. Precious metals portfolio tracker.",
+      "Live gold, silver, platinum, and palladium spot prices. Set daily email price alerts, calculate coin melt values, and track your precious metals portfolio.",
     url: "https://lode.rocks",
   },
 };
@@ -216,7 +216,7 @@ export default async function HomePage() {
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "1 price alert, portfolio tracker, spot prices updated every 15 minutes",
+            "description": "1 price alert, portfolio tracker, live spot prices",
           },
           {
             "@type": "Offer",
@@ -263,7 +263,7 @@ export default async function HomePage() {
                 {gold.percentChange >= 0 ? "▲" : "▼"} {Math.abs(gold.percentChange).toFixed(2)}% today
               </span>
             )}
-            <span className="label">Updated every 15 min</span>
+            <span className="label">Live spot price</span>
           </div>
 
           {/* CTA */}

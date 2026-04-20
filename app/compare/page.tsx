@@ -9,9 +9,10 @@ import { DEALERS, buildDealerUrl } from "@/lib/compare/dealers";
 import CompareClient, { type DealerUrlMap } from "./CompareClient";
 
 // Structured data for /compare. We intentionally avoid Product/Offer schema
-// because Lode is not the seller — dealers are. Claiming Offer markup with
-// prices scraped from third parties risks misrepresentation and would be
-// disallowed by Google's product-structured-data policy. Instead we emit:
+// because Lode is not the seller — dealers are — and our totals are estimates
+// (live spot × coin weight + hand-maintained dealer premiums), not scraped
+// live prices. Claiming Offer markup would risk misrepresentation and fall
+// outside Google's product-structured-data policy. Instead we emit:
 //   1. WebPage — identifies the page + describes it
 //   2. BreadcrumbList — Home → Compare
 //   3. ItemList — the four coins we track, each as a neutral Thing
@@ -24,9 +25,9 @@ const compareJsonLd = {
       "@type": "WebPage",
       "@id": "https://lode.rocks/compare#page",
       "url": "https://lode.rocks/compare",
-      "name": "Cheapest Place to Buy Bullion Right Now — Silver & Gold Eagle, Maple Leaf",
+      "name": "Estimated Bullion Pricing Across Top US Dealers — Silver & Gold Eagle, Maple Leaf",
       "description":
-        "Compare live dealer prices on the most-bought bullion coins across top US dealers.",
+        "Estimated total cost per coin across top US bullion dealers, using today's live spot price plus dealer premiums we maintain by hand.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
     {
@@ -45,7 +46,7 @@ const compareJsonLd = {
         "item": {
           "@type": "Thing",
           "name": coin.label,
-          "description": `${coin.oz} troy oz ${coin.metal} bullion coin — price compared across top US dealers.`,
+          "description": `${coin.oz} troy oz ${coin.metal} bullion coin — estimated cost across top US dealers.`,
         },
       })),
     },
@@ -53,16 +54,16 @@ const compareJsonLd = {
 };
 
 export const metadata: Metadata = {
-  title: "Cheapest Place to Buy Bullion Right Now — Silver & Gold Eagle, Maple Leaf",
+  title: "Compare Bullion Prices Across Top US Dealers — Silver & Gold Eagle, Maple Leaf",
   description:
-    "Compare live dealer prices on the most-bought bullion coins. Find the cheapest American Silver Eagle, Gold Eagle, and Canadian Maple Leaf across top US dealers at today's spot price.",
+    "Estimated total cost for the most-bought bullion coins — Silver Eagle, Gold Eagle, Silver and Gold Maple Leaf — across APMEX, JM Bullion, SD Bullion, and Money Metals at today's live spot price.",
   alternates: {
     canonical: "https://lode.rocks/compare",
   },
   openGraph: {
-    title: "Cheapest Place to Buy Bullion Right Now — Lode",
+    title: "Compare Bullion Prices Across Top US Dealers — Lode",
     description:
-      "Live price comparison across top US bullion dealers. Silver Eagle, Gold Eagle, Silver Maple, Gold Maple — sorted by cheapest right now.",
+      "Estimated pricing for Silver Eagle, Gold Eagle, Silver Maple, and Gold Maple across top US bullion dealers. Live spot plus dealer premiums we track by hand.",
     url: "https://lode.rocks/compare",
   },
 };
@@ -99,16 +100,16 @@ export default async function ComparePage() {
       {/* ── Hero ──────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 pt-14 pb-4 sm:pt-20">
         <div className="mx-auto max-w-2xl space-y-4">
-          <p className="label">Price comparison</p>
+          <p className="label">Estimated dealer pricing</p>
           <h1
             className="font-black tracking-tight text-white"
             style={{ fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "-0.04em", lineHeight: "1.02" }}
           >
-            Cheapest place to buy,<br />
-            <span style={{ color: "var(--gold-bright)" }}>right now.</span>
+            Likely cheapest,<br />
+            <span style={{ color: "var(--gold-bright)" }}>at today&rsquo;s spot.</span>
           </h1>
           <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-            Live dealer prices on the four most-bought bullion coins. Sorted by total cost.
+            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — today&rsquo;s live spot price plus dealer premiums we maintain by hand. Sorted low to high.
           </p>
           {/* FTC affiliate disclosure — required for sponsored outbound links */}
           <p className="text-[11px] text-gray-600 leading-relaxed">
