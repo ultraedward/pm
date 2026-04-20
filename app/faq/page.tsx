@@ -1,28 +1,123 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "FAQ — Lode",
+  title: "Precious Metals FAQ — Spot Prices, Alerts & How Lode Works",
   description:
-    "Frequently asked questions about Lode: is it legit, where the price data comes from, how to verify it, what happens to your data, and how alerts work.",
+    "Answers to the most common questions about Lode: where spot price data comes from, how price alerts work, whether the site is legitimate, and what we do (and don't) do with your data.",
   alternates: {
     canonical: "https://lode.rocks/faq",
   },
   openGraph: {
-    title: "FAQ | Lode",
+    title: "Precious Metals FAQ — Spot Prices, Alerts & How Lode Works",
     description:
-      "Is Lode legit? Where does the data come from? How do alerts work? Direct answers to common questions.",
+      "Where does the price data come from? How do alerts work? Is Lode legitimate? Direct answers to the most common questions.",
     url: "https://lode.rocks/faq",
   },
+};
+
+// FAQ structured data — enables Google FAQ rich results (expandable Q&As in SERP)
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",  "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "FAQ",   "item": "https://lode.rocks/faq" },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Lode legit?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Lode is an independent precious metals price tracker. It does not buy, sell, or broker metal — no funds ever move through the site. Spot prices come from metals.dev (with Yahoo Finance as a fallback) and can be cross-checked against Kitco or any broker terminal. Data collection and usage are documented in the Privacy Policy at lode.rocks/privacy.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Where does the spot price data come from?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Live spot prices come from metals.dev as the primary source, with Yahoo Finance futures data (GC=F, SI=F, PL=F, PA=F) as an automatic fallback if the primary source is unavailable. Full methodology is published at lode.rocks/methodology.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "How fresh are the precious metals prices?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Prices are fetched live when you load a page, cached on Lode's servers for up to 5 minutes, then refetched. During active market hours the displayed price is at most a few minutes old. On weekends and holidays the price reflects the last traded value — markets are closed.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "How do gold and silver price alerts work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You set a target price (e.g. 'alert me when gold goes above $2,400/ozt'). When the spot price Lode fetches crosses that threshold, one email is sent to your account address. Alerts are checked once per day. Email is the only notification channel — no SMS, no push notifications.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use Lode without creating an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The price dashboard, coin melt calculator, gram converter, and portfolio tracker all work without signing in. If you use the portfolio tracker anonymously, holdings are stored only in your browser's localStorage and never sent to Lode's servers. An account is only required for email price alerts or cross-device portfolio sync.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Does Lode sell precious metals?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Lode is not a dealer, broker, or exchange. It does not hold metal, sell metal, or take commissions from dealers. It is a price tracking and comparison tool only.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Does Lode sell user data or show ads?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Lode does not run advertising, sell user data, or use third-party tracking cookies. The only third-party services used are those operationally required to run the site (Google OAuth, Stripe, Neon, Vercel), documented in the Privacy Policy.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "How does Lode make money?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Affiliate commissions on dealer outbound clicks from the compare page at lode.rocks/compare. When you click through to APMEX, JM Bullion, SD Bullion, or Money Metals and buy, Lode may earn a referral fee at no cost to you. Commissions do not affect rankings — the compare page sorts by estimated total cost.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Is the information on Lode financial advice?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Everything on Lode is informational — spot prices, calculations, and alerts are tools to help you see market data, not recommendations to buy, sell, or hold anything. Consult a qualified financial professional for investment decisions.",
+          },
+        },
+      ],
+    },
+  ],
 };
 
 export default function FaqPage() {
   return (
     <main className="min-h-screen bg-surface px-6 py-24 text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="mx-auto max-w-2xl space-y-12">
 
         <div>
           <p className="label mb-2">Questions</p>
-          <h1 className="text-4xl font-black tracking-tight">FAQ</h1>
+          <h1 className="text-4xl font-black tracking-tight">Frequently Asked Questions</h1>
           <p className="mt-3 text-sm text-gray-500">
             Direct answers to the things people actually ask us.
           </p>

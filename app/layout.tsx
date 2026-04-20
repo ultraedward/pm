@@ -80,6 +80,14 @@ const siteJsonLd = {
       "url": "https://lode.rocks",
       "name": "Lode",
       "publisher": { "@id": "https://lode.rocks/#org" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://lode.rocks/?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
     },
   ],
 };

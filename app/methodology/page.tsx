@@ -15,9 +15,22 @@ export const metadata = {
   },
 };
 
+const methodologyJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home",        "item": "https://lode.rocks" },
+    { "@type": "ListItem", "position": 2, "name": "Methodology", "item": "https://lode.rocks/methodology" },
+  ],
+};
+
 export default function MethodologyPage() {
   return (
     <main className="min-h-screen bg-surface px-6 py-24 text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(methodologyJsonLd) }}
+      />
       <div className="mx-auto max-w-2xl space-y-12">
 
         <div>

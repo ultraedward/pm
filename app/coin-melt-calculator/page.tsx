@@ -33,6 +33,13 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",                   "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "Coin Melt Calculator",   "item": "https://lode.rocks/coin-melt-calculator" },
+      ],
+    },
+    {
       "@type": "WebApplication",
       "@id": "https://lode.rocks/coin-melt-calculator#app",
       "name": "Coin Melt Value Calculator — Lode",

@@ -71,6 +71,13 @@ export default async function GramPage() {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home",               "item": "https://lode.rocks" },
+          { "@type": "ListItem", "position": 2, "name": "Price Per Gram",     "item": "https://lode.rocks/gram" },
+        ],
+      },
+      {
         "@type": "WebApplication",
         "@id": "https://lode.rocks/gram#app",
         "name": "Silver & Gold Price Per Gram Calculator",

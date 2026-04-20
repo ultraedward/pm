@@ -1,23 +1,36 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "About — Lode",
+  title: "About Lode — Independent Precious Metals Price Tracker",
   description:
     "Lode is an independent precious metals price tracker — live spot prices, a coin melt calculator, a portfolio tracker, and daily email price alerts. Built for people who hold physical metal.",
   alternates: {
     canonical: "https://lode.rocks/about",
   },
   openGraph: {
-    title: "About | Lode",
+    title: "About Lode — Independent Precious Metals Price Tracker",
     description:
-      "An independent precious metals price tracker. Built for people who hold physical metal.",
+      "An independent precious metals price tracker built for people who hold physical metal. No dealer affiliation, no ads.",
     url: "https://lode.rocks/about",
   },
+};
+
+const aboutJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home",  "item": "https://lode.rocks" },
+    { "@type": "ListItem", "position": 2, "name": "About", "item": "https://lode.rocks/about" },
+  ],
 };
 
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-surface px-6 py-24 text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
+      />
       <div className="mx-auto max-w-2xl space-y-12">
 
         <div>
