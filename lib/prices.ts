@@ -21,10 +21,10 @@ const SYMBOL_MAP: Record<keyof PriceMap, string> = {
 // Last-resort fallback — only used if both metals.dev and the CF Worker/Yahoo Finance fail.
 // Updated April 2026. If you see these values in production, all live sources are down.
 const FALLBACK_PRICES: PriceMap = {
-  Gold: 3338.00,
-  Silver: 33.15,
-  Platinum: 980.00,
-  Palladium: 956.00,
+  Gold: 4830.00,
+  Silver: 80.40,
+  Platinum: 2102.00,
+  Palladium: 1580.00,
 };
 
 // ─── In-memory cache ──────────────────────────────────────────────────────────
