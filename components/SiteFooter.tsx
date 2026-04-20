@@ -4,7 +4,7 @@ import Link from "next/link";
 
 /**
  * Consistent site-wide footer used on every page.
- * Links: Home | Pricing | Contact | Privacy | Terms
+ * Links: Home | About | Methodology | FAQ | Pricing | Contact | Privacy | Terms
  */
 export function SiteFooter() {
   return (
@@ -16,12 +16,15 @@ export function SiteFooter() {
         >
           Lode
         </Link>
-        <div className="flex gap-6">
-          <Link href="/"        className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
-          <Link href="/pricing" className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
-          <Link href="/contact" className="hover:text-gray-300 transition-colors">Contact</Link>
-          <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
-          <Link href="/terms"   className="hover:text-gray-300 transition-colors">Terms</Link>
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+          <Link href="/"            className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
+          <Link href="/about"       className="hover:text-gray-300 transition-colors">About</Link>
+          <Link href="/methodology" className="hover:text-gray-300 transition-colors">Methodology</Link>
+          <Link href="/faq"         className="hover:text-gray-300 transition-colors">FAQ</Link>
+          <Link href="/pricing"     className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
+          <Link href="/contact"     className="hover:text-gray-300 transition-colors">Contact</Link>
+          <Link href="/privacy"     className="hover:text-gray-300 transition-colors">Privacy</Link>
+          <Link href="/terms"       className="hover:text-gray-300 transition-colors">Terms</Link>
         </div>
         <span className="hidden sm:block">© {new Date().getFullYear()} Lode</span>
       </div>

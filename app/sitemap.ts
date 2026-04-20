@@ -48,6 +48,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // Trust / transparency pages — linked from footer
+    {
+      url: `${base}/about`,
+      lastModified: new Date("2026-04-19"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${base}/methodology`,
+      lastModified: new Date("2026-04-19"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${base}/faq`,
+      lastModified: new Date("2026-04-19"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // Legal + contact pages — rarely change
     {
       url: `${base}/contact`,
