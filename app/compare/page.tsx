@@ -112,8 +112,8 @@ export default async function ComparePage() {
             Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — today&rsquo;s live spot price plus dealer premiums we maintain by hand. Sorted low to high.
           </p>
           {/* FTC affiliate disclosure — required for sponsored outbound links */}
-          <p className="text-[11px] text-gray-600 leading-relaxed">
-            Lode may earn a commission when you buy through dealer links on this page. Prices and rankings are not affected.
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Dealer links on this page are affiliate links. Lode may earn a commission if you buy — at no extra cost to you. Prices and rankings are not influenced by affiliate relationships.
           </p>
         </div>
       </section>
