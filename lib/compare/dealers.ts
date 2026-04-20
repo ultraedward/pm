@@ -68,8 +68,8 @@ export const DEALERS: Dealer[] = [
     name: "Money Metals",
     short: "MM",
     product: "https://www.moneymetals.com/{slug}",
-    // Money Metals is on Awin (same account as JM Bullion) — enable once approved.
-    // affiliate: "https://www.awin1.com/cread.php?awinmid=XXXXX&awinaffid={id}&ued={url}",
+    // Money Metals is on Awin (merchant ID 88985) — enable once approved.
+    // affiliate: "https://www.awin1.com/cread.php?awinmid=88985&awinaffid={id}&ued={url}",
     affiliateId: AFF_IDS.moneymetals,
   },
 ];

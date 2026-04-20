@@ -15,7 +15,7 @@ export const metadata = {
   },
 };
 
-const LAST_UPDATED = "April 11, 2026";
+const LAST_UPDATED = "April 20, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -54,17 +54,23 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">5. Cookies</h2>
-            <p>We use a single session cookie set by NextAuth to keep you signed in. We do not use tracking cookies or advertising cookies.</p>
+            <h2 className="text-base font-bold text-white">5. Affiliate Links and Tracking</h2>
+            <p>The dealer comparison page on lode.rocks contains affiliate links. When you click a dealer link, Awin Ltd (our affiliate network) may set a cookie in your browser to record the referral and attribute any resulting purchase to us. This allows us to earn a commission at no additional cost to you. Rankings and prices on the compare page are not affected by affiliate relationships — we sort strictly by estimated total cost.</p>
+            <p>Awin's own privacy policy governs how they collect and process data from their tracking cookies. You can opt out of Awin's tracking by visiting <a href="https://www.awin.com/gb/privacy" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">awin.com/gb/privacy</a>.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">6. Your Rights</h2>
+            <h2 className="text-base font-bold text-white">6. Cookies</h2>
+            <p>We use a single session cookie set by NextAuth to keep you signed in. Beyond that, we do not set advertising or analytics tracking cookies ourselves. If you click an affiliate dealer link, Awin may set a third-party tracking cookie as described in section 5 above.</p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-base font-bold text-white">7. Your Rights</h2>
             <p>You may request access to, correction of, or deletion of your personal data at any time. To do so, email us and we will respond within 30 days.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">7. Contact</h2>
+            <h2 className="text-base font-bold text-white">8. Contact</h2>
             <p>Questions about this policy can be directed to <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">hello@lode.rocks</a>.</p>
           </section>
 
