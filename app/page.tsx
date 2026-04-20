@@ -189,6 +189,7 @@ export default async function HomePage() {
   ]);
 
   const isLoggedIn = !!session?.user?.email;
+  const pricesUnavailable = liveSpots.source === "fallback";
   const prices: [Metal, MetalData][] = [
     ["gold", gold], ["silver", silver],
     ["platinum", platinum], ["palladium", palladium],
@@ -236,6 +237,13 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* ── PRICES UNAVAILABLE BANNER ────────────────────────────── */}
+      {pricesUnavailable && (
+        <div className="w-full px-6 py-3 text-center text-xs font-semibold tracking-wide" style={{ background: "#1a1200", color: "#D4AF37", borderBottom: "1px solid #3a2d00" }}>
+          Live price feeds are temporarily unavailable — showing recent cached values.
+        </div>
+      )}
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section className="px-6 pt-16 pb-0 sm:pt-28">

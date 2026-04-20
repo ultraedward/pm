@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { queueEmail } from "@/lib/emailQueue";
+import { getLivePrices } from "@/lib/prices";
 
 /**
  * Evaluate a single alert against the current market price.
@@ -90,21 +91,34 @@ export async function runAlertEngine() {
 
   if (alerts.length === 0) return;
 
-  // Fetch current spot price for each distinct metal in one pass
-  const metals = [...new Set(alerts.map((a) => a.metal))];
-  const latestPrices = await Promise.all(
-    metals.map((metal) =>
-      prisma.price.findFirst({
-        where: { metal },
-        orderBy: { timestamp: "desc" },
-        select: { metal: true, price: true },
-      })
-    )
-  );
-
+  // Prefer live spot prices for accurate alert evaluation.
+  // The in-memory cache in getLivePrices() means this is cheap when called
+  // right after updateMetalsPrices() in the same cron run.
+  // Falls back to the latest DB snapshot only if the live fetch fails entirely.
   const priceMap: Record<string, number> = {};
-  for (const row of latestPrices) {
-    if (row) priceMap[row.metal] = row.price;
+
+  try {
+    const live = await getLivePrices();
+    priceMap.gold      = live.Gold;
+    priceMap.silver    = live.Silver;
+    priceMap.platinum  = live.Platinum;
+    priceMap.palladium = live.Palladium;
+  } catch {
+    // Live fetch failed — fall back to latest DB prices per metal
+    console.warn("[alert engine] Live price fetch failed, falling back to DB prices");
+    const metals = [...new Set(alerts.map((a) => a.metal))];
+    const dbPrices = await Promise.all(
+      metals.map((metal) =>
+        prisma.price.findFirst({
+          where: { metal },
+          orderBy: { timestamp: "desc" },
+          select: { metal: true, price: true },
+        })
+      )
+    );
+    for (const row of dbPrices) {
+      if (row) priceMap[row.metal] = row.price;
+    }
   }
 
   for (const alert of alerts) {

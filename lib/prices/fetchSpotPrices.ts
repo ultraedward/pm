@@ -1,15 +1,16 @@
 /**
  * Spot price fetching — routes through getLivePrices() which tries
- * Yahoo Finance first, metals.dev as emergency fallback.
+ * metals.dev first, then the CF Worker / Yahoo Finance as fallback.
  */
 
-import { getLivePrices } from "@/lib/prices";
+import { getLivePrices, type PriceSource } from "@/lib/prices";
 
 export async function fetchAllSpotPrices(): Promise<{
   gold:      number | null;
   silver:    number | null;
   platinum:  number | null;
   palladium: number | null;
+  source:    PriceSource;
   fetchedAt: string;
 }> {
   const prices = await getLivePrices();
@@ -18,6 +19,7 @@ export async function fetchAllSpotPrices(): Promise<{
     silver:    prices.Silver,
     platinum:  prices.Platinum,
     palladium: prices.Palladium,
+    source:    prices.source,
     fetchedAt: new Date().toISOString(),
   };
 }

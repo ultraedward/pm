@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>img loader</title></head>
+<body>
+<script>
+(async () => {
+  try {
+    const res = await fetch('/screenshot-dashboard.jpg');
+    const blob = await res.blob();
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const b64 = e.target.result.split(',')[1];
+      if (window.opener) {
+        window.opener.postMessage({type: 'ph_img_data', name: 'dashboard.jpg', b64: b64}, '*');
+      }
+      document.body.innerHTML = 'Done! Sent ' + b64.length + ' chars to opener.';
+    };
+    reader.readAsDataURL(blob);
+  } catch(err) {
+    document.body.innerHTML = 'Error: ' + err.message;
+    if (window.opener) window.opener.postMessage({type: 'ph_img_error', error: err.message}, '*');
+  }
+})();
+</script>
+</body>
+</html>
