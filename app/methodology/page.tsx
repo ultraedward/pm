@@ -1,7 +1,7 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "Methodology & Data Sources — Lode",
+  title: "Methodology & Data Sources",
   description:
     "Where Lode's precious metals price data comes from, how often it refreshes, and how our calculators work. Full transparency on sources, formulas, and limitations.",
   alternates: {

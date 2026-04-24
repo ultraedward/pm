@@ -1,7 +1,7 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "Contact — Lode",
+  title: "Contact",
   description:
     "Get in touch with Lode. Questions, feedback, partnerships, or press — reach us at hello@lode.rocks.",
   alternates: {

@@ -8,9 +8,9 @@ import { GramCalculator } from "@/components/GramCalculator";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Silver Price Per Gram Calculator — Live Spot | Lode",
+  title: "Sterling Silver Price Per Gram Calculator — Live Spot",
   description:
-    "Calculate the silver price per gram instantly with live spot prices — .999 fine, sterling 925, coin 900, European 800. Also covers 14k, 18k, and 24k gold price per gram.",
+    "Calculate sterling silver price per gram instantly with live spot prices — .999 fine, 925 sterling, coin 900, European 800. Also covers 14k, 18k, and 24k gold price per gram.",
   alternates: {
     canonical: "https://lode.rocks/gram",
   },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     "gold price grams calculator",
   ],
   openGraph: {
-    title: "Silver Price Per Gram Calculator — Live Spot | Lode",
+    title: "Sterling Silver Price Per Gram Calculator — Live Spot",
     description:
       "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900, and 14k–24k gold.",
     url: "https://lode.rocks/gram",
