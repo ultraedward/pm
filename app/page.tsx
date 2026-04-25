@@ -217,14 +217,7 @@ export default async function HomePage() {
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "1 price alert, portfolio tracker, live spot prices",
-          },
-          {
-            "@type": "Offer",
-            "name": "Pro",
-            "price": "3.00",
-            "priceCurrency": "USD",
-            "description": "Unlimited price alerts, everything in Free",
+            "description": "Unlimited price alerts, portfolio tracker, live spot prices, weekly digest",
           },
         ],
       },
@@ -274,7 +267,10 @@ export default async function HomePage() {
           </div>
 
           {/* CTA */}
-          <div className="mt-10">
+          <div className="mt-10 space-y-4">
+            {!isLoggedIn && (
+              <p className="label">Price alerts · Portfolio tracking · Weekly digest</p>
+            )}
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
               {isLoggedIn ? "Go to dashboard" : "Get started free"}
             </Link>
@@ -307,12 +303,6 @@ export default async function HomePage() {
             </h2>
             <p className="text-sm mt-3" style={{ color: "var(--text-muted)" }}>
               Coins, bars, jewelry, or scrap.
-              {!isLoggedIn && (
-                <>
-                  {" "}
-                  <Link href="/login" className="underline underline-offset-4 hover:text-white transition-colors">Sign up free</Link> to save your stack.
-                </>
-              )}
             </p>
             <p className="text-xs mt-2" style={{ color: "var(--text-dim)" }}>
               Looking up a specific coin?{" "}
@@ -329,11 +319,6 @@ export default async function HomePage() {
               palladium: palladium.price,
             }}
           />
-          {!isLoggedIn && (
-            <p className="text-xs" style={{ color: "var(--text-dim)" }}>
-              <Link href="/login" className="hover:text-white transition-colors underline underline-offset-4">Track your portfolio →</Link>
-            </p>
-          )}
         </div>
       </section>
 
@@ -349,7 +334,7 @@ export default async function HomePage() {
               Track your stack.<br />Free forever.
             </p>
             <Link href="/login" className="btn-gold">
-              Create free account
+              Get started free
             </Link>
           </div>
         </section>

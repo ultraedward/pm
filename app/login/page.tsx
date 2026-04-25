@@ -17,10 +17,10 @@ export default function LoginPage() {
             Lode
           </p>
           <h1 className="text-5xl font-black tracking-tightest leading-none" style={{ color: "var(--text)" }}>
-            Sign in
+            Track your stack.
           </h1>
           <p className="text-sm text-gray-500">
-            Gold, silver, platinum, and palladium — tracked.
+            Free alerts, portfolio tracking, and a weekly digest.
           </p>
         </div>
 
@@ -40,17 +40,11 @@ export default function LoginPage() {
           </button>
 
           <p className="text-xs text-gray-700 leading-relaxed">
-            By signing in you agree to our{" "}
+            By continuing you agree to our{" "}
             <a href="/terms" className="hover:text-gray-400 transition-colors">Terms</a>
             {" "}and{" "}
             <a href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</a>.
-            {" "}Your account is created on first sign-in.
-          </p>
-          <p className="text-xs text-gray-700">
-            Just need a quick calculation?{" "}
-            <a href="/gram" className="hover:text-gray-400 transition-colors underline underline-offset-2">
-              Try the melt value calculator →
-            </a>
+            {" "}No password. No card. Account created on first sign-in.
           </p>
         </div>
       </div>
