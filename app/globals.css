@@ -29,8 +29,8 @@
   --surface:       #FFFFFF;
   --surface-2:     #F0F0F0;
   --text:          #0A0A0A;
-  --text-muted:    rgba(0, 0, 0, 0.48);
-  --text-dim:      rgba(0, 0, 0, 0.24);
+  --text-muted:    rgba(0, 0, 0, 0.55);
+  --text-dim:      rgba(0, 0, 0, 0.36);
   --gold:          #C8860A;
   --gold-bright:   #E8970A;
   --gold-dim:      rgba(200, 134, 10, 0.08);
@@ -170,40 +170,57 @@ html, body {
    Override hardcoded Tailwind classes that can't use CSS vars.
 ─────────────────────────────────────────────────────────────── */
 
-/* Text */
-[data-theme="light"] .text-white      { color: var(--text) !important; }
-[data-theme="light"] .hover\:text-white:hover { color: var(--text) !important; }
-[data-theme="light"] .text-gray-700   { color: var(--text-muted) !important; }
-[data-theme="light"] .text-gray-500   { color: var(--text-muted) !important; }
-[data-theme="light"] .text-gray-400   { color: var(--text-muted) !important; }
+/* Text — full readable scale */
+[data-theme="light"] .text-white                { color: var(--text) !important; }
+[data-theme="light"] .hover\:text-white:hover   { color: var(--text) !important; }
+[data-theme="light"] .text-gray-100             { color: rgba(0,0,0,0.85) !important; }
+[data-theme="light"] .text-gray-200             { color: rgba(0,0,0,0.80) !important; }
+[data-theme="light"] .text-gray-300             { color: rgba(0,0,0,0.72) !important; }
+[data-theme="light"] .text-gray-400             { color: rgba(0,0,0,0.60) !important; }
+[data-theme="light"] .text-gray-500             { color: rgba(0,0,0,0.52) !important; }
+[data-theme="light"] .text-gray-600             { color: rgba(0,0,0,0.44) !important; }
+[data-theme="light"] .text-gray-700             { color: rgba(0,0,0,0.52) !important; }
+[data-theme="light"] .hover\:text-gray-300:hover { color: rgba(0,0,0,0.75) !important; }
 
 /* Backgrounds */
-[data-theme="light"] .bg-surface      { background-color: var(--surface) !important; }
-[data-theme="light"] .bg-black        { background-color: var(--dropdown-bg) !important; }
-[data-theme="light"] .bg-gray-900     { background-color: var(--surface-2) !important; }
-[data-theme="light"] .hover\:bg-gray-900:hover { background-color: var(--surface-2) !important; }
+[data-theme="light"] .bg-surface                { background-color: var(--surface) !important; }
+[data-theme="light"] .bg-black                  { background-color: var(--dropdown-bg) !important; }
+[data-theme="light"] .bg-gray-900               { background-color: var(--surface-2) !important; }
+[data-theme="light"] .hover\:bg-gray-900:hover  { background-color: var(--surface-2) !important; }
+/* Alpha backgrounds used in cards / toggles */
+[data-theme="light"] .bg-white\/15              { background-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .bg-white\/5               { background-color: rgba(0,0,0,0.04) !important; }
+[data-theme="light"] .hover\:bg-white\/5:hover  { background-color: rgba(0,0,0,0.05) !important; }
 
 /* Borders */
-[data-theme="light"] .border-gray-800 { border-color: var(--border-strong) !important; }
-[data-theme="light"] .border-b        { border-bottom-color: var(--border) !important; }
-[data-theme="light"] .border-t        { border-top-color: var(--border) !important; }
+[data-theme="light"] .border-gray-800           { border-color: var(--border-strong) !important; }
+[data-theme="light"] .border-b                  { border-bottom-color: var(--border) !important; }
+[data-theme="light"] .border-t                  { border-top-color: var(--border) !important; }
+/* Alpha borders used in pricing cards */
+[data-theme="light"] .border-white\/10          { border-color: rgba(0,0,0,0.10) !important; }
+[data-theme="light"] .border-white\/\[0\.1\]    { border-color: rgba(0,0,0,0.10) !important; }
 
 /* Dividers */
 [data-theme="light"] .divide-white\/\[0\.06\] > * + * {
   border-color: var(--border) !important;
 }
 
-/* Hamburger lines and icon fills */
+/* Hamburger lines */
 [data-theme="light"] .bg-white {
   background-color: var(--text) !important;
 }
 
-/* Amber/gold accents — stay consistent */
-[data-theme="light"] .text-amber-400  { color: var(--gold) !important; }
-[data-theme="light"] .bg-amber-500\/10 { background-color: var(--gold-dim) !important; }
-[data-theme="light"] .hover\:bg-amber-500\/20:hover { background-color: rgba(200, 134, 10, 0.14) !important; }
-[data-theme="light"] .hover\:text-amber-300:hover { color: var(--gold) !important; }
+/* Amber / gold accents — keep consistent */
+[data-theme="light"] .text-amber-400            { color: var(--gold) !important; }
+[data-theme="light"] .text-amber-500            { color: var(--gold-bright) !important; }
+[data-theme="light"] .bg-amber-500\/10          { background-color: var(--gold-dim) !important; }
+[data-theme="light"] .bg-amber-500\/5           { background-color: rgba(200,134,10,0.05) !important; }
+[data-theme="light"] .bg-amber-500\/20          { background-color: rgba(200,134,10,0.12) !important; }
+[data-theme="light"] .border-amber-500\/20      { border-color: rgba(200,134,10,0.22) !important; }
+[data-theme="light"] .border-amber-500\/40      { border-color: rgba(200,134,10,0.40) !important; }
+[data-theme="light"] .hover\:bg-amber-500\/20:hover { background-color: rgba(200,134,10,0.14) !important; }
+[data-theme="light"] .hover\:text-amber-300:hover  { color: var(--gold) !important; }
 
-/* Emerald / red price change badges — keep vivid */
-[data-theme="light"] .text-emerald-400 { color: #1a9e3f !important; }
-[data-theme="light"] .text-red-400     { color: #e0260d !important; }
+/* Emerald / red price badges — keep vivid on white */
+[data-theme="light"] .text-emerald-400          { color: #1a9e3f !important; }
+[data-theme="light"] .text-red-400              { color: #e0260d !important; }
