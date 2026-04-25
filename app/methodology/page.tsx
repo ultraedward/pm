@@ -59,7 +59,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Spot price sources</h2>
             <p>
-              Live spot prices come from <a href="https://metals.dev" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">metals.dev</a> as the primary provider, with <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F) as an automatic fallback if the primary source is unavailable.
+              Live spot prices come from <a href="https://metals.dev" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">metals.dev</a> as the primary provider. If metals.dev is unavailable, prices fall back to <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker — Yahoo Finance blocks direct requests from server infrastructure, so the Worker acts as a proxy on Cloudflare&rsquo;s edge network.
             </p>
             <p>
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.
@@ -72,7 +72,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Refresh cadence</h2>
             <p>
-              Live prices are fetched on demand when you load a page, cached for up to 5 minutes on our servers to avoid hammering the upstream provider, then refetched. During active market hours you&rsquo;ll see prices updated within that 5-minute window on any new page load.
+              Live prices are fetched on demand when you load a page, cached for up to 10 minutes on our servers to avoid exhausting upstream API quotas, then refetched. During active market hours you&rsquo;ll see prices updated within that 10-minute window on any new page load.
             </p>
             <p>
               Historical sparklines, 52-week high/low, and 24-hour percent change are computed from daily snapshots we record to our own database at 00:00 UTC. Over time this gives us an independent history series we can plot without depending on a paid history API.
