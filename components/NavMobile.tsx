@@ -7,10 +7,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 type Props = {
   isLoggedIn: boolean;
-  isPro: boolean;
 };
 
-export default function NavMobile({ isLoggedIn, isPro }: Props) {
+export default function NavMobile({ isLoggedIn }: Props) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -18,13 +17,11 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/alerts",    label: "Alerts"    },
     { href: "/account",   label: "Account"   },
-    ...(!isPro ? [{ href: "/pricing", label: "Upgrade to Pro" }] : []),
   ];
 
   const loggedOutLinks = [
     { href: "/gram",    label: "Calculator" },
     { href: "/compare", label: "Compare"    },
-    { href: "/pricing", label: "Pricing"    },
     { href: "/login",   label: "Get started free" },
   ];
 
@@ -87,7 +84,6 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
         >
           {links.map(({ href, label }) => {
             const isActive = pathname === href;
-            const isUpgrade = label === "Upgrade to Pro";
             return (
               <Link
                 key={href}
@@ -96,33 +92,14 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
                 className="block px-4 py-3 text-sm font-medium transition-colors"
                 style={{
                   borderRadius: 0,
-                  backgroundColor: isActive
-                    ? "var(--surface-2)"
-                    : isUpgrade
-                    ? "var(--gold-dim)"
-                    : "transparent",
-                  color: isUpgrade
-                    ? "var(--gold)"
-                    : isActive
-                    ? "var(--text)"
-                    : "var(--text-muted)",
+                  backgroundColor: isActive ? "var(--surface-2)" : "transparent",
+                  color: isActive ? "var(--text)" : "var(--text-muted)",
                 }}
               >
                 {label}
               </Link>
             );
           })}
-
-          {isLoggedIn && isPro && (
-            <div className="px-4 pt-2">
-              <span
-                className="px-3 py-1 text-xs font-medium"
-                style={{ backgroundColor: "var(--gold-dim)", color: "var(--gold)" }}
-              >
-                PRO
-              </span>
-            </div>
-          )}
         </div>
       )}
     </div>

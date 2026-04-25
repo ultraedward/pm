@@ -1,55 +1,87 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { PricingClient } from "./PricingClient";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free & Pro Plans",
+  title: "Pricing — Free Forever",
   description:
-    "Lode is free forever: live spot prices, melt calculators, portfolio tracker, weekly digest, and 1 price alert. Upgrade to Pro for unlimited price alerts — $3/month.",
+    "Lode is free forever: live spot prices, melt calculators, portfolio tracker, unlimited price alerts, and a weekly digest.",
   alternates: {
     canonical: "https://lode.rocks/pricing",
   },
   openGraph: {
-    title: "Pricing — Free & Pro Plans | Lode",
+    title: "Pricing — Free Forever | Lode",
     description:
-      "Free forever: live prices, calculators & portfolio tracker. Pro adds a weekly stack report every Monday and unlimited price alerts — $3/month.",
+      "Lode is free forever: live prices, calculators, portfolio tracker, unlimited alerts, and a weekly Monday digest.",
     url: "https://lode.rocks/pricing",
   },
 };
 
+const FEATURES = [
+  "Live spot prices — gold, silver, platinum & palladium",
+  "Coin melt calculator — all metals, all coin types",
+  "Gram calculator — jewelry & scrap, any karat",
+  "Portfolio tracker — holdings & P&L",
+  "30-day price charts",
+  "Unlimited price alerts — set targets across any metal",
+  "Weekly Monday digest — spot prices in your inbox",
+];
+
 export default async function PricingPage() {
   const session = await getServerSession(authOptions);
-
-  let isPro = false;
-  if (session?.user?.email) {
-    const dbUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { subscriptionStatus: true },
-    });
-    isPro = dbUser?.subscriptionStatus === "active";
-  }
+  const isLoggedIn = !!session?.user?.email;
 
   return (
     <main className="min-h-screen bg-surface px-6 py-24 text-white">
-      <div className="mx-auto max-w-4xl space-y-16">
+      <div className="mx-auto max-w-lg space-y-12">
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-5xl font-black tracking-tight">Pricing</h1>
-          <p className="text-gray-400 max-w-sm mx-auto">
-            Free forever. Upgrade when you need unlimited price alerts.
+          <h1 className="text-5xl font-black tracking-tight">Free forever.</h1>
+          <p className="text-gray-400">
+            Everything Lode offers is free — no trials, no paywalls, no credit card.
           </p>
         </div>
 
-        <PricingClient isPro={isPro} isLoggedIn={!!session?.user?.email} />
+        {/* Feature card */}
+        <div className="rounded-2xl border border-white/10 p-8 space-y-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Included</p>
+            <span className="text-4xl font-black">$0</span>
+            <span className="text-gray-500 ml-1">/month</span>
+          </div>
 
-        <p className="text-center text-sm text-gray-600">
-          Cancel anytime.
-        </p>
+          <ul className="space-y-3 text-sm text-gray-300">
+            {FEATURES.map((f) => (
+              <li key={f} className="flex items-center gap-2">
+                <span className="text-amber-500">✓</span> {f}
+              </li>
+            ))}
+          </ul>
+
+          <div>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="block rounded-full border border-white/10 py-2.5 text-center text-sm text-gray-400 hover:bg-white/5 transition-colors"
+              >
+                Go to dashboard →
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="block rounded-full bg-amber-500 py-2.5 text-center text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+              >
+                Get started free
+              </Link>
+            )}
+          </div>
+        </div>
 
       </div>
+      <SiteFooter />
     </main>
   );
 }

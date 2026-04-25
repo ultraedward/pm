@@ -5,10 +5,9 @@ import { usePathname } from "next/navigation";
 
 type Props = {
   isLoggedIn: boolean;
-  isPro: boolean;
 };
 
-export default function NavLinks({ isLoggedIn, isPro }: Props) {
+export default function NavLinks({ isLoggedIn }: Props) {
   const pathname = usePathname();
 
   function linkClass(href: string) {
@@ -26,22 +25,9 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
           <Link href="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
           <Link href="/alerts"    className={linkClass("/alerts")}>Alerts</Link>
           <Link href="/compare"   className={linkClass("/compare")}>Compare</Link>
-          {isPro ? (
-            <span className="px-3 py-1 label border" style={{ color: "var(--gold)", borderColor: "rgba(255,194,0,0.25)" }}>
-              Pro
-            </span>
-          ) : (
-            <Link href="/pricing" className="btn-gold px-4 py-1.5 text-xs">
-              Upgrade
-            </Link>
-          )}
           <Link
             href="/account"
-            className={`transition-colors ${
-              pathname === "/account"
-                ? "text-white"
-                : "text-gray-500 hover:text-white"
-            }`}
+            className={`transition-colors ${pathname === "/account" ? "text-white" : "text-gray-500 hover:text-white"}`}
             aria-label="Account"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -53,7 +39,6 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
         <>
           <Link href="/gram"    className={linkClass("/gram")}>Calculator</Link>
           <Link href="/compare" className={linkClass("/compare")}>Compare</Link>
-          <Link href="/pricing" className={linkClass("/pricing")}>Pricing</Link>
           <Link href="/login" className="btn-gold px-4 py-1.5 text-xs">
             Get started free
           </Link>

@@ -16,8 +16,6 @@ export default async function AccountPage() {
       select: {
         email: true,
         name: true,
-        subscriptionStatus: true,
-        stripeCurrentPeriodEnd: true,
         createdAt: true,
       },
     }),
@@ -26,8 +24,6 @@ export default async function AccountPage() {
   ]);
 
   if (!dbUser?.email) redirect("/");
-
-  const isPro = dbUser.subscriptionStatus === "active";
 
   return (
     <main className="min-h-screen bg-surface text-white">
@@ -40,41 +36,11 @@ export default async function AccountPage() {
           <p className="text-sm text-gray-500 mt-1">{dbUser.email}</p>
         </div>
 
-        {/* Plan + usage — one card */}
+        {/* Usage — one card */}
         <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <div className="flex items-center justify-between px-6 py-5">
-            <div>
-              <p className="text-lg font-black tracking-tight">
-                {isPro ? "Pro" : "Free"}
-                {isPro && (
-                  <span className="ml-2 text-xs font-semibold text-amber-400">Active</span>
-                )}
-              </p>
-              <p className="text-sm text-gray-500 mt-0.5">
-                {isPro
-                  ? dbUser.stripeCurrentPeriodEnd
-                    ? `Renews ${new Date(dbUser.stripeCurrentPeriodEnd).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}`
-                    : "Unlimited alerts"
-                  : `${Math.max(0, 1 - alertCount)} of 1 alert remaining`}
-              </p>
-            </div>
-            {isPro ? (
-              <form action="/api/billing/portal" method="POST">
-                <button
-                  type="submit"
-                  className="rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 transition-colors min-h-[44px]"
-                >
-                  Manage billing
-                </button>
-              </form>
-            ) : (
-              <Link
-                href="/pricing"
-                className="rounded-full bg-amber-500 px-5 py-3 text-sm font-bold text-black hover:bg-amber-400 transition-colors min-h-[44px] flex items-center"
-              >
-                Upgrade
-              </Link>
-            )}
+          <div className="px-6 py-5">
+            <p className="text-lg font-black tracking-tight">Free</p>
+            <p className="text-sm text-gray-500 mt-0.5">Unlimited alerts · all features included</p>
           </div>
           <div className="grid grid-cols-2 divide-x border-t" style={{ borderColor: "var(--border)" }}>
             <Link href="/dashboard/alerts" className="group px-6 py-4 hover:bg-white/5 transition-colors">

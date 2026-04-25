@@ -57,7 +57,7 @@ function makeInitialQty(): Quantities {
   return q;
 }
 
-type Props = { spots: Record<Metal, number>; isPro?: boolean };
+type Props = { spots: Record<Metal, number> };
 
 export function MeltCalculator({ spots }: Props) {
   const [qty, setQty] = useState<Quantities>(makeInitialQty());

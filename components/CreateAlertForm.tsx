@@ -30,13 +30,6 @@ export function CreateAlertForm() {
       body: JSON.stringify({ metal, direction, price: Number(price), type: "price" }),
     });
 
-    if (res.status === 402) {
-      const checkout = await fetch("/api/billing/checkout", { method: "POST" });
-      const data = await checkout.json();
-      window.location.href = data.url;
-      return;
-    }
-
     if (!res.ok) {
       setError("Something went wrong. Please try again.");
       setSubmitting(false);

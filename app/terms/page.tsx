@@ -51,8 +51,8 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">5. Subscriptions and Billing</h2>
-            <p>The Free plan is provided at no charge and includes 1 active price alert. The Pro plan is billed monthly at $3.00 USD (or $25.00 USD annually) via Stripe. You may cancel at any time from your account page. Cancellations take effect at the end of the current billing period. We do not offer refunds for partial billing periods.</p>
+            <h2 className="text-base font-bold text-white">5. Free Service</h2>
+            <p>Lode is provided free of charge. All features — including unlimited price alerts, portfolio tracking, calculators, and the weekly digest — are available to all registered users at no cost.</p>
           </section>
 
           <section className="space-y-3">

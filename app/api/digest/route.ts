@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hasProAccess } from "@/lib/entitlements";
 import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
@@ -237,8 +236,6 @@ export async function GET(req: Request) {
       id: true,
       email: true,
       name: true,
-      subscriptionStatus: true,
-      proUntil: true,
       holdings: {
         select: { metal: true, ounces: true, purchasePrice: true },
       },

@@ -69,7 +69,7 @@ export default async function DashboardPage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { id: true, name: true, subscriptionStatus: true },
+    select: { id: true, name: true },
   });
 
   if (!user) redirect("/login");
@@ -126,7 +126,6 @@ export default async function DashboardPage() {
     totalValue += ounces * (spot || purchasePrice);
   }
 
-  const isPro = user.subscriptionStatus === "active";
   const gainLoss = totalValue - totalInvested;
   const pctReturn = totalInvested > 0 ? (gainLoss / totalInvested) * 100 : 0;
   const gainColor = gainLoss >= 0 ? "text-amber-400" : "text-red-400";

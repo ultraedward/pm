@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/requireUser";
 import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
-import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
 import { AlertsTable } from "@/components/AlertsTable";
 import { prisma } from "@/lib/prisma";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -10,9 +9,8 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardAlertsPage() {
   const user = await requireUser();
-  const [alerts, plan, spotRows] = await Promise.all([
+  const [alerts, spotRows] = await Promise.all([
     getUserAlerts(user.id),
-    canCreateAlert(user.id),
     prisma.price.findMany({
       where: { metal: { in: ["gold", "silver", "platinum", "palladium"] } },
       orderBy: { timestamp: "desc" },
@@ -46,24 +44,6 @@ export default async function DashboardAlertsPage() {
           </div>
           <p className="text-sm text-gray-500 mt-2">Get an email when a metal hits your target price — checked daily.</p>
         </div>
-
-        {/* Plan Banner */}
-        {!plan.isPro && (
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-gray-300">
-              <span className="font-semibold text-white">Free plan —</span>{" "}
-              {plan.remaining === 0
-                ? "Free alert used."
-                : "1 free alert remaining."}
-            </span>
-            <Link
-              href="/pricing"
-              className="self-start sm:self-auto shrink-0 rounded-full bg-amber-500/20 px-4 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-500/30 transition-colors"
-            >
-              Upgrade for unlimited →
-            </Link>
-          </div>
-        )}
 
         {/* Content */}
         {hasAlerts ? (

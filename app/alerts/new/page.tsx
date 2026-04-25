@@ -1,16 +1,9 @@
-import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/requireUser";
-import { canCreateAlert } from "@/lib/alerts/canCreateAlert";
 import { CreateAlertForm } from "@/components/CreateAlertForm";
 import Link from "next/link";
 
 export default async function NewAlertPage() {
-  const user = await requireUser();
-  const { allowed } = await canCreateAlert(user.id);
-
-  if (!allowed) {
-    redirect("/pricing");
-  }
+  await requireUser();
 
   return (
     <main className="min-h-screen bg-surface px-4 py-6 sm:p-8 text-white">

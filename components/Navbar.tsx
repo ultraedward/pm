@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import NavMobile from "@/components/NavMobile";
 import NavLinks from "@/components/NavLinks";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -9,16 +8,6 @@ import ThemeToggle from "@/components/ThemeToggle";
 export default async function Navbar() {
   const session = await getServerSession(authOptions);
 
-  let subscriptionStatus: string | null = null;
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { subscriptionStatus: true },
-    });
-    subscriptionStatus = user?.subscriptionStatus || null;
-  }
-
-  const isPro = subscriptionStatus === "active";
   const isLoggedIn = !!session?.user;
 
   return (
@@ -31,7 +20,7 @@ export default async function Navbar() {
         </Link>
 
         {/* Desktop */}
-        <NavLinks isLoggedIn={isLoggedIn} isPro={isPro} />
+        <NavLinks isLoggedIn={isLoggedIn} />
 
         {/* Theme toggle — desktop */}
         <div className="hidden sm:flex items-center">
@@ -39,7 +28,7 @@ export default async function Navbar() {
         </div>
 
         {/* Mobile */}
-        <NavMobile isLoggedIn={isLoggedIn} isPro={isPro} />
+        <NavMobile isLoggedIn={isLoggedIn} />
       </div>
     </nav>
   );
