@@ -59,7 +59,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Spot price sources</h2>
             <p>
-              Live spot prices come from <a href="https://metals.dev" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">metals.dev</a> as the primary provider. If metals.dev is unavailable, prices fall back to <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker — Yahoo Finance blocks direct requests from server infrastructure, so the Worker acts as a proxy on Cloudflare&rsquo;s edge network.
+              Live spot prices come from <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Yahoo Finance blocks direct requests from server infrastructure, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
             </p>
             <p>
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.
