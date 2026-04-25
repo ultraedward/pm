@@ -48,7 +48,7 @@ export function DashboardCalculatorTabs({ spots }: Props) {
         ))}
       </div>
 
-      {tab === "coins" && <MeltCalculator spots={spots} isPro={true} />}
+      {tab === "coins" && <MeltCalculator spots={spots} />}
       {tab === "gram"  && <GramCalculator spots={{ gold: spots.gold, silver: spots.silver }} />}
     </div>
   );
