@@ -178,7 +178,7 @@ export function GramCalculator({ spots }: Props) {
               className={`rounded-lg py-2 px-1 text-center transition-colors ${
                 currentKarat === k.id
                   ? "bg-amber-500/20 border border-amber-500/40 text-amber-400"
-                  : "border text-gray-500"
+                  : "border text-gray-500 hover:text-gray-300 hover:border-white/20"
               }`}
               style={currentKarat !== k.id ? { borderColor: "var(--border-strong)" } : {}}
             >
