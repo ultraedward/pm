@@ -65,7 +65,7 @@ export default function MethodologyPage() {
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.
             </p>
             <p>
-              If both providers are unreachable, the site returns the last cached value rather than showing a $0 price. Over-the-weekend and holiday prices reflect the last traded value.
+              If the price source is unreachable, the site returns the last cached value rather than showing a $0 price. Over-the-weekend and holiday prices reflect the last traded value.
             </p>
           </section>
 

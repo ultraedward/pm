@@ -34,7 +34,7 @@ const faqJsonLd = {
           "name": "Is Lode legit?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Lode is an independent precious metals price tracker. It does not buy, sell, or broker metal — no funds ever move through the site. Spot prices come from metals.dev (with Yahoo Finance as a fallback) and can be cross-checked against Kitco or any broker terminal. Data collection and usage are documented in the Privacy Policy at lode.rocks/privacy.",
+            "text": "Yes. Lode is an independent precious metals price tracker. It does not buy, sell, or broker metal — no funds ever move through the site. Spot prices come from Yahoo Finance futures data, routed through a Cloudflare Worker, and can be cross-checked against Kitco or any broker terminal. Data collection and usage are documented in the Privacy Policy at lode.rocks/privacy.",
           },
         },
         {
@@ -42,7 +42,7 @@ const faqJsonLd = {
           "name": "Where does the spot price data come from?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Live spot prices come from metals.dev as the primary source, with Yahoo Finance futures data (GC=F, SI=F, PL=F, PA=F) as an automatic fallback if the primary source is unavailable. Full methodology is published at lode.rocks/methodology.",
+            "text": "Live spot prices come from Yahoo Finance futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Full methodology is published at lode.rocks/methodology.",
           },
         },
         {
@@ -50,7 +50,7 @@ const faqJsonLd = {
           "name": "How fresh are the precious metals prices?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Prices are fetched live when you load a page, cached on Lode's servers for up to 5 minutes, then refetched. During active market hours the displayed price is at most a few minutes old. On weekends and holidays the price reflects the last traded value — markets are closed.",
+            "text": "Prices are fetched live when you load a page, cached on Lode's servers for up to 10 minutes, then refetched. During active market hours the displayed price is at most a few minutes old. On weekends and holidays the price reflects the last traded value — markets are closed.",
           },
         },
         {
@@ -164,14 +164,14 @@ export default function FaqPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Where does the price data come from?</h2>
             <p>
-              Live spot prices come from <a href="https://metals.dev" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">metals.dev</a>, with Yahoo Finance futures (GC=F, SI=F, PL=F, PA=F) as an automatic fallback if the primary source is unavailable. Full detail is on the <a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">Methodology</a> page.
+              Live spot prices come from <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Full detail is on the <a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">Methodology</a> page.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">How fresh are the prices?</h2>
             <p>
-              Prices are fetched live when you load a page, cached on our servers for up to 5 minutes, then refetched. During active market hours you&rsquo;ll see a number that&rsquo;s at most a few minutes old. Markets are closed on weekends and certain holidays — during those windows the displayed price reflects the last traded value.
+              Prices are fetched live when you load a page, cached on our servers for up to 10 minutes, then refetched. During active market hours you&rsquo;ll see a number that&rsquo;s at most a few minutes old. Markets are closed on weekends and certain holidays — during those windows the displayed price reflects the last traded value.
             </p>
           </section>
 

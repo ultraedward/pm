@@ -37,7 +37,7 @@ export default function TermsPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">2. Description of Service</h2>
-            <p>Precious Metals provides live spot price tracking, once-daily email price alerts, and portfolio tracking for gold, silver, platinum, and palladium. Spot prices are sourced from third-party data providers and are provided for informational purposes only. See the <a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">Methodology</a> page for data sources and refresh cadence.</p>
+            <p>Lode provides live spot price tracking, price alerts, and portfolio tracking for gold, silver, platinum, and palladium. Spot prices are sourced from third-party data providers and are provided for informational purposes only. See the <a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">Methodology</a> page for data sources and refresh cadence.</p>
           </section>
 
           <section className="space-y-3">

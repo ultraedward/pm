@@ -4,7 +4,7 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// 5-minute in-memory cache — avoids hammering Stooq on every page load
+// 5-minute in-memory cache for this API route — avoids redundant calls to the CF Worker / Yahoo Finance
 const CACHE_TTL = 5 * 60 * 1000;
 let cache: { data: Awaited<ReturnType<typeof fetchAllSpotPrices>>; ts: number } | null = null;
 

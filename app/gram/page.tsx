@@ -218,7 +218,7 @@ export default async function GramPage() {
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-16" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-2xl space-y-8">
-          <h2 className="text-xl font-black tracking-tight">Frequently asked questions</h2>
+          <h2 className="text-xl font-black tracking-tight">Common questions</h2>
 
           <div className="space-y-6">
             <div className="space-y-2">
