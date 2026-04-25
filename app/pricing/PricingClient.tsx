@@ -114,18 +114,10 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
                 </>
               )}
             </div>
-            <p className="text-sm text-gray-400 mt-2">Your stack, in your inbox every Monday.</p>
+            <p className="text-sm text-gray-400 mt-2">For serious stackers watching the market.</p>
             {annual && (
               <p className="text-xs text-gray-600 mt-1">~$2.08 / month</p>
             )}
-          </div>
-
-          {/* Digest callout */}
-          <div className="relative rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 space-y-1">
-            <p className="text-xs font-bold uppercase tracking-widest text-amber-500">Every Monday</p>
-            <p className="text-sm text-gray-300">
-              Spot prices, 7-day moves, and your portfolio value — summarized and sent to your inbox. No app to open.
-            </p>
           </div>
 
           <ul className="relative space-y-3 text-sm text-gray-300">

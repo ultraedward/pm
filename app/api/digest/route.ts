@@ -230,12 +230,9 @@ export async function GET(req: Request) {
     if (!(metal in weeklyPct)) weeklyPct[metal] = null;
   }
 
-  // ── 3. Fetch Pro users who have an email ──────────────────────────────
+  // ── 3. Fetch all users who have an email ─────────────────────────────
   const users = await prisma.user.findMany({
-    where: {
-      email: { not: null },
-      subscriptionStatus: "active",
-    },
+    where: { email: { not: null } },
     select: {
       id: true,
       email: true,
@@ -254,10 +251,6 @@ export async function GET(req: Request) {
 
   for (const user of users) {
     if (!user.email) { skipped++; continue; }
-
-    // Double-check Pro access (handles proUntil grace period)
-    const isPro = hasProAccess({ stripeStatus: user.subscriptionStatus, proUntil: user.proUntil });
-    if (!isPro) { skipped++; continue; }
 
     // ── Compute portfolio totals ──────────────────────────────────────
     let totalInvested = 0;

@@ -8,7 +8,6 @@ type Metal = "gold" | "silver" | "platinum" | "palladium";
 
 type Props = {
   spots: Record<Metal, number>;
-  isPro: boolean;
 };
 
 const TABS = [
@@ -18,7 +17,7 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-export function DashboardCalculatorTabs({ spots, isPro }: Props) {
+export function DashboardCalculatorTabs({ spots }: Props) {
   const [tab, setTab] = useState<TabId>("coins");
 
   return (
@@ -49,7 +48,7 @@ export function DashboardCalculatorTabs({ spots, isPro }: Props) {
         ))}
       </div>
 
-      {tab === "coins" && <MeltCalculator spots={spots} isPro={isPro} />}
+      {tab === "coins" && <MeltCalculator spots={spots} isPro={true} />}
       {tab === "gram"  && <GramCalculator spots={{ gold: spots.gold, silver: spots.silver }} />}
     </div>
   );

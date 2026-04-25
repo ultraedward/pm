@@ -25,7 +25,7 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
     { href: "/gram",    label: "Calculator" },
     { href: "/compare", label: "Compare"    },
     { href: "/pricing", label: "Pricing"    },
-    { href: "/login",   label: "Sign in"    },
+    { href: "/login",   label: "Get started free" },
   ];
 
   const links = isLoggedIn ? loggedInLinks : loggedOutLinks;
@@ -38,12 +38,12 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
       {/* Theme toggle */}
       <ThemeToggle />
 
-      {/* Sign up CTA — always visible on mobile */}
+      {/* CTA — always visible on mobile */}
       <Link
         href="/login"
         className="btn-gold px-3 py-1.5 text-xs"
       >
-        Sign up free
+        Get started
       </Link>
 
       {/* Hamburger button */}

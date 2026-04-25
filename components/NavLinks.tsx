@@ -54,11 +54,8 @@ export default function NavLinks({ isLoggedIn, isPro }: Props) {
           <Link href="/gram"    className={linkClass("/gram")}>Calculator</Link>
           <Link href="/compare" className={linkClass("/compare")}>Compare</Link>
           <Link href="/pricing" className={linkClass("/pricing")}>Pricing</Link>
-          <Link href="/login" className="label hover:!text-white transition-colors">
-            Sign in
-          </Link>
           <Link href="/login" className="btn-gold px-4 py-1.5 text-xs">
-            Sign up free
+            Get started free
           </Link>
         </>
       )}

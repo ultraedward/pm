@@ -277,7 +277,7 @@ export default async function DashboardPage() {
         )}
 
         {/* Unified calculator — coins/bars + jewelry/scrap */}
-        <DashboardCalculatorTabs spots={spots} isPro={isPro} />
+        <DashboardCalculatorTabs spots={spots} />
 
         {/* Nav links */}
         <div className="grid grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">

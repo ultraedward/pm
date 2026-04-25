@@ -97,11 +97,8 @@ export default async function AccountPage() {
               <span className="text-xs font-semibold text-amber-400">On</span>
             </div>
             <div className="flex items-center justify-between px-5 py-3">
-              <p className={`text-sm ${isPro ? "text-white" : "text-gray-500"}`}>Weekly digest</p>
-              {isPro
-                ? <span className="text-xs font-semibold text-amber-400">On</span>
-                : <Link href="/pricing" className="text-xs font-semibold text-gray-500 hover:text-amber-400 transition-colors">Pro</Link>
-              }
+              <p className="text-sm text-white">Weekly digest</p>
+              <span className="text-xs font-semibold text-amber-400">On</span>
             </div>
           </div>
         </div>

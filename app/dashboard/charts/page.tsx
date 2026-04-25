@@ -2,17 +2,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ChartsClient } from "./ChartsClient";
-import { PredictionCard } from "@/components/PredictionCard";
-import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const dynamic = "force-dynamic";
 
 export default async function ChartsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
-
-  const live = await fetchAllSpotPrices();
-  const goldSpot = live.gold ?? 0;
 
   return (
     <main className="min-h-screen bg-surface p-8 text-white">
@@ -22,7 +17,6 @@ export default async function ChartsPage() {
           <h1 className="text-3xl font-black tracking-tight">Price History</h1>
         </div>
         <ChartsClient />
-        {goldSpot > 0 && <PredictionCard goldSpot={goldSpot} />}
       </div>
     </main>
   );

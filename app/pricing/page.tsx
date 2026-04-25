@@ -7,7 +7,7 @@ import { PricingClient } from "./PricingClient";
 export const metadata: Metadata = {
   title: "Pricing — Free & Pro Plans",
   description:
-    "Lode is free forever: live spot prices, melt calculators, portfolio tracker, and 1 price alert. Upgrade to Pro for your weekly metals digest and unlimited alerts — $3/month.",
+    "Lode is free forever: live spot prices, melt calculators, portfolio tracker, weekly digest, and 1 price alert. Upgrade to Pro for unlimited price alerts — $3/month.",
   alternates: {
     canonical: "https://lode.rocks/pricing",
   },
@@ -39,7 +39,7 @@ export default async function PricingPage() {
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-black tracking-tight">Pricing</h1>
           <p className="text-gray-400 max-w-sm mx-auto">
-            Free forever. Upgrade when you want your stack waiting in your inbox every Monday.
+            Free forever. Upgrade when you need unlimited price alerts.
           </p>
         </div>
 
