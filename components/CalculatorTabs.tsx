@@ -38,11 +38,11 @@ export function CalculatorTabs({ spots }: Props) {
                 : "hover:text-gray-300"
             }`}
             style={{
-              background: tab === t.id ? "rgba(255,255,255,0.05)" : "transparent",
+              background: tab === t.id ? "var(--surface-2)" : "transparent",
               borderRight: "1px solid var(--border)",
             }}
           >
-            <span className="label" style={{ color: tab === t.id ? "rgba(255,255,255,0.9)" : undefined }}>{t.label}</span>
+            <span className="label" style={{ color: tab === t.id ? "var(--text)" : undefined }}>{t.label}</span>
             <span className="text-[9px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{t.sub}</span>
           </button>
         ))}

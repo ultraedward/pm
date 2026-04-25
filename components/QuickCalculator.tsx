@@ -41,7 +41,7 @@ export function QuickCalculator({ spots }: Props) {
           const { label, dot } = METAL_META[metal];
           const active = parseFloat(oz[metal]) > 0;
           return (
-            <div key={metal} className="px-5 py-5 flex flex-col gap-3 bg-black/20">
+            <div key={metal} className="px-5 py-5 flex flex-col gap-3" style={{ backgroundColor: "var(--surface-2)" }}>
               {/* Metal label */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -65,7 +65,9 @@ export function QuickCalculator({ spots }: Props) {
                   placeholder="0"
                   value={oz[metal]}
                   onChange={(e) => setOz((prev) => ({ ...prev, [metal]: e.target.value }))}
-                  className="w-full bg-transparent text-2xl font-black tracking-tightest tabular-nums text-white placeholder:text-white/15 focus:outline-none"
+                  className="w-full bg-transparent text-2xl font-black tracking-tightest tabular-nums focus:outline-none"
+                  style={{ color: "var(--text)" }}
+                  data-placeholder-muted
                 />
                 <span className="text-xs text-gray-700 shrink-0">oz</span>
               </div>
@@ -102,7 +104,7 @@ export function QuickCalculator({ spots }: Props) {
               );
             })}
             <div className="flex items-center justify-between px-5 py-4">
-              <span className="text-sm font-bold text-white">Total value</span>
+              <span className="text-sm font-bold" style={{ color: "var(--text)" }}>Total value</span>
               <span className="text-2xl font-black tabular-nums tracking-tightest" style={{ color: "var(--gold-bright)" }}>
                 {fmt(total)}
               </span>

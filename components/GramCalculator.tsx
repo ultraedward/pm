@@ -82,10 +82,9 @@ export function GramCalculator({ spots }: Props) {
       {/* ── Result — always visible at top, updates live ─────────── */}
       <div
         className={`rounded-xl border px-5 py-4 transition-all duration-200 ${
-          hasValue
-            ? "border-amber-500/20 bg-amber-500/5"
-            : "border-white/5 bg-white/[0.02]"
+          hasValue ? "border-amber-500/20 bg-amber-500/5" : ""
         }`}
+        style={!hasValue ? { borderColor: "var(--border)", backgroundColor: "var(--surface-2)" } : {}}
       >
         {hasValue ? (
           <div className="flex items-center justify-between gap-4">
@@ -116,7 +115,7 @@ export function GramCalculator({ spots }: Props) {
       {/* ── Metal toggle ─────────────────────────────────────────── */}
       <div
         className="flex rounded-xl border overflow-hidden"
-        style={{ borderColor: "rgba(255,255,255,0.08)" }}
+        style={{ borderColor: "var(--border-strong)" }}
       >
         {(["gold", "silver"] as Metal[]).map((m) => (
           <button
@@ -144,12 +143,13 @@ export function GramCalculator({ spots }: Props) {
           placeholder="0.00"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          className="w-full bg-transparent rounded-xl border px-4 py-3 text-2xl font-black tabular-nums text-white placeholder:text-white/15 focus:outline-none focus:border-amber-500/40 transition-colors"
-          style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          className="w-full bg-transparent rounded-xl border px-4 py-3 text-2xl font-black tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
+          style={{ borderColor: "var(--border-strong)", color: "var(--text)" }}
+          data-placeholder-muted
         />
         <div
           className="flex rounded-lg border overflow-hidden"
-          style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          style={{ borderColor: "var(--border-strong)" }}
         >
           {(["g", "dwt", "ozt"] as const).map((u) => (
             <button
@@ -178,9 +178,9 @@ export function GramCalculator({ spots }: Props) {
               className={`rounded-lg py-2 px-1 text-center transition-colors ${
                 currentKarat === k.id
                   ? "bg-amber-500/20 border border-amber-500/40 text-amber-400"
-                  : "border text-gray-500 hover:text-gray-300 hover:border-white/20"
+                  : "border text-gray-500"
               }`}
-              style={currentKarat !== k.id ? { borderColor: "rgba(255,255,255,0.08)" } : {}}
+              style={currentKarat !== k.id ? { borderColor: "var(--border-strong)" } : {}}
             >
               <span className="block text-xs font-bold">{k.label}</span>
               {k.pct && (
@@ -201,8 +201,9 @@ export function GramCalculator({ spots }: Props) {
               placeholder="e.g. 75.0"
               value={customPct}
               onChange={(e) => setCustomPct(e.target.value)}
-              className="w-32 bg-transparent rounded-lg border px-3 py-2 text-sm font-bold tabular-nums text-white placeholder:text-white/20 focus:outline-none focus:border-amber-500/40 transition-colors"
-              style={{ borderColor: "rgba(255,255,255,0.08)" }}
+              className="w-32 bg-transparent rounded-lg border px-3 py-2 text-sm font-bold tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
+              style={{ borderColor: "var(--border-strong)", color: "var(--text)" }}
+              data-placeholder-muted
             />
             <span className="text-sm text-gray-600">% pure {metal}</span>
           </div>

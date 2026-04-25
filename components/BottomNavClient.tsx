@@ -47,9 +47,10 @@ export function BottomNavClient() {
 
   return (
     <nav
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-black/95 backdrop-blur-md"
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t backdrop-blur-md"
       style={{
-        borderColor: "rgba(255,255,255,0.06)",
+        backgroundColor: "var(--nav-bg)",
+        borderColor: "var(--border)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >

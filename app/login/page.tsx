@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen bg-surface flex items-center justify-center px-6">
+    <main className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: "var(--bg)" }}>
       {/* Ambient glow — stronger */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="h-[600px] w-[600px] rounded-full blur-[120px]" style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)", opacity: 0.08 }} />
@@ -16,7 +16,7 @@ export default function LoginPage() {
           <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--gold-bright)" }}>
             Lode
           </p>
-          <h1 className="text-5xl font-black tracking-tightest text-white leading-none">
+          <h1 className="text-5xl font-black tracking-tightest leading-none" style={{ color: "var(--text)" }}>
             Sign in
           </h1>
           <p className="text-sm text-gray-500">
@@ -28,7 +28,7 @@ export default function LoginPage() {
         <div className="space-y-4">
           <button
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="flex w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-4 text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
+            className="google-signin-btn flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
               <path d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.2c-.6 3-2.3 5.5-4.8 7.2v6h7.7c4.5-4.2 7.4-10.3 7.4-17.5z" fill="#4285F4"/>
