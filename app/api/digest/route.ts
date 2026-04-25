@@ -31,8 +31,9 @@ function buildDigestHtml(params: {
   portfolioGainLoss: number | null;
   portfolioPctReturn: number | null;
   hasHoldings: boolean;
+  unsubscribeUrl?: string;
 }) {
-  const { firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss, portfolioPctReturn, hasHoldings } = params;
+  const { firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss, portfolioPctReturn, hasHoldings, unsubscribeUrl } = params;
 
   const metalRows = METALS.map((metal) => {
     const price = spots[metal];
@@ -152,8 +153,8 @@ function buildDigestHtml(params: {
           <tr>
             <td style="padding-top:40px;border-top:1px solid rgba(255,255,255,0.06);margin-top:40px;">
               <p style="margin:0;font-size:11px;color:#444;line-height:1.6;">
-                You're receiving this weekly digest from <a href="https://lode.rocks" style="color:#555;text-decoration:none;">lode.rocks</a> because you have an account.<br>
-                Questions? Reply to this email or write to <a href="mailto:hello@lode.rocks" style="color:#555;text-decoration:none;">hello@lode.rocks</a>.
+                You're receiving this from <a href="https://lode.rocks" style="color:#555;text-decoration:none;">lode.rocks</a>.<br>
+                Questions? <a href="mailto:hello@lode.rocks" style="color:#555;text-decoration:none;">hello@lode.rocks</a>${unsubscribeUrl ? ` · <a href="${unsubscribeUrl}" style="color:#555;text-decoration:none;">Unsubscribe</a>` : ""}.
               </p>
             </td>
           </tr>
@@ -293,6 +294,39 @@ export async function GET(req: Request) {
     } catch (err) {
       console.error(`Digest email failed for ${user.email}:`, err);
       errors.push(user.email);
+    }
+  }
+
+  // ── 4. Send spot-prices-only digest to email-only subscribers ────
+  const baseUrl = process.env.NEXTAUTH_URL ?? "https://lode.rocks";
+  const subscribers = await prisma.emailSubscriber.findMany({
+    where: { active: true },
+  });
+
+  for (const sub of subscribers) {
+    const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${sub.unsubscribeToken}`;
+    const html = buildDigestHtml({
+      firstName: "",
+      spots,
+      weeklyPct,
+      portfolioValue: null,
+      portfolioGainLoss: null,
+      portfolioPctReturn: null,
+      hasHoldings: false,
+      unsubscribeUrl,
+    });
+
+    try {
+      await resend.emails.send({
+        from,
+        to: sub.email,
+        subject: "Your weekly precious metals update — Lode",
+        html,
+      });
+      sent++;
+    } catch (err) {
+      console.error(`Digest email failed for subscriber ${sub.email}:`, err);
+      errors.push(sub.email);
     }
   }
 

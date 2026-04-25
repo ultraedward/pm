@@ -132,3 +132,12 @@ model Holding {
 
   @@index([userId])
 }
+
+model EmailSubscriber {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  createdAt        DateTime @default(now())
+  unsubscribeToken String   @unique @default(cuid())
+  active           Boolean  @default(true)
+  source           String   @default("unknown")
+}

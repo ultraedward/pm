@@ -14,6 +14,7 @@ const FREE_FEATURES = [
   "Gram calculator — jewelry & scrap, any karat",
   "Portfolio tracker — holdings & P&L",
   "30-day price charts",
+  "Weekly Monday digest — spot prices in your inbox",
   "1 price alert",
 ];
 

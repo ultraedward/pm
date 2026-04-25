@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CoinMeltTable } from "@/components/CoinMeltTable";
+import { EmailCapture } from "@/components/EmailCapture";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const metadata: Metadata = {
@@ -134,6 +135,13 @@ export default async function CoinMeltCalculatorPage() {
             spots={{ silver: silverPrice, gold: goldPrice }}
             updatedAt={updatedAt}
           />
+        </div>
+      </section>
+
+      {/* ── Email capture ─────────────────────────────────────── */}
+      <section className="px-4 sm:px-6 pb-10">
+        <div className="mx-auto max-w-2xl">
+          <EmailCapture source="coin-melt" />
         </div>
       </section>
 

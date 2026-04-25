@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { GramCalculator } from "@/components/GramCalculator";
+import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
@@ -212,6 +213,13 @@ export default async function GramPage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* ── Email capture ────────────────────────────────────────── */}
+      <section className="px-4 sm:px-6 pb-10">
+        <div className="mx-auto max-w-2xl">
+          <EmailCapture source="gram" />
         </div>
       </section>
 
