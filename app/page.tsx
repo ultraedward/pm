@@ -232,7 +232,7 @@ export default async function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -250,15 +250,14 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl">
 
           {/* Eyebrow */}
-          <p className="label mb-5">Gold · Live spot price</p>
+          <p className="rainbow-accent label mb-5">Gold · Live spot price</p>
 
           {/* Giant price — viewport-scaled */}
           <div
-            className="font-black tabular-nums leading-none"
+            className="rainbow-text font-black tabular-nums leading-none"
             style={{
               fontSize: "clamp(4.5rem, 13vw, 10.5rem)",
               letterSpacing: "-0.05em",
-              color: "var(--gold)",
             }}
           >
             ${Math.round(gold.price).toLocaleString("en-US")}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type Props = {
   isLoggedIn: boolean;
@@ -33,7 +34,10 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
   if (isLoggedIn) return null;
 
   return (
-    <div className="sm:hidden flex items-center gap-3">
+    <div className="sm:hidden flex items-center gap-2">
+      {/* Theme toggle */}
+      <ThemeToggle />
+
       {/* Sign up CTA — always visible on mobile */}
       <Link
         href="/login"
@@ -46,44 +50,63 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Toggle menu"
-        className="flex flex-col justify-center items-center gap-1.5 p-2 rounded-lg hover:bg-gray-900 transition-colors"
+        className="flex flex-col justify-center items-center gap-1.5 p-2 transition-colors"
+        style={{ borderRadius: 0 }}
       >
         <span
-          className={`block h-0.5 w-5 bg-white transition-all duration-200 ${
-            open ? "translate-y-2 rotate-45" : ""
-          }`}
+          className="block h-0.5 w-5 transition-all duration-200"
+          style={{
+            backgroundColor: "var(--text)",
+            transform: open ? "translateY(8px) rotate(45deg)" : undefined,
+          }}
         />
         <span
-          className={`block h-0.5 w-5 bg-white transition-all duration-200 ${
-            open ? "opacity-0" : ""
-          }`}
+          className="block h-0.5 w-5 transition-all duration-200"
+          style={{
+            backgroundColor: "var(--text)",
+            opacity: open ? 0 : 1,
+          }}
         />
         <span
-          className={`block h-0.5 w-5 bg-white transition-all duration-200 ${
-            open ? "-translate-y-2 -rotate-45" : ""
-          }`}
+          className="block h-0.5 w-5 transition-all duration-200"
+          style={{
+            backgroundColor: "var(--text)",
+            transform: open ? "translateY(-8px) rotate(-45deg)" : undefined,
+          }}
         />
       </button>
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 border-b border-gray-800 bg-black px-6 py-4 space-y-1">
+        <div
+          className="absolute left-0 right-0 top-full z-50 px-6 py-4 space-y-1"
+          style={{
+            backgroundColor: "var(--dropdown-bg)",
+            borderBottom: "1px solid var(--border-strong)",
+          }}
+        >
           {links.map(({ href, label }) => {
             const isActive = pathname === href;
+            const isUpgrade = label === "Upgrade to Pro";
             return (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className={`block rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-400 hover:bg-gray-900 hover:text-white"
-                } ${
-                  label === "Upgrade to Pro"
-                    ? "mt-2 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300"
-                    : ""
-                }`}
+                className="block px-4 py-3 text-sm font-medium transition-colors"
+                style={{
+                  borderRadius: 0,
+                  backgroundColor: isActive
+                    ? "var(--surface-2)"
+                    : isUpgrade
+                    ? "var(--gold-dim)"
+                    : "transparent",
+                  color: isUpgrade
+                    ? "var(--gold)"
+                    : isActive
+                    ? "var(--text)"
+                    : "var(--text-muted)",
+                }}
               >
                 {label}
               </Link>
@@ -92,7 +115,10 @@ export default function NavMobile({ isLoggedIn, isPro }: Props) {
 
           {isLoggedIn && isPro && (
             <div className="px-4 pt-2">
-              <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-400">
+              <span
+                className="px-3 py-1 text-xs font-medium"
+                style={{ backgroundColor: "var(--gold-dim)", color: "var(--gold)" }}
+              >
                 PRO
               </span>
             </div>

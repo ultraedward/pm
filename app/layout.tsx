@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
+import ThemeScript from "@/components/ThemeScript";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -98,8 +99,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`bg-surface text-white ${inter.variable}`}>
-      <body className="min-h-screen bg-surface text-white antialiased font-sans">
+    <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="min-h-screen antialiased font-sans" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}

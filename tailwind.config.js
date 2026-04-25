@@ -13,7 +13,7 @@ module.exports = {
         tightest: "-0.05em",
       },
       colors: {
-        surface: "#050505",
+        surface: "var(--surface)",
       },
     },
   },

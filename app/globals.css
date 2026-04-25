@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Dark Mode (default) ── */
 :root {
   --bg:            #050505;
   --surface:       #0A0A0A;
@@ -14,11 +15,39 @@
   --gold-dim:      rgba(255, 194, 0, 0.07);
   --border:        rgba(255, 255, 255, 0.06);
   --border-strong: rgba(255, 255, 255, 0.14);
+  --nav-bg:        rgba(5, 5, 5, 0.92);
+  --nav-border:    rgba(255, 255, 255, 0.05);
+  --dropdown-bg:   #000000;
+  --input-bg:      #111111;
+  --input-border:  rgba(255, 255, 255, 0.10);
+  color-scheme:    dark;
+}
+
+/* ── Light Mode ── */
+[data-theme="light"] {
+  --bg:            #F7F7F7;
+  --surface:       #FFFFFF;
+  --surface-2:     #F0F0F0;
+  --text:          #0A0A0A;
+  --text-muted:    rgba(0, 0, 0, 0.48);
+  --text-dim:      rgba(0, 0, 0, 0.24);
+  --gold:          #C8860A;
+  --gold-bright:   #E8970A;
+  --gold-dim:      rgba(200, 134, 10, 0.08);
+  --border:        rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.13);
+  --nav-bg:        rgba(247, 247, 247, 0.92);
+  --nav-border:    rgba(0, 0, 0, 0.07);
+  --dropdown-bg:   #FFFFFF;
+  --input-bg:      #FFFFFF;
+  --input-border:  rgba(0, 0, 0, 0.12);
+  color-scheme:    light;
 }
 
 html, body {
   background-color: var(--bg);
   color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ── Typography ── */
@@ -38,6 +67,50 @@ html, body {
     letter-spacing: 0.24em;
     color: var(--text-muted);
   }
+
+  /* ── Rainbow Text ─────────────────────────────────────────────
+     Dark mode: flat gold. Light mode: curated spectrum gradient.
+     Apply to hero numerals, wordmarks, or section accents.
+  ─────────────────────────────────────────────────────────────── */
+  .rainbow-text {
+    color: var(--gold);
+  }
+
+  .rainbow-accent {
+    color: var(--text-muted);
+  }
+}
+
+/* Rainbow gradient — light mode only */
+[data-theme="light"] .rainbow-text {
+  background: linear-gradient(
+    135deg,
+    #FF3A30 0%,
+    #FF9500 22%,
+    #FFD60A 42%,
+    #30D158 62%,
+    #0A84FF 82%,
+    #BF5AF2 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+[data-theme="light"] .rainbow-accent {
+  background: linear-gradient(
+    90deg,
+    #FF3A30 0%,
+    #FF9500 25%,
+    #30D158 55%,
+    #0A84FF 80%,
+    #BF5AF2 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* ── Components ── */
@@ -71,14 +144,14 @@ html, body {
     transform: scale(0.98);
   }
 
-  /* Ghost — white outline, sharp */
+  /* Ghost — adapts to theme */
   .btn-ghost {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 1rem 2.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    color: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
     background: transparent;
     font-size: 10px;
     font-weight: 700;
@@ -88,7 +161,49 @@ html, body {
     transition: background-color 0.12s ease, color 0.12s ease;
   }
   .btn-ghost:hover {
-    background-color: #FFFFFF;
-    color: #000000;
+    background-color: var(--text);
+    color: var(--bg);
   }
 }
+
+/* ── Light Mode: Global Overrides ───────────────────────────────
+   Override hardcoded Tailwind classes that can't use CSS vars.
+─────────────────────────────────────────────────────────────── */
+
+/* Text */
+[data-theme="light"] .text-white      { color: var(--text) !important; }
+[data-theme="light"] .hover\:text-white:hover { color: var(--text) !important; }
+[data-theme="light"] .text-gray-700   { color: var(--text-muted) !important; }
+[data-theme="light"] .text-gray-500   { color: var(--text-muted) !important; }
+[data-theme="light"] .text-gray-400   { color: var(--text-muted) !important; }
+
+/* Backgrounds */
+[data-theme="light"] .bg-surface      { background-color: var(--surface) !important; }
+[data-theme="light"] .bg-black        { background-color: var(--dropdown-bg) !important; }
+[data-theme="light"] .bg-gray-900     { background-color: var(--surface-2) !important; }
+[data-theme="light"] .hover\:bg-gray-900:hover { background-color: var(--surface-2) !important; }
+
+/* Borders */
+[data-theme="light"] .border-gray-800 { border-color: var(--border-strong) !important; }
+[data-theme="light"] .border-b        { border-bottom-color: var(--border) !important; }
+[data-theme="light"] .border-t        { border-top-color: var(--border) !important; }
+
+/* Dividers */
+[data-theme="light"] .divide-white\/\[0\.06\] > * + * {
+  border-color: var(--border) !important;
+}
+
+/* Hamburger lines and icon fills */
+[data-theme="light"] .bg-white {
+  background-color: var(--text) !important;
+}
+
+/* Amber/gold accents — stay consistent */
+[data-theme="light"] .text-amber-400  { color: var(--gold) !important; }
+[data-theme="light"] .bg-amber-500\/10 { background-color: var(--gold-dim) !important; }
+[data-theme="light"] .hover\:bg-amber-500\/20:hover { background-color: rgba(200, 134, 10, 0.14) !important; }
+[data-theme="light"] .hover\:text-amber-300:hover { color: var(--gold) !important; }
+
+/* Emerald / red price change badges — keep vivid */
+[data-theme="light"] .text-emerald-400 { color: #1a9e3f !important; }
+[data-theme="light"] .text-red-400     { color: #e0260d !important; }
