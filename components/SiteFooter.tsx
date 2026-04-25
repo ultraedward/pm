@@ -4,7 +4,7 @@ import Link from "next/link";
 
 /**
  * Consistent site-wide footer used on every page.
- * Links: Home | About | Methodology | FAQ | Pricing | Contact | Privacy | Terms
+ * Links: Home | About | Melt Calculator | Gram Calculator | FAQ | Contact | Privacy | Terms
  */
 export function SiteFooter() {
   return (
@@ -22,7 +22,6 @@ export function SiteFooter() {
           <Link href="/coin-melt-calculator" className="hover:text-gray-300 transition-colors">Melt Calculator</Link>
           <Link href="/gram"                 className="hover:text-gray-300 transition-colors">Gram Calculator</Link>
           <Link href="/faq"                  className="hover:text-gray-300 transition-colors">FAQ</Link>
-          <Link href="/pricing"              className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
           <Link href="/contact"     className="hover:text-gray-300 transition-colors">Contact</Link>
           <Link href="/privacy"     className="hover:text-gray-300 transition-colors">Privacy</Link>
           <Link href="/terms"       className="hover:text-gray-300 transition-colors">Terms</Link>

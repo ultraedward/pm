@@ -360,7 +360,6 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="font-black tracking-[0.3em] text-sm uppercase text-white hover:opacity-60 transition-opacity">Lode</Link>
           <div className="flex gap-8">
-            <Link href="/pricing" className="hidden sm:block label hover:text-white transition-colors">Pricing</Link>
             <Link href="/privacy" className="label hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms"   className="label hover:text-white transition-colors">Terms</Link>
             {isLoggedIn
