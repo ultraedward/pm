@@ -18,10 +18,11 @@ export function SiteFooter() {
         </Link>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <Link href="/"            className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
-          <Link href="/about"       className="hover:text-gray-300 transition-colors">About</Link>
-          <Link href="/methodology" className="hover:text-gray-300 transition-colors">Methodology</Link>
-          <Link href="/faq"         className="hover:text-gray-300 transition-colors">FAQ</Link>
-          <Link href="/pricing"     className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
+          <Link href="/about"                className="hover:text-gray-300 transition-colors">About</Link>
+          <Link href="/coin-melt-calculator" className="hover:text-gray-300 transition-colors">Melt Calculator</Link>
+          <Link href="/gram"                 className="hover:text-gray-300 transition-colors">Gram Calculator</Link>
+          <Link href="/faq"                  className="hover:text-gray-300 transition-colors">FAQ</Link>
+          <Link href="/pricing"              className="hidden sm:block hover:text-gray-300 transition-colors">Pricing</Link>
           <Link href="/contact"     className="hover:text-gray-300 transition-colors">Contact</Link>
           <Link href="/privacy"     className="hover:text-gray-300 transition-colors">Privacy</Link>
           <Link href="/terms"       className="hover:text-gray-300 transition-colors">Terms</Link>

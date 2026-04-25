@@ -9,20 +9,18 @@ type Props = {
 };
 
 const FREE_FEATURES = [
-  "Spot prices — gold, silver, platinum & palladium",
-  "Gold:silver ratio",
+  "Live spot prices — gold, silver, platinum & palladium",
+  "Coin melt calculator — all metals, all coin types",
+  "Gram calculator — jewelry & scrap, any karat",
   "Portfolio tracker — holdings & P&L",
   "30-day price charts",
   "1 price alert",
-  "Melt value calculator — coins, jewelry & scrap",
-  "Daily gold prediction game",
 ];
 
-const PRO_EXCLUSIVE = [
+const PRO_FEATURES = [
+  "Weekly stack report — prices, 7-day moves & portfolio value every Monday",
+  "Unlimited price alerts — set targets across any metal",
   "Everything in Free",
-  "Unlimited price alerts — never miss a target price",
-  "Weekly portfolio digest email",
-  "Coin-by-coin calculator — silver, platinum & palladium",
 ];
 
 export function PricingClient({ isPro, isLoggedIn }: Props) {
@@ -116,15 +114,24 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
                 </>
               )}
             </div>
+            <p className="text-sm text-gray-400 mt-2">Your stack, in your inbox every Monday.</p>
             {annual && (
-              <p className="text-sm text-gray-500 mt-2">~$2.08 / month</p>
+              <p className="text-xs text-gray-600 mt-1">~$2.08 / month</p>
             )}
           </div>
 
+          {/* Digest callout */}
+          <div className="relative rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 space-y-1">
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-500">Every Monday</p>
+            <p className="text-sm text-gray-300">
+              Spot prices, 7-day moves, and your portfolio value — summarized and sent to your inbox. No app to open.
+            </p>
+          </div>
+
           <ul className="relative space-y-3 text-sm text-gray-300">
-            {PRO_EXCLUSIVE.map((f) => (
-              <li key={f} className="flex items-center gap-2">
-                <span className="text-amber-500">✓</span> {f}
+            {PRO_FEATURES.map((f) => (
+              <li key={f} className="flex items-start gap-2">
+                <span className="text-amber-500 mt-0.5">✓</span> {f}
               </li>
             ))}
           </ul>

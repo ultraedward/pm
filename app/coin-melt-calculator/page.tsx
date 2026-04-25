@@ -1,6 +1,11 @@
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
+import { CoinMeltTable } from "@/components/CoinMeltTable";
+import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const metadata: Metadata = {
   title: "Coin Melt Value Calculator — Silver Eagles, Junk Silver & More",
@@ -35,8 +40,8 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home",                   "item": "https://lode.rocks" },
-        { "@type": "ListItem", "position": 2, "name": "Coin Melt Calculator",   "item": "https://lode.rocks/coin-melt-calculator" },
+        { "@type": "ListItem", "position": 1, "name": "Home",                 "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "Coin Melt Calculator", "item": "https://lode.rocks/coin-melt-calculator" },
       ],
     },
     {
@@ -65,7 +70,7 @@ const jsonLd = {
           "name": "What is the melt value of a silver dollar?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Morgan and Peace silver dollars contain 0.7734 troy ounces of silver (90% silver, 10% copper, 26.73g total weight). To find the melt value, multiply 0.7734 by the current silver spot price. Use the calculator on lode.rocks for an up-to-date figure.",
+            "text": "Morgan and Peace silver dollars contain 0.7734 troy ounces of silver (90% silver, 10% copper, 26.73g total weight). To find the melt value, multiply 0.7734 by the current silver spot price.",
           },
         },
         {
@@ -73,7 +78,7 @@ const jsonLd = {
           "name": "How much silver is in pre-1965 junk silver coins?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pre-1965 US dimes, quarters, and half dollars are 90% silver. A single dime contains 0.0723 troy oz of silver, a quarter contains 0.1808 troy oz, and a half dollar contains 0.3617 troy oz. A $1 face value in 90% silver coins contains approximately 0.715 troy oz of silver.",
+            "text": "Pre-1965 US dimes, quarters, and half dollars are 90% silver. A dime contains 0.0723 troy oz, a quarter 0.1808 troy oz, and a half dollar 0.3617 troy oz. A $1 face value in 90% silver holds about 0.715 troy oz of silver.",
           },
         },
         {
@@ -81,7 +86,7 @@ const jsonLd = {
           "name": "What is the melt value of an American Silver Eagle?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "An American Silver Eagle contains exactly 1 troy ounce of fine (.999) silver. Its melt value equals the current silver spot price. Use the Lode calculator for the live figure.",
+            "text": "An American Silver Eagle contains exactly 1 troy ounce of fine (.999) silver. Its melt value equals the current silver spot price.",
           },
         },
       ],
@@ -89,18 +94,13 @@ const jsonLd = {
   ],
 };
 
-const COINS = [
-  { name: "American Silver Eagle", content: "1.000 troy oz fine silver (.999)", note: "Most popular silver bullion coin" },
-  { name: "Canadian Silver Maple Leaf", content: "1.000 troy oz fine silver (.9999)", note: "Highest purity standard silver coin" },
-  { name: "Morgan / Peace Dollar (1878–1935)", content: "0.7734 troy oz silver (90% pure)", note: "Classic US 90% silver dollar" },
-  { name: "Pre-1965 Dime", content: "0.0723 troy oz silver (90% pure)", note: "Roosevelt or Mercury dime" },
-  { name: "Pre-1965 Quarter", content: "0.1808 troy oz silver (90% pure)", note: "Washington quarter" },
-  { name: "Pre-1965 Half Dollar", content: "0.3617 troy oz silver (90% pure)", note: "Franklin or Walking Liberty" },
-  { name: "American Gold Eagle (1 oz)", content: "1.000 troy oz pure gold (22k)", note: "Contains exactly 1 ozt pure gold" },
-  { name: "Canadian Gold Maple Leaf (1 oz)", content: "1.000 troy oz gold (.9999 fine)", note: "99.99% pure gold" },
-];
+export default async function CoinMeltCalculatorPage() {
+  const spots = await fetchAllSpotPrices();
 
-export default function CoinMeltCalculatorPage() {
+  const silverPrice = spots.silver ?? 0;
+  const goldPrice   = spots.gold   ?? 0;
+  const updatedAt   = silverPrice > 0 ? new Date().toISOString() : null;
+
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
       <script
@@ -109,56 +109,31 @@ export default function CoinMeltCalculatorPage() {
       />
 
       {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 pt-14 pb-12 sm:pt-20 sm:pb-16">
+      <section className="relative px-4 sm:px-6 pt-14 pb-10 sm:pt-20 sm:pb-14">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="absolute left-1/2 top-0 h-96 w-[600px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-10 blur-3xl"
             style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
           />
         </div>
-        <div className="relative z-10 mx-auto max-w-2xl text-center space-y-5">
+        <div className="relative z-10 mx-auto max-w-2xl text-center space-y-4">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-tight">
             Coin Melt Value<br />
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
-          <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
-            Melt value for common silver and gold coins at live spot prices.
+          <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
+            Live melt values for common silver and gold coins. Enter a quantity on any row to total your stack.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link href="/#calculator" className="btn-gold px-10">
-              Open the calculator
-            </Link>
-            <Link href="/gram" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-              Calculate by gram weight →
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* ── Coin reference table ───────────────────────────────── */}
-      <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-3xl space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-black tracking-tight">Silver content reference</h2>
-            <p className="text-sm text-gray-500">Troy oz of precious metal per coin — multiply by spot price for melt value.</p>
-          </div>
-          <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-            <div className="divide-y" style={{ borderColor: "var(--border)" }}>
-              {COINS.map(({ name, content, note }) => (
-                <div key={name} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                  <div>
-                    <p className="text-sm font-bold text-white">{name}</p>
-                    <p className="text-xs text-gray-600">{note}</p>
-                  </div>
-                  <p className="text-sm text-amber-400 font-mono tabular-nums sm:text-right whitespace-nowrap">{content}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <p className="text-xs text-gray-700 text-center">
-            Melt value = troy oz content × current spot price.{" "}
-            <Link href="/#calculator" className="underline hover:text-gray-500 transition-colors">Use the calculator →</Link>
-          </p>
+      {/* ── Interactive melt table ─────────────────────────────── */}
+      <section className="border-t px-4 sm:px-6 py-10" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-2xl">
+          <CoinMeltTable
+            spots={{ silver: silverPrice, gold: goldPrice }}
+            updatedAt={updatedAt}
+          />
         </div>
       </section>
 
@@ -167,10 +142,10 @@ export default function CoinMeltCalculatorPage() {
         <div className="mx-auto max-w-2xl space-y-8">
           <h2 className="text-2xl font-black tracking-tight text-center">Common questions</h2>
           <div className="space-y-6">
-            {(jsonLd["@graph"][1] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
+            {(jsonLd["@graph"][2] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
               <div key={qa.name} className="space-y-2">
                 <p className="font-bold text-white">{qa.name}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{qa.acceptedAnswer.text}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{qa.acceptedAnswer.text}</p>
               </div>
             ))}
           </div>
@@ -180,15 +155,15 @@ export default function CoinMeltCalculatorPage() {
       {/* ── CTA ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-2xl font-black tracking-tight">Know what your stack is worth — right now</p>
-        <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          Live spot prices, coin melt calculator, portfolio tracker, and price alerts.
+        <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
+          Live spot prices, price alerts, and portfolio tracker.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/#calculator" className="btn-gold px-10">
-            Calculate melt value
+          <Link href="/login" className="btn-gold px-10">
+            Get started free
           </Link>
-          <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-            See where to buy at today&apos;s spot →
+          <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-dim)" }}>
+            Calculate by gram weight →
           </Link>
         </div>
       </section>

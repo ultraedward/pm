@@ -315,6 +315,12 @@ export default async function HomePage() {
                 </>
               )}
             </p>
+            <p className="text-xs mt-2" style={{ color: "var(--text-dim)" }}>
+              Looking up a specific coin?{" "}
+              <Link href="/coin-melt-calculator" className="underline underline-offset-4 hover:text-white transition-colors">
+                See live melt values by coin type →
+              </Link>
+            </p>
           </div>
           <CalculatorTabs
             spots={{

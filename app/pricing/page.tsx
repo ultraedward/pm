@@ -7,14 +7,14 @@ import { PricingClient } from "./PricingClient";
 export const metadata: Metadata = {
   title: "Pricing — Free & Pro Plans",
   description:
-    "Lode is free forever: 1 price alert, full portfolio tracking, and live spot prices. Upgrade to Pro for unlimited gold and silver price alerts.",
+    "Lode is free forever: live spot prices, melt calculators, portfolio tracker, and 1 price alert. Upgrade to Pro for your weekly metals digest and unlimited alerts — $3/month.",
   alternates: {
     canonical: "https://lode.rocks/pricing",
   },
   openGraph: {
     title: "Pricing — Free & Pro Plans | Lode",
     description:
-      "Lode is free forever: 1 price alert, portfolio tracker, and live spot prices. Upgrade to Pro for unlimited alerts at $3/month.",
+      "Free forever: live prices, calculators & portfolio tracker. Pro adds a weekly stack report every Monday and unlimited price alerts — $3/month.",
     url: "https://lode.rocks/pricing",
   },
 };
@@ -38,8 +38,8 @@ export default async function PricingPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-black tracking-tight">Pricing</h1>
-          <p className="text-gray-400 max-w-md mx-auto">
-            One free tier, one pro tier. No surprises.
+          <p className="text-gray-400 max-w-sm mx-auto">
+            Free forever. Upgrade when you want your stack waiting in your inbox every Monday.
           </p>
         </div>
 

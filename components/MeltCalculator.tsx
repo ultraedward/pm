@@ -59,7 +59,7 @@ function makeInitialQty(): Quantities {
 
 type Props = { spots: Record<Metal, number>; isPro?: boolean };
 
-export function MeltCalculator({ spots, isPro = false }: Props) {
+export function MeltCalculator({ spots }: Props) {
   const [qty, setQty] = useState<Quantities>(makeInitialQty());
 
   function setQtyFor(metal: Metal, coinId: string, val: string) {
@@ -94,38 +94,6 @@ export function MeltCalculator({ spots, isPro = false }: Props) {
           const coins = COIN_SPECS[metal];
           const metalTotal = metalTotals.find((m) => m.metal === metal)!;
           const hasValue = metalTotal.value > 0;
-          const isLocked = !isPro && metal !== "gold";
-
-          if (isLocked) {
-            return (
-              <a
-                key={metal}
-                href="/pricing"
-                className="rounded-2xl border bg-black/20 px-5 py-5 flex flex-col gap-3 relative overflow-hidden cursor-pointer hover:border-amber-500/20 transition-colors group"
-                style={{ borderColor: "rgba(255,255,255,0.06)" }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full flex-shrink-0 opacity-40" style={{ backgroundColor: dot }} />
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-600">{label}</span>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">Pro</span>
-                </div>
-                <div className="space-y-2.5 opacity-25 pointer-events-none select-none">
-                  {coins.slice(0, 2).map((coin) => (
-                    <div key={coin.id} className="flex items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-gray-300 leading-tight truncate">{coin.label}</p>
-                        <p className="text-[10px] text-gray-600 tabular-nums">{coin.oz} troy oz</p>
-                      </div>
-                      <div className="w-16 h-8 rounded-lg border bg-white/5" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-                    </div>
-                  ))}
-                </div>
-              </a>
-            );
-          }
-
           return (
             <div
               key={metal}
