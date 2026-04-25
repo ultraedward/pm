@@ -18,7 +18,6 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "Weekly stack report — prices, 7-day moves & portfolio value every Monday",
   "Unlimited price alerts — set targets across any metal",
   "Everything in Free",
 ];
