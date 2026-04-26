@@ -142,16 +142,6 @@ export default function FaqPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Who runs Lode?</h2>
-            <p>
-              Lode is an independent project, self-funded, with no investors and not owned by a dealer. We&rsquo;re keeping the operator&rsquo;s identity private for now — not because there&rsquo;s anything to hide, but because we&rsquo;d rather be judged on the product than on anyone&rsquo;s resume. Every piece of the tool that matters — the data sources, the calculations, what we collect, how we use it — is published publicly on this site so you can evaluate it directly.
-            </p>
-            <p>
-              If that&rsquo;s a dealbreaker for you, we understand. The data and methodology pages should still let you sanity-check whether the tool is doing what it claims.
-            </p>
-          </section>
-
-          <section className="space-y-3">
             <h2 className="text-base font-bold text-white">How does Lode make money?</h2>
             <p>
               Affiliate commissions on dealer outbound clicks from the <a href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">compare</a> page. When you click through to APMEX, JM Bullion, SD Bullion, or Money Metals and buy something, Lode may earn a referral fee at no cost to you. That&rsquo;s disclosed on the page itself (FTC requires it) and is currently our only revenue stream.
