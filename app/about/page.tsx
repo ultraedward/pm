@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata = {
   title: "About Lode — Independent Precious Metals Price Tracker",
   description:
-    "Lode is an independent precious metals price tracker — live spot prices, a coin melt calculator, a portfolio tracker, and daily email price alerts. Built for people who hold physical metal.",
+    "Lode is an independent precious metals price tracker — live spot prices, a coin melt calculator, a portfolio tracker, and email price alerts. Built for people who hold physical metal.",
   alternates: {
     canonical: "https://lode.rocks/about",
   },
@@ -48,7 +48,7 @@ export default function AboutPage() {
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">At a glance</p>
           <ul className="space-y-2 text-gray-300">
-            <li><span className="text-white font-semibold">What it is:</span> live spot prices for gold, silver, platinum, palladium — plus a coin melt calculator, gram converter, portfolio tracker, and daily email price alerts.</li>
+            <li><span className="text-white font-semibold">What it is:</span> live spot prices for gold, silver, platinum, palladium — plus a coin melt calculator, gram converter, portfolio tracker, and email price alerts.</li>
             <li><span className="text-white font-semibold">What it isn&rsquo;t:</span> a dealer, a broker, an exchange, or financial advice. We don&rsquo;t hold anything for you.</li>
             <li><span className="text-white font-semibold">How we fund it:</span> affiliate commissions on dealer clicks from the <a href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">compare</a> page. No ads, no data sales. Rankings sort by price, not by who pays us.</li>
             <li><span className="text-white font-semibold">How to verify it:</span> cross-check any spot price against Kitco or a broker terminal — numbers should match within pennies. See <a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">methodology</a>.</li>

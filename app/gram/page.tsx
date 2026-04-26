@@ -268,7 +268,7 @@ export default async function GramPage() {
         <p className="text-sm text-gray-400 max-w-sm mx-auto">Portfolio tracker, price alerts, and live spot for gold, silver, platinum &amp; palladium.</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/login" className="btn-gold px-10 inline-block">
-            Sign in to track
+            Get started free
           </Link>
           <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
             See where to buy at today&apos;s spot →

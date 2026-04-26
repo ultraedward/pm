@@ -33,13 +33,12 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">1. Information We Collect</h2>
             <p>When you sign in with Google, we receive your name and email address from Google OAuth. We store this information to identify your account and send you price alert notifications.</p>
-            <p>Portfolio holdings you enter without signing in are stored only in your browser (localStorage) and never transmitted to our servers. If you create an account, your holdings are stored in our database solely to enable cross-device access — we have no other use for them. Price alert targets are stored in our database regardless of account status, only to trigger the notifications you configure.</p>
-            <p>We use Stripe for payment processing. We do not store your credit card information — Stripe handles all payment data under their own privacy policy.</p>
+            <p>Portfolio holdings you enter without signing in are stored only in your browser (localStorage) and never transmitted to our servers. If you create an account, your holdings are stored in our database solely to enable cross-device access — we have no other use for them. Price alert targets are stored in your account, only to trigger the notifications you configure.</p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">2. How We Use Your Information</h2>
-            <p>Your email address is used to send price alert notifications you have explicitly configured, and for transactional emails related to your subscription (receipts, cancellations).</p>
+            <p>Your email address is used to send price alert notifications you have explicitly configured, and to deliver the weekly digest if you have subscribed to it.</p>
             <p>We do not sell, rent, or share your personal information with third parties for marketing purposes.</p>
           </section>
 
@@ -50,7 +49,7 @@ export default function PrivacyPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">4. Third-Party Services</h2>
-            <p>We use the following third-party services to operate the platform: Google OAuth for authentication, Stripe for billing, Neon for database hosting, Vercel for application hosting, and a Cloudflare Worker proxying Yahoo Finance futures data for spot prices. Each service operates under its own privacy policy. None of these services receive your email or account information for the purpose of fetching prices — price requests are anonymous and contain no user data.</p>
+            <p>We use the following third-party services to operate the platform: Google OAuth for authentication, Resend for transactional email delivery, Neon for database hosting, Vercel for application hosting, and a Cloudflare Worker proxying Yahoo Finance futures data for spot prices. Each service operates under its own privacy policy. None of these services receive your email or account information for the purpose of fetching prices — price requests are anonymous and contain no user data.</p>
           </section>
 
           <section className="space-y-3">

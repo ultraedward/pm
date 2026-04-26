@@ -188,7 +188,7 @@ export default function PortfolioTrackerPage() {
           No account, no spreadsheets. Your holdings stay on your device.
         </p>
         <Link href="/login" className="btn-gold px-10 inline-block">
-          Create free account
+          Get started free
         </Link>
       </section>
 

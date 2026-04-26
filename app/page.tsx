@@ -13,14 +13,14 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
   description:
-    "Live gold, silver, platinum, and palladium spot prices. Set daily email price alerts, calculate coin melt values, and track your precious metals portfolio.",
+    "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
   alternates: {
     canonical: "https://lode.rocks",
   },
   openGraph: {
     title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Live gold, silver, platinum, and palladium spot prices. Set daily email price alerts, calculate coin melt values, and track your precious metals portfolio.",
+      "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
     url: "https://lode.rocks",
   },
 };

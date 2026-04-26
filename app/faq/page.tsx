@@ -82,7 +82,7 @@ const faqJsonLd = {
           "name": "Does Lode sell user data or show ads?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Lode does not run advertising, sell user data, or use third-party tracking cookies. The only third-party services used are those operationally required to run the site (Google OAuth, Stripe, Neon, Vercel), documented in the Privacy Policy.",
+            "text": "No. Lode does not run advertising, sell user data, or use third-party tracking cookies. The only third-party services used are those operationally required to run the site (Google OAuth, Resend, Neon, Vercel), documented in the Privacy Policy.",
           },
         },
         {
