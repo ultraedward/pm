@@ -3,6 +3,8 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CoinMeltTable } from "@/components/CoinMeltTable";
 import { EmailCapture } from "@/components/EmailCapture";
@@ -96,7 +98,11 @@ const jsonLd = {
 };
 
 export default async function CoinMeltCalculatorPage() {
-  const spots = await fetchAllSpotPrices();
+  const [spots, session] = await Promise.all([
+    fetchAllSpotPrices(),
+    getServerSession(authOptions),
+  ]);
+  const isLoggedIn = !!session?.user?.email;
 
   const silverPrice = spots.silver ?? 0;
   const goldPrice   = spots.gold   ?? 0;
@@ -138,12 +144,16 @@ export default async function CoinMeltCalculatorPage() {
         </div>
       </section>
 
-      {/* ── Email capture ─────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 pb-10">
-        <div className="mx-auto max-w-2xl">
-          <EmailCapture source="coin-melt" />
-        </div>
-      </section>
+      {/* ── Email capture — non-converts only.
+          Logged-in users already gave us their email at signup; prompting
+          them again under their own tool is awkward. ───────────────── */}
+      {!isLoggedIn && (
+        <section className="px-4 sm:px-6 pb-10">
+          <div className="mx-auto max-w-2xl">
+            <EmailCapture source="coin-melt" />
+          </div>
+        </section>
+      )}
 
       {/* ── FAQ ───────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
@@ -160,20 +170,36 @@ export default async function CoinMeltCalculatorPage() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────────── */}
+      {/* ── CTA — sign-up pitch for non-converts; cross-sell for users.
+          For logged-in users we keep the section but swap the sign-up
+          pitch for a quiet pointer to the gram calculator. They came
+          here for a tool, not a marketing pitch. ───────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
-        <p className="text-2xl font-black tracking-tight">Know what your stack is worth — right now</p>
-        <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
-          Live spot prices, price alerts, and portfolio tracker.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/login" className="btn-gold px-10">
-            Get started
-          </Link>
-          <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-dim)" }}>
-            Calculate by gram weight →
-          </Link>
-        </div>
+        {isLoggedIn ? (
+          <>
+            <p className="text-sm" style={{ color: "var(--text-dim)" }}>
+              Calculating jewelry or scrap?
+            </p>
+            <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>
+              Calculate by gram weight →
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="text-2xl font-black tracking-tight">Know what your stack is worth — right now</p>
+            <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
+              Live spot prices, price alerts, and portfolio tracker.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/login" className="btn-gold px-10">
+                Get started
+              </Link>
+              <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-dim)" }}>
+                Calculate by gram weight →
+              </Link>
+            </div>
+          </>
+        )}
       </section>
 
       <SiteFooter />

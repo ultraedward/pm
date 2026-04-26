@@ -3,6 +3,8 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { GramCalculator } from "@/components/GramCalculator";
 import { EmailCapture } from "@/components/EmailCapture";
@@ -38,7 +40,11 @@ export const metadata: Metadata = {
 };
 
 export default async function GramPage() {
-  const spots = await fetchAllSpotPrices();
+  const [spots, session] = await Promise.all([
+    fetchAllSpotPrices(),
+    getServerSession(authOptions),
+  ]);
+  const isLoggedIn = !!session?.user?.email;
 
   const goldSpot   = spots.gold   ?? 0;
   const silverSpot = spots.silver ?? 0;
@@ -216,12 +222,16 @@ export default async function GramPage() {
         </div>
       </section>
 
-      {/* ── Email capture ────────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 pb-10">
-        <div className="mx-auto max-w-2xl">
-          <EmailCapture source="gram" />
-        </div>
-      </section>
+      {/* ── Email capture — non-converts only.
+          Logged-in users gave us their email at signup; re-prompting
+          them under their own tool is awkward. ─────────────────────── */}
+      {!isLoggedIn && (
+        <section className="px-4 sm:px-6 pb-10">
+          <div className="mx-auto max-w-2xl">
+            <EmailCapture source="gram" />
+          </div>
+        </section>
+      )}
 
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-16" style={{ borderColor: "var(--border)" }}>
@@ -262,18 +272,34 @@ export default async function GramPage() {
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────── */}
+      {/* ── CTA — sign-up pitch for non-converts; cross-sell for users.
+          Logged-in users see only the /compare pointer (a high-intent
+          monetized surface), not the sign-up pitch they've already
+          completed. ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
-        <p className="text-2xl font-black tracking-tight">Track your full stack on Lode</p>
-        <p className="text-sm text-gray-400 max-w-sm mx-auto">Portfolio tracker, price alerts, and live spot for gold, silver, platinum &amp; palladium.</p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/login" className="btn-gold px-10 inline-block">
-            Get started
-          </Link>
-          <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-            See where to buy at today&apos;s spot →
-          </Link>
-        </div>
+        {isLoggedIn ? (
+          <>
+            <p className="text-sm text-gray-500">
+              Looking to buy?
+            </p>
+            <Link href="/compare" className="text-sm text-gray-400 hover:text-gray-200 transition-colors">
+              See the cheapest dealer at today&apos;s spot →
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="text-2xl font-black tracking-tight">Track your full stack on Lode</p>
+            <p className="text-sm text-gray-400 max-w-sm mx-auto">Portfolio tracker, price alerts, and live spot for gold, silver, platinum &amp; palladium.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/login" className="btn-gold px-10 inline-block">
+                Get started
+              </Link>
+              <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                See where to buy at today&apos;s spot →
+              </Link>
+            </div>
+          </>
+        )}
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────── */}

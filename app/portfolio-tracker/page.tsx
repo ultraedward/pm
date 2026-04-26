@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { SiteFooter } from "@/components/SiteFooter";
 import LocalPortfolioTracker from "@/components/LocalPortfolioTracker";
+
+// /portfolio-tracker is the no-account, localStorage-backed tracker — its
+// purpose is to give anonymous visitors a useful tool without asking for
+// signup. Once a user is logged in, they have a real DB-backed tracker at
+// /dashboard with cross-device sync; landing them here would be confusing
+// (their dashboard holdings wouldn't show up). Redirect for them.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Precious Metals Portfolio Tracker — Track Gold & Silver Holdings",
@@ -105,7 +115,12 @@ const FEATURES = [
   },
 ];
 
-export default function PortfolioTrackerPage() {
+export default async function PortfolioTrackerPage() {
+  const session = await getServerSession(authOptions);
+  if (session?.user?.email) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
       <script
