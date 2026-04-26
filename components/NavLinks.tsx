@@ -40,7 +40,7 @@ export default function NavLinks({ isLoggedIn }: Props) {
           <Link href="/gram"    className={linkClass("/gram")}>Calculator</Link>
           <Link href="/compare" className={linkClass("/compare")}>Compare</Link>
           <Link href="/login" className="btn-gold px-4 py-1.5 text-xs">
-            Get started free
+            Get started
           </Link>
         </>
       )}

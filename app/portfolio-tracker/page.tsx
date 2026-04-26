@@ -68,7 +68,7 @@ const jsonLd = {
           "name": "Do I need an account to use the portfolio tracker?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. The portfolio tracker works without any account. Your holdings are saved in your browser and never sent to our servers. If you want to sync across multiple devices, you can optionally create a free account.",
+            "text": "No. The portfolio tracker works without any account. Your holdings are saved in your browser and never sent to our servers. If you want to sync across multiple devices, you can optionally create an account.",
           },
         },
         {
@@ -188,7 +188,7 @@ export default function PortfolioTrackerPage() {
           No account, no spreadsheets. Your holdings stay on your device.
         </p>
         <Link href="/login" className="btn-gold px-10 inline-block">
-          Get started free
+          Get started
         </Link>
       </section>
 

@@ -168,7 +168,7 @@ export default async function CoinMeltCalculatorPage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/login" className="btn-gold px-10">
-            Get started free
+            Get started
           </Link>
           <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-dim)" }}>
             Calculate by gram weight →

@@ -60,7 +60,7 @@ export default function AboutPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">What Lode does</h2>
             <p>
-              Lode tracks live spot prices for gold, silver, platinum, and palladium. It lets you calculate coin melt values, convert between troy ounces and grams, track a physical-metal portfolio at current spot, and get a daily email when a price you set is crossed.
+              Lode tracks live spot prices for gold, silver, platinum, and palladium. It lets you calculate coin melt values, convert between troy ounces and grams, track a physical-metal portfolio at current spot, and get an email when a price target you set is crossed.
             </p>
             <p>
               It&rsquo;s built as a small, focused tool for the person holding the metal — not the person selling it to you.

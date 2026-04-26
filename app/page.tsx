@@ -272,7 +272,7 @@ export default async function HomePage() {
               <p className="label">Price alerts · Portfolio tracking · Weekly digest</p>
             )}
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
-              {isLoggedIn ? "Go to dashboard" : "Get started free"}
+              {isLoggedIn ? "Go to dashboard" : "Get started"}
             </Link>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default async function HomePage() {
               Track your stack.<br />Free forever.
             </p>
             <Link href="/login" className="btn-gold">
-              Get started free
+              Get started
             </Link>
           </div>
         </section>

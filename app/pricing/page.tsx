@@ -70,11 +70,8 @@ export default async function PricingPage() {
                 Go to dashboard →
               </Link>
             ) : (
-              <Link
-                href="/login"
-                className="block rounded-full bg-amber-500 py-2.5 text-center text-sm font-bold text-black hover:bg-amber-400 transition-colors"
-              >
-                Get started free
+              <Link href="/login" className="btn-gold w-full">
+                Get started
               </Link>
             )}
           </div>
