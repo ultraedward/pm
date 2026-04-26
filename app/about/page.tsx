@@ -68,16 +68,6 @@ export default function AboutPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">What Lode is not</h2>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li>Not a dealer, broker, or exchange. We hold no metal on your behalf.</li>
-              <li>Not owned by a dealer, and not marketing copy dressed up as a tool.</li>
-              <li>Not financial, investment, or tax advice. Everything here is informational.</li>
-              <li>Not a data broker. The only data we collect is documented in the <a href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">Privacy Policy</a>.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-3">
             <h2 className="text-base font-bold text-white">How we make money</h2>
             <p>
               When you click a dealer link on the <a href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">compare</a> page and end up buying, Lode may earn an affiliate commission at no cost to you. That&rsquo;s disclosed on the page itself (the FTC requires it) and it&rsquo;s currently our only revenue stream — no ads, no tracking cookies sold to third parties, no data-broker relationships.
@@ -88,30 +78,24 @@ export default function AboutPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Who runs it</h2>
-            <p>
-              Lode is independently operated and self-funded. No investors, no advertisers. The operator is staying anonymous for now — we&rsquo;d rather be judged on the product than on a resume. Every part of the tool that matters (data sources, calculations, what we collect, how long we keep it) is documented publicly on this site so you can evaluate it directly rather than taking anyone&rsquo;s word for it.
-            </p>
-            <p>
-              Questions, bug reports, or press:{" "}
-              <a
-                href="mailto:hello@lode.rocks"
-                className="text-amber-500 hover:text-amber-400 transition-colors"
-              >
-                hello@lode.rocks
-              </a>
-              . A human reads every message.
-            </p>
-          </section>
-
-          <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Dig deeper</h2>
             <ul className="list-disc pl-5 space-y-1.5">
               <li><a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">Methodology</a> — where prices come from and how calculations work.</li>
-              <li><a href="/faq" className="text-amber-500 hover:text-amber-400 transition-colors">FAQ</a> — is this legit, who runs it, how alerts work, what happens to your data.</li>
+              <li><a href="/faq" className="text-amber-500 hover:text-amber-400 transition-colors">FAQ</a> — how alerts work, what happens to your data, and common questions.</li>
               <li><a href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">Privacy</a> — what we collect and what we don&rsquo;t.</li>
             </ul>
           </section>
+
+          <p className="text-xs text-gray-600">
+            Questions, bug reports, or press:{" "}
+            <a
+              href="mailto:hello@lode.rocks"
+              className="text-amber-500 hover:text-amber-400 transition-colors"
+            >
+              hello@lode.rocks
+            </a>
+            . A human reads every message.
+          </p>
 
         </div>
       </div>
