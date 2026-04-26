@@ -141,3 +141,32 @@ model EmailSubscriber {
   active           Boolean  @default(true)
   source           String   @default("unknown")
 }
+
+// Outbound dealer click tracking. Every click on a /compare row (and later,
+// on dealer CTAs in alert emails / digest) routes through /api/track/click,
+// which logs a DealerClick row and 302-redirects to the (affiliate-wrapped)
+// dealer URL. The `subId` we mint here is also passed through to the
+// affiliate network's sub-ID slot (Awin clickref, FlexOffers fos), so when
+// commission reports come back we can join them against this table to see
+// which coin × dealer × source actually converts.
+//
+// We intentionally store an IP hash rather than the raw IP — analytics
+// signal (unique-click counting, bot detection) without retaining PII any
+// longer than necessary.
+model DealerClick {
+  id        String   @id @default(cuid())
+  coinId    String   // matches CompareCoin["id"] in lib/compare/coins.ts
+  dealerId  String   // matches Dealer["id"] in lib/compare/dealers.ts
+  userId    String?  // null for anonymous visitors
+  subId     String   @unique
+  source    String   @default("compare") // "compare" | "alert-email" | "digest" | "faq" | etc
+  userAgent String?
+  ipHash    String?
+  referer   String?
+  createdAt DateTime @default(now())
+
+  @@index([coinId, dealerId, createdAt])
+  @@index([dealerId, createdAt])
+  @@index([source, createdAt])
+  @@index([userId])
+}

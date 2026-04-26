@@ -8,17 +8,20 @@ import { PREMIUMS } from "@/lib/compare/premiums";
 
 type Spots = { gold: number; silver: number };
 
-// URL map: { [coinId]: { [dealerId]: string } } — precomputed server-side so
-// affiliate IDs from process.env never leak to the client bundle.
-export type DealerUrlMap = Record<string, Record<string, string>>;
+// Availability map: { [coinId]: { [dealerId]: hasVerifiedSlug } }. We do
+// not precompute outbound URLs in the client — every dealer click routes
+// through /api/track/click, which logs the click and 302-redirects to the
+// affiliate-wrapped dealer URL. That keeps affiliate IDs server-side and
+// gives us a single point of truth for click metrics.
+export type DealerAvailabilityMap = Record<string, Record<string, boolean>>;
 
-type Props = { spots: Spots; dealerUrls: DealerUrlMap };
+type Props = { spots: Spots; available: DealerAvailabilityMap };
 
 type Row = {
   dealerId: string;
   dealerName: string;
   short: string;
-  url: string;
+  trackedUrl: string;
   premium: number;
   total: number;
 };
@@ -32,35 +35,38 @@ function fmtUSD(n: number, opts: { cents?: boolean } = {}) {
   });
 }
 
-function buildRows(coin: CompareCoin, spots: Spots, dealerUrls: DealerUrlMap): Row[] {
+function buildRows(coin: CompareCoin, spots: Spots, available: DealerAvailabilityMap): Row[] {
   const spot = coin.metal === "gold" ? spots.gold : spots.silver;
   const melt = coin.oz * spot;
   return DEALERS
+    .filter((d) => available[coin.id]?.[d.id])
     .map((d) => {
       const premium = PREMIUMS[coin.id]?.[d.id] ?? 0;
-      const url = dealerUrls[coin.id]?.[d.id] ?? "";
+      // Outbound URL is the tracker — the actual dealer URL (with affiliate
+      // wrapper + sub-id) is resolved server-side inside /api/track/click.
+      const trackedUrl =
+        `/api/track/click?coin=${encodeURIComponent(coin.id)}` +
+        `&dealer=${encodeURIComponent(d.id)}` +
+        `&source=compare`;
       return {
         dealerId: d.id,
         dealerName: d.name,
         short: d.short,
-        url,
+        trackedUrl,
         premium,
         total: melt + premium,
       };
     })
-    // Skip dealers we don't yet have a verified product URL for. The comparison
-    // is "among dealers we link to"; when the slug lands, the row reappears.
-    .filter((r) => r.url !== "")
     .sort((a, b) => a.total - b.total);
 }
 
-export default function CompareClient({ spots, dealerUrls }: Props) {
+export default function CompareClient({ spots, available }: Props) {
   const [coinId, setCoinId] = useState<CompareCoin["id"]>("silver-eagle");
   const coin = COMPARE_COINS.find((c) => c.id === coinId)!;
   const spot = coin.metal === "gold" ? spots.gold : spots.silver;
   const melt = coin.oz * spot;
 
-  const rows = useMemo(() => buildRows(coin, spots, dealerUrls), [coin, spots, dealerUrls]);
+  const rows = useMemo(() => buildRows(coin, spots, available), [coin, spots, available]);
   const best = rows[0];
 
   // Defensive: if we haven't wired up any dealer slugs for this coin yet,
@@ -177,9 +183,11 @@ export default function CompareClient({ spots, dealerUrls }: Props) {
                   </span>
                 </div>
 
-                {/* CTA — hidden on small screens, whole row is tappable via link below */}
+                {/* CTA — hidden on small screens, whole row is tappable via link below.
+                    Both CTAs point at /api/track/click, which logs the click and
+                    302-redirects to the dealer's (affiliate-wrapped) product page. */}
                 <a
-                  href={r.url || "#"}
+                  href={r.trackedUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
                   className={`hidden sm:inline-flex items-center justify-center rounded-lg px-4 py-2 text-xs font-bold transition-colors ${
@@ -188,23 +196,17 @@ export default function CompareClient({ spots, dealerUrls }: Props) {
                       : "border border-white/[0.12] text-gray-300 hover:text-white hover:border-white/30"
                   }`}
                   aria-label={`View ${coin.label} at ${r.dealerName}`}
-                  onClick={(e) => {
-                    if (!r.url) e.preventDefault();
-                  }}
                 >
                   View
                 </a>
 
                 {/* Mobile CTA — a second full-width link under the row */}
                 <a
-                  href={r.url || "#"}
+                  href={r.trackedUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
                   className="sm:hidden col-span-2 text-[11px] font-bold tracking-wide text-amber-300 hover:text-amber-200"
                   aria-label={`View ${coin.label} at ${r.dealerName}`}
-                  onClick={(e) => {
-                    if (!r.url) e.preventDefault();
-                  }}
                 >
                   View at {r.dealerName} →
                 </a>

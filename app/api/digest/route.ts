@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
+import {
+  findCheapest,
+  renderCheapestBlock,
+  renderAffiliateDisclosure,
+  type CheapestPick,
+} from "@/lib/compare/cheapestPick";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +36,10 @@ function buildDigestHtml(params: {
   portfolioGainLoss: number | null;
   portfolioPctReturn: number | null;
   hasHoldings: boolean;
+  cheapestPicks: CheapestPick[];
   unsubscribeUrl?: string;
 }) {
-  const { firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss, portfolioPctReturn, hasHoldings, unsubscribeUrl } = params;
+  const { firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss, portfolioPctReturn, hasHoldings, cheapestPicks, unsubscribeUrl } = params;
 
   const metalRows = METALS.map((metal) => {
     const price = spots[metal];
@@ -57,6 +64,25 @@ function buildDigestHtml(params: {
       </tr>
     `;
   }).join("");
+
+  // Cheapest-dealer picks render between the spot-prices table and the
+  // portfolio section. We only show the section when at least one pick is
+  // available; if both gold and silver picks are missing (no spots, no
+  // catalog match) we omit the entire block rather than render an empty
+  // header.
+  const cheapestSection = cheapestPicks.length > 0
+    ? `
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+        <tr>
+          <td style="padding-bottom:10px;">
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#888;">Priced right now</p>
+            <p style="margin:4px 0 0;font-size:12px;color:#666;line-height:1.5;">Cheapest dealer for the most-bought 1 oz coins, sorted by total cost at today&rsquo;s spot.</p>
+          </td>
+        </tr>
+        ${cheapestPicks.map((p) => `<tr><td>${renderCheapestBlock(p)}</td></tr>`).join("")}
+      </table>
+    `
+    : "";
 
   const portfolioSection = hasHoldings && portfolioValue !== null
     ? `
@@ -135,6 +161,9 @@ function buildDigestHtml(params: {
             </td>
           </tr>
 
+          <!-- Cheapest dealer picks (gold + silver, when available) -->
+          <tr><td>${cheapestSection}</td></tr>
+
           <!-- Portfolio section -->
           <tr><td>${portfolioSection}</td></tr>
 
@@ -151,7 +180,8 @@ function buildDigestHtml(params: {
           <!-- Footer -->
           <tr>
             <td style="padding-top:40px;border-top:1px solid rgba(255,255,255,0.06);margin-top:40px;">
-              <p style="margin:0;font-size:11px;color:#444;line-height:1.6;">
+              ${cheapestPicks.length > 0 ? renderAffiliateDisclosure() : ""}
+              <p style="margin:${cheapestPicks.length > 0 ? "12px" : "0"} 0 0;font-size:11px;color:#444;line-height:1.6;">
                 You're receiving this from <a href="https://lode.rocks" style="color:#555;text-decoration:none;">lode.rocks</a>.<br>
                 Questions? <a href="mailto:hello@lode.rocks" style="color:#555;text-decoration:none;">hello@lode.rocks</a>${unsubscribeUrl ? ` · <a href="${unsubscribeUrl}" style="color:#555;text-decoration:none;">Unsubscribe</a>` : ""}.
               </p>
@@ -229,6 +259,19 @@ export async function GET(req: Request) {
     if (!(metal in weeklyPct)) weeklyPct[metal] = null;
   }
 
+  // ── Compute cheapest-dealer picks once for the entire run ─────────────
+  // Picks are identical across recipients (no per-user personalization
+  // yet), so we compute them once and reuse. Order: silver first, then
+  // gold — silver is the higher-frequency purchase for stackers, so it
+  // earns top placement. findCheapest returns null if catalog/spot data
+  // is missing; we filter those out so the email doesn't render an empty
+  // CTA card.
+  const baseUrl = process.env.NEXTAUTH_URL ?? "https://lode.rocks";
+  const cheapestPicks = [
+    findCheapest("silver-eagle", spots.silver, baseUrl, "digest"),
+    findCheapest("gold-eagle",   spots.gold,   baseUrl, "digest"),
+  ].filter((p): p is NonNullable<typeof p> => p !== null);
+
   // ── 3. Fetch all users who have an email ─────────────────────────────
   const users = await prisma.user.findMany({
     where: { email: { not: null } },
@@ -271,6 +314,7 @@ export async function GET(req: Request) {
       portfolioGainLoss: hasHoldings ? gainLoss : null,
       portfolioPctReturn: pctReturn,
       hasHoldings,
+      cheapestPicks,
     });
 
     try {
@@ -288,7 +332,7 @@ export async function GET(req: Request) {
   }
 
   // ── 4. Send spot-prices-only digest to email-only subscribers ────
-  const baseUrl = process.env.NEXTAUTH_URL ?? "https://lode.rocks";
+  // baseUrl is defined above (used to build cheapestPicks); reuse it here.
   const subscribers = await prisma.emailSubscriber.findMany({
     where: { active: true },
   });
@@ -303,6 +347,7 @@ export async function GET(req: Request) {
       portfolioGainLoss: null,
       portfolioPctReturn: null,
       hasHoldings: false,
+      cheapestPicks,
       unsubscribeUrl,
     });
 

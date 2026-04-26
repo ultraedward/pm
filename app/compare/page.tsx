@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { COMPARE_COINS } from "@/lib/compare/coins";
-import { DEALERS, buildDealerUrl } from "@/lib/compare/dealers";
-import CompareClient, { type DealerUrlMap } from "./CompareClient";
+import { DEALERS } from "@/lib/compare/dealers";
+import CompareClient, { type DealerAvailabilityMap } from "./CompareClient";
 
 // Structured data for /compare. We intentionally avoid Product/Offer schema
 // because Lode is not the seller — dealers are — and our totals are estimates
@@ -68,16 +68,17 @@ export const metadata: Metadata = {
   },
 };
 
-// Build the coin × dealer URL map server-side. Affiliate IDs come from
-// process.env (see lib/compare/dealers.ts) and must never ship in the client
-// bundle, so we resolve fully-qualified outbound URLs here and pass only the
-// strings down.
-function buildDealerUrls(): DealerUrlMap {
-  const map: DealerUrlMap = {};
+// Build a sparse coin × dealer availability map. The client only needs to
+// know which combos have a verified product slug (so we can hide rows that
+// don't); the actual outbound URL is resolved server-side inside
+// /api/track/click, which keeps affiliate IDs and the URL-construction
+// logic out of the client bundle entirely.
+function buildAvailability(): DealerAvailabilityMap {
+  const map: DealerAvailabilityMap = {};
   for (const coin of COMPARE_COINS) {
     map[coin.id] = {};
     for (const d of DEALERS) {
-      map[coin.id][d.id] = buildDealerUrl(d, coin.slugs[d.id]);
+      map[coin.id][d.id] = !!coin.slugs[d.id];
     }
   }
   return map;
@@ -89,7 +90,7 @@ export default async function ComparePage() {
     gold:   live.gold   ?? 0,
     silver: live.silver ?? 0,
   };
-  const dealerUrls = buildDealerUrls();
+  const available = buildAvailability();
 
   return (
     <main className="min-h-screen bg-surface text-white overflow-x-hidden">
@@ -121,7 +122,7 @@ export default async function ComparePage() {
       {/* ── Compare ───────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 pt-6 pb-20">
         <div className="mx-auto max-w-2xl">
-          <CompareClient spots={spots} dealerUrls={dealerUrls} />
+          <CompareClient spots={spots} available={available} />
         </div>
       </section>
 

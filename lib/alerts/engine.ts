@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { queueEmail } from "@/lib/emailQueue";
 import { getLivePrices } from "@/lib/prices";
+import {
+  findCheapest,
+  defaultCoinForMetal,
+  renderCheapestBlock,
+  renderAffiliateDisclosure,
+} from "@/lib/compare/cheapestPick";
 
 /**
  * Evaluate a single alert against the current market price.
@@ -52,6 +58,29 @@ export async function evaluateAlert(alertId: string, currentPrice: number) {
     },
   });
 
+  // The alert email is the highest-intent moment in the entire product —
+  // a price the user has been waiting for just hit. When we have a coin
+  // in the /compare catalog for this metal (currently gold and silver),
+  // attach a "cheapest right now" CTA so the user can act on the signal
+  // without having to navigate to /compare separately. For platinum and
+  // palladium we omit the block (no coin in catalog) — the alert still
+  // sends, just without the affiliate CTA.
+  const baseUrl = process.env.NEXTAUTH_URL ?? "https://lode.rocks";
+  const compareCoinId = defaultCoinForMetal(alert.metal);
+  const cheapest = compareCoinId
+    ? findCheapest(compareCoinId, currentPrice, baseUrl, "alert-email")
+    : null;
+
+  const cheapestHtml = cheapest ? renderCheapestBlock(cheapest) : "";
+  const disclosureHtml = cheapest ? renderAffiliateDisclosure() : "";
+  // When the cheapest CTA is present, the dashboard CTA becomes secondary
+  // (outline) so the gold "Buy at..." button is the visual primary action.
+  // When there's no cheapest block (pt/pd alerts), the dashboard CTA stays
+  // primary (filled gold) — its original style.
+  const dashboardCtaStyle = cheapest
+    ? "background:transparent;color:#D4AF37;border:1px solid rgba(212,175,55,0.4);"
+    : "background:#D4AF37;color:#000;";
+
   await queueEmail({
     alertId: alert.id,
     to: alert.user.email,
@@ -64,10 +93,12 @@ export async function evaluateAlert(alertId: string, currentPrice: number) {
         <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:24px;">
           <p style="margin:0;font-size:14px;">Current price: <strong>$${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
         </div>
-        <a href="https://lode.rocks/dashboard"
-           style="display:inline-block;padding:12px 20px;background:#D4AF37;color:#000;font-weight:700;text-decoration:none;border-radius:999px;font-size:13px;">
+        ${cheapestHtml}
+        <a href="${baseUrl}/dashboard"
+           style="display:inline-block;padding:12px 20px;${dashboardCtaStyle}font-weight:700;text-decoration:none;border-radius:999px;font-size:13px;margin-top:${cheapest ? "8px" : "0"};">
           View Dashboard
         </a>
+        ${disclosureHtml}
         <p style="margin-top:32px;font-size:11px;color:#555;">
           You're receiving this because you set a price alert on lode.rocks.
         </p>
