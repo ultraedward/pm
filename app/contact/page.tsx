@@ -40,7 +40,7 @@ export default function ContactPage() {
               >
                 hello@lode.rocks
               </a>
-              . We aim to respond within 1–2 business days.
+              . We respond to every email — usually within one business day.
             </p>
           </section>
 

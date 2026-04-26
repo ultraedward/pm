@@ -125,7 +125,13 @@ export default function CompareClient({ spots, available }: Props) {
         })}
       </div>
 
-      {/* Headline — cheapest price right now */}
+      {/* Headline — cheapest price right now.
+          We show three lines of meaning under the price:
+            1. Where it is (dealer name)
+            2. How much you save vs. the most expensive of the dealers we
+               ranked — anchors the value of using the comparison rather
+               than going direct to a dealer the user already knows
+            3. Spot melt — for users who care about the over-spot premium */}
       <div className="space-y-2">
         <p className="label">Cheapest right now</p>
         <div className="flex items-baseline gap-4 flex-wrap">
@@ -143,6 +149,12 @@ export default function CompareClient({ spots, available }: Props) {
             at <span className="text-white font-semibold">{best.dealerName}</span>
           </span>
         </div>
+        {rows.length > 1 && rows[rows.length - 1].total > best.total && (
+          <p className="text-xs text-emerald-400 tabular-nums font-semibold">
+            {fmtUSD(rows[rows.length - 1].total - best.total)} less than the
+            most expensive of {rows.length} dealers
+          </p>
+        )}
         <p className="text-xs text-gray-600 tabular-nums">
           Spot melt: {fmtUSD(melt)} · {coin.oz} oz {coin.metal}
         </p>
@@ -161,8 +173,14 @@ export default function CompareClient({ spots, available }: Props) {
                 key={r.dealerId}
                 className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_auto] items-center gap-4 px-5 py-4 sm:py-5"
               >
-                {/* Dealer name + premium */}
-                <div className="min-w-0">
+                {/* Dealer name + premium + report-wrong affordance.
+                    The "Report wrong" link is a mailto with a pre-filled
+                    subject so corrections land in the inbox already
+                    routed. Cheap to add, signals that we care about
+                    accuracy, and turns adversarial users (skeptics) into
+                    collaborators (correctors). Hidden until row hover so
+                    it doesn't compete with the primary CTA. */}
+                <div className="min-w-0 group/row">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-white truncate">{r.dealerName}</span>
                     {isBest && (
@@ -173,6 +191,16 @@ export default function CompareClient({ spots, available }: Props) {
                   </div>
                   <p className="text-[11px] text-gray-600 tabular-nums mt-0.5">
                     spot + {fmtUSD(r.premium)} premium
+                    <a
+                      href={`mailto:hello@lode.rocks?subject=${encodeURIComponent(
+                        `Premium discrepancy — ${coin.label} at ${r.dealerName}`
+                      )}&body=${encodeURIComponent(
+                        `Coin: ${coin.label}\nDealer: ${r.dealerName}\nPremium shown on Lode: $${r.premium.toFixed(2)}\nWhat you saw at checkout: \n\nNotes: `
+                      )}`}
+                      className="ml-2 text-gray-700 hover:text-gray-400 underline underline-offset-2 sm:opacity-0 sm:group-hover/row:opacity-100 transition-opacity"
+                    >
+                      Report wrong
+                    </a>
                   </p>
                 </div>
 

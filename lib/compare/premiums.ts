@@ -8,9 +8,15 @@
 // so the ordering stays accurate as spot moves; only the absolute
 // premiums need periodic maintenance.
 //
+// IMPORTANT: When you adjust any premium below, update PREMIUMS_LAST_REVIEWED
+// to today's date (YYYY-MM-DD). The /compare page surfaces this date as a
+// freshness signal — claiming a freshness date and then not honoring it is
+// worse for trust than not claiming one at all.
+//
 // NOTE: These default to reasonable 2026 single-piece premiums. A later
 // iteration can swap this for a small DB table or a scheduled scraper
-// without touching the UI — just export the same shape from this file.
+// without touching the UI — just export the same shape from this file
+// plus a per-row verifiedAt date.
 
 import type { CompareCoin } from "./coins";
 import type { Dealer } from "./dealers";
@@ -47,3 +53,9 @@ export const PREMIUMS: PremiumTable = {
 export function premiumFor(coinId: CompareCoin["id"], dealerId: Dealer["id"]): number {
   return PREMIUMS[coinId]?.[dealerId] ?? 0;
 }
+
+// Date the PREMIUMS table was last hand-reviewed. Surfaced on /compare so
+// users can judge how fresh the comparison really is. Update whenever you
+// edit any value above. ISO format (YYYY-MM-DD) — the UI formats it for
+// display.
+export const PREMIUMS_LAST_REVIEWED = "2026-04-25";

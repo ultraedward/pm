@@ -6,7 +6,27 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { COMPARE_COINS } from "@/lib/compare/coins";
 import { DEALERS } from "@/lib/compare/dealers";
+import { PREMIUMS_LAST_REVIEWED } from "@/lib/compare/premiums";
 import CompareClient, { type DealerAvailabilityMap } from "./CompareClient";
+
+// Render PREMIUMS_LAST_REVIEWED ("YYYY-MM-DD") as a human-friendly date.
+// We intentionally avoid showing relative time ("3 days ago") because it
+// re-renders on every load and a relative timestamp that ticks past
+// "1 week ago" silently degrades the trust signal — an absolute date
+// always shows the actual review cadence.
+function fmtPremiumsReviewed(iso: string): string {
+  // Append a fixed UTC time so server + client format it identically and
+  // we don't trip Next.js hydration warnings if the visitor's local TZ
+  // happens to push the date back by a day.
+  const d = new Date(`${iso}T12:00:00Z`);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
 
 // Structured data for /compare. We intentionally avoid Product/Offer schema
 // because Lode is not the seller — dealers are — and our totals are estimates
@@ -116,6 +136,37 @@ export default async function ComparePage() {
           <p className="text-xs text-gray-500 leading-relaxed">
             Dealer links on this page are affiliate links. Lode may earn a commission if you buy — at no extra cost to you. Prices and rankings are not influenced by affiliate relationships.
           </p>
+
+          {/* Freshness + verify strip. Two trust micro-signals at the top of
+              the conversion screen:
+                • Spot prices are live (with an out-link to a third-party
+                  reference so the user can sanity-check us in one click)
+                • Dealer premiums are hand-verified, with the actual date
+                  rather than a vague "regularly updated" claim. */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-gray-500 pt-1">
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: "#10b981" }}
+              />
+              <span>Live spot price</span>
+              <span className="text-gray-700">·</span>
+              <a
+                href="https://www.kitco.com/charts/livegold.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-gray-300 transition-colors"
+              >
+                cross-check at Kitco
+              </a>
+            </span>
+            <span className="text-gray-700">·</span>
+            <span>
+              Dealer premiums verified{" "}
+              <span className="text-gray-300">{fmtPremiumsReviewed(PREMIUMS_LAST_REVIEWED)}</span>
+            </span>
+          </div>
         </div>
       </section>
 
