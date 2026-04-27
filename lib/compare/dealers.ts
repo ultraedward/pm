@@ -59,9 +59,11 @@ export const DEALERS: Dealer[] = [
     name: "JM Bullion",
     short: "JM",
     product: "https://www.jmbullion.com/{slug}/",
-    // JM Bullion is on Awin (merchant ID 22685) — enable once approved.
-    // clickref is Awin's sub-ID slot — passes our DealerClick.subId through.
-    // affiliate: "https://www.awin1.com/cread.php?awinmid=22685&awinaffid={id}&ued={url}&clickref={subid}",
+    // JM Bullion via Awin (merchant ID 22685). awinaffid is our Awin publisher
+    // ID; clickref is Awin's sub-ID slot, which round-trips DealerClick.subId
+    // back in their commission reports. Awin gates each merchant relationship
+    // separately — the wrapper only kicks in when AFFILIATE_JMBULLION_ID is set.
+    affiliate: "https://www.awin1.com/cread.php?awinmid=22685&awinaffid={id}&ued={url}&clickref={subid}",
     affiliateId: AFF_IDS.jmbullion,
   },
   {
@@ -69,8 +71,10 @@ export const DEALERS: Dealer[] = [
     name: "SD Bullion",
     short: "SD",
     product: "https://sdbullion.com/{slug}",
-    // SD Bullion is on Awin (merchant ID 78598) — same account as JM Bullion + Money Metals.
-    // affiliate: "https://www.awin1.com/cread.php?awinmid=78598&awinaffid={id}&ued={url}&clickref={subid}",
+    // SD Bullion via Awin (merchant ID 78598). Same Awin publisher account as
+    // JM Bullion + Money Metals — one ID covers all three. Wrapper kicks in
+    // only when AFFILIATE_SDBULLION_ID is set.
+    affiliate: "https://www.awin1.com/cread.php?awinmid=78598&awinaffid={id}&ued={url}&clickref={subid}",
     affiliateId: AFF_IDS.sdbullion,
   },
   {
@@ -78,8 +82,9 @@ export const DEALERS: Dealer[] = [
     name: "Money Metals",
     short: "MM",
     product: "https://www.moneymetals.com/{slug}",
-    // Money Metals is on Awin (merchant ID 88985) — enable once approved.
-    // affiliate: "https://www.awin1.com/cread.php?awinmid=88985&awinaffid={id}&ued={url}&clickref={subid}",
+    // Money Metals via Awin (merchant ID 88985). Same Awin publisher account
+    // as JM + SD. Wrapper kicks in only when AFFILIATE_MONEYMETALS_ID is set.
+    affiliate: "https://www.awin1.com/cread.php?awinmid=88985&awinaffid={id}&ued={url}&clickref={subid}",
     affiliateId: AFF_IDS.moneymetals,
   },
 ];
