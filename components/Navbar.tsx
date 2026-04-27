@@ -22,8 +22,11 @@ export default async function Navbar() {
         {/* Desktop */}
         <NavLinks isLoggedIn={isLoggedIn} />
 
-        {/* Theme toggle — desktop */}
-        <div className="hidden sm:flex items-center">
+        {/* Theme toggle
+            - Desktop: always visible (right of nav links)
+            - Mobile logged-in: visible here (NavMobile is null when logged in)
+            - Mobile logged-out: hidden here (NavMobile renders its own toggle) */}
+        <div className={isLoggedIn ? "flex items-center" : "hidden sm:flex items-center"}>
           <ThemeToggle />
         </div>
 

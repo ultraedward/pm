@@ -121,7 +121,7 @@ export function GramCalculator({ spots }: Props) {
           <button
             key={m}
             onClick={() => setMetal(m)}
-            className={`flex-1 py-2.5 text-sm font-bold capitalize transition-colors ${
+            className={`flex-1 min-h-[44px] text-sm font-bold capitalize transition-colors ${
               metal === m
                 ? "bg-amber-500/15 text-amber-400"
                 : "text-gray-500 hover:text-gray-300"
@@ -143,8 +143,8 @@ export function GramCalculator({ spots }: Props) {
           placeholder="0.00"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          className="w-full bg-transparent rounded-xl border px-4 py-3 text-2xl font-black tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
-          style={{ borderColor: "var(--border-strong)", color: "var(--text)" }}
+          className="w-full bg-transparent rounded-xl border px-4 py-3 font-black tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
+          style={{ borderColor: "var(--border-strong)", color: "var(--text)", fontSize: "clamp(1rem, 5vw, 1.5rem)" }}
           data-placeholder-muted
         />
         <div
@@ -155,13 +155,13 @@ export function GramCalculator({ spots }: Props) {
             <button
               key={u}
               onClick={() => setUnit(u)}
-              className={`flex-1 py-2 text-xs font-bold transition-colors ${
+              className={`flex-1 text-xs font-bold transition-colors min-h-[44px] ${
                 unit === u
                   ? "bg-amber-500/15 text-amber-400"
                   : "text-gray-600 hover:text-gray-400"
               }`}
             >
-              {u === "g" ? "Grams (g)" : u === "dwt" ? "Pennyweight (dwt)" : "Troy oz (ozt)"}
+              {u === "g" ? "Grams (g)" : u === "dwt" ? "Pennyweight" : "Troy oz"}
             </button>
           ))}
         </div>
@@ -175,7 +175,7 @@ export function GramCalculator({ spots }: Props) {
             <button
               key={k.id}
               onClick={() => setKarat(k.id)}
-              className={`rounded-lg py-2 px-1 text-center transition-colors ${
+              className={`rounded-lg py-2.5 px-1 text-center transition-colors min-h-[44px] flex flex-col items-center justify-center ${
                 currentKarat === k.id
                   ? "bg-amber-500/20 border border-amber-500/40 text-amber-400"
                   : "border text-gray-500 hover:text-gray-300 hover:border-white/20"
@@ -201,8 +201,8 @@ export function GramCalculator({ spots }: Props) {
               placeholder="e.g. 75.0"
               value={customPct}
               onChange={(e) => setCustomPct(e.target.value)}
-              className="w-32 bg-transparent rounded-lg border px-3 py-2 text-sm font-bold tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
-              style={{ borderColor: "var(--border-strong)", color: "var(--text)" }}
+              className="w-32 bg-transparent rounded-lg border px-3 py-2 font-bold tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
+              style={{ borderColor: "var(--border-strong)", color: "var(--text)", fontSize: "16px" }}
               data-placeholder-muted
             />
             <span className="text-sm text-gray-600">% pure {metal}</span>

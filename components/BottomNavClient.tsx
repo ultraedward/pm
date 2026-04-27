@@ -65,10 +65,17 @@ export function BottomNavClient() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center justify-center gap-1 py-3 min-h-[56px] transition-colors ${
+              className={`relative flex flex-col items-center justify-center gap-1 py-3 min-h-[56px] transition-colors ${
                 isActive ? "text-amber-400" : "text-gray-500"
               }`}
             >
+              {/* Active indicator — gold rule at top */}
+              {isActive && (
+                <span
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5"
+                  style={{ backgroundColor: "var(--gold)" }}
+                />
+              )}
               {icon}
               <span className="text-[10px] font-semibold uppercase tracking-wider">
                 {label}
