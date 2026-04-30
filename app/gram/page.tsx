@@ -285,6 +285,12 @@ export default async function GramPage() {
             <Link href="/compare" className="text-sm text-gray-400 hover:text-gray-200 transition-colors">
               See the cheapest dealer at today&apos;s spot →
             </Link>
+            <p className="text-sm text-gray-500 pt-2">
+              Have coins?{" "}
+              <Link href="/coin-melt-calculator" className="text-gray-400 hover:text-gray-200 transition-colors">
+                Calculate coin melt values →
+              </Link>
+            </p>
           </>
         ) : (
           <>
@@ -298,6 +304,12 @@ export default async function GramPage() {
                 See where to buy at today&apos;s spot →
               </Link>
             </div>
+            <p className="text-sm text-gray-600">
+              Have coins?{" "}
+              <Link href="/coin-melt-calculator" className="text-gray-500 hover:text-gray-300 transition-colors">
+                Calculate coin melt values →
+              </Link>
+            </p>
           </>
         )}
       </section>

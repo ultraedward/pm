@@ -13,7 +13,7 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 export const metadata: Metadata = {
   title: "Coin Melt Value Calculator — Silver Eagles, Junk Silver & More",
   description:
-    "Calculate the melt value of silver and gold coins at live spot prices. Covers American Silver Eagles, Maple Leafs, pre-1965 junk silver (dimes, quarters, halves), Morgan dollars, and gold Eagles.",
+    "Free silver coin melt value calculator with live spot prices. Find melt values for pre-1965 junk silver (dimes, quarters, half dollars), American Silver Eagles, Morgan dollars, Canadian Maple Leafs, and gold coins.",
   keywords: [
     "coin melt value calculator",
     "silver coin melt value",
@@ -92,6 +92,30 @@ const jsonLd = {
             "text": "An American Silver Eagle contains exactly 1 troy ounce of fine (.999) silver. Its melt value equals the current silver spot price.",
           },
         },
+        {
+          "@type": "Question",
+          "name": "What is the melt value of a 90% silver dime?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A pre-1965 US silver dime (Roosevelt or Mercury) contains 0.0723 troy ounces of silver. Multiply 0.0723 by the current silver spot price to get the melt value. At a $30 spot price, a silver dime is worth about $2.17 in melt value.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "How do I calculate junk silver melt value?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Junk silver refers to pre-1965 US dimes, quarters, and half dollars that are 90% silver. To calculate melt value: multiply the face value in dollars by 0.715 (troy ounces of silver per $1 face value) then multiply by the spot price. For example, $1 face value in junk silver × 0.715 × spot price = melt value. The calculator above does this automatically.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "What is the scrap value of a silver coin?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The scrap or melt value of a silver coin is the intrinsic value of its silver content at current spot prices. It differs from the coin's numismatic (collectible) value. To find scrap value: fine troy oz content × spot price per troy oz. Dealers typically pay 90–95% of melt value when buying scrap silver.",
+          },
+        },
       ],
     },
   ],
@@ -129,7 +153,7 @@ export default async function CoinMeltCalculatorPage() {
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-            Live melt values for common silver and gold coins. Enter a quantity on any row to total your stack.
+            Live melt values for pre-1965 junk silver (dimes, quarters, half dollars), American Silver Eagles, Morgan &amp; Peace dollars, Canadian Maple Leafs, and gold coins. Enter a quantity on any row to total your stack.
           </p>
         </div>
       </section>
