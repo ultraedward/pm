@@ -36,13 +36,10 @@ export default async function AccountPage() {
           <p className="text-sm text-gray-500 mt-1">{dbUser.email}</p>
         </div>
 
-        {/* Usage — one card */}
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <div className="px-6 py-5">
-            <p className="text-lg font-black tracking-tight">Free</p>
-            <p className="text-sm text-gray-500 mt-0.5">Unlimited alerts · all features included</p>
-          </div>
-          <div className="grid grid-cols-2 divide-x border-t" style={{ borderColor: "var(--border)" }}>
+        {/* Usage */}
+        <div className="space-y-3">
+          <p className="label">Activity</p>
+          <div className="grid grid-cols-2 divide-x rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
             <Link href="/dashboard/alerts" className="group px-6 py-4 hover:bg-white/5 transition-colors">
               <p className="text-2xl font-black tabular-nums">{alertCount}</p>
               <p className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{alertCount === 1 ? "Alert" : "Alerts"} →</p>
@@ -54,19 +51,12 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* Email preferences — just two rows, no chrome */}
+        {/* Email notifications */}
         <div className="space-y-3">
           <p className="label">Email</p>
-          <div className="divide-y rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-            <div className="flex items-center justify-between px-5 py-3">
-              <p className="text-sm text-white">Price alerts</p>
-              <span className="text-xs font-semibold text-amber-400">On</span>
-            </div>
-            <div className="flex items-center justify-between px-5 py-3">
-              <p className="text-sm text-white">Weekly digest</p>
-              <span className="text-xs font-semibold text-amber-400">On</span>
-            </div>
-          </div>
+          <p className="text-sm text-gray-500">
+            Price alert emails are sent when your target is hit. The weekly digest arrives each Monday. Manage preferences via the unsubscribe link in any email.
+          </p>
         </div>
 
         {/* Footer row — sign out + feedback */}
