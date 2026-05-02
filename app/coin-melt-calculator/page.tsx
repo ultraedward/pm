@@ -133,7 +133,7 @@ export default async function CoinMeltCalculatorPage() {
   const updatedAt   = silverPrice > 0 ? new Date().toISOString() : null;
 
   return (
-    <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -207,6 +207,12 @@ export default async function CoinMeltCalculatorPage() {
             <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>
               Calculate by gram weight →
             </Link>
+            <p className="text-sm pt-2" style={{ color: "var(--text-dim)" }}>
+              Only have junk silver?{" "}
+              <Link href="/junk-silver-calculator" className="transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>
+                Try the junk silver calculator →
+              </Link>
+            </p>
           </>
         ) : (
           <>
@@ -222,6 +228,12 @@ export default async function CoinMeltCalculatorPage() {
                 Calculate by gram weight →
               </Link>
             </div>
+            <p className="text-sm text-gray-600">
+              Only have junk silver?{" "}
+              <Link href="/junk-silver-calculator" className="text-gray-500 hover:text-gray-300 transition-colors">
+                Try the junk silver calculator →
+              </Link>
+            </p>
           </>
         )}
       </section>

@@ -24,6 +24,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${base}/junk-silver-calculator`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}/silver-price`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 1.0,
+    },
+    {
       url: `${base}/compare`,
       lastModified: new Date(),
       changeFrequency: "hourly",
@@ -63,9 +75,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/faq`,
-      lastModified: new Date("2026-04-19"),
+      lastModified: new Date("2026-05-01"),
       changeFrequency: "monthly",
-      priority: 0.7,
+      priority: 0.8,
+    },
+    // Editorial / blog content — earns links, builds topical authority
+    {
+      url: `${base}/blog/junk-silver-guide`,
+      lastModified: new Date("2026-05-01"),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     // Legal + contact pages — rarely change
     {

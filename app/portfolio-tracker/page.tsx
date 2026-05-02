@@ -104,14 +104,45 @@ const jsonLd = {
 
 const FEATURES = [
   {
-    icon: "🔒",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </svg>
+    ),
     title: "Private by default",
-    body: "Holdings live in your browser — not our servers. No account required.",
+    body: "Holdings live in your browser — not our servers. Nothing is transmitted unless you choose to create an account.",
   },
   {
-    icon: "📈",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+        <polyline points="17 6 23 6 23 12" />
+      </svg>
+    ),
     title: "Live P&L at spot",
-    body: "Log your cost basis and see your gain or loss at today's live spot price.",
+    body: "Log your cost basis and see your gain or loss at today's live spot price, refreshed on every page load.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M3 3v18h18" />
+        <path d="m19 9-5 5-4-4-3 3" />
+      </svg>
+    ),
+    title: "All four metals",
+    body: "Track gold, silver, platinum, and palladium. Log any form — coins, bars, or rounds — in troy ounces.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+        <line x1="22" y1="11" x2="16" y2="11" />
+      </svg>
+    ),
+    title: "No account required",
+    body: "Start tracking immediately. Create an account only if you want to sync your holdings across devices.",
   },
 ];
 
@@ -122,7 +153,7 @@ export default async function PortfolioTrackerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -169,12 +200,17 @@ export default async function PortfolioTrackerPage() {
             {FEATURES.map(({ icon, title, body }) => (
               <div
                 key={title}
-                className="rounded-2xl border p-6 space-y-2"
+                className="rounded-2xl border p-6 space-y-3"
                 style={{ borderColor: "var(--border)" }}
               >
-                <p className="text-2xl">{icon}</p>
-                <p className="font-bold text-white">{title}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "var(--gold-dim)", color: "var(--gold)" }}
+                >
+                  {icon}
+                </div>
+                <p className="font-bold" style={{ color: "var(--text)" }}>{title}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{body}</p>
               </div>
             ))}
           </div>
@@ -186,10 +222,10 @@ export default async function PortfolioTrackerPage() {
         <div className="mx-auto max-w-2xl space-y-8">
           <h2 className="text-2xl font-black tracking-tight text-center">Common questions</h2>
           <div className="space-y-6">
-            {(jsonLd["@graph"][1] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
+            {(jsonLd["@graph"][2] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
               <div key={qa.name} className="space-y-2">
-                <p className="font-bold text-white">{qa.name}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{qa.acceptedAnswer.text}</p>
+                <p className="font-bold" style={{ color: "var(--text)" }}>{qa.name}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{qa.acceptedAnswer.text}</p>
               </div>
             ))}
           </div>
@@ -198,12 +234,12 @@ export default async function PortfolioTrackerPage() {
 
       {/* ── CTA ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
-        <p className="text-2xl font-black tracking-tight">Know exactly what your stack is worth — right now</p>
-        <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          No account, no spreadsheets. Your holdings stay on your device.
+        <p className="text-2xl font-black tracking-tight">Sync your stack across devices</p>
+        <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
+          Create a free account to save your holdings to the cloud and access them from anywhere.
         </p>
         <Link href="/login" className="btn-gold px-10 inline-block">
-          Get started
+          Save your stack
         </Link>
       </section>
 

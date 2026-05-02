@@ -89,20 +89,53 @@ const jsonLd = {
 
 const FEATURES = [
   {
-    icon: "🔔",
-    title: "Above or below — your choice",
-    body: "Alert when a metal breaks above resistance or falls below a buy target. Both directions, any metal.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="3" />
+        <line x1="12" y1="2" x2="12" y2="5" />
+        <line x1="12" y1="19" x2="12" y2="22" />
+        <line x1="2" y1="12" x2="5" y2="12" />
+        <line x1="19" y1="12" x2="22" y2="12" />
+      </svg>
+    ),
+    title: "Any metal, any direction",
+    body: "Alert above or below spot for gold, silver, platinum, or palladium. Set multiple targets across any combination of metals.",
   },
   {
-    icon: "📬",
-    title: "Email-only, no app",
-    body: "Daily check after the trading day closes. If your threshold was crossed, the alert is in your inbox. No permissions, no downloads.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <rect x="2" y="4" width="20" height="16" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      </svg>
+    ),
+    title: "Email-only. No app.",
+    body: "Daily check after market close. If your threshold was crossed, the alert lands in your inbox. No permissions, no downloads.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      </svg>
+    ),
+    title: "One fire per trigger",
+    body: "Alert fires once — then pauses. No repeated notifications for the same move. Reset it when you're ready to watch again.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    ),
+    title: "Set it in under a minute",
+    body: "Sign in, pick a metal, enter your target price. No forms, no tiers, no credit card.",
   },
 ];
 
 export default function GoldPriceAlertsPage() {
   return (
-    <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -144,12 +177,17 @@ export default function GoldPriceAlertsPage() {
             {FEATURES.map(({ icon, title, body }) => (
               <div
                 key={title}
-                className="rounded-2xl border p-6 space-y-2"
+                className="rounded-2xl border p-6 space-y-3"
                 style={{ borderColor: "var(--border)" }}
               >
-                <p className="text-2xl">{icon}</p>
-                <p className="font-bold text-white">{title}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "var(--gold-dim)", color: "var(--gold)" }}
+                >
+                  {icon}
+                </div>
+                <p className="font-bold" style={{ color: "var(--text)" }}>{title}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{body}</p>
               </div>
             ))}
           </div>
@@ -161,10 +199,10 @@ export default function GoldPriceAlertsPage() {
         <div className="mx-auto max-w-2xl space-y-8">
           <h2 className="text-2xl font-black tracking-tight text-center">Common questions</h2>
           <div className="space-y-6">
-            {(jsonLd["@graph"][1] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
+            {(jsonLd["@graph"][2] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
               <div key={qa.name} className="space-y-2">
-                <p className="font-bold text-white">{qa.name}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{qa.acceptedAnswer.text}</p>
+                <p className="font-bold" style={{ color: "var(--text)" }}>{qa.name}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{qa.acceptedAnswer.text}</p>
               </div>
             ))}
           </div>
@@ -173,9 +211,9 @@ export default function GoldPriceAlertsPage() {
 
       {/* ── CTA ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
-        <p className="text-2xl font-black tracking-tight">Set it once. Lode watches the close so you don&rsquo;t have to.</p>
-        <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          Create an account and set your first alert in under a minute.
+        <p className="text-2xl font-black tracking-tight">Set it once. Lode watches so you don&rsquo;t have to.</p>
+        <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
+          Create a free account and set your first alert in under a minute.
         </p>
         <Link href="/login" className="btn-gold px-10 inline-block">
           Set your first alert

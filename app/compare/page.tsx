@@ -74,16 +74,28 @@ const compareJsonLd = {
 };
 
 export const metadata: Metadata = {
-  title: "Compare Bullion Prices Across Top US Dealers — Silver & Gold Eagle, Maple Leaf",
+  title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
   description:
-    "Estimated total cost for the most-bought bullion coins — Silver Eagle, Gold Eagle, Silver and Gold Maple Leaf — across APMEX, JM Bullion, SD Bullion, and Money Metals at today's live spot price.",
+    "Compare Silver Eagle, Gold Eagle, and Maple Leaf prices across APMEX, JM Bullion, SD Bullion, and Money Metals at today's live spot. Sorted by total cost — see who's cheapest right now.",
   alternates: {
     canonical: "https://lode.rocks/compare",
   },
+  keywords: [
+    "compare silver bullion dealers",
+    "cheapest place to buy silver eagles",
+    "APMEX vs JM Bullion",
+    "SD Bullion vs APMEX",
+    "gold eagle price comparison",
+    "silver dealer premium comparison",
+    "buy silver cheapest dealer",
+    "bullion dealer comparison",
+    "silver maple leaf price comparison",
+    "where to buy silver online cheapest",
+  ],
   openGraph: {
-    title: "Compare Bullion Prices Across Top US Dealers — Lode",
+    title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
     description:
-      "Estimated pricing for Silver Eagle, Gold Eagle, Silver Maple, and Gold Maple across top US bullion dealers. Live spot plus dealer premiums we track by hand.",
+      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Live spot plus hand-verified dealer premiums, sorted low to high.",
     url: "https://lode.rocks/compare",
   },
 };
@@ -113,7 +125,7 @@ export default async function ComparePage() {
   const available = buildAvailability();
 
   return (
-    <main className="min-h-screen bg-surface text-white overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(compareJsonLd) }}
@@ -171,9 +183,85 @@ export default async function ComparePage() {
       </section>
 
       {/* ── Compare ───────────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 pt-6 pb-20">
+      <section className="px-4 sm:px-6 pt-6 pb-10">
         <div className="mx-auto max-w-2xl">
           <CompareClient spots={spots} available={available} />
+        </div>
+      </section>
+
+      {/* ── Editorial — server-rendered for indexability ───────── */}
+      <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-2xl space-y-10 text-sm text-gray-400 leading-relaxed">
+
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-white">How to compare bullion dealer prices</h2>
+            <p>
+              The sticker price on a dealer&rsquo;s website is not the real comparison point — the{" "}
+              <strong className="text-white">premium over spot</strong> is. Every dealer charges spot price
+              plus a markup that covers their minting costs, storage, shipping, and margin. A dealer advertising
+              a low per-coin price may still be more expensive overall if their premium is higher. This page
+              calculates total estimated cost as:{" "}
+              <em>live spot × coin weight + dealer premium</em>, then sorts low to high so the cheapest
+              option is always at the top.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-white">About the dealers we track</h2>
+            <p>
+              <strong className="text-white">APMEX</strong> (American Precious Metals Exchange) is one of
+              the largest US bullion dealers by volume, with a wide coin and bar selection. Premiums tend to
+              run slightly higher than discount competitors, but product availability and customer service are
+              consistently strong.
+            </p>
+            <p>
+              <strong className="text-white">JM Bullion</strong> is a popular online dealer known for
+              competitive silver premiums and free shipping on orders over a minimum. Frequently among the
+              cheapest for American Silver Eagles and silver Maple Leafs.
+            </p>
+            <p>
+              <strong className="text-white">SD Bullion</strong> competes aggressively on price, particularly
+              for generic silver rounds and junk silver, but also carries Eagles and Maples. Worth checking
+              when buying larger quantities.
+            </p>
+            <p>
+              <strong className="text-white">Money Metals Exchange</strong> is a subscription-friendly dealer
+              with a recurring purchase program. Premiums are competitive and they carry an unusually broad
+              range of fractional gold coins.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-white">What affects the premium you pay?</h2>
+            <p>
+              Premiums vary by coin type, quantity, and payment method. Government-minted coins (Silver Eagles,
+              Gold Eagles, Maple Leafs) carry higher premiums than privately minted rounds or bars because of
+              the added minting and distribution costs. Buying in larger quantities — a full monster box of
+              500 Silver Eagles, for example — typically reduces the per-coin premium. Paying by check or bank
+              wire instead of credit card usually saves another 3–4% that dealers charge to offset card
+              processing fees.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-white">How Lode maintains premium data</h2>
+            <p>
+              Dealer premiums are not scraped automatically — they are reviewed by hand and updated when
+              dealers change their pricing. The "premiums verified" date shown at the top of the page is the
+              last time we checked each dealer&rsquo;s current prices. Live spot prices update on every page
+              load from Yahoo Finance futures data, so the estimated totals are always based on the current
+              market price even if the premium was last verified a few days ago.
+            </p>
+            <p>
+              If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email
+              us at{" "}
+              <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+                hello@lode.rocks
+              </a>{" "}
+              and we&rsquo;ll update it.
+            </p>
+          </div>
+
         </div>
       </section>
 
