@@ -36,13 +36,13 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
-      className="flex items-center justify-center w-8 h-8 rounded-none transition-opacity hover:opacity-60 focus:outline-none"
+      className="flex items-center justify-center w-8 h-8 rounded-none transition-opacity hover:opacity-60"
       style={{ color: "var(--text-muted)" }}
       title={isLight ? "Dark mode" : "Light mode"}
     >
       {isLight ? (
         /* Moon — minimal, geometric */
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M14 10.5A6.5 6.5 0 1 1 5.5 2a5 5 0 0 0 8.5 8.5z"
             fill="currentColor"
@@ -50,7 +50,7 @@ export default function ThemeToggle() {
         </svg>
       ) : (
         /* Sun — clean, athletic */
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="8" cy="8" r="3" fill="currentColor" />
           <line x1="8" y1="1" x2="8" y2="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
           <line x1="8" y1="13" x2="8" y2="15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />

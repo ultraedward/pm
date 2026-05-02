@@ -31,21 +31,33 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
 
       {/* Toggle */}
       <div className="flex items-center justify-center gap-4">
-        <span className={`text-sm font-medium transition-colors ${!annual ? "text-white" : "text-gray-500"}`}>
+        {/* role="switch" is the correct ARIA pattern for binary on/off controls.
+            aria-checked communicates the current state to screen readers. */}
+        <span
+          id="billing-monthly-label"
+          className={`text-sm font-medium transition-colors ${!annual ? "text-white" : "text-gray-500"}`}
+        >
           Monthly
         </span>
         <button
+          role="switch"
+          aria-checked={annual}
+          aria-label="Annual billing"
+          aria-describedby="billing-monthly-label billing-annual-label"
           onClick={() => setAnnual((v) => !v)}
-          className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none ${annual ? "bg-amber-500" : "bg-white/15"}`}
-          aria-label="Toggle annual billing"
+          className={`relative h-6 w-11 rounded-full transition-colors duration-200 ${annual ? "bg-amber-500" : "bg-white/15"}`}
         >
           <span
+            aria-hidden="true"
             className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${annual ? "translate-x-5" : "translate-x-0"}`}
           />
         </button>
-        <span className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-gray-500"}`}>
+        <span
+          id="billing-annual-label"
+          className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-gray-500"}`}
+        >
           Annual
-          <span className="ml-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-400">
+          <span aria-hidden="true" className="ml-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-400">
             Save $11
           </span>
         </span>

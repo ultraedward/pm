@@ -65,8 +65,9 @@ export default function AddHoldingForm({ onCreated }: Props) {
 
       <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm text-white/70">Metal</label>
+          <label htmlFor="holding-metal" className="block text-sm text-white/70">Metal</label>
           <select
+            id="holding-metal"
             className="mt-1 w-full rounded-md bg-black/40 p-2"
             value={metal}
             onChange={(e) => setMetal(e.target.value)}
@@ -79,10 +80,14 @@ export default function AddHoldingForm({ onCreated }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70">Ounces</label>
+          <label htmlFor="holding-ounces" className="block text-sm text-white/70">Ounces</label>
           <input
-            className="mt-1 w-full rounded-md bg-black/40 p-2"
+            id="holding-ounces"
+            type="number"
             inputMode="decimal"
+            step="0.001"
+            min="0"
+            className="mt-1 w-full rounded-md bg-black/40 p-2"
             value={ounces}
             onChange={(e) => setOunces(e.target.value)}
             placeholder="e.g. 1"
@@ -91,8 +96,9 @@ export default function AddHoldingForm({ onCreated }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70">Purchase date</label>
+          <label htmlFor="holding-purchase-date" className="block text-sm text-white/70">Purchase date</label>
           <input
+            id="holding-purchase-date"
             className="mt-1 w-full rounded-md bg-black/40 p-2"
             type="date"
             value={purchaseDate}
@@ -102,12 +108,16 @@ export default function AddHoldingForm({ onCreated }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70">
+          <label htmlFor="holding-cost-basis" className="block text-sm text-white/70">
             Cost basis (total paid) <span className="text-white/40">(optional)</span>
           </label>
           <input
-            className="mt-1 w-full rounded-md bg-black/40 p-2"
+            id="holding-cost-basis"
+            type="number"
             inputMode="decimal"
+            step="0.01"
+            min="0"
+            className="mt-1 w-full rounded-md bg-black/40 p-2"
             value={costBasis}
             onChange={(e) => setCostBasis(e.target.value)}
             placeholder="e.g. 2450"
@@ -115,10 +125,12 @@ export default function AddHoldingForm({ onCreated }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70">
+          <label htmlFor="holding-notes" className="block text-sm text-white/70">
             Notes <span className="text-white/40">(optional)</span>
           </label>
           <input
+            id="holding-notes"
+            type="text"
             className="mt-1 w-full rounded-md bg-black/40 p-2"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -126,15 +138,15 @@ export default function AddHoldingForm({ onCreated }: Props) {
           />
         </div>
 
-        {error ? <p className="text-sm text-red-400">{error}</p> : null}
-        {ok ? <p className="text-sm text-amber-400">{ok}</p> : null}
+        {error ? <p role="alert" className="text-sm text-red-400">{error}</p> : null}
+        {ok ? <p role="status" className="text-sm text-amber-400">{ok}</p> : null}
 
         <button
           type="submit"
           disabled={loading}
           className="rounded-md bg-white/15 px-4 py-2 hover:bg-white/20 disabled:opacity-50"
         >
-          {loading ? "Adding..." : "Add holding"}
+          {loading ? "Adding…" : "Add holding"}
         </button>
       </form>
     </div>

@@ -309,8 +309,9 @@ export default function LocalPortfolioTracker() {
         <form onSubmit={addHolding} className="space-y-3">
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Metal</label>
+              <label htmlFor="lpt-metal" className="block text-xs text-gray-500 mb-1">Metal</label>
               <select
+                id="lpt-metal"
                 value={metal}
                 onChange={(e) => setMetal(e.target.value as Metal)}
                 className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
@@ -323,8 +324,9 @@ export default function LocalPortfolioTracker() {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Troy ounces</label>
+              <label htmlFor="lpt-ounces" className="block text-xs text-gray-500 mb-1">Troy ounces</label>
               <input
+                id="lpt-ounces"
                 type="number"
                 step="0.001"
                 min="0"
@@ -337,8 +339,9 @@ export default function LocalPortfolioTracker() {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Price paid per oz</label>
+              <label htmlFor="lpt-price" className="block text-xs text-gray-500 mb-1">Price paid per oz</label>
               <input
+                id="lpt-price"
                 type="number"
                 step="0.01"
                 min="0"
@@ -351,8 +354,9 @@ export default function LocalPortfolioTracker() {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Purchase date</label>
+              <label htmlFor="lpt-date" className="block text-xs text-gray-500 mb-1">Purchase date</label>
               <input
+                id="lpt-date"
                 type="date"
                 value={purchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
@@ -363,8 +367,9 @@ export default function LocalPortfolioTracker() {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Notes <span className="text-gray-700">(optional)</span></label>
+            <label htmlFor="lpt-notes" className="block text-xs text-gray-500 mb-1">Notes <span className="text-gray-700">(optional)</span></label>
             <input
+              id="lpt-notes"
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -373,8 +378,8 @@ export default function LocalPortfolioTracker() {
             />
           </div>
 
-          {formError && <p className="text-xs text-red-400">{formError}</p>}
-          {formOk    && <p className="text-xs text-amber-400">Holding added ✓</p>}
+          {formError && <p role="alert" className="text-xs text-red-400">{formError}</p>}
+          {formOk    && <p role="status" className="text-xs text-amber-400">Holding added ✓</p>}
 
           <button
             type="submit"

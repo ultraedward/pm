@@ -50,6 +50,50 @@ html, body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* ── Accessibility: keyboard focus ring ─────────────────────────────────────
+   :focus-visible fires only on keyboard navigation, not mouse clicks.
+   We use !important to override the widespread `focus:outline-none` Tailwind
+   class without having to touch every component individually.
+   Inputs/selects use inset box-shadow so the ring doesn't conflict with
+   their border-based focus style.
+─────────────────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 2px !important;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--gold) !important;
+}
+
+/* ── Accessibility: screen-reader-only utility ─────────────────────────────
+   .sr-only hides content visually while keeping it in the accessibility tree.
+   .not-sr-only reverses it (used by skip-to-main link on focus).
+─────────────────────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.not-sr-only {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
 /* ── Typography ── */
 @layer base {
   h1, h2, h3, h4 {

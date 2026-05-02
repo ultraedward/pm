@@ -79,8 +79,12 @@ export function GramCalculator({ spots }: Props) {
   return (
     <div className="space-y-4">
 
-      {/* ── Result — always visible at top, updates live ─────────── */}
+      {/* ── Result — aria-live="polite" announces the updated value to
+          screen readers without interrupting ongoing speech ─────── */}
       <div
+        aria-live="polite"
+        aria-atomic="true"
+        aria-label="Melt value result"
         className={`rounded-xl border px-5 py-4 transition-all duration-200 ${
           hasValue ? "border-amber-500/20 bg-amber-500/5" : ""
         }`}
@@ -94,7 +98,7 @@ export function GramCalculator({ spots }: Props) {
                 {isCustom ? `${customPct || 0}% pure` : purityObj.label}{" "}
                 · {(pureOz * 31.1035).toFixed(3)}g pure {metal}
               </p>
-              <p className="text-[10px] text-gray-700 tabular-nums">
+              <p aria-hidden="true" className="text-[10px] text-gray-700 tabular-nums">
                 Spot {fmt(spotPrice)} / troy oz
               </p>
             </div>
@@ -112,30 +116,36 @@ export function GramCalculator({ spots }: Props) {
         )}
       </div>
 
-      {/* ── Metal toggle ─────────────────────────────────────────── */}
+      {/* ── Metal toggle — aria-pressed communicates selection state ── */}
       <div
+        role="group"
+        aria-labelledby="gram-metal-label"
         className="flex rounded-xl border overflow-hidden"
         style={{ borderColor: "var(--border-strong)" }}
       >
+        <p id="gram-metal-label" className="sr-only">Metal</p>
         {(["gold", "silver"] as Metal[]).map((m) => (
           <button
             key={m}
             onClick={() => setMetal(m)}
+            aria-pressed={metal === m}
             className={`flex-1 min-h-[44px] text-sm font-bold capitalize transition-colors ${
               metal === m
                 ? "bg-amber-500/15 text-amber-400"
                 : "text-gray-500 hover:text-gray-300"
             }`}
           >
-            {m === "gold" ? "🥇 Gold" : "🥈 Silver"}
+            <span aria-hidden="true">{m === "gold" ? "🥇" : "🥈"}</span>
+            {" "}{m === "gold" ? "Gold" : "Silver"}
           </button>
         ))}
       </div>
 
       {/* ── Weight input + unit toggle ───────────────────────────── */}
       <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Weight</p>
+        <label htmlFor="gram-weight" className="block text-xs font-bold uppercase tracking-widest text-gray-500">Weight</label>
         <input
+          id="gram-weight"
           type="number"
           inputMode="decimal"
           step="0.01"
@@ -147,7 +157,10 @@ export function GramCalculator({ spots }: Props) {
           style={{ borderColor: "var(--border-strong)", color: "var(--text)", fontSize: "clamp(1rem, 5vw, 1.5rem)" }}
           data-placeholder-muted
         />
+        {/* Unit selector — aria-pressed marks which unit is active */}
         <div
+          role="group"
+          aria-label="Weight unit"
           className="flex rounded-lg border overflow-hidden"
           style={{ borderColor: "var(--border-strong)" }}
         >
@@ -155,6 +168,7 @@ export function GramCalculator({ spots }: Props) {
             <button
               key={u}
               onClick={() => setUnit(u)}
+              aria-pressed={unit === u}
               className={`flex-1 text-xs font-bold transition-colors min-h-[44px] ${
                 unit === u
                   ? "bg-amber-500/15 text-amber-400"
@@ -167,14 +181,15 @@ export function GramCalculator({ spots }: Props) {
         </div>
       </div>
 
-      {/* ── Purity selector ──────────────────────────────────────── */}
+      {/* ── Purity selector — aria-pressed marks the selected purity ── */}
       <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Purity</p>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+        <p id="gram-purity-label" className="text-xs font-bold uppercase tracking-widest text-gray-500">Purity</p>
+        <div role="group" aria-labelledby="gram-purity-label" className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
           {karats.map((k) => (
             <button
               key={k.id}
               onClick={() => setKarat(k.id)}
+              aria-pressed={currentKarat === k.id}
               className={`rounded-lg py-2.5 px-1 text-center transition-colors min-h-[44px] flex flex-col items-center justify-center ${
                 currentKarat === k.id
                   ? "bg-amber-500/20 border border-amber-500/40 text-amber-400"
@@ -184,7 +199,7 @@ export function GramCalculator({ spots }: Props) {
             >
               <span className="block text-xs font-bold">{k.label}</span>
               {k.pct && (
-                <span className="block text-[10px] opacity-60 mt-0.5">{k.pct}</span>
+                <span aria-hidden="true" className="block text-[10px] opacity-60 mt-0.5">{k.pct}</span>
               )}
             </button>
           ))}
@@ -192,7 +207,9 @@ export function GramCalculator({ spots }: Props) {
 
         {isCustom && (
           <div className="flex items-center gap-2 mt-1">
+            <label htmlFor="gram-custom-pct" className="sr-only">Custom purity percentage</label>
             <input
+              id="gram-custom-pct"
               type="number"
               inputMode="decimal"
               step="0.1"
@@ -205,7 +222,7 @@ export function GramCalculator({ spots }: Props) {
               style={{ borderColor: "var(--border-strong)", color: "var(--text)", fontSize: "16px" }}
               data-placeholder-muted
             />
-            <span className="text-sm text-gray-600">% pure {metal}</span>
+            <span aria-hidden="true" className="text-sm text-gray-600">% pure {metal}</span>
           </div>
         )}
       </div>

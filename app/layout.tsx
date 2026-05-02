@@ -108,8 +108,18 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
+        {/* Skip-to-main — visually hidden until focused by keyboard, lets users
+            bypass the navigation bar and jump straight to page content */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:text-xs focus:font-bold focus:uppercase focus:tracking-widest"
+          style={{ background: "var(--gold)", color: "#000" }}
+        >
+          Skip to main content
+        </a>
+
         <Navbar />
-        <div className="sm:pb-0 pb-20">
+        <div id="main-content" className="sm:pb-0 pb-20">
           {children}
         </div>
         <BottomNav />

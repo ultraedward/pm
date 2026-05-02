@@ -106,10 +106,10 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       {/* Metal identifier */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
           <span className="label">{label}</span>
         </div>
-        <span className="text-[10px] font-mono tracking-widest text-gray-700">{symbol}</span>
+        <span aria-hidden="true" className="text-[10px] font-mono tracking-widest text-gray-700">{symbol}</span>
       </div>
 
       {/* Price */}
@@ -125,7 +125,10 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
         </div>
         {data.percentChange != null && (
           <div className={`mt-2 text-xs font-bold tabular-nums tracking-wide ${isUp ? "text-emerald-400" : "text-red-400"}`}>
-            {isUp ? "▲" : "▼"} {Math.abs(data.percentChange).toFixed(2)}%
+            {/* Arrow is decorative; sr-only text carries the direction meaning */}
+            <span aria-hidden="true">{isUp ? "▲" : "▼"}</span>
+            <span className="sr-only">{isUp ? "Up" : "Down"}</span>
+            {" "}{Math.abs(data.percentChange).toFixed(2)}%
             <span className="ml-1.5 font-normal text-gray-700 tracking-normal">24H</span>
           </div>
         )}
@@ -260,7 +263,9 @@ export default async function HomePage() {
           <div className="mt-4 flex items-center gap-6 flex-wrap">
             {gold.percentChange !== null && (
               <span className={`text-sm font-bold tabular-nums ${gold.percentChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                {gold.percentChange >= 0 ? "▲" : "▼"} {Math.abs(gold.percentChange).toFixed(2)}% today
+                <span aria-hidden="true">{gold.percentChange >= 0 ? "▲" : "▼"}</span>
+                <span className="sr-only">{gold.percentChange >= 0 ? "Up" : "Down"}</span>
+                {" "}{Math.abs(gold.percentChange).toFixed(2)}% today
               </span>
             )}
             <span className="label">Live spot price</span>

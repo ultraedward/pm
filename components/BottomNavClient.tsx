@@ -56,6 +56,7 @@ export function BottomNavClient() {
 
   return (
     <nav
+      aria-label="Primary navigation"
       className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t backdrop-blur-md"
       style={{
         backgroundColor: "var(--nav-bg)",
@@ -74,6 +75,7 @@ export function BottomNavClient() {
             <Link
               key={href}
               href={href}
+              aria-current={isActive ? "page" : undefined}
               className={`relative flex flex-col items-center justify-center gap-1 py-3 min-h-[56px] transition-colors ${
                 isActive ? "text-amber-400" : "text-gray-500"
               }`}
@@ -81,11 +83,13 @@ export function BottomNavClient() {
               {/* Active indicator — gold rule at top */}
               {isActive && (
                 <span
+                  aria-hidden="true"
                   className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5"
                   style={{ backgroundColor: "var(--gold)" }}
                 />
               )}
-              {icon}
+              {/* SVG icon is decorative — the visible text label below carries the name */}
+              <span aria-hidden="true">{icon}</span>
               <span className="text-[10px] font-semibold uppercase tracking-wider">
                 {label}
               </span>

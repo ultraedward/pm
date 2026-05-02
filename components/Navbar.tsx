@@ -11,7 +11,7 @@ export default async function Navbar() {
   const isLoggedIn = !!session?.user;
 
   return (
-    <nav className="sticky top-0 z-40 border-b" style={{ borderColor: "var(--nav-border)", backgroundColor: "var(--nav-bg)", backdropFilter: "blur(12px)" }}>
+    <nav aria-label="Main navigation" className="sticky top-0 z-40 border-b" style={{ borderColor: "var(--nav-border)", backgroundColor: "var(--nav-bg)", backdropFilter: "blur(12px)" }}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 
         {/* Logo */}

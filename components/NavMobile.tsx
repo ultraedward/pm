@@ -43,14 +43,18 @@ export default function NavMobile({ isLoggedIn }: Props) {
         Get started
       </Link>
 
-      {/* Hamburger button */}
+      {/* Hamburger button — aria-expanded tells screen readers whether the
+          menu is currently open; aria-controls points to the dropdown id */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Toggle menu"
+        aria-label={open ? "Close menu" : "Open menu"}
+        aria-expanded={open}
+        aria-controls="mobile-nav-menu"
         className="flex flex-col justify-center items-center gap-1.5 p-2 transition-colors"
         style={{ borderRadius: 0 }}
       >
         <span
+          aria-hidden="true"
           className="block h-0.5 w-5 transition-all duration-200"
           style={{
             backgroundColor: "var(--text)",
@@ -58,6 +62,7 @@ export default function NavMobile({ isLoggedIn }: Props) {
           }}
         />
         <span
+          aria-hidden="true"
           className="block h-0.5 w-5 transition-all duration-200"
           style={{
             backgroundColor: "var(--text)",
@@ -65,6 +70,7 @@ export default function NavMobile({ isLoggedIn }: Props) {
           }}
         />
         <span
+          aria-hidden="true"
           className="block h-0.5 w-5 transition-all duration-200"
           style={{
             backgroundColor: "var(--text)",
@@ -73,35 +79,38 @@ export default function NavMobile({ isLoggedIn }: Props) {
         />
       </button>
 
-      {/* Dropdown */}
-      {open && (
-        <div
-          className="absolute left-0 right-0 top-full z-50 px-6 py-4 space-y-1"
-          style={{
-            backgroundColor: "var(--dropdown-bg)",
-            borderBottom: "1px solid var(--border-strong)",
-          }}
-        >
-          {links.map(({ href, label }) => {
-            const isActive = pathname === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                className="block px-4 py-3 text-sm font-medium transition-colors"
-                style={{
-                  borderRadius: 0,
-                  backgroundColor: isActive ? "var(--surface-2)" : "transparent",
-                  color: isActive ? "var(--text)" : "var(--text-muted)",
-                }}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {/* Dropdown — role="navigation" makes it a landmark; hidden when closed
+          via display (not conditional render) so aria-expanded stays accurate */}
+      <nav
+        id="mobile-nav-menu"
+        aria-label="Mobile navigation"
+        className="absolute left-0 right-0 top-full z-50 px-6 py-4 space-y-1"
+        style={{
+          backgroundColor: "var(--dropdown-bg)",
+          borderBottom: "1px solid var(--border-strong)",
+          display: open ? "block" : "none",
+        }}
+      >
+        {links.map(({ href, label }) => {
+          const isActivePath = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              aria-current={isActivePath ? "page" : undefined}
+              className="block px-4 py-3 text-sm font-medium transition-colors"
+              style={{
+                borderRadius: 0,
+                backgroundColor: isActivePath ? "var(--surface-2)" : "transparent",
+                color: isActivePath ? "var(--text)" : "var(--text-muted)",
+              }}
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

@@ -53,11 +53,12 @@ export async function SiteFooter() {
           </div>
         )}
 
-        {/* Nav strip — shown to everyone. The pt-6 only applies when the
-            trust strip is rendered above; without it, the footer needs no
-            top padding inside the inner wrapper since the <footer> already
-            has pt-7. */}
-        <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600 ${!isLoggedIn ? "pt-6" : ""}`}>
+        {/* Nav strip — nav landmark gives screen reader users a quick way to
+            jump to footer links; aria-label distinguishes it from the main nav */}
+        <nav
+          aria-label="Footer navigation"
+          className={`flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600 ${!isLoggedIn ? "pt-6" : ""}`}
+        >
           <Link
             href="/"
             className="font-bold text-gray-400 tracking-widest uppercase hover:text-white transition-colors"
@@ -65,18 +66,18 @@ export async function SiteFooter() {
             Lode
           </Link>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            <Link href="/"            className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
+            <Link href="/"                     className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
             <Link href="/compare"              className="hover:text-gray-300 transition-colors">Compare</Link>
             <Link href="/coin-melt-calculator" className="hover:text-gray-300 transition-colors">Melt Calculator</Link>
             <Link href="/gram"                 className="hover:text-gray-300 transition-colors">Gram Calculator</Link>
             <Link href="/about"                className="hidden sm:block hover:text-gray-300 transition-colors">About</Link>
             <Link href="/faq"                  className="hover:text-gray-300 transition-colors">FAQ</Link>
-            <Link href="/contact"     className="hidden sm:block hover:text-gray-300 transition-colors">Contact</Link>
-            <Link href="/privacy"     className="hover:text-gray-300 transition-colors">Privacy</Link>
-            <Link href="/terms"       className="hover:text-gray-300 transition-colors">Terms</Link>
+            <Link href="/contact"              className="hidden sm:block hover:text-gray-300 transition-colors">Contact</Link>
+            <Link href="/privacy"              className="hover:text-gray-300 transition-colors">Privacy</Link>
+            <Link href="/terms"                className="hover:text-gray-300 transition-colors">Terms</Link>
           </div>
           <span className="hidden sm:block">© {new Date().getFullYear()} Lode</span>
-        </div>
+        </nav>
 
       </div>
     </footer>

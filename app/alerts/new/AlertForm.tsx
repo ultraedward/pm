@@ -51,12 +51,13 @@ export default function AlertForm() {
 
   return (
     <div className="space-y-4">
-      {error && <p className="text-red-600">{error}</p>}
-      {success && <p className="text-amber-400">Alert created</p>}
+      {error && <p role="alert" className="text-red-600">{error}</p>}
+      {success && <p role="status" className="text-amber-400">Alert created</p>}
 
       <div>
-        <label className="block text-sm font-medium">Metal</label>
+        <label htmlFor="alertform-metal" className="block text-sm font-medium">Metal</label>
         <select
+          id="alertform-metal"
           value={metal}
           onChange={(e) => setMetal(e.target.value)}
           className="w-full border p-2 rounded"
@@ -69,10 +70,11 @@ export default function AlertForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Direction</label>
+        <label htmlFor="alertform-direction" className="block text-sm font-medium">Direction</label>
         <select
+          id="alertform-direction"
           value={direction}
-          onChange={(e) => setDirection(e.target.value as any)}
+          onChange={(e) => setDirection(e.target.value as "above" | "below")}
           className="w-full border p-2 rounded"
         >
           <option value="above">Above</option>
@@ -81,9 +83,11 @@ export default function AlertForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Target Price</label>
+        <label htmlFor="alertform-target" className="block text-sm font-medium">Target Price (USD / oz)</label>
         <input
+          id="alertform-target"
           type="number"
+          inputMode="decimal"
           value={target}
           onChange={(e) => setTarget(e.target.value)}
           className="w-full border p-2 rounded"
@@ -91,8 +95,9 @@ export default function AlertForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Frequency</label>
+        <label htmlFor="alertform-frequency" className="block text-sm font-medium">Frequency</label>
         <select
+          id="alertform-frequency"
           value={frequency}
           onChange={(e) => setFrequency(e.target.value as Frequency)}
           className="w-full border p-2 rounded"
@@ -106,16 +111,19 @@ export default function AlertForm() {
 
       {frequency === "trailing_stop" && (
         <div>
-          <label className="block text-sm font-medium">
+          <label htmlFor="alertform-trailing" className="block text-sm font-medium">
             Trailing Offset (USD)
           </label>
           <input
+            id="alertform-trailing"
             type="number"
+            inputMode="decimal"
             value={trailingOffset}
             onChange={(e) => setTrailingOffset(e.target.value)}
+            aria-describedby="alertform-trailing-hint"
             className="w-full border p-2 rounded"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p id="alertform-trailing-hint" className="text-xs text-gray-500 mt-1">
             Target will move as price improves
           </p>
         </div>
@@ -126,7 +134,7 @@ export default function AlertForm() {
         onClick={submit}
         className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
       >
-        {loading ? "Creating..." : "Create Alert"}
+        {loading ? "Creating…" : "Create Alert"}
       </button>
     </div>
   );

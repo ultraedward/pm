@@ -41,12 +41,18 @@ export function EmailCapture({ source }: { source: string }) {
         <p className="text-xs text-gray-500 mt-0.5">Gold, silver, platinum &amp; palladium in your inbox every week. No account needed.</p>
       </div>
       <form onSubmit={handleSubmit} className="flex gap-2">
+        {/* sr-only label associates the input with its purpose for screen readers */}
+        <label htmlFor="email-capture-input" className="sr-only">
+          Email address
+        </label>
         <input
+          id="email-capture-input"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your@email.com"
           required
+          aria-describedby={state === "error" ? "email-capture-error" : undefined}
           className="flex-1 min-w-0 rounded-full bg-black border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
         />
         <button
@@ -54,11 +60,13 @@ export function EmailCapture({ source }: { source: string }) {
           disabled={state === "loading"}
           className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors disabled:opacity-60 whitespace-nowrap"
         >
-          {state === "loading" ? "..." : "Subscribe"}
+          {state === "loading" ? (
+            <><span aria-hidden="true">…</span><span className="sr-only">Subscribing…</span></>
+          ) : "Subscribe"}
         </button>
       </form>
       {state === "error" && (
-        <p className="text-xs text-red-400">Something went wrong — try again.</p>
+        <p id="email-capture-error" role="alert" className="text-xs text-red-400">Something went wrong — try again.</p>
       )}
     </div>
   );
