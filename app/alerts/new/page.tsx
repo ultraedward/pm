@@ -1,9 +1,22 @@
 import { requireUser } from "@/lib/requireUser";
+import { prisma } from "@/lib/prisma";
 import { CreateAlertForm } from "@/components/CreateAlertForm";
+import { type SupportedCurrency, SUPPORTED_CURRENCIES } from "@/lib/fx";
 import Link from "next/link";
 
 export default async function NewAlertPage() {
-  await requireUser();
+  const user = await requireUser();
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { preferredCurrency: true },
+  });
+
+  const currency: SupportedCurrency = SUPPORTED_CURRENCIES.includes(
+    dbUser?.preferredCurrency as SupportedCurrency
+  )
+    ? (dbUser!.preferredCurrency as SupportedCurrency)
+    : "USD";
 
   return (
     <main className="min-h-screen bg-surface px-4 py-6 sm:p-8 text-white">
@@ -20,7 +33,7 @@ export default async function NewAlertPage() {
             Get an email when your target price is hit — checked daily.
           </p>
         </div>
-        <CreateAlertForm />
+        <CreateAlertForm currency={currency} />
       </div>
     </main>
   );

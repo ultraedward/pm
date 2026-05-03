@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
+import { formatCurrency } from "@/lib/formatCurrency";
 import { GramCalculator } from "@/components/GramCalculator";
 import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -49,10 +50,7 @@ export default async function GramPage() {
   const goldSpot   = spots.gold   ?? 0;
   const silverSpot = spots.silver ?? 0;
 
-  const fmtSpot = (n: number) =>
-    n > 0
-      ? n.toLocaleString("en-US", { style: "currency", currency: "USD" })
-      : "—";
+  const fmtSpot = (n: number) => (n > 0 ? formatCurrency(n) : "—");
 
   // Pre-computed reference table rows
   const GOLD_KARATS = [
@@ -187,7 +185,7 @@ export default async function GramPage() {
                       <div key={label} className="flex items-center justify-between px-5 py-3">
                         <span className="text-sm text-gray-400">{label}</span>
                         <span className="text-sm font-bold tabular-nums text-white">
-                          {perGram.toLocaleString("en-US", { style: "currency", currency: "USD" })}/g
+                          {formatCurrency(perGram)}/g
                         </span>
                       </div>
                     );
@@ -210,7 +208,7 @@ export default async function GramPage() {
                       <div key={label} className="flex items-center justify-between px-5 py-3">
                         <span className="text-sm text-gray-400">{label}</span>
                         <span className="text-sm font-bold tabular-nums text-white">
-                          {perGram.toLocaleString("en-US", { style: "currency", currency: "USD" })}/g
+                          {formatCurrency(perGram)}/g
                         </span>
                       </div>
                     );
@@ -243,7 +241,7 @@ export default async function GramPage() {
               <h3 className="text-sm font-bold text-white">What is the silver price per gram today?</h3>
               <p className="text-sm text-gray-400 leading-relaxed">
                 {silverSpot > 0
-                  ? `Fine .999 silver is currently ${(silverSpot / 31.1035).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4, maximumFractionDigits: 4 })} per gram, based on a spot price of ${fmtSpot(silverSpot)} per troy ounce. Sterling silver (92.5% pure) is ${(silverSpot * 0.925 / 31.1035).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4, maximumFractionDigits: 4 })} per gram.`
+                  ? `Fine .999 silver is currently ${formatCurrency(silverSpot / 31.1035)} per gram, based on a spot price of ${fmtSpot(silverSpot)} per troy ounce. Sterling silver (92.5% pure) is ${formatCurrency(silverSpot * 0.925 / 31.1035)} per gram.`
                   : "The current silver price per gram is shown in the calculator and reference table above, calculated from the live spot price."}
               </p>
             </div>
@@ -253,7 +251,7 @@ export default async function GramPage() {
               <p className="text-sm text-gray-400 leading-relaxed">
                 Sterling silver is 92.5% pure silver (marked &quot;925&quot;).
                 {silverSpot > 0
-                  ? ` At today's spot price, sterling silver is worth ${(silverSpot * 0.925 / 31.1035).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4, maximumFractionDigits: 4 })} per gram. To calculate it yourself: multiply the fine silver price per gram by 0.925.`
+                  ? ` At today's spot price, sterling silver is worth ${formatCurrency(silverSpot * 0.925 / 31.1035)} per gram. To calculate it yourself: multiply the fine silver price per gram by 0.925.`
                   : " To calculate: multiply the fine .999 silver price per gram by 0.925. The calculator above does this automatically."}
               </p>
             </div>
@@ -263,7 +261,7 @@ export default async function GramPage() {
               <p className="text-sm text-gray-400 leading-relaxed">
                 14k gold is 58.3% pure (14 ÷ 24 karats).
                 {goldSpot > 0
-                  ? ` At today's spot price of ${fmtSpot(goldSpot)} per troy oz, 14k gold is worth ${(goldSpot * (14/24) / 31.1035).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 })} per gram.`
+                  ? ` At today's spot price of ${fmtSpot(goldSpot)} per troy oz, 14k gold is worth ${formatCurrency(goldSpot * (14/24) / 31.1035)} per gram.`
                   : " The current 14k gold price per gram is in the reference table above."}
                 {" "}18k gold (75% pure) and 24k gold (99.9% pure) are in the table as well.
               </p>

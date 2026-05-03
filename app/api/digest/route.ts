@@ -7,6 +7,8 @@ import {
   renderAffiliateDisclosure,
   type CheapestPick,
 } from "@/lib/compare/cheapestPick";
+import { getFxRates } from "@/lib/fx";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +21,6 @@ const METAL_COLOR: Record<Metal, string> = {
   platinum: "#E5E4E2",
   palladium: "#9FA8C7",
 };
-
-function fmt(n: number) {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
 
 function fmtPct(n: number) {
   return `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
@@ -37,9 +35,16 @@ function buildDigestHtml(params: {
   portfolioPctReturn: number | null;
   hasHoldings: boolean;
   cheapestPicks: CheapestPick[];
+  currency?: string;
   unsubscribeUrl?: string;
 }) {
-  const { firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss, portfolioPctReturn, hasHoldings, cheapestPicks, unsubscribeUrl } = params;
+  const {
+    firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss,
+    portfolioPctReturn, hasHoldings, cheapestPicks,
+    currency = "USD", unsubscribeUrl,
+  } = params;
+
+  const fmt = (n: number) => formatCurrency(n, currency);
 
   const metalRows = METALS.map((metal) => {
     const price = spots[metal];
@@ -65,11 +70,6 @@ function buildDigestHtml(params: {
     `;
   }).join("");
 
-  // Cheapest-dealer picks render between the spot-prices table and the
-  // portfolio section. We only show the section when at least one pick is
-  // available; if both gold and silver picks are missing (no spots, no
-  // catalog match) we omit the entire block rather than render an empty
-  // header.
   const cheapestSection = cheapestPicks.length > 0
     ? `
       <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
@@ -144,7 +144,7 @@ function buildDigestHtml(params: {
           <!-- Spot prices table -->
           <tr>
             <td style="background:#111;border-radius:10px;padding:4px 20px 0;">
-              <p style="margin:12px 0;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#555;">Spot Prices</p>
+              <p style="margin:12px 0;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#555;">Spot Prices · ${currency}</p>
               <table width="100%" cellpadding="0" cellspacing="0">
                 <thead>
                   <tr>
@@ -197,7 +197,6 @@ function buildDigestHtml(params: {
 }
 
 export async function GET(req: Request) {
-  // Auth: accept both cron secret (from Vercel) and admin secret (for manual test)
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
   const adminSecret = process.env.ADMIN_SECRET;
@@ -217,7 +216,7 @@ export async function GET(req: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const from = process.env.RESEND_FROM ?? "Lode <onboarding@resend.dev>";
 
-  // ── 1. Fetch current spot prices ──────────────────────────────────────
+  // ── 1. Fetch current spot prices (USD) ────────────────────────────────
   const latestPriceRows = await Promise.all(
     METALS.map((metal) =>
       prisma.price.findFirst({
@@ -228,9 +227,9 @@ export async function GET(req: Request) {
     )
   );
 
-  const spots = {} as Record<Metal, number>;
+  const spotsUSD = {} as Record<Metal, number>;
   for (const row of latestPriceRows) {
-    if (row) spots[row.metal as Metal] = row.price;
+    if (row) spotsUSD[row.metal as Metal] = row.price;
   }
 
   // ── 2. Fetch prices from ~7 days ago for weekly % change ──────────────
@@ -245,40 +244,47 @@ export async function GET(req: Request) {
     )
   );
 
+  // Weekly % change is currency-agnostic (it's a ratio), so compute once in USD
   const weeklyPct = {} as Record<Metal, number | null>;
   for (const row of weekOldRows) {
-    if (row && spots[row.metal as Metal] > 0 && row.price > 0) {
+    if (row && spotsUSD[row.metal as Metal] > 0 && row.price > 0) {
       weeklyPct[row.metal as Metal] =
-        ((spots[row.metal as Metal] - row.price) / row.price) * 100;
+        ((spotsUSD[row.metal as Metal] - row.price) / row.price) * 100;
     } else {
       weeklyPct[(row?.metal ?? "gold") as Metal] = null;
     }
   }
-  // Ensure all metals have a value
   for (const metal of METALS) {
     if (!(metal in weeklyPct)) weeklyPct[metal] = null;
   }
 
-  // ── Compute cheapest-dealer picks once for the entire run ─────────────
-  // Picks are identical across recipients (no per-user personalization
-  // yet), so we compute them once and reuse. Order: silver first, then
-  // gold — silver is the higher-frequency purchase for stackers, so it
-  // earns top placement. findCheapest returns null if catalog/spot data
-  // is missing; we filter those out so the email doesn't render an empty
-  // CTA card.
+  // ── 3. Fetch FX rates once — reused for all per-user conversions ──────
+  const fxRates = await getFxRates();
+  const convertSpots = (currency: string): Record<Metal, number> => {
+    const rate = fxRates[currency] ?? 1;
+    return {
+      gold:      (spotsUSD.gold      ?? 0) * rate,
+      silver:    (spotsUSD.silver    ?? 0) * rate,
+      platinum:  (spotsUSD.platinum  ?? 0) * rate,
+      palladium: (spotsUSD.palladium ?? 0) * rate,
+    };
+  };
+
+  // ── 4. Cheapest-dealer picks (USD-denominated, computed once) ─────────
   const baseUrl = process.env.NEXTAUTH_URL ?? "https://lode.rocks";
   const cheapestPicks = [
-    findCheapest("silver-eagle", spots.silver, baseUrl, "digest"),
-    findCheapest("gold-eagle",   spots.gold,   baseUrl, "digest"),
+    findCheapest("silver-eagle", spotsUSD.silver, baseUrl, "digest"),
+    findCheapest("gold-eagle",   spotsUSD.gold,   baseUrl, "digest"),
   ].filter((p): p is NonNullable<typeof p> => p !== null);
 
-  // ── 3. Fetch all users who have an email ─────────────────────────────
+  // ── 5. Send per-user digest ───────────────────────────────────────────
   const users = await prisma.user.findMany({
     where: { email: { not: null } },
     select: {
       id: true,
       email: true,
       name: true,
+      preferredCurrency: true,
       holdings: {
         select: { metal: true, ounces: true, purchasePrice: true },
       },
@@ -292,13 +298,17 @@ export async function GET(req: Request) {
   for (const user of users) {
     if (!user.email) { skipped++; continue; }
 
-    // ── Compute portfolio totals ──────────────────────────────────────
+    const currency = user.preferredCurrency ?? "USD";
+    const rate = fxRates[currency] ?? 1;
+    const spots = convertSpots(currency);
+
+    // Portfolio totals — purchasePrice is stored in the user's preferred currency
     let totalInvested = 0;
     let totalValue = 0;
     for (const h of user.holdings) {
       const spot = spots[h.metal as Metal] ?? h.purchasePrice;
       totalInvested += h.ounces * h.purchasePrice;
-      totalValue += h.ounces * (spot || h.purchasePrice);
+      totalValue    += h.ounces * (spot || h.purchasePrice);
     }
     const hasHoldings = user.holdings.length > 0;
     const gainLoss = totalValue - totalInvested;
@@ -310,11 +320,12 @@ export async function GET(req: Request) {
       firstName,
       spots,
       weeklyPct,
-      portfolioValue: hasHoldings ? totalValue : null,
-      portfolioGainLoss: hasHoldings ? gainLoss : null,
+      portfolioValue:    hasHoldings ? totalValue : null,
+      portfolioGainLoss: hasHoldings ? gainLoss   : null,
       portfolioPctReturn: pctReturn,
       hasHoldings,
       cheapestPicks,
+      currency,
     });
 
     try {
@@ -331,8 +342,7 @@ export async function GET(req: Request) {
     }
   }
 
-  // ── 4. Send spot-prices-only digest to email-only subscribers ────
-  // baseUrl is defined above (used to build cheapestPicks); reuse it here.
+  // ── 6. Email-only subscribers — always USD ────────────────────────────
   const subscribers = await prisma.emailSubscriber.findMany({
     where: { active: true },
   });
@@ -341,13 +351,14 @@ export async function GET(req: Request) {
     const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${sub.unsubscribeToken}`;
     const html = buildDigestHtml({
       firstName: "",
-      spots,
+      spots: spotsUSD,
       weeklyPct,
-      portfolioValue: null,
+      portfolioValue:    null,
       portfolioGainLoss: null,
       portfolioPctReturn: null,
       hasHoldings: false,
       cheapestPicks,
+      currency: "USD",
       unsubscribeUrl,
     });
 

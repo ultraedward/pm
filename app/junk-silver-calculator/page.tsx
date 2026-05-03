@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
+import { formatCurrency } from "@/lib/formatCurrency";
 import { JunkSilverCalculator } from "@/components/JunkSilverCalculator";
 import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -142,10 +143,7 @@ export default async function JunkSilverCalculatorPage() {
 
   const silverSpot = spots.silver ?? 0;
 
-  const fmtSpot = (n: number) =>
-    n > 0
-      ? n.toLocaleString("en-US", { style: "currency", currency: "USD" })
-      : "—";
+  const fmtSpot = (n: number) => (n > 0 ? formatCurrency(n) : "—");
 
   // Pre-compute reference values for the static table
   const OZ_PER_DOLLAR = 0.715; // industry standard for 90% circulated
@@ -226,7 +224,7 @@ export default async function JunkSilverCalculatorPage() {
                       {asw.toFixed(4)}
                     </span>
                     <span className="text-sm font-bold tabular-nums text-white text-right w-24">
-                      {(asw * silverSpot).toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                      {formatCurrency(asw * silverSpot)}
                     </span>
                   </div>
                 ))}

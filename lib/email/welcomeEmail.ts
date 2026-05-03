@@ -3,20 +3,21 @@
  * Design language matches the weekly digest exactly.
  */
 
+import { formatCurrency } from "@/lib/formatCurrency";
+
 export function buildWelcomeHtml(params: {
   firstName: string;
   goldPrice: number | null;
   baseUrl: string;
+  currency?: string;
 }): string {
-  const { firstName, goldPrice, baseUrl } = params;
+  const { firstName, goldPrice, baseUrl, currency = "USD" } = params;
 
   const greeting = firstName
     ? `Welcome, ${firstName}.`
     : "Welcome to Lode.";
 
-  const goldDisplay = goldPrice
-    ? goldPrice.toLocaleString("en-US", { style: "currency", currency: "USD" })
-    : null;
+  const goldDisplay = goldPrice ? formatCurrency(goldPrice, currency) : null;
 
   return `<!DOCTYPE html>
 <html lang="en">

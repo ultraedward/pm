@@ -9,9 +9,8 @@
  *        Goal: re-engage with live prices, two clear actions.
  */
 
-function fmt(n: number) {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
+import { formatCurrency } from "@/lib/formatCurrency";
+const fmt = (n: number, currency = "USD") => formatCurrency(n, currency);
 
 // ─── Day 3 ────────────────────────────────────────────────────────────────────
 
@@ -19,10 +18,11 @@ export function buildDay3Html(params: {
   firstName: string;
   goldPrice: number | null;
   baseUrl: string;
+  currency?: string;
 }): string {
-  const { firstName, goldPrice, baseUrl } = params;
+  const { firstName, goldPrice, baseUrl, currency = "USD" } = params;
 
-  const goldDisplay = goldPrice ? fmt(goldPrice) : null;
+  const goldDisplay = goldPrice ? fmt(goldPrice, currency) : null;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -123,8 +123,9 @@ export function buildDay7Html(params: {
   goldPrice: number | null;
   silverPrice: number | null;
   baseUrl: string;
+  currency?: string;
 }): string {
-  const { firstName, goldPrice, silverPrice, baseUrl } = params;
+  const { firstName, goldPrice, silverPrice, baseUrl, currency = "USD" } = params;
 
   const goldRow = goldPrice
     ? `<tr>
@@ -133,7 +134,7 @@ export function buildDay7Html(params: {
           <span style="color:#aaa;font-size:13px;vertical-align:middle;">Gold</span>
         </td>
         <td style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);text-align:right;font-size:15px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;">
-          ${fmt(goldPrice)}
+          ${fmt(goldPrice, currency)}
         </td>
       </tr>`
     : "";
@@ -145,7 +146,7 @@ export function buildDay7Html(params: {
           <span style="color:#aaa;font-size:13px;vertical-align:middle;">Silver</span>
         </td>
         <td style="padding:12px 0;text-align:right;font-size:15px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;">
-          ${fmt(silverPrice)}
+          ${fmt(silverPrice, currency)}
         </td>
       </tr>`
     : "";

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CURRENCY_SYMBOLS, type SupportedCurrency } from "@/lib/fx";
 
 const METALS = [
   { value: "gold",      label: "Gold",      dot: "#D4AF37" },
@@ -10,14 +11,21 @@ const METALS = [
   { value: "palladium", label: "Palladium", dot: "#9FA8C7" },
 ];
 
-export function CreateAlertForm() {
+interface Props {
+  /** User's preferred currency — passed from the server page */
+  currency: SupportedCurrency;
+}
+
+export function CreateAlertForm({ currency }: Props) {
   const router = useRouter();
 
-  const [metal, setMetal]         = useState("gold");
-  const [direction, setDirection] = useState("above");
-  const [price, setPrice]         = useState("");
+  const [metal, setMetal]           = useState("gold");
+  const [direction, setDirection]   = useState("above");
+  const [price, setPrice]           = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const [error, setError]           = useState<string | null>(null);
+
+  const currencySymbol = CURRENCY_SYMBOLS[currency] ?? "$";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,7 +35,13 @@ export function CreateAlertForm() {
     const res = await fetch("/api/alerts/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ metal, direction, price: Number(price), type: "price" }),
+      body: JSON.stringify({
+        metal,
+        direction,
+        price: Number(price),
+        type: "price",
+        currency, // tells the server what unit this threshold is in
+      }),
     });
 
     if (!res.ok) {
@@ -45,8 +59,7 @@ export function CreateAlertForm() {
   return (
     <form onSubmit={submit} className="rounded-2xl border p-6 space-y-6" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}>
 
-      {/* Metal picker — role="group" makes screen readers announce "Metal" before
-          the individual button names, matching what a fieldset/legend would do */}
+      {/* Metal picker */}
       <div className="space-y-2" role="group" aria-labelledby="alert-metal-label">
         <p id="alert-metal-label" className="label">Metal</p>
         <div className="grid grid-cols-2 gap-2">
@@ -99,23 +112,34 @@ export function CreateAlertForm() {
         </div>
       </div>
 
-      {/* Target price — label linked to input via htmlFor/id */}
+      {/* Target price */}
       <div className="space-y-2">
-        <label htmlFor="alert-target-price" className="label">Target Price (USD / oz)</label>
+        <label htmlFor="alert-target-price" className="label">
+          Target Price ({currency} / oz)
+        </label>
         <div className="relative">
-          <span aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-600">$</span>
+          <span aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-600">
+            {currencySymbol}
+          </span>
           <input
             id="alert-target-price"
             type="number"
             inputMode="decimal"
             required
+            min="0"
+            step="any"
             value={price}
             onChange={e => setPrice(e.target.value)}
-            placeholder="2500.00"
+            placeholder="0.00"
             aria-describedby={error ? "alert-form-error" : undefined}
             className={`${inputClass} pl-7`}
           />
         </div>
+        {currency !== "USD" && (
+          <p className="text-xs text-gray-600">
+            Enter your target in {currency}. The alert fires when the {currency} spot price crosses this level.
+          </p>
+        )}
       </div>
 
       {error && (

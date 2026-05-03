@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/requireUser";
 import { prisma } from "@/lib/prisma";
 import { SignOutButton } from "@/components/SignOutButton";
 import { SiteFooter } from "@/components/SiteFooter";
+import { CurrencyPicker } from "@/components/CurrencyPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ export default async function AccountPage() {
         email: true,
         name: true,
         createdAt: true,
+        preferredCurrency: true,
       },
     }),
     prisma.alert.count({ where: { userId: user.id } }),
@@ -49,6 +51,16 @@ export default async function AccountPage() {
               <p className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{holdingCount === 1 ? "Holding" : "Holdings"} →</p>
             </Link>
           </div>
+        </div>
+
+        {/* Currency preference */}
+        <div className="space-y-3">
+          <p className="label">Currency</p>
+          <p className="text-sm text-gray-500">
+            Prices, portfolio values, and alert thresholds are shown in your preferred currency.
+            All conversions use live exchange rates.
+          </p>
+          <CurrencyPicker current={dbUser.preferredCurrency ?? "USD"} />
         </div>
 
         {/* Email notifications */}

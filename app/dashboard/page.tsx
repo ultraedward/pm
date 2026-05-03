@@ -8,6 +8,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { SiteFooter } from "@/components/SiteFooter";
+import { convertPricesFromUSD, type SupportedCurrency } from "@/lib/fx";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -41,9 +43,7 @@ async function getRecentPrices(metal: Metal) {
   return rows.reverse(); // return in ascending order for the sparkline
 }
 
-function fmtMoney(n: number) {
-  return n.toLocaleString(undefined, { style: "currency", currency: "USD" });
-}
+// fmtMoney is replaced by formatCurrency(n, currency) — see below
 
 function fmtPct(n: number) {
   return `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
@@ -69,8 +69,9 @@ export default async function DashboardPage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { id: true, name: true },
+    select: { id: true, name: true, preferredCurrency: true },
   });
+  const currency = (user?.preferredCurrency ?? "USD") as SupportedCurrency;
 
   if (!user) redirect("/login");
 
@@ -93,11 +94,23 @@ export default async function DashboardPage() {
     getRecentPrices("palladium"),
   ]);
 
-  const spots: Record<Metal, number> = {
+  const spotsUSD: Record<Metal, number> = {
     gold:      liveSpots.gold      ?? goldHistory[goldHistory.length - 1]?.price      ?? 0,
     silver:    liveSpots.silver    ?? silverHistory[silverHistory.length - 1]?.price    ?? 0,
     platinum:  liveSpots.platinum  ?? platinumHistory[platinumHistory.length - 1]?.price  ?? 0,
     palladium: liveSpots.palladium ?? palladiumHistory[palladiumHistory.length - 1]?.price ?? 0,
+  };
+
+  // Convert all spot prices to the user's preferred currency in one FX call
+  const convertedSpots = await convertPricesFromUSD(
+    { Gold: spotsUSD.gold, Silver: spotsUSD.silver, Platinum: spotsUSD.platinum, Palladium: spotsUSD.palladium },
+    currency
+  );
+  const spots: Record<Metal, number> = {
+    gold:      convertedSpots.Gold,
+    silver:    convertedSpots.Silver,
+    platinum:  convertedSpots.Platinum,
+    palladium: convertedSpots.Palladium,
   };
 
   // 24H % change — live price vs yesterday's DB snapshot
@@ -193,7 +206,7 @@ export default async function DashboardPage() {
                     <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{metal}</p>
                   </div>
                   <p className="text-xl font-black tabular-nums tracking-tightest">
-                    {price > 0 ? fmtMoney(price) : <span className="text-white/20">—</span>}
+                    {price > 0 ? formatCurrency(price, currency) : <span className="text-white/20">—</span>}
                   </p>
                   {chg !== null && (
                     <p className={`text-xs font-semibold tabular-nums ${isUp ? "text-amber-400" : "text-red-400"}`}>
@@ -234,9 +247,9 @@ export default async function DashboardPage() {
         ) : (
           <div className="rounded-2xl border border-white/5 bg-gray-950 px-6 py-7">
             <p className="text-xs text-gray-600 font-medium uppercase tracking-widest mb-3">Total Portfolio Value</p>
-            <p className="text-5xl font-black tracking-tightest tabular-nums leading-none">{fmtMoney(totalValue)}</p>
+            <p className="text-5xl font-black tracking-tightest tabular-nums leading-none">{formatCurrency(totalValue, currency)}</p>
             <p className={`text-sm mt-3 font-medium tabular-nums ${gainColor}`}>
-              {gainLoss >= 0 ? "+" : ""}{fmtMoney(gainLoss)} ({fmtPct(pctReturn)}) all-time
+              {gainLoss >= 0 ? "+" : ""}{formatCurrency(gainLoss, currency)} ({fmtPct(pctReturn)}) all-time
             </p>
           </div>
         )}
@@ -247,7 +260,7 @@ export default async function DashboardPage() {
             <div className="flex justify-between items-start">
               <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Portfolio value · 30 days</p>
               <p className={`text-sm font-semibold tabular-nums ${changeColor30d}`}>
-                {change30d >= 0 ? "+" : ""}{fmtMoney(change30d)} ({fmtPct(pct30d)})
+                {change30d >= 0 ? "+" : ""}{formatCurrency(change30d, currency)} ({fmtPct(pct30d)})
               </p>
             </div>
             <svg width="100%" height="80" viewBox="0 0 300 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>

@@ -22,6 +22,7 @@ model User {
   emailVerified          DateTime?
   stripeCurrentPeriodEnd DateTime?
   proUntil               DateTime? // gifted pro access — null means not gifted
+  preferredCurrency      String    @default("USD") // "USD" | "AUD" | "CAD" | "GBP" | "EUR"
   accounts               Account[]
   alerts                 Alert[]
   holdings               Holding[]
@@ -75,6 +76,7 @@ model Alert {
   lastTriggeredAt DateTime?
   percentValue    Float?
   type            String         @default("price")
+  currency        String         @default("USD") // currency the price threshold is stored in
   user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   triggers        AlertTrigger[]
 
