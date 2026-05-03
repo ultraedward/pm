@@ -37,11 +37,12 @@ function buildDigestHtml(params: {
   cheapestPicks: CheapestPick[];
   currency?: string;
   unsubscribeUrl?: string;
+  preheader?: string;
 }) {
   const {
     firstName, spots, weeklyPct, portfolioValue, portfolioGainLoss,
     portfolioPctReturn, hasHoldings, cheapestPicks,
-    currency = "USD", unsubscribeUrl,
+    currency = "USD", unsubscribeUrl, preheader,
   } = params;
 
   const fmt = (n: number) => formatCurrency(n, currency);
@@ -119,6 +120,10 @@ function buildDigestHtml(params: {
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0907;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+  <!-- Preheader — hidden inbox preview text -->
+  ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#0a0907;">${preheader}&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;</div>` : ""}
+
   <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
       <td align="center" style="padding:40px 16px;">
@@ -172,7 +177,7 @@ function buildDigestHtml(params: {
             <td style="padding-top:28px;text-align:center;">
               <a href="https://lode.rocks/dashboard"
                  style="display:inline-block;padding:13px 28px;background:#D4AF37;color:#000;font-weight:800;text-decoration:none;border-radius:999px;font-size:14px;letter-spacing:0.01em;">
-                Open Dashboard →
+                ${hasHoldings ? "Check your portfolio →" : "See live prices →"}
               </a>
             </td>
           </tr>
@@ -277,6 +282,20 @@ export async function GET(req: Request) {
     findCheapest("gold-eagle",   spotsUSD.gold,   baseUrl, "digest"),
   ].filter((p): p is NonNullable<typeof p> => p !== null);
 
+  // ── Subject + preheader (computed once, shared by all sends) ──────────
+  // Include live gold price in subject — readers see the number before opening.
+  const goldUsd = spotsUSD.gold ?? 0;
+  const goldWeeklyPct = weeklyPct.gold;
+  const weeklyDir = goldWeeklyPct !== null ? (goldWeeklyPct >= 0 ? "▲" : "▼") : "";
+  const weeklyStr = goldWeeklyPct !== null ? ` ${weeklyDir}${Math.abs(goldWeeklyPct).toFixed(1)}%` : "";
+  const digestSubject = goldUsd > 0
+    ? `Gold: $${Math.round(goldUsd).toLocaleString()}${weeklyStr} · Your weekly metals brief`
+    : "Your weekly precious metals update — Lode";
+
+  const digestPreheader = goldUsd > 0
+    ? `Gold $${Math.round(goldUsd).toLocaleString()} · Silver $${Math.round(spotsUSD.silver ?? 0).toLocaleString()} · Platinum $${Math.round(spotsUSD.platinum ?? 0).toLocaleString()} · Palladium $${Math.round(spotsUSD.palladium ?? 0).toLocaleString()}`
+    : "Spot prices, your portfolio value, and the cheapest dealer picks — all in one email.";
+
   // ── 5. Send per-user digest ───────────────────────────────────────────
   const users = await prisma.user.findMany({
     where: { email: { not: null } },
@@ -326,13 +345,14 @@ export async function GET(req: Request) {
       hasHoldings,
       cheapestPicks,
       currency,
+      preheader: digestPreheader,
     });
 
     try {
       await resend.emails.send({
         from,
         to: user.email,
-        subject: "Your weekly precious metals update — Lode",
+        subject: digestSubject,
         html,
       });
       sent++;
@@ -360,13 +380,14 @@ export async function GET(req: Request) {
       cheapestPicks,
       currency: "USD",
       unsubscribeUrl,
+      preheader: digestPreheader,
     });
 
     try {
       await resend.emails.send({
         from,
         to: sub.email,
-        subject: "Your weekly precious metals update — Lode",
+        subject: digestSubject,
         html,
       });
       sent++;

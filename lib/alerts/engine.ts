@@ -48,7 +48,22 @@ export async function evaluateAlert(alertId: string, currentPrice: number) {
   }
 
   const metal = alert.metal.charAt(0).toUpperCase() + alert.metal.slice(1);
-  const direction = alert.direction === "above" ? "risen above" : "fallen below";
+  const metalColor: Record<string, string> = {
+    gold: "#D4AF37", silver: "#C0C0C0", platinum: "#E5E4E2", palladium: "#9FA8C7",
+  };
+  const dot = metalColor[alert.metal] ?? "#D4AF37";
+
+  // Human-readable direction phrase: "crossed above" / "dropped below"
+  const directionPhrase = alert.direction === "above" ? "crossed above" : "dropped below";
+
+  // % delta between current price and the target — gives the user instant context
+  const targetPrice = alert.price ?? 0;
+  const deltaPct = targetPrice > 0
+    ? ((currentPrice - targetPrice) / targetPrice) * 100
+    : null;
+  const deltaStr = deltaPct !== null
+    ? `${deltaPct >= 0 ? "+" : ""}${deltaPct.toFixed(1)}% from target`
+    : null;
 
   await prisma.alertTrigger.create({
     data: {
@@ -73,37 +88,104 @@ export async function evaluateAlert(alertId: string, currentPrice: number) {
 
   const cheapestHtml = cheapest ? renderCheapestBlock(cheapest) : "";
   const disclosureHtml = cheapest ? renderAffiliateDisclosure() : "";
+
   // When the cheapest CTA is present, the dashboard CTA becomes secondary
-  // (outline) so the gold "Buy at..." button is the visual primary action.
+  // (outline) so the "Buy now" button is the visual primary action.
   // When there's no cheapest block (pt/pd alerts), the dashboard CTA stays
-  // primary (filled gold) — its original style.
+  // primary (filled gold).
   const dashboardCtaStyle = cheapest
     ? "background:transparent;color:#D4AF37;border:1px solid rgba(212,175,55,0.4);"
     : "background:#D4AF37;color:#000;";
 
+  // Subject: feels like breaking news, not a system log
+  const priceDisplay = `$${Math.round(currentPrice).toLocaleString()}`;
+  const subject = `${metal} just hit ${priceDisplay} — your alert fired`;
+
+  // Preheader: inbox preview snippet (hidden from rendered email)
+  const preheader = `Spot ${directionPhrase} your target of $${targetPrice.toLocaleString()}. ${deltaStr ?? ""}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0907;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+  <!-- Preheader — hidden inbox preview text -->
+  <div style="display:none;max-height:0;overflow:hidden;color:#0a0907;">${preheader}&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center" style="padding:40px 16px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+
+          <!-- Logo -->
+          <tr>
+            <td style="padding-bottom:32px;">
+              <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#D4AF37;">Lode</p>
+            </td>
+          </tr>
+
+          <!-- Heading -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <p style="margin:0 0 8px 0;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dot};margin-right:6px;vertical-align:middle;"></span>
+                <span style="color:#666;vertical-align:middle;">${metal} · Price Alert</span>
+              </p>
+              <h1 style="margin:0 0 8px;font-size:26px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-0.02em;">
+                ${metal} hit ${priceDisplay}.
+              </h1>
+              <p style="margin:0;font-size:14px;color:#666;line-height:1.5;">
+                Spot ${directionPhrase} your target of <span style="color:#fff;font-weight:700;">$${targetPrice.toLocaleString()}</span>.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Price tile -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <div style="background:#111;border-radius:10px;padding:20px 20px 16px;">
+                <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#555;">Spot now</p>
+                <p style="margin:0;font-size:32px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.03em;">${priceDisplay}</p>
+                ${deltaStr ? `<p style="margin:6px 0 0;font-size:12px;font-weight:600;color:${deltaPct! >= 0 ? "#D4AF37" : "#ef4444"};font-variant-numeric:tabular-nums;">${deltaStr}</p>` : ""}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Cheapest dealer block (gold / silver only) -->
+          ${cheapestHtml ? `<tr><td style="padding-bottom:8px;">${cheapestHtml}</td></tr>` : ""}
+
+          <!-- CTA -->
+          <tr>
+            <td style="padding-top:${cheapest ? "4px" : "0"};text-align:center;">
+              <a href="${baseUrl}/dashboard"
+                 style="display:inline-block;padding:13px 28px;${dashboardCtaStyle}font-weight:800;text-decoration:none;border-radius:999px;font-size:14px;letter-spacing:0.01em;">
+                See your dashboard →
+              </a>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding-top:40px;border-top:1px solid rgba(255,255,255,0.06);">
+              ${disclosureHtml ? `<div style="margin-bottom:12px;">${disclosureHtml}</div>` : ""}
+              <p style="margin:0;font-size:11px;color:#444;line-height:1.6;">
+                You're receiving this because you set a price alert on <a href="${baseUrl}" style="color:#555;text-decoration:none;">lode.rocks</a>.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
   await queueEmail({
     alertId: alert.id,
     to: alert.user.email,
-    subject: `${metal} alert triggered — $${currentPrice.toLocaleString()}`,
-    html: `
-      <div style="font-family:sans-serif;padding:24px;background:#0a0907;color:#fff;max-width:480px;">
-        <p style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#D4AF37;margin:0 0 16px;">Lode</p>
-        <h2 style="margin:0 0 16px;font-size:20px;">${metal} Alert Triggered</h2>
-        <p style="color:#aaa;margin:0 0 20px;">The spot price has ${direction} your target of <strong style="color:#fff;">$${alert.price?.toLocaleString()}</strong>.</p>
-        <div style="background:#111;border-radius:8px;padding:16px;margin-bottom:24px;">
-          <p style="margin:0;font-size:14px;">Current price: <strong>$${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></p>
-        </div>
-        ${cheapestHtml}
-        <a href="${baseUrl}/dashboard"
-           style="display:inline-block;padding:12px 20px;${dashboardCtaStyle}font-weight:700;text-decoration:none;border-radius:999px;font-size:13px;margin-top:${cheapest ? "8px" : "0"};">
-          View Dashboard
-        </a>
-        ${disclosureHtml}
-        <p style="margin-top:32px;font-size:11px;color:#555;">
-          You're receiving this because you set a price alert on lode.rocks.
-        </p>
-      </div>
-    `,
+    subject,
+    html,
   });
 
   return { triggered: true };

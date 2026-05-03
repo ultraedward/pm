@@ -28,6 +28,10 @@ export function buildDay3Html(params: {
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0907;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+  <!-- Preheader — hidden inbox preview text -->
+  <div style="display:none;max-height:0;overflow:hidden;color:#0a0907;">Gold is moving. Set your target price and Lode will email you the moment spot crosses it.&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;</div>
+
   <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
       <td align="center" style="padding:40px 16px;">
@@ -155,6 +159,10 @@ export function buildDay7Html(params: {
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#0a0907;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+  <!-- Preheader — hidden inbox preview text -->
+  <div style="display:none;max-height:0;overflow:hidden;color:#0a0907;">Here's where gold and silver stand. One alert — set in 30 seconds — and you'll never miss your entry again.&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;</div>
+
   <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
       <td align="center" style="padding:40px 16px;">
