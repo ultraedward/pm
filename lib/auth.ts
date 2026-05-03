@@ -1,9 +1,11 @@
 import GoogleProvider from "next-auth/providers/google";
+import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import { buildWelcomeHtml } from "@/lib/email/welcomeEmail";
+import { buildMagicLinkHtml } from "@/lib/email/magicLinkEmail";
 
 const BASE_URL = process.env.NEXTAUTH_URL ?? "https://lode.rocks";
 
@@ -47,6 +49,27 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+
+    EmailProvider({
+      // We handle sending ourselves via Resend — no SMTP config needed
+      sendVerificationRequest: async ({ identifier: email, url }) => {
+        if (!process.env.RESEND_API_KEY) {
+          console.error("[auth] RESEND_API_KEY not set — magic link not sent");
+          return;
+        }
+
+        const host = new URL(BASE_URL).host;
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const from = process.env.RESEND_FROM ?? "Lode <onboarding@resend.dev>";
+
+        await resend.emails.send({
+          from,
+          to: email,
+          subject: "Your Lode sign-in link",
+          html: buildMagicLinkHtml({ url, host }),
+        });
+      },
     }),
   ],
 
