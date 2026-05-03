@@ -1,6 +1,6 @@
 /**
- * Spot price fetching — routes through getLivePrices() which tries
- * metals.dev first, then the CF Worker / Yahoo Finance as fallback.
+ * Spot price fetching — routes through getLivePrices() which uses
+ * the CF Worker / Yahoo Finance, with hardcoded prices as a last resort.
  */
 
 import { getLivePrices, type PriceSource } from "@/lib/prices";

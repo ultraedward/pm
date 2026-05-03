@@ -1,3 +1,6 @@
+// ARCHIVED — one-off backfill script, no longer needed.
+// Historic price data now lives in the Price table via the cron job.
+
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 

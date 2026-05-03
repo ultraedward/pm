@@ -1,3 +1,6 @@
+// ARCHIVED — one-off timeseries fetch script, no longer needed.
+// Historic price data now lives in the Price table via the cron job.
+
 import { prisma } from "../lib/prisma";
 import dotenv from "dotenv";
 

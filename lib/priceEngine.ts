@@ -27,7 +27,7 @@ export async function updateMetalsPrices() {
       };
     }
 
-    // Fetch prices: metals.dev → Yahoo Finance → hardcoded fallback
+    // Fetch prices: CF Worker / Yahoo Finance → hardcoded fallback
     const { Gold: gold, Silver: silver, Platinum: platinum, Palladium: palladium } = await getLivePrices();
 
     const timestamp = new Date();
