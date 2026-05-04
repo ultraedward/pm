@@ -14,9 +14,11 @@ const METALS = [
 interface Props {
   /** User's preferred currency — passed from the server page */
   currency: SupportedCurrency;
+  /** Augusta affiliate URL — passed from server so process.env stays server-side only */
+  iraUrl?: string | null;
 }
 
-export function CreateAlertForm({ currency }: Props) {
+export function CreateAlertForm({ currency, iraUrl }: Props) {
   const router = useRouter();
 
   const [metal, setMetal]           = useState("gold");
@@ -24,6 +26,7 @@ export function CreateAlertForm({ currency }: Props) {
   const [price, setPrice]           = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState<string | null>(null);
+  const [created, setCreated]       = useState(false);
 
   const currencySymbol = CURRENCY_SYMBOLS[currency] ?? "$";
 
@@ -40,7 +43,7 @@ export function CreateAlertForm({ currency }: Props) {
         direction,
         price: Number(price),
         type: "price",
-        currency, // tells the server what unit this threshold is in
+        currency,
       }),
     });
 
@@ -50,7 +53,48 @@ export function CreateAlertForm({ currency }: Props) {
       return;
     }
 
-    router.push("/dashboard/alerts");
+    // Show success state briefly; IRA nudge appears for gold alerts when configured
+    setCreated(true);
+    setSubmitting(false);
+  }
+
+  // Success screen — replaces the form
+  if (created) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+          <p className="label">Alert set</p>
+          <p className="text-sm text-gray-400">
+            We&apos;ll email you when {metal} {direction === "above" ? "rises above" : "drops below"} {currencySymbol}{Number(price).toLocaleString()}.
+          </p>
+          <button
+            onClick={() => router.push("/dashboard/alerts")}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+          >
+            View my alerts →
+          </button>
+        </div>
+
+        {/* IRA nudge — only shown for gold alerts when affiliate is configured */}
+        {metal === "gold" && iraUrl && (
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+            <p className="label">Planning a larger gold purchase?</p>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              A self-directed Gold IRA lets you hold physical bullion with potential tax advantages. Augusta Precious Metals offers a free guide — no commitment.
+            </p>
+            <a
+              href={iraUrl}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+            >
+              Get the free guide →
+            </a>
+            <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
+          </div>
+        )}
+      </div>
+    );
   }
 
   const inputClass =

@@ -4,6 +4,9 @@ import { CreateAlertForm } from "@/components/CreateAlertForm";
 import { type SupportedCurrency, SUPPORTED_CURRENCIES } from "@/lib/fx";
 import Link from "next/link";
 
+// Passed to the client form — keeps process.env server-side only
+const AFFILIATE_AUGUSTA_URL = process.env.AFFILIATE_AUGUSTA_URL ?? null;
+
 export default async function NewAlertPage() {
   const user = await requireUser();
 
@@ -33,7 +36,7 @@ export default async function NewAlertPage() {
             Get an email when your target price is hit — checked daily.
           </p>
         </div>
-        <CreateAlertForm currency={currency} />
+        <CreateAlertForm currency={currency} iraUrl={AFFILIATE_AUGUSTA_URL} />
       </div>
     </main>
   );

@@ -283,6 +283,25 @@ export default async function HoldingsPage() {
           </div>
         )}
 
+        {/* IRA callout — shown only when gold holdings exceed $5k in value */}
+        {goldValue >= 5000 && process.env.AFFILIATE_AUGUSTA_URL && (
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+            <p className="label">Tax-advantaged gold</p>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              You&apos;re holding significant gold. A self-directed IRA lets you hold physical bullion with potential tax advantages — no liquidation required.
+            </p>
+            <a
+              href={process.env.AFFILIATE_AUGUSTA_URL}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+            >
+              See how it works →
+            </a>
+            <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
+          </div>
+        )}
+
         {/* Add Holding form */}
         <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-5">
           <p className="label">Add Holding</p>
