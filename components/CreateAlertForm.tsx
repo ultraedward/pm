@@ -69,7 +69,7 @@ export function CreateAlertForm({ currency }: Props) {
               type="button"
               onClick={() => setMetal(value)}
               aria-pressed={metal === value}
-              className={`rounded-xl border px-4 py-3 text-sm font-semibold text-left transition-all ${
+              className={`rounded-xl border px-4 min-h-[52px] text-sm font-semibold text-left transition-all ${
                 metal === value
                   ? "border-white/10 bg-white/5 text-white"
                   : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
@@ -100,7 +100,7 @@ export function CreateAlertForm({ currency }: Props) {
               type="button"
               onClick={() => setDirection(value)}
               aria-pressed={direction === value}
-              className={`flex-1 rounded-full border py-2.5 text-sm font-semibold transition-all ${
+              className={`flex-1 rounded-full border min-h-[44px] text-sm font-semibold transition-all ${
                 direction === value
                   ? "border-amber-500/40 bg-amber-500/10 text-white"
                   : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"

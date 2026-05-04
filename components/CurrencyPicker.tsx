@@ -45,14 +45,14 @@ export function CurrencyPicker({ current }: Props) {
               onClick={() => save(c)}
               disabled={saving}
               aria-pressed={isActive}
-              className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition-all disabled:opacity-50 ${
+              className={`flex items-center justify-between rounded-xl border px-4 min-h-[44px] text-sm transition-all disabled:opacity-50 ${
                 isActive
                   ? "border-amber-500/40 bg-amber-500/10 text-white"
                   : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
               }`}
             >
-              <span className="font-semibold">{c}</span>
-              <span className="text-xs text-gray-500">
+              <span className="font-semibold shrink-0">{c}</span>
+              <span className="text-xs text-gray-500 truncate ml-3">
                 {CURRENCY_SYMBOLS[c]} · {CURRENCY_LABELS[c]}
               </span>
             </button>
