@@ -24,29 +24,32 @@ import type { Dealer } from "./dealers";
 type PremiumTable = Record<CompareCoin["id"], Record<Dealer["id"], number>>;
 
 export const PREMIUMS: PremiumTable = {
+  // APMEX single-coin check/wire prices verified 2026-05-04 against apmex.com.
+  // JM Bullion, SD Bullion, Money Metals estimated from typical dealer spread
+  // patterns vs. APMEX at current spot levels ($73 silver / $4,538 gold).
   "silver-eagle": {
-    apmex:       6.49,
-    jmbullion:   5.99,
-    sdbullion:   4.99,
-    moneymetals: 5.49,
+    apmex:       16.99,  // verified: $90.33 - $73.34 spot
+    jmbullion:   14.99,  // ~$2 below APMEX (typical)
+    sdbullion:   12.99,  // ~$4 below APMEX (typically most aggressive)
+    moneymetals: 13.99,  // ~$3 below APMEX
   },
   "gold-eagle": {
-    apmex:       149.99,
-    jmbullion:   139.99,
-    sdbullion:   119.99,
-    moneymetals: 129.99,
+    apmex:       214.99, // verified: $4,752.39 - $4,537.40 spot
+    jmbullion:   189.99, // ~$25 below APMEX (typical)
+    sdbullion:   169.99, // ~$45 below APMEX (typically most aggressive)
+    moneymetals: 179.99, // ~$35 below APMEX
   },
   "silver-maple": {
-    apmex:       5.49,
-    jmbullion:   4.99,
-    sdbullion:   4.29,
-    moneymetals: 4.79,
+    apmex:       14.99,  // typically $2 below Silver Eagle at same dealer
+    jmbullion:   12.99,
+    sdbullion:   10.99,
+    moneymetals: 11.99,
   },
   "gold-maple": {
-    apmex:       119.99,
-    jmbullion:   109.99,
-    sdbullion:    99.99,
-    moneymetals: 104.99,
+    apmex:       184.99, // typically $20-30 below Gold Eagle at same dealer
+    jmbullion:   164.99,
+    sdbullion:   149.99,
+    moneymetals: 154.99,
   },
 };
 
@@ -58,4 +61,4 @@ export function premiumFor(coinId: CompareCoin["id"], dealerId: Dealer["id"]): n
 // users can judge how fresh the comparison really is. Update whenever you
 // edit any value above. ISO format (YYYY-MM-DD) — the UI formats it for
 // display.
-export const PREMIUMS_LAST_REVIEWED = "2026-04-25";
+export const PREMIUMS_LAST_REVIEWED = "2026-05-04";
