@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { SiteFooter } from "@/components/SiteFooter";
 
 // ─── Accordion primitive ───────────────────────────────────────────────────────
 
@@ -378,7 +377,6 @@ export function FaqClient() {
         </section>
 
       </div>
-      <SiteFooter />
     </main>
   );
 }

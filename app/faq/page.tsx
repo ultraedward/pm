@@ -1,4 +1,5 @@
 import { FaqClient } from "./FaqClient";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
   title: "Precious Metals FAQ — Spot Prices, Troy Ounces, Junk Silver & More",
@@ -178,6 +179,7 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <FaqClient />
+      <SiteFooter />
     </>
   );
 }
