@@ -9,6 +9,7 @@ import { CalculatorTabs } from "@/components/CalculatorTabs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
@@ -435,21 +436,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── FOOTER ───────────────────────────────────────────────── */}
-      <footer className="border-t px-6 py-10" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="font-black tracking-[0.3em] text-sm uppercase text-white hover:opacity-60 transition-opacity">Lode</Link>
-          <div className="flex gap-8">
-            <Link href="/privacy" className="label hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms"   className="label hover:text-white transition-colors">Terms</Link>
-            {isLoggedIn
-              ? <Link href="/dashboard" className="hidden sm:block label hover:text-white transition-colors">Dashboard</Link>
-              : <Link href="/login"     className="hidden sm:block label hover:text-white transition-colors">Sign in</Link>
-            }
-          </div>
-          <span className="hidden sm:block label">© {new Date().getFullYear()} Lode</span>
-        </div>
-      </footer>
+      <SiteFooter />
 
     </main>
   );
