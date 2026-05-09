@@ -173,13 +173,13 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-black tracking-tight">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
             Welcome back{user.name ? `, ${user.name.split(" ")[0]}` : ""}.
           </h1>
           <Link
             href="/dashboard/holdings"
-            className="rounded-full border border-white/10 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
+            className="shrink-0 rounded-full border border-white/10 px-4 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
           >
             Manage Holdings
           </Link>

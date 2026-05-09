@@ -18,12 +18,12 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <>
-    <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
+    <main className="px-6 py-12 sm:py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <div className="mx-auto max-w-2xl space-y-12">
 
         <div>
           <p className="label mb-2">Get in touch</p>
-          <h1 className="text-4xl font-black tracking-tight">Contact</h1>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Contact</h1>
           <p className="mt-3 text-sm text-gray-500">
             Questions, feedback, partnerships, or press — we read every message.
           </p>

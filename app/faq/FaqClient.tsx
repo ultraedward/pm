@@ -332,13 +332,13 @@ const lodeFaq: FaqItem[] = [
 
 export function FaqClient() {
   return (
-    <main className="bg-surface px-6 py-24 text-white">
+    <main className="bg-surface px-6 py-12 sm:py-24 text-white">
       <div className="mx-auto max-w-2xl space-y-16">
 
         {/* Page header */}
         <div>
           <p className="label mb-2">Questions</p>
-          <h1 className="text-4xl font-black tracking-tight">Frequently Asked Questions</h1>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Frequently Asked Questions</h1>
           <p className="mt-3 text-sm text-gray-500">
             Precious metals basics and answers to common questions about Lode.
           </p>

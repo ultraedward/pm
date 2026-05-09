@@ -27,7 +27,7 @@ const aboutJsonLd = {
 export default function AboutPage() {
   return (
     <>
-    <main className="bg-surface px-6 py-24 text-white">
+    <main className="bg-surface px-6 py-12 sm:py-24 text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
@@ -36,7 +36,7 @@ export default function AboutPage() {
 
         <div>
           <p className="label mb-2">About</p>
-          <h1 className="text-4xl font-black tracking-tight">About Lode</h1>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">About Lode</h1>
           <p className="mt-3 text-sm text-gray-500">
             An independent precious metals price tracker, built for people who actually hold physical metal.
           </p>

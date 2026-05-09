@@ -35,7 +35,7 @@ export default async function PricingPage() {
 
   return (
     <>
-    <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
+    <main className="px-6 py-12 sm:py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <div className="mx-auto max-w-lg space-y-12">
 
         {/* Header */}

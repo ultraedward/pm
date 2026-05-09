@@ -23,7 +23,18 @@ export async function SiteFooter() {
   const isLoggedIn = !!session?.user?.email;
 
   return (
-    <footer className="border-t px-6 pt-7 pb-8" style={{ borderColor: "var(--border)" }}>
+    /*
+     * On mobile, logged-in users get BottomNav for all navigation needs —
+     * showing the footer too creates visual clutter and can cause layout bugs
+     * (flex-row triggering at ~640px on some viewports pushes links sideways).
+     * Hide it entirely on mobile for logged-in users; always show on desktop.
+     * Logged-out users keep the footer visible at all sizes since they have
+     * no BottomNav and need these links.
+     */
+    <footer
+      className={`border-t px-6 pt-7 pb-8 ${isLoggedIn ? "hidden sm:block" : "block"}`}
+      style={{ borderColor: "var(--border)" }}
+    >
       <div className="mx-auto max-w-6xl">
 
         {/* Trust strip — logged-out only */}
@@ -53,11 +64,10 @@ export async function SiteFooter() {
           </div>
         )}
 
-        {/* Nav strip — nav landmark gives screen reader users a quick way to
-            jump to footer links; aria-label distinguishes it from the main nav */}
+        {/* Nav strip */}
         <nav
           aria-label="Footer navigation"
-          className={`flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600 ${!isLoggedIn ? "pt-6" : ""}`}
+          className={`flex flex-col items-center gap-3 text-xs text-gray-600 sm:flex-row sm:justify-between sm:gap-4 ${!isLoggedIn ? "pt-6" : ""}`}
         >
           <Link
             href="/"
@@ -65,7 +75,7 @@ export async function SiteFooter() {
           >
             Lode
           </Link>
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2">
             <Link href="/"                     className="hidden sm:block hover:text-gray-300 transition-colors">Home</Link>
             <Link href="/compare"              className="hover:text-gray-300 transition-colors">Compare</Link>
             <Link href="/coin-melt-calculator" className="hover:text-gray-300 transition-colors">Melt Calculator</Link>

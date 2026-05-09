@@ -31,14 +31,14 @@ export default async function DashboardAlertsPage() {
 
         {/* Header */}
         <div>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="label mb-1">Alerts</p>
-              <h1 className="text-3xl font-black tracking-tight">Price Alerts</h1>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Price Alerts</h1>
             </div>
             <Link
               href="/alerts/new"
-              className="btn-gold shrink-0 px-5 py-2 text-sm"
+              className="btn-gold shrink-0 px-5 py-2.5 text-sm min-h-[44px] flex items-center"
             >
               + New alert
             </Link>
