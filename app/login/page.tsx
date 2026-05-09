@@ -28,20 +28,28 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: "var(--bg)" }}>
       {/* Ambient glow */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[600px] w-[600px] rounded-full blur-[120px]" style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)", opacity: 0.08 }} />
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+        <div
+          className="h-[600px] w-[600px] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)", opacity: 0.07 }}
+        />
       </div>
 
-      <div className="relative w-full max-w-sm space-y-12 text-center">
+      <div className="relative w-full max-w-sm space-y-10 text-center">
         {/* Wordmark + headline */}
-        <div className="space-y-4">
-          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--gold-bright)" }}>
-            Lode
-          </p>
-          <h1 className="text-5xl font-black tracking-tightest leading-none" style={{ color: "var(--text)" }}>
+        <div className="space-y-4 animate-fade-up">
+          <p className="label" style={{ color: "var(--gold-bright)" }}>Lode</p>
+          <h1
+            className="font-black leading-none"
+            style={{
+              fontSize: "clamp(2.75rem, 10vw, 3.75rem)",
+              letterSpacing: "-0.04em",
+              color: "var(--text)",
+            }}
+          >
             Track your stack.
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             Free alerts, portfolio tracking, and a weekly digest.
           </p>
         </div>
@@ -69,7 +77,7 @@ export default function LoginPage() {
           </div>
         ) : (
           /* ── Sign-in options ── */
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fade-up animate-delay-100">
             {/* Google */}
             <button
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}

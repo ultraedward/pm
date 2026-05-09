@@ -221,7 +221,7 @@ export default async function HomePage() {
   const features = [
     {
       label: "Price alerts",
-      body: "Set a target. Get one email when your metal crosses it. No spam, no daily noise.",
+      body: "Set a target. One email when your metal crosses it. No noise, no daily digests.",
       href: isLoggedIn ? "/dashboard/alerts" : "/login",
     },
     {
@@ -236,12 +236,17 @@ export default async function HomePage() {
     },
     {
       label: "Portfolio tracker",
-      body: "Log your holdings. See your total stack value against live spot in real time.",
+      body: "Log your holdings. See total stack value against live spot in real time.",
       href: isLoggedIn ? "/dashboard/holdings" : "/login",
     },
     {
+      label: "Price history",
+      body: "30-day charts for all four metals. See the trend before you buy or sell.",
+      href: isLoggedIn ? "/dashboard/charts" : "/login",
+    },
+    {
       label: "Gold IRA guide",
-      body: "Compare Augusta, Goldco, and Birch Gold side-by-side — fees, minimums, and who each is best for.",
+      body: "Augusta, Goldco, Birch Gold — fees, minimums, and who each is best for.",
       href: "/gold-ira",
     },
   ];
@@ -261,24 +266,27 @@ export default async function HomePage() {
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="px-6 pt-16 pb-14 sm:pt-28 sm:pb-20">
+      <section className="px-6 pt-16 pb-14 sm:pt-32 sm:pb-24">
         <div className="mx-auto max-w-6xl">
 
-          <p className="label mb-5">Precious metals tracker</p>
+          <p className="label mb-6 animate-fade-up">Precious metals tracker</p>
 
           <h1
-            className="font-black text-white"
-            style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", letterSpacing: "-0.04em", lineHeight: "0.95" }}
+            className="font-black text-white animate-fade-up animate-delay-100"
+            style={{ fontSize: "clamp(2.8rem, 7vw, 5.75rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}
           >
             Know what your<br />stack is worth.
           </h1>
 
-          <p className="mt-6 text-base leading-relaxed max-w-lg" style={{ color: "var(--text-muted)" }}>
+          <p
+            className="mt-7 text-base leading-relaxed max-w-lg animate-fade-up animate-delay-200"
+            style={{ color: "var(--text-muted)" }}
+          >
             Email alerts when prices hit your target. Coin melt calculator. Dealer comparison.
-            Portfolio tracker. Built for stackers — free forever.
+            Portfolio tracker. Free forever.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="mt-9 flex flex-wrap items-center gap-4 animate-fade-up animate-delay-300">
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
               {isLoggedIn ? "Go to dashboard" : "Get started — it's free"}
             </Link>
@@ -287,56 +295,77 @@ export default async function HomePage() {
               className="text-sm font-medium transition-colors"
               style={{ color: "var(--text-muted)" }}
             >
-              Try the calculator →
+              Try the calculator ↓
             </Link>
           </div>
 
-          {/* Gold price as supporting stat — context, not the product */}
+          {/* Compact metal price strip — credibility, not the product */}
           <div
-            className="mt-12 pt-8 border-t flex flex-wrap items-center gap-x-6 gap-y-3"
+            className="mt-14 pt-7 border-t animate-fade-up animate-delay-400"
             style={{ borderColor: "var(--border)" }}
           >
-            {prices.map(([metal, data]) => {
-              const { label, dot } = METAL_META[metal];
-              const isUp = (data.percentChange ?? 0) >= 0;
-              return (
-                <div key={metal} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
-                  <span className="label">{label}</span>
-                  {data.price > 0 && (
-                    <span className="font-bold tabular-nums text-white text-sm">
-                      ${data.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                    </span>
-                  )}
-                  {data.percentChange != null && (
-                    <span className={`text-[11px] font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
-                      {isUp ? "▲" : "▼"}{Math.abs(data.percentChange).toFixed(2)}%
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-            <span className="text-[10px] text-gray-700 tracking-wide uppercase ml-auto">{fmtUpdated(lastUpdated)}</span>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-x-8 gap-y-4">
+              {prices.map(([metal, data]) => {
+                const { label, dot } = METAL_META[metal];
+                const isUp = (data.percentChange ?? 0) >= 0;
+                return (
+                  <div key={metal} className="flex items-center gap-2.5">
+                    <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+                    <span className="label">{label}</span>
+                    {data.price > 0 && (
+                      <span className="font-bold tabular-nums text-white text-sm">
+                        ${data.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </span>
+                    )}
+                    {data.percentChange != null && (
+                      <span className={`text-[11px] font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+                        {isUp ? "▲" : "▼"}{Math.abs(data.percentChange).toFixed(2)}%
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+              <span className="hidden sm:block label ml-auto">{fmtUpdated(lastUpdated)}</span>
+            </div>
+            <p className="mt-3 sm:hidden label">{fmtUpdated(lastUpdated)}</p>
           </div>
 
         </div>
       </section>
 
-      {/* ── CALCULATOR (elevated) ────────────────────────────────── */}
-      <section id="calculator" className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
+      {/* ── PRICE PANEL ─────────────────────────────────────────── */}
+      <section className="border-t reveal" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+            <p className="label">Today&apos;s spot prices</p>
+            <Link href="/silver-price" className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">
+              Silver detail →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
+            {prices.map(([metal, data]) => (
+              <PriceTile key={metal} metal={metal} data={data} />
+            ))}
+          </div>
+          <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+            <span className="label">Spot prices · 30-day trend</span>
+            <span className="text-[10px] text-gray-700 tracking-wide uppercase">{fmtUpdated(lastUpdated)}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CALCULATOR ───────────────────────────────────────────── */}
+      <section id="calculator" className="border-t px-6 py-14 sm:py-20 reveal" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl space-y-8">
           <div className="space-y-2">
             <p className="label">Melt calculator</p>
             <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
-              What&apos;s it worth<br className="hidden sm:block" /> at today&apos;s spot?
+              What&apos;s it worth at today&apos;s spot?
             </h2>
             <p className="text-sm mt-3" style={{ color: "var(--text-muted)" }}>
-              Coins, bars, jewelry, or scrap.
-            </p>
-            <p className="text-xs mt-2" style={{ color: "var(--text-dim)" }}>
-              Looking up a specific coin?{" "}
-              <Link href="/coin-melt-calculator" className="underline underline-offset-4 hover:text-white transition-colors">
-                See live melt values by coin type →
+              Coins, bars, jewelry, or scrap. —{" "}
+              <Link href="/coin-melt-calculator" className="underline underline-offset-4 hover:text-white transition-colors" style={{ color: "var(--text-dim)" }}>
+                browse by coin type →
               </Link>
             </p>
           </div>
@@ -353,29 +382,30 @@ export default async function HomePage() {
 
       {/* ── FEATURES ─────────────────────────────────────────────── */}
       <section className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl space-y-8">
-          <div className="space-y-2">
+        <div className="mx-auto max-w-6xl space-y-10">
+          <div className="reveal space-y-2">
             <p className="label">What Lode does</p>
             <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
-              Tools built for stackers.
+              Every tool a stacker needs.
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
-            {features.map(({ label, body, href }) => (
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
+            {features.map(({ label, body, href }, i) => (
               <Link
                 key={label}
                 href={href}
-                className="group p-7 hover:bg-white/5 transition-colors space-y-3"
+                className={`reveal reveal-delay-${Math.min(i + 1, 6)} group p-7 hover:bg-white/[0.04] transition-colors duration-200 space-y-3`}
                 style={{ background: "var(--bg)" }}
               >
-                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">
+                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
                   {label}
                 </p>
                 <p className="text-xs leading-relaxed" style={{ color: "var(--text-dim)" }}>
                   {body}
                 </p>
-                <p className="text-[11px] text-amber-600 group-hover:text-amber-400 transition-colors">
-                  Learn more →
+                <p className="text-[11px] text-amber-700 group-hover:text-amber-400 transition-colors duration-150">
+                  Explore →
                 </p>
               </Link>
             ))}
@@ -383,41 +413,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── PRICE PANEL (supporting section) ────────────────────── */}
-      <section className="border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-            <p className="label">Today&apos;s spot prices</p>
-            <Link href="/silver-price" className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">
-              Silver price detail →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
-            {prices.map(([metal, data]) => (
-              <PriceTile key={metal} metal={metal} data={data} />
-            ))}
-          </div>
-          <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-            <span className="label">Spot prices · 30D trend</span>
-            <span className="text-[10px] text-gray-700 tracking-wide uppercase">{fmtUpdated(lastUpdated)}</span>
-          </div>
-        </div>
-      </section>
-
       {/* ── ALERT CTA ────────────────────────────────────────────── */}
       {!isLoggedIn && (
-        <section className="border-t px-6 py-24" style={{ borderColor: "var(--border)" }}>
-          <div className="mx-auto max-w-6xl space-y-6">
+        <section className="border-t px-6 py-24 sm:py-32 reveal" style={{ borderColor: "var(--border)" }}>
+          <div className="mx-auto max-w-6xl space-y-7">
             <p className="label">Price alerts</p>
             <p
               className="font-black text-white"
-              style={{ fontSize: "clamp(2rem, 6vw, 4rem)", letterSpacing: "-0.04em", lineHeight: "0.95" }}
+              style={{ fontSize: "clamp(2rem, 6vw, 4.25rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}
             >
               Tell me when<br />gold hits $____
             </p>
-            <p className="text-sm max-w-md leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              One email when your target price is crossed. No daily digests, no noise.
-              Free account — takes 30 seconds.
+            <p className="text-sm max-w-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
+              One email. Your target price crossed. No noise, no daily digests.
+              Free — takes 30 seconds.
             </p>
             <Link href="/login" className="btn-gold">
               Set your first alert

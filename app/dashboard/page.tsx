@@ -168,50 +168,78 @@ export default async function DashboardPage() {
   const changeColor30d = change30d >= 0 ? "text-amber-400" : "text-red-400";
 
   return (
-    <main className="bg-surface px-4 py-6 sm:p-8 text-white">
-      <div className="mx-auto max-w-5xl space-y-8">
+    <main
+      className="px-4 py-6 sm:px-8 sm:py-10"
+      style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
+    >
+      <div className="mx-auto max-w-5xl space-y-6">
 
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            Welcome back{user.name ? `, ${user.name.split(" ")[0]}` : ""}.
-          </h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 animate-fade-up">
+          <div>
+            <p className="label mb-1">Dashboard</p>
+            <h1 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em" }}>
+              {user.name ? `Welcome back, ${user.name.split(" ")[0]}.` : "Welcome back."}
+            </h1>
+          </div>
           <Link
             href="/dashboard/holdings"
-            className="shrink-0 rounded-full border border-white/10 px-4 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
+            className="shrink-0 border px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-white hover:bg-white/5 transition-colors min-h-[44px] flex items-center"
+            style={{ borderColor: "var(--border-strong)" }}
           >
             Manage Holdings
           </Link>
         </div>
 
         {/* Daily spot prices */}
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <div className="px-5 py-3 border-b flex items-center justify-between gap-4" style={{ borderColor: "var(--border)" }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Spot Prices</p>
+        <div
+          className="border overflow-hidden rounded-none reveal"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div
+            className="px-5 py-3 border-b flex items-center justify-between gap-4"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <p className="label">Spot Prices</p>
             {spots.gold > 0 && spots.silver > 0 && (
-              <p className="text-[11px] text-gray-600 tabular-nums">
-                Gold:Silver <span className="text-gray-300 font-semibold">{(spots.gold / spots.silver).toFixed(1)}</span>
+              <p className="text-[11px] tabular-nums" style={{ color: "var(--text-dim)" }}>
+                Gold/Silver ratio{" "}
+                <span className="font-bold" style={{ color: "var(--text-muted)" }}>
+                  {(spots.gold / spots.silver).toFixed(1)}
+                </span>
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09]">
-            {METALS.map((metal) => {
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
+            {METALS.map((metal, i) => {
               const price = spots[metal];
               const chg = pctChange[metal];
               const isUp = (chg ?? 0) >= 0;
               return (
-                <div key={metal} className="px-5 py-4 space-y-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: METAL_DOTS[metal] }} />
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{metal}</p>
+                <div
+                  key={metal}
+                  className={`reveal reveal-delay-${i + 1} px-5 py-5 space-y-2`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="h-1.5 w-1.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: METAL_DOTS[metal] }}
+                    />
+                    <p className="label">{metal}</p>
                   </div>
-                  <p className="text-xl font-black tabular-nums tracking-tightest">
-                    {price > 0 ? formatCurrency(price, currency) : <span className="text-white/20">—</span>}
+                  <p
+                    className="font-black tabular-nums leading-none"
+                    style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.6rem)", letterSpacing: "-0.04em" }}
+                  >
+                    {price > 0
+                      ? formatCurrency(price, currency)
+                      : <span style={{ color: "var(--text-dim)" }}>—</span>
+                    }
                   </p>
                   {chg !== null && (
-                    <p className={`text-xs font-semibold tabular-nums ${isUp ? "text-amber-400" : "text-red-400"}`}>
+                    <p className={`text-xs font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
                       {isUp ? "+" : ""}{chg.toFixed(2)}%
-                      <span className="ml-1 font-normal text-gray-600">24H</span>
+                      <span className="ml-1 font-normal" style={{ color: "var(--text-dim)" }}>24H</span>
                     </p>
                   )}
                 </div>
@@ -222,64 +250,82 @@ export default async function DashboardPage() {
 
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-6">
+          <div
+            className="border border-dashed p-10 sm:p-14 text-center space-y-6 reveal"
+            style={{ borderColor: "var(--border-strong)" }}
+          >
             <div className="space-y-2">
-              <p className="text-xl font-black tracking-tight text-white">Start tracking your stack</p>
-              <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-                Add your gold, silver, platinum, or palladium and see your total portfolio value at current spot prices.
+              <p className="text-xl font-black" style={{ letterSpacing: "-0.04em" }}>
+                Start tracking your stack
+              </p>
+              <p className="text-sm max-w-sm mx-auto leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                Add your gold, silver, platinum, or palladium and see total portfolio value at live spot prices.
               </p>
             </div>
             <div className="flex flex-col items-center gap-3">
-              <Link
-                href="/dashboard/holdings"
-                className="inline-block btn-gold px-10 py-3 text-base"
-              >
+              <Link href="/dashboard/holdings" className="btn-gold">
                 Add your first holding
               </Link>
               <Link
                 href="/dashboard/alerts"
-                className="text-sm text-gray-600 hover:text-gray-400 transition-colors"
+                className="text-xs font-medium transition-colors"
+                style={{ color: "var(--text-dim)" }}
               >
                 Or set a price alert →
               </Link>
             </div>
           </div>
         ) : (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 px-6 py-7">
-            <p className="text-xs text-gray-600 font-medium uppercase tracking-widest mb-3">Total Portfolio Value</p>
-            <p className="text-5xl font-black tracking-tightest tabular-nums leading-none">{formatCurrency(totalValue, currency)}</p>
+          <div
+            className="border px-6 py-7 reveal"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <p className="label mb-3">Total Portfolio Value</p>
+            <p
+              className="font-black tabular-nums leading-none"
+              style={{ fontSize: "clamp(2.5rem, 7vw, 4rem)", letterSpacing: "-0.05em" }}
+            >
+              {formatCurrency(totalValue, currency)}
+            </p>
             <p className={`text-sm mt-3 font-medium tabular-nums ${gainColor}`}>
-              {gainLoss >= 0 ? "+" : ""}{formatCurrency(gainLoss, currency)} ({fmtPct(pctReturn)}) all-time
+              {gainLoss >= 0 ? "+" : ""}{formatCurrency(gainLoss, currency)}
+              {" "}({fmtPct(pctReturn)}){" "}
+              <span className="font-normal" style={{ color: "var(--text-dim)" }}>all-time</span>
             </p>
           </div>
         )}
 
-        {/* 30d portfolio chart — only when there's enough history to be meaningful */}
+        {/* 30d portfolio sparkline — only when there's enough history */}
         {holdings.length > 0 && portfolioSpark && portfolioHistory.length >= 7 && (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Portfolio value · 30 days</p>
-              <p className={`text-sm font-semibold tabular-nums ${changeColor30d}`}>
-                {change30d >= 0 ? "+" : ""}{formatCurrency(change30d, currency)} ({fmtPct(pct30d)})
+          <div
+            className="border px-6 py-6 space-y-4 reveal"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <div className="flex justify-between items-center">
+              <p className="label">Portfolio · 30 days</p>
+              <p className={`text-xs font-semibold tabular-nums ${changeColor30d}`}>
+                {change30d >= 0 ? "+" : ""}{formatCurrency(change30d, currency)}{" "}
+                <span className="font-normal" style={{ color: "var(--text-dim)" }}>({fmtPct(pct30d)})</span>
               </p>
             </div>
-            <svg width="100%" height="80" viewBox="0 0 300 100" preserveAspectRatio="none" style={{ overflow: "visible" }}>
+            <svg
+              width="100%"
+              height="72"
+              viewBox="0 0 300 100"
+              preserveAspectRatio="none"
+              style={{ overflow: "visible" }}
+            >
               <defs>
                 <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={change30d >= 0 ? "#F59E0B" : "#ef4444"} stopOpacity="0.2" />
-                  <stop offset="100%" stopColor={change30d >= 0 ? "#F59E0B" : "#ef4444"} stopOpacity="0" />
+                  <stop offset="0%" stopColor={change30d >= 0 ? "#FFC200" : "#ef4444"} stopOpacity="0.18" />
+                  <stop offset="100%" stopColor={change30d >= 0 ? "#FFC200" : "#ef4444"} stopOpacity="0" />
                 </linearGradient>
               </defs>
-              {/* Area fill */}
-              <polygon
-                fill="url(#equityGrad)"
-                points={`${portfolioSpark} 300,100 0,100`}
-              />
-              {/* Line */}
+              <polygon fill="url(#equityGrad)" points={`${portfolioSpark} 300,100 0,100`} />
               <polyline
                 fill="none"
-                stroke={change30d >= 0 ? "#F59E0B" : "#ef4444"}
-                strokeWidth="2"
+                stroke={change30d >= 0 ? "#FFC200" : "#ef4444"}
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={portfolioSpark}
@@ -288,23 +334,31 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Unified calculator — coins/bars + jewelry/scrap */}
-        <DashboardCalculatorTabs spots={spots} />
+        {/* Unified calculator */}
+        <div className="reveal">
+          <DashboardCalculatorTabs spots={spots} />
+        </div>
 
-        {/* Nav links */}
-        <div className="grid grid-cols-3 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+        {/* Quick nav */}
+        <div
+          className="grid grid-cols-3 gap-px border overflow-hidden reveal"
+          style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--border)" }}
+        >
           {[
-            { href: "/dashboard/charts",   label: "Price Charts",  sub: "30-day history"    },
-            { href: "/dashboard/holdings", label: "Holdings",      sub: "Portfolio detail"   },
-            { href: "/gram",               label: "Calculator",    sub: "Melt value"         },
+            { href: "/dashboard/charts",   label: "Price Charts", sub: "30-day history"  },
+            { href: "/dashboard/holdings", label: "Holdings",     sub: "Portfolio detail" },
+            { href: "/gram",               label: "Calculator",   sub: "Melt value"       },
           ].map(({ href, label, sub }) => (
             <Link
               key={href}
               href={href}
-              className="group bg-black p-5 hover:bg-white/5 transition-colors"
+              className="group p-5 hover:bg-white/[0.04] transition-colors duration-150"
+              style={{ background: "var(--bg)" }}
             >
-              <p className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">{label}</p>
-              <p className="text-xs text-gray-600 mt-0.5">{sub}</p>
+              <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
+                {label}
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{sub}</p>
             </Link>
           ))}
         </div>

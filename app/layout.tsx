@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+import { RevealObserver } from "@/components/RevealObserver";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import ThemeScript from "@/components/ThemeScript";
@@ -124,6 +125,7 @@ export default function RootLayout({
         </div>
         <BottomNav />
         <AnalyticsProvider />
+        <RevealObserver />
       </body>
     </html>
   );
