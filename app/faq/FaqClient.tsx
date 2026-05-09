@@ -333,7 +333,7 @@ const lodeFaq: FaqItem[] = [
 export function FaqClient({ footer }: { footer?: React.ReactNode }) {
   return (
     <main className="bg-surface px-6 py-12 sm:py-24 text-white">
-      <div className="mx-auto max-w-2xl space-y-16">
+      <div className="mx-auto max-w-2xl space-y-16 pb-20 sm:pb-28">
 
         {/* Page header */}
         <div>

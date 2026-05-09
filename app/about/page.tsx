@@ -32,7 +32,7 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
       />
-      <div className="mx-auto max-w-2xl space-y-12">
+      <div className="mx-auto max-w-2xl space-y-12 pb-20 sm:pb-28">
 
         <div>
           <p className="label mb-2">About</p>

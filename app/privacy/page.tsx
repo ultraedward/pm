@@ -21,7 +21,7 @@ export default function PrivacyPage() {
   return (
     <>
     <main className="px-6 py-12 sm:py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
-      <div className="mx-auto max-w-2xl space-y-12">
+      <div className="mx-auto max-w-2xl space-y-12 pb-20 sm:pb-28">
 
         <div>
           <p className="label mb-2">Legal</p>

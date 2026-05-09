@@ -32,7 +32,7 @@ export default function MethodologyPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(methodologyJsonLd) }}
       />
-      <div className="mx-auto max-w-2xl space-y-12">
+      <div className="mx-auto max-w-2xl space-y-12 pb-20 sm:pb-28">
 
         <div>
           <p className="label mb-2">How it works</p>
