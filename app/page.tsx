@@ -272,12 +272,15 @@ export default async function HomePage() {
           </div>
 
           {/* CTA */}
-          <div className="mt-10 space-y-4">
+          <div className="mt-10 space-y-5">
             {!isLoggedIn && (
-              <p className="label">Price alerts · Portfolio tracking · Weekly digest</p>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Free price alerts when gold or silver hits your target.
+                Portfolio tracking and weekly digest — no spam, cancel any time.
+              </p>
             )}
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
-              {isLoggedIn ? "Go to dashboard" : "Get started"}
+              {isLoggedIn ? "Go to dashboard" : "Get started — it's free"}
             </Link>
           </div>
         </div>

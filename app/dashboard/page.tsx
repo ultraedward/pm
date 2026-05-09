@@ -222,25 +222,25 @@ export default async function DashboardPage() {
 
         {/* Portfolio value — empty state for new users */}
         {holdings.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-5">
+          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-6">
             <div className="space-y-2">
               <p className="text-xl font-black tracking-tight text-white">Start tracking your stack</p>
               <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
                 Add your gold, silver, platinum, or palladium and see your total portfolio value at current spot prices.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col items-center gap-3">
               <Link
                 href="/dashboard/holdings"
-                className="inline-block btn-gold px-7 py-2.5"
+                className="inline-block btn-gold px-10 py-3 text-base"
               >
                 Add your first holding
               </Link>
               <Link
                 href="/dashboard/alerts"
-                className="inline-block rounded-full border border-white/10 px-7 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+                className="text-sm text-gray-600 hover:text-gray-400 transition-colors"
               >
-                Set a price alert
+                Or set a price alert →
               </Link>
             </div>
           </div>

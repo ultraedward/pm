@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { SilverPriceChart } from "@/components/SilverPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -331,83 +332,87 @@ export default async function SilverPricePage() {
 
       {/* ── Editorial ────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-2xl space-y-10 text-sm text-gray-400 leading-relaxed">
-
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">What moves the silver price?</h2>
-            <p>
-              Silver trades on two distinct demand bases simultaneously, which makes it more volatile than
-              gold. <strong className="text-white">Industrial demand</strong> accounts for roughly half of all
-              silver consumption — it is used in solar panels, EV batteries, electronics, medical equipment, and
-              water purification. As the renewable energy build-out accelerates, industrial silver demand has
-              grown significantly. <strong className="text-white">Investment demand</strong> — physical coins
-              and bars, ETFs, and futures — drives most of the price volatility. When investors rotate into
-              precious metals during periods of dollar weakness or inflation concern, silver often moves more
-              sharply than gold.
-            </p>
-            <p>
-              The <strong className="text-white">gold-to-silver ratio</strong> is a key metric many silver
-              investors watch. When the ratio is historically high (above 80:1), silver is considered cheap
-              relative to gold. When it compresses toward 50:1 or below, silver has typically outperformed
-              gold during that period.
-            </p>
+        <div className="mx-auto max-w-2xl space-y-10">
+          <div>
+            <p className="label mb-1">Context &amp; background</p>
+            <h2 className="text-lg font-black tracking-tight">Understanding the silver market</h2>
           </div>
+          <div className="space-y-10 text-sm text-gray-400 leading-relaxed">
 
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">How to convert silver price to grams and kilos</h2>
-            <p>
-              Silver spot price is always quoted in US dollars per troy ounce. One troy ounce equals
-              31.1035 grams, so to get the per-gram price, divide the spot price by 31.1035. To get the
-              per-kilogram price, multiply by 32.1507 (the number of troy ounces in a kilogram).
-            </p>
-            <p>
-              The weight reference table above shows today&rsquo;s silver price per gram, per kilogram, and per
-              pennyweight (a unit used for jewelry). For jewelry, coin, and scrap calculations, the{" "}
-              <Link href="/gram" className="text-amber-500 hover:text-amber-400 transition-colors">
-                silver price per gram calculator
-              </Link>{" "}
-              lets you enter any weight and purity (fine .999, sterling 925, coin 900) to get an instant
-              melt value.
-            </p>
+            <div className="space-y-3">
+              <h3 className="text-base font-bold text-white">What moves the silver price?</h3>
+              <p>
+                Silver trades on two distinct demand bases simultaneously, which makes it more volatile than
+                gold. <strong className="text-white">Industrial demand</strong> accounts for roughly half of all
+                silver consumption — it is used in solar panels, EV batteries, electronics, medical equipment, and
+                water purification. As the renewable energy build-out accelerates, industrial silver demand has
+                grown significantly. <strong className="text-white">Investment demand</strong> — physical coins
+                and bars, ETFs, and futures — drives most of the price volatility. When investors rotate into
+                precious metals during periods of dollar weakness or inflation concern, silver often moves more
+                sharply than gold.
+              </p>
+              <p>
+                The <strong className="text-white">gold-to-silver ratio</strong> is a key metric many silver
+                investors watch. When the ratio is historically high (above 80:1), silver is considered cheap
+                relative to gold. When it compresses toward 50:1 or below, silver has typically outperformed
+                gold during that period.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-base font-bold text-white">How to convert silver price to grams and kilos</h3>
+              <p>
+                Silver spot price is always quoted in US dollars per troy ounce. One troy ounce equals
+                31.1035 grams, so to get the per-gram price, divide the spot price by 31.1035. To get the
+                per-kilogram price, multiply by 32.1507 (the number of troy ounces in a kilogram).
+              </p>
+              <p>
+                The weight reference table above shows today&rsquo;s silver price per gram, per kilogram, and per
+                pennyweight (a unit used for jewelry). For jewelry, coin, and scrap calculations, the{" "}
+                <Link href="/gram" className="text-amber-500 hover:text-amber-400 transition-colors">
+                  silver price per gram calculator
+                </Link>{" "}
+                lets you enter any weight and purity (fine .999, sterling 925, coin 900) to get an instant
+                melt value.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-base font-bold text-white">Buying silver: spot price vs. what you actually pay</h3>
+              <p>
+                The spot price shown on this page is not what you pay at a dealer — it&rsquo;s the raw market price
+                for pure silver. Dealers charge a <strong className="text-white">premium over spot</strong> that
+                covers minting costs, distribution, and their margin. For common government-minted coins like
+                American Silver Eagles, premiums typically run $3–8 per ounce above spot. Generic silver rounds
+                carry lower premiums. Buying in larger quantities (a full monster box of 500 Eagles, for example)
+                usually reduces the per-ounce premium.
+              </p>
+              <p>
+                The{" "}
+                <Link href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">
+                  dealer comparison page
+                </Link>{" "}
+                tracks current premiums across APMEX, JM Bullion, SD Bullion, and Money Metals so you can see
+                who&rsquo;s cheapest at today&rsquo;s spot.
+              </p>
+            </div>
+
           </div>
-
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">Buying silver: spot price vs. what you actually pay</h2>
-            <p>
-              The spot price shown on this page is not what you pay at a dealer — it&rsquo;s the raw market price
-              for pure silver. Dealers charge a <strong className="text-white">premium over spot</strong> that
-              covers minting costs, distribution, and their margin. For common government-minted coins like
-              American Silver Eagles, premiums typically run $3–8 per ounce above spot. Generic silver rounds
-              carry lower premiums. Buying in larger quantities (a full monster box of 500 Eagles, for example)
-              usually reduces the per-ounce premium.
-            </p>
-            <p>
-              The{" "}
-              <Link href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">
-                dealer comparison page
-              </Link>{" "}
-              tracks current premiums across APMEX, JM Bullion, SD Bullion, and Money Metals so you can see
-              who&rsquo;s cheapest at today&rsquo;s spot.
-            </p>
-          </div>
-
         </div>
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-2xl space-y-8">
-          <h2 className="text-xl font-black tracking-tight">Common questions</h2>
-          <div className="space-y-6">
-            {(jsonLd["@graph"][2] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map((qa) => (
-              <div key={qa.name} className="space-y-2">
-                <h3 className="text-sm font-bold text-white">{qa.name}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                  {qa.acceptedAnswer.text}
-                </p>
-              </div>
-            ))}
+        <div className="mx-auto max-w-2xl space-y-6">
+          <div>
+            <p className="label mb-1">Questions</p>
+            <h2 className="text-xl font-black tracking-tight">Common questions</h2>
           </div>
+          <SimpleAccordion
+            items={(jsonLd["@graph"][2] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map(
+              (qa) => ({ question: qa.name, answer: qa.acceptedAnswer.text })
+            )}
+          />
         </div>
       </section>
 
