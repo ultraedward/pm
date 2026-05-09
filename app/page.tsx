@@ -55,18 +55,15 @@ async function getMetalData(metal: Metal, livePrice: number | null): Promise<Met
 
     if (!rows.length) return { price, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt };
 
-    // 24H % change — live price vs the most recent DB snapshot ≥20h old
     const cutoff = new Date(Date.now() - 20 * 60 * 60 * 1000);
     const prevRow = [...rows].reverse().find((r) => r.timestamp <= cutoff);
     const percentChange = prevRow?.price ? ((price - prevRow.price) / prevRow.price) * 100 : null;
 
-    // 30D sparkline — last 30 DB data points
     const history30D = rows.slice(-30).map((r) => ({
       price: r.price,
       timestamp: r.timestamp.toISOString(),
     }));
 
-    // 52W high / low (from DB history)
     const prices = rows.map((r) => r.price);
     const week52High = Math.max(...prices);
     const week52Low  = Math.min(...prices);
@@ -95,7 +92,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
   const isUp = (data.percentChange ?? 0) >= 0;
   const spark = data.history30D.map((p) => ({ value: p.price }));
 
-  // 52W range bar position (0–100%)
   const rangePos =
     data.week52High && data.week52Low && data.week52High !== data.week52Low && data.price > 0
       ? ((data.price - data.week52Low) / (data.week52High - data.week52Low)) * 100
@@ -103,7 +99,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 
   return (
     <div className="group px-5 py-6 sm:px-7 sm:py-8 flex flex-col gap-5 transition-colors duration-200 hover:bg-white/[0.015]" style={{ borderLeft: "2px solid transparent" }}>
-      {/* Metal identifier */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
@@ -112,7 +107,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
         <span aria-hidden="true" className="text-[10px] font-mono tracking-widest text-gray-700">{symbol}</span>
       </div>
 
-      {/* Price */}
       <div>
         <div
           className="font-black tabular-nums leading-none"
@@ -125,7 +119,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
         </div>
         {data.percentChange != null && (
           <div className={`mt-2 text-xs font-bold tabular-nums tracking-wide ${isUp ? "text-emerald-400" : "text-red-400"}`}>
-            {/* Arrow is decorative; sr-only text carries the direction meaning */}
             <span aria-hidden="true">{isUp ? "▲" : "▼"}</span>
             <span className="sr-only">{isUp ? "Up" : "Down"}</span>
             {" "}{Math.abs(data.percentChange).toFixed(2)}%
@@ -134,14 +127,12 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
         )}
       </div>
 
-      {/* Sparkline */}
       {spark.length > 1 && (
         <div className="opacity-50 group-hover:opacity-100 transition-opacity duration-400">
           <Sparkline data={spark} color={dot} />
         </div>
       )}
 
-      {/* 52W range */}
       {rangePos !== null && data.week52Low && data.week52High && (
         <div className="space-y-1.5 pt-0.5 opacity-30 group-hover:opacity-80 transition-opacity duration-400">
           <div className="relative h-px w-full bg-white/[0.08]">
@@ -227,6 +218,29 @@ export default async function HomePage() {
     ],
   };
 
+  const features = [
+    {
+      label: "Price alerts",
+      body: "Set a target. Get one email when your metal crosses it. No spam, no daily noise.",
+      href: isLoggedIn ? "/dashboard/alerts" : "/login",
+    },
+    {
+      label: "Coin melt value",
+      body: "Eagles, Maple Leafs, Morgans, junk silver — melt value at today's live spot.",
+      href: "/coin-melt-calculator",
+    },
+    {
+      label: "Dealer comparison",
+      body: "See who's cheapest before you buy. Premiums tracked across major dealers.",
+      href: "/compare",
+    },
+    {
+      label: "Portfolio tracker",
+      body: "Log your holdings. See your total stack value against live spot in real time.",
+      href: isLoggedIn ? "/dashboard/holdings" : "/login",
+    },
+  ];
+
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
@@ -242,66 +256,68 @@ export default async function HomePage() {
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="px-6 pt-16 pb-0 sm:pt-28">
+      <section className="px-6 pt-16 pb-14 sm:pt-28 sm:pb-20">
         <div className="mx-auto max-w-6xl">
 
-          {/* Eyebrow */}
-          <p className="rainbow-accent label mb-5">Gold · Live spot price</p>
+          <p className="label mb-5">Precious metals tracker</p>
 
-          {/* Giant price — viewport-scaled */}
-          <div
-            className="rainbow-text font-black tabular-nums leading-none"
-            style={{
-              fontSize: "clamp(4.5rem, 13vw, 10.5rem)",
-              letterSpacing: "-0.05em",
-            }}
+          <h1
+            className="font-black text-white"
+            style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", letterSpacing: "-0.04em", lineHeight: "0.95" }}
           >
-            ${Math.round(gold.price).toLocaleString("en-US")}
-          </div>
+            Know what your<br />stack is worth.
+          </h1>
 
-          {/* Change + meta */}
-          <div className="mt-4 flex items-center gap-6 flex-wrap">
-            {gold.percentChange !== null && (
-              <span className={`text-sm font-bold tabular-nums ${gold.percentChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                <span aria-hidden="true">{gold.percentChange >= 0 ? "▲" : "▼"}</span>
-                <span className="sr-only">{gold.percentChange >= 0 ? "Up" : "Down"}</span>
-                {" "}{Math.abs(gold.percentChange).toFixed(2)}% today
-              </span>
-            )}
-            <span className="label">Live spot price</span>
-          </div>
+          <p className="mt-6 text-base leading-relaxed max-w-lg" style={{ color: "var(--text-muted)" }}>
+            Email alerts when prices hit your target. Coin melt calculator. Dealer comparison.
+            Portfolio tracker. Built for stackers — free forever.
+          </p>
 
-          {/* CTA */}
-          <div className="mt-10 space-y-5">
-            {!isLoggedIn && (
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Free price alerts when gold or silver hits your target.
-                Portfolio tracking and weekly digest — no spam, cancel any time.
-              </p>
-            )}
+          <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
               {isLoggedIn ? "Go to dashboard" : "Get started — it's free"}
             </Link>
+            <Link
+              href="#calculator"
+              className="text-sm font-medium transition-colors"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Try the calculator →
+            </Link>
           </div>
+
+          {/* Gold price as supporting stat — context, not the product */}
+          <div
+            className="mt-12 pt-8 border-t flex flex-wrap items-center gap-x-6 gap-y-3"
+            style={{ borderColor: "var(--border)" }}
+          >
+            {prices.map(([metal, data]) => {
+              const { label, dot } = METAL_META[metal];
+              const isUp = (data.percentChange ?? 0) >= 0;
+              return (
+                <div key={metal} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+                  <span className="label">{label}</span>
+                  {data.price > 0 && (
+                    <span className="font-bold tabular-nums text-white text-sm">
+                      ${data.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </span>
+                  )}
+                  {data.percentChange != null && (
+                    <span className={`text-[11px] font-semibold tabular-nums ${isUp ? "text-emerald-400" : "text-red-400"}`}>
+                      {isUp ? "▲" : "▼"}{Math.abs(data.percentChange).toFixed(2)}%
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+            <span className="text-[10px] text-gray-700 tracking-wide uppercase ml-auto">{fmtUpdated(lastUpdated)}</span>
+          </div>
+
         </div>
       </section>
 
-      {/* ── PRICE PANEL ──────────────────────────────────────────── */}
-      <section className="mt-16 border-t" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
-            {prices.map(([metal, data]) => (
-              <PriceTile key={metal} metal={metal} data={data} />
-            ))}
-          </div>
-          <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-            <span className="label">Spot prices · 30D trend</span>
-            <span className="text-[10px] text-gray-700 tracking-wide uppercase">{fmtUpdated(lastUpdated)}</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CALCULATOR ───────────────────────────────────────────── */}
+      {/* ── CALCULATOR (elevated) ────────────────────────────────── */}
       <section id="calculator" className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl space-y-8">
           <div className="space-y-2">
@@ -330,19 +346,76 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────── */}
+      {/* ── FEATURES ─────────────────────────────────────────────── */}
+      <section className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl space-y-8">
+          <div className="space-y-2">
+            <p className="label">What Lode does</p>
+            <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
+              Tools built for stackers.
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
+            {features.map(({ label, body, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="group p-7 hover:bg-white/5 transition-colors space-y-3"
+                style={{ background: "var(--bg)" }}
+              >
+                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">
+                  {label}
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-dim)" }}>
+                  {body}
+                </p>
+                <p className="text-[11px] text-amber-600 group-hover:text-amber-400 transition-colors">
+                  Learn more →
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICE PANEL (supporting section) ────────────────────── */}
+      <section className="border-t" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+            <p className="label">Today&apos;s spot prices</p>
+            <Link href="/silver-price" className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">
+              Silver price detail →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
+            {prices.map(([metal, data]) => (
+              <PriceTile key={metal} metal={metal} data={data} />
+            ))}
+          </div>
+          <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+            <span className="label">Spot prices · 30D trend</span>
+            <span className="text-[10px] text-gray-700 tracking-wide uppercase">{fmtUpdated(lastUpdated)}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ALERT CTA ────────────────────────────────────────────── */}
       {!isLoggedIn && (
         <section className="border-t px-6 py-24" style={{ borderColor: "var(--border)" }}>
-          <div className="mx-auto max-w-6xl space-y-8">
-            <p className="label">Get started</p>
+          <div className="mx-auto max-w-6xl space-y-6">
+            <p className="label">Price alerts</p>
             <p
               className="font-black text-white"
               style={{ fontSize: "clamp(2rem, 6vw, 4rem)", letterSpacing: "-0.04em", lineHeight: "0.95" }}
             >
-              Track your stack.<br />Free forever.
+              Tell me when<br />gold hits $____
+            </p>
+            <p className="text-sm max-w-md leading-relaxed" style={{ color: "var(--text-muted)" }}>
+              One email when your target price is crossed. No daily digests, no noise.
+              Free account — takes 30 seconds.
             </p>
             <Link href="/login" className="btn-gold">
-              Get started
+              Set your first alert
             </Link>
           </div>
         </section>
