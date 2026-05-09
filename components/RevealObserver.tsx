@@ -3,33 +3,58 @@
 import { useEffect } from "react";
 
 /**
- * Mounts an IntersectionObserver that adds the `.revealed` class to any
- * element with the `.reveal` class as it scrolls into view.
- * Combined with the CSS in globals.css this produces a staggered
- * fade-up entrance effect for below-the-fold sections.
+ * Wires up scroll-reveal for every element with the `.reveal` class.
  *
- * Re-queries on every render so dynamically added `.reveal` elements
- * (e.g. after hydration) are picked up too.
+ * Two layers of robustness:
+ *
+ * 1. MutationObserver — watches for elements added after initial mount.
+ *    Required for Next.js App Router pages that use `force-dynamic` /
+ *    streaming, where page content arrives in the DOM *after* the layout
+ *    client component has already hydrated and run its first useEffect.
+ *
+ * 2. Safety-net setTimeout — after 600 ms, anything still hidden gets
+ *    `.revealed` unconditionally. Guarantees no content is ever stuck
+ *    invisible if an IntersectionObserver callback is delayed or missed.
  */
 export function RevealObserver() {
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("revealed");
-            observer.unobserve(entry.target); // fire once
+            io.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.08, rootMargin: "0px 0px -48px 0px" },
+      { threshold: 0.05, rootMargin: "0px 0px -40px 0px" },
     );
 
-    document.querySelectorAll(".reveal:not(.revealed)").forEach((el) =>
-      observer.observe(el),
-    );
+    function observeAll() {
+      document
+        .querySelectorAll<Element>(".reveal:not(.revealed)")
+        .forEach((el) => io.observe(el));
+    }
 
-    return () => observer.disconnect();
+    // Observe whatever is already in the DOM
+    observeAll();
+
+    // Re-query every time new nodes land (streaming / Suspense boundaries)
+    const mo = new MutationObserver(observeAll);
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    // Hard fallback: reveal anything still hidden after 600 ms
+    const timer = setTimeout(() => {
+      document
+        .querySelectorAll<Element>(".reveal:not(.revealed)")
+        .forEach((el) => el.classList.add("revealed"));
+    }, 600);
+
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   return null;
