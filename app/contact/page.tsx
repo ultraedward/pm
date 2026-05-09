@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
+    <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <div className="mx-auto max-w-2xl space-y-12">
 
         <div>

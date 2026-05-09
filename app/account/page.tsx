@@ -28,7 +28,7 @@ export default async function AccountPage() {
   if (!dbUser?.email) redirect("/");
 
   return (
-    <main className="min-h-screen bg-surface text-white">
+    <main className="bg-surface text-white">
       <div className="mx-auto max-w-xl px-6 py-16 space-y-10">
 
         {/* Header */}

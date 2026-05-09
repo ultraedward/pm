@@ -332,7 +332,7 @@ const lodeFaq: FaqItem[] = [
 
 export function FaqClient() {
   return (
-    <main className="min-h-screen bg-surface px-6 py-24 text-white">
+    <main className="bg-surface px-6 py-24 text-white">
       <div className="mx-auto max-w-2xl space-y-16">
 
         {/* Page header */}

@@ -123,7 +123,7 @@ export default function JunkSilverGuidePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main className="min-h-screen bg-gray-950 text-gray-100">
+      <main className="bg-gray-950 text-gray-100">
         {/* Header */}
         <div className="bg-gray-900 border-b border-gray-800">
           <div className="max-w-3xl mx-auto px-4 py-10">
