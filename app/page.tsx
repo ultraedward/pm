@@ -239,6 +239,11 @@ export default async function HomePage() {
       body: "Log your holdings. See your total stack value against live spot in real time.",
       href: isLoggedIn ? "/dashboard/holdings" : "/login",
     },
+    {
+      label: "Gold IRA guide",
+      body: "Compare Augusta, Goldco, and Birch Gold side-by-side — fees, minimums, and who each is best for.",
+      href: "/gold-ira",
+    },
   ];
 
   return (

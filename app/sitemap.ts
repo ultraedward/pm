@@ -79,6 +79,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // Affiliate / editorial pages — high-intent, monetised
+    {
+      url: `${base}/gold-ira`,
+      lastModified: new Date("2026-05-08"),
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
     // Editorial / blog content — earns links, builds topical authority
     {
       url: `${base}/blog/junk-silver-guide`,

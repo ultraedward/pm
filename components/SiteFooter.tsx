@@ -80,6 +80,7 @@ export async function SiteFooter() {
             <Link href="/compare"              className="hover:text-gray-300 transition-colors">Compare</Link>
             <Link href="/coin-melt-calculator" className="hover:text-gray-300 transition-colors">Melt Calculator</Link>
             <Link href="/gram"                 className="hover:text-gray-300 transition-colors">Gram Calculator</Link>
+            <Link href="/gold-ira"             className="hover:text-gray-300 transition-colors">Gold IRA</Link>
             <Link href="/about"                className="hidden sm:block hover:text-gray-300 transition-colors">About</Link>
             <Link href="/faq"                  className="hover:text-gray-300 transition-colors">FAQ</Link>
             <Link href="/contact"              className="hidden sm:block hover:text-gray-300 transition-colors">Contact</Link>
