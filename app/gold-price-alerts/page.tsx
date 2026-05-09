@@ -221,8 +221,8 @@ export default function GoldPriceAlertsPage() {
         </Link>
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

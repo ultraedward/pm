@@ -301,8 +301,8 @@ export default async function JunkSilverCalculatorPage() {
         )}
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

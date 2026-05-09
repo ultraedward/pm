@@ -157,8 +157,8 @@ export default function MethodologyPage() {
 
         </div>
       </div>
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

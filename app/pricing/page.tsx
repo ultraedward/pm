@@ -79,8 +79,7 @@ export default async function PricingPage() {
         </div>
 
       </div>
-      </main>
-    <SiteFooter />
-  </>
+      <SiteFooter />
+    </main>
   );
 }

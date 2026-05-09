@@ -25,7 +25,6 @@ export default async function DashboardAlertsPage() {
   const hasAlerts = alerts.length > 0;
 
   return (
-    <>
     <main className="bg-surface px-4 py-8 sm:p-8 text-white">
       <div className="mx-auto max-w-4xl space-y-6">
 
@@ -63,8 +62,7 @@ export default async function DashboardAlertsPage() {
           </div>
         )}
       </div>
+      <SiteFooter />
     </main>
-    <SiteFooter />
-    </>
   );
 }

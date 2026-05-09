@@ -171,15 +171,15 @@ const faqJsonLd = {
   ],
 };
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const footer = <SiteFooter />;
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <FaqClient />
-      <SiteFooter />
+      <FaqClient footer={footer} />
     </>
   );
 }

@@ -314,8 +314,8 @@ export default async function GramPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────── */}
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

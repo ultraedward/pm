@@ -266,8 +266,8 @@ export default async function ComparePage() {
         </div>
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

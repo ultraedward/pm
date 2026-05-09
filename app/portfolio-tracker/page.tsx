@@ -244,8 +244,8 @@ export default async function PortfolioTrackerPage() {
         </Link>
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

@@ -330,7 +330,7 @@ const lodeFaq: FaqItem[] = [
 
 // ─── Page component ────────────────────────────────────────────────────────────
 
-export function FaqClient() {
+export function FaqClient({ footer }: { footer?: React.ReactNode }) {
   return (
     <main className="bg-surface px-6 py-12 sm:py-24 text-white">
       <div className="mx-auto max-w-2xl space-y-16">
@@ -377,6 +377,7 @@ export function FaqClient() {
         </section>
 
       </div>
+      {footer}
     </main>
   );
 }

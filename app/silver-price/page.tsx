@@ -459,8 +459,8 @@ export default async function SilverPricePage() {
         )}
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

@@ -746,8 +746,8 @@ export default function GoldIraPage() {
         </div>
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

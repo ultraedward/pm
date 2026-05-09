@@ -84,8 +84,8 @@ export default async function AccountPage() {
         </div>
 
       </div>
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }

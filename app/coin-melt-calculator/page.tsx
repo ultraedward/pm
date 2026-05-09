@@ -239,8 +239,8 @@ export default async function CoinMeltCalculatorPage() {
         )}
       </section>
 
+      <SiteFooter />
       </main>
-    <SiteFooter />
   </>
   );
 }
