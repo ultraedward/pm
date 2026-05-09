@@ -454,8 +454,9 @@ export default function JunkSilverGuidePage() {
 
         </article>
 
-        <SiteFooter />
       </main>
+
+      <SiteFooter />
     </>
   );
 }

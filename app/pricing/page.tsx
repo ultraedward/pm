@@ -34,6 +34,7 @@ export default async function PricingPage() {
   const isLoggedIn = !!session?.user?.email;
 
   return (
+    <>
     <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <div className="mx-auto max-w-lg space-y-12">
 
@@ -78,7 +79,8 @@ export default async function PricingPage() {
         </div>
 
       </div>
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

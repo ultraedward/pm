@@ -159,6 +159,7 @@ export default async function JunkSilverCalculatorPage() {
   ];
 
   return (
+    <>
     <main className="bg-surface text-white overflow-x-hidden">
       <script
         type="application/ld+json"
@@ -300,7 +301,8 @@ export default async function JunkSilverCalculatorPage() {
         )}
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

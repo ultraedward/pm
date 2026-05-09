@@ -246,6 +246,7 @@ export default function GoldIraPage() {
   const augusta = COMPANIES[0];
 
   return (
+    <>
     <main className="min-h-screen" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -745,7 +746,8 @@ export default function GoldIraPage() {
         </div>
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

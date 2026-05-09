@@ -198,6 +198,7 @@ export default async function SilverPricePage() {
   });
 
   return (
+    <>
     <main className="bg-surface text-white overflow-x-hidden">
       <script
         type="application/ld+json"
@@ -458,7 +459,8 @@ export default async function SilverPricePage() {
         )}
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

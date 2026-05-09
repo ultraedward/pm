@@ -133,6 +133,7 @@ export default async function CoinMeltCalculatorPage() {
   const updatedAt   = silverPrice > 0 ? new Date().toISOString() : null;
 
   return (
+    <>
     <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -238,7 +239,8 @@ export default async function CoinMeltCalculatorPage() {
         )}
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

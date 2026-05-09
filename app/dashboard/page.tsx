@@ -168,7 +168,8 @@ export default async function DashboardPage() {
   const changeColor30d = change30d >= 0 ? "text-amber-400" : "text-red-400";
 
   return (
-    <main className="min-h-screen bg-surface px-4 py-6 sm:p-8 text-white">
+    <>
+    <main className="bg-surface px-4 py-6 sm:p-8 text-white">
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
@@ -310,7 +311,8 @@ export default async function DashboardPage() {
         </div>
 
       </div>
-      <SiteFooter />
     </main>
+    <SiteFooter />
+    </>
   );
 }

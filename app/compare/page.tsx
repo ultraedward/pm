@@ -125,6 +125,7 @@ export default async function ComparePage() {
   const available = buildAvailability();
 
   return (
+    <>
     <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -265,7 +266,8 @@ export default async function ComparePage() {
         </div>
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

@@ -153,6 +153,7 @@ export default async function PortfolioTrackerPage() {
   }
 
   return (
+    <>
     <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -243,7 +244,8 @@ export default async function PortfolioTrackerPage() {
         </Link>
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

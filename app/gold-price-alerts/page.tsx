@@ -135,6 +135,7 @@ const FEATURES = [
 
 export default function GoldPriceAlertsPage() {
   return (
+    <>
     <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -220,7 +221,8 @@ export default function GoldPriceAlertsPage() {
         </Link>
       </section>
 
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

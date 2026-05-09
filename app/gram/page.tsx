@@ -133,6 +133,7 @@ export default async function GramPage() {
   };
 
   return (
+    <>
     <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -313,7 +314,8 @@ export default async function GramPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────── */}
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

@@ -26,6 +26,7 @@ const aboutJsonLd = {
 
 export default function AboutPage() {
   return (
+    <>
     <main className="bg-surface px-6 py-24 text-white">
       <script
         type="application/ld+json"
@@ -99,7 +100,8 @@ export default function AboutPage() {
 
         </div>
       </div>
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

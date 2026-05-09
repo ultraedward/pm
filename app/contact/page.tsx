@@ -17,6 +17,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
+    <>
     <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <div className="mx-auto max-w-2xl space-y-12">
 
@@ -74,7 +75,8 @@ export default function ContactPage() {
 
         </div>
       </div>
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

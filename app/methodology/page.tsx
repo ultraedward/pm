@@ -26,6 +26,7 @@ const methodologyJsonLd = {
 
 export default function MethodologyPage() {
   return (
+    <>
     <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
@@ -156,7 +157,8 @@ export default function MethodologyPage() {
 
         </div>
       </div>
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

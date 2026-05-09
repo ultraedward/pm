@@ -19,6 +19,7 @@ const LAST_UPDATED = "March 12, 2026";
 
 export default function TermsPage() {
   return (
+    <>
     <main className="px-6 py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <div className="mx-auto max-w-2xl space-y-12">
 
@@ -77,7 +78,8 @@ export default function TermsPage() {
 
         </div>
       </div>
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }

@@ -28,6 +28,7 @@ export default async function AccountPage() {
   if (!dbUser?.email) redirect("/");
 
   return (
+    <>
     <main className="bg-surface text-white">
       <div className="mx-auto max-w-xl px-6 py-16 space-y-10">
 
@@ -83,7 +84,8 @@ export default async function AccountPage() {
         </div>
 
       </div>
-      <SiteFooter />
-    </main>
+      </main>
+    <SiteFooter />
+  </>
   );
 }
