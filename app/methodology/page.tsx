@@ -27,7 +27,7 @@ const methodologyJsonLd = {
 export default function MethodologyPage() {
   return (
     <>
-    <main className="px-6 py-12 sm:py-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
+    <main className="px-6 pt-12 sm:pt-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(methodologyJsonLd) }}
