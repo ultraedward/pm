@@ -339,14 +339,21 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
             <p className="label">Today&apos;s spot prices</p>
-            <Link href="/silver-price" className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">
-              Silver detail →
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/gold-price"   className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">Gold detail →</Link>
+              <Link href="/silver-price" className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">Silver detail →</Link>
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
-            {prices.map(([metal, data]) => (
-              <PriceTile key={metal} metal={metal} data={data} />
-            ))}
+            {prices.map(([metal, data]) => {
+              const detailHref = metal === "gold" ? "/gold-price" : metal === "silver" ? "/silver-price" : null;
+              const tile = <PriceTile key={metal} metal={metal} data={data} />;
+              return detailHref ? (
+                <Link key={metal} href={detailHref} className="block hover:bg-white/[0.01] transition-colors" aria-label={`${METAL_META[metal].label} price detail`}>
+                  {tile}
+                </Link>
+              ) : tile;
+            })}
           </div>
           <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
             <span className="label">Spot prices · 30-day trend</span>

@@ -20,9 +20,13 @@ export default function NavMobile({ isLoggedIn }: Props) {
   ];
 
   const loggedOutLinks = [
-    { href: "/gram",    label: "Calculator" },
-    { href: "/compare", label: "Compare"    },
-    { href: "/login",   label: "Get started" },
+    { href: "/gold-price",   label: "Gold Price"   },
+    { href: "/silver-price", label: "Silver Price"  },
+    { href: "/compare",      label: "Compare"       },
+    { href: "/gram",         label: "Calculator"    },
+    { href: "/gold-ira",     label: "Gold IRA"      },
+    { href: "/faq",          label: "FAQ"           },
+    { href: "/login",        label: "Get started"   },
   ];
 
   const links = isLoggedIn ? loggedInLinks : loggedOutLinks;

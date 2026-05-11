@@ -79,6 +79,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // Gold price detail page — mirrors /silver-price, highest-volume search
+    {
+      url: `${base}/gold-price`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 1.0,
+    },
     // Affiliate / editorial pages — high-intent, monetised
     {
       url: `${base}/gold-ira`,
@@ -86,13 +93,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.85,
     },
-    // Editorial / blog content — earns links, builds topical authority
-    {
-      url: `${base}/blog/junk-silver-guide`,
-      lastModified: new Date("2026-05-01"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+    // Editorial / blog — removed /blog/junk-silver-guide (route not yet live → avoids 404 in crawl)
     // Legal + contact pages — rarely change
     {
       url: `${base}/contact`,

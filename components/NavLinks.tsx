@@ -42,8 +42,10 @@ export default function NavLinks({ isLoggedIn }: Props) {
         </>
       ) : (
         <>
-          <Link href="/gram"    className={linkClass("/gram")}    aria-current={isActive("/gram")    ? "page" : undefined}>Calculator</Link>
-          <Link href="/compare" className={linkClass("/compare")} aria-current={isActive("/compare") ? "page" : undefined}>Compare</Link>
+          <Link href="/gold-price" className={linkClass("/gold-price")} aria-current={isActive("/gold-price") ? "page" : undefined}>Gold Price</Link>
+          <Link href="/silver-price" className={linkClass("/silver-price")} aria-current={isActive("/silver-price") ? "page" : undefined}>Silver Price</Link>
+          <Link href="/compare"    className={linkClass("/compare")}    aria-current={isActive("/compare")    ? "page" : undefined}>Compare</Link>
+          <Link href="/gold-ira"   className={linkClass("/gold-ira")}   aria-current={isActive("/gold-ira")   ? "page" : undefined}>Gold IRA</Link>
           <Link href="/login" className="btn-gold px-4 py-1.5 text-xs">
             Get started
           </Link>

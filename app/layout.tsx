@@ -62,8 +62,10 @@ export const metadata: Metadata = {
 };
 
 // Site-wide JSON-LD. Emitted once in the root layout so every page inherits
-// the Organization/WebSite graph — enables Google's sitelinks search box and
-// knowledge-panel signals without repeating boilerplate on every route.
+// the Organization/WebSite graph — enables Google knowledge-panel signals
+// without repeating boilerplate on every route.
+// NOTE: SearchAction was removed — there is no on-site search; a fake
+// SearchAction risks a Google quality action and confuses crawlers.
 const siteJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -82,14 +84,6 @@ const siteJsonLd = {
       "url": "https://lode.rocks",
       "name": "Lode",
       "publisher": { "@id": "https://lode.rocks/#org" },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://lode.rocks/?q={search_term_string}",
-        },
-        "query-input": "required name=search_term_string",
-      },
     },
   ],
 };
