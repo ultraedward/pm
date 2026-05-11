@@ -24,26 +24,31 @@ import type { Dealer } from "./dealers";
 type PremiumTable = Record<CompareCoin["id"], Record<Dealer["id"], number>>;
 
 export const PREMIUMS: PremiumTable = {
-  // APMEX single-coin check/wire prices verified 2026-05-04 against apmex.com.
-  // JM Bullion, SD Bullion, Money Metals estimated from typical dealer spread
-  // patterns vs. APMEX at current spot levels ($73 silver / $4,538 gold).
+  // Silver premiums re-verified 2026-05-10 against apmex.com at $80.34 spot.
+  // APMEX Silver Eagle MintDirect single: $93.66 → ~$13.32 premium (compressed
+  // from $16.99 on May 4 as spot rose ~$7). JM/SD/MM estimated from typical
+  // spreads vs. APMEX. Silver Maple adjusted proportionally (~$2 below Eagle).
+  //
+  // Gold premiums held from 2026-05-04 ($4,537 spot). Search data for gold
+  // today returned stale cached prices — re-verify directly at apmex.com
+  // before next gold update.
   "silver-eagle": {
-    apmex:       16.99,  // verified: $90.33 - $73.34 spot
-    jmbullion:   14.99,  // ~$2 below APMEX (typical)
-    sdbullion:   12.99,  // ~$4 below APMEX (typically most aggressive)
-    moneymetals: 13.99,  // ~$3 below APMEX
+    apmex:       13.49,  // verified: $93.66 - $80.34 spot (2026-05-10)
+    jmbullion:   11.49,  // ~$2 below APMEX (typical)
+    sdbullion:    9.49,  // ~$4 below APMEX (typically most aggressive)
+    moneymetals: 10.49,  // ~$3 below APMEX
   },
   "gold-eagle": {
-    apmex:       214.99, // verified: $4,752.39 - $4,537.40 spot
+    apmex:       214.99, // verified 2026-05-04: $4,752.39 - $4,537.40 spot
     jmbullion:   189.99, // ~$25 below APMEX (typical)
     sdbullion:   169.99, // ~$45 below APMEX (typically most aggressive)
     moneymetals: 179.99, // ~$35 below APMEX
   },
   "silver-maple": {
-    apmex:       14.99,  // typically $2 below Silver Eagle at same dealer
-    jmbullion:   12.99,
-    sdbullion:   10.99,
-    moneymetals: 11.99,
+    apmex:       11.49,  // typically $1.50-2 below Silver Eagle at same dealer
+    jmbullion:    9.49,
+    sdbullion:    7.49,
+    moneymetals:  8.49,
   },
   "gold-maple": {
     apmex:       184.99, // typically $20-30 below Gold Eagle at same dealer
@@ -61,4 +66,4 @@ export function premiumFor(coinId: CompareCoin["id"], dealerId: Dealer["id"]): n
 // users can judge how fresh the comparison really is. Update whenever you
 // edit any value above. ISO format (YYYY-MM-DD) — the UI formats it for
 // display.
-export const PREMIUMS_LAST_REVIEWED = "2026-05-04";
+export const PREMIUMS_LAST_REVIEWED = "2026-05-10";
