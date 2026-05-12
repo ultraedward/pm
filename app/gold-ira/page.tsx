@@ -365,7 +365,7 @@ export default function GoldIraPage() {
                     >
                       <span>{c.name.split(" ").slice(0, 2).join(" ")}</span>
                       {c.affiliate && (
-                        <span className="ml-2 inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider" style={{ background: "rgba(22,163,74,0.12)", color: "#16a34a", border: "1px solid rgba(22,163,74,0.25)" }}>
+                        <span className="ml-2 inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider" style={{ background: "rgba(0,0,0,0.12)", color: "var(--text-muted)", border: "1px solid rgba(0,0,0,0.1)" }}>
                           partner
                         </span>
                       )}
