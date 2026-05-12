@@ -354,17 +354,17 @@ export default function GoldIraPage() {
             <table className="w-full text-sm" style={{ background: "rgba(0,0,0,0.3)" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-36">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-36">
                     Company
                   </th>
                   {COMPANIES.map((c) => (
                     <th
                       key={c.id}
                       className="text-left px-4 py-3 text-xs font-bold"
-                      style={{ color: c.affiliate ? "var(--gold-bright)" : "white" }}
+                      style={{ color: c.affiliate ? "#4ade80" : "white" }}
                     >
                       {c.name.split(" ").slice(0, 2).join(" ")}
-                      {c.affiliate && <span className="ml-1 text-gray-600 font-normal text-[10px]">★ partner</span>}
+                      {c.affiliate && <span className="ml-1 text-green-600 font-normal text-[10px]">★ partner</span>}
                     </th>
                   ))}
                 </tr>
@@ -378,9 +378,9 @@ export default function GoldIraPage() {
                       background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
                     }}
                   >
-                    <td className="px-4 py-3 text-xs text-gray-500 font-medium">{row.label}</td>
+                    <td className="px-4 py-3 text-xs text-gray-400 font-medium">{row.label}</td>
                     {COMPANIES.map((c) => (
-                      <td key={c.id} className="px-4 py-3 text-xs text-gray-300">
+                      <td key={c.id} className="px-4 py-3 text-xs text-gray-200">
                         {String(c[row.key])}
                       </td>
                     ))}

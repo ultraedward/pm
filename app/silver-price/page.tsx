@@ -199,7 +199,7 @@ export default async function SilverPricePage() {
 
   return (
     <>
-    <main className="bg-surface text-white overflow-x-hidden">
+    <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

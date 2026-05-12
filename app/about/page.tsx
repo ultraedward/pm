@@ -27,7 +27,7 @@ const aboutJsonLd = {
 export default function AboutPage() {
   return (
     <>
-    <main className="bg-surface px-6 pt-12 sm:pt-24 text-white">
+    <main className="px-6 pt-12 sm:pt-24" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
