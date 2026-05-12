@@ -409,7 +409,7 @@ export default async function HomePage() {
                 <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
                   {label}
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--text-dim)" }}>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
                   {body}
                 </p>
                 <p className="text-[11px] text-amber-700 group-hover:text-amber-400 transition-colors duration-150">

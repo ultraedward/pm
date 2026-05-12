@@ -85,7 +85,7 @@ export default function CompareClient({ spots, available }: Props) {
                 onClick={() => setCoinId(c.id)}
                 className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-colors border ${
                   active
-                    ? "bg-amber-500/15 border-amber-500/40 text-amber-200"
+                    ? "bg-amber-500/15 border-amber-500/40 text-amber-500"
                     : "border-white/[0.08] text-gray-500 hover:text-white hover:border-white/20"
                 }`}
                 style={active ? { borderColor: "rgba(212, 175, 55, 0.4)" } : undefined}
@@ -114,7 +114,7 @@ export default function CompareClient({ spots, available }: Props) {
               onClick={() => setCoinId(c.id)}
               className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-colors border ${
                 active
-                  ? "bg-amber-500/15 border-amber-500/40 text-amber-200"
+                  ? "bg-amber-500/15 border-amber-500/40 text-amber-500"
                   : "border-white/[0.08] text-gray-500 hover:text-white hover:border-white/20"
               }`}
               style={active ? { borderColor: "rgba(212, 175, 55, 0.4)" } : undefined}

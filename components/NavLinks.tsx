@@ -19,19 +19,24 @@ export default function NavLinks({ isLoggedIn }: Props) {
   }
 
   function linkClass(href: string) {
-    return `label transition-colors ${isActive(href) ? "!text-white" : "hover:!text-white"}`;
+    return `label transition-colors ${isActive(href) ? "" : "hover:!text-white"}`;
+  }
+
+  function activeStyle(href: string): React.CSSProperties | undefined {
+    return isActive(href) ? { color: "var(--text)" } : undefined;
   }
 
   return (
     <div className="hidden sm:flex items-center gap-8">
       {isLoggedIn ? (
         <>
-          <Link href="/dashboard" className={linkClass("/dashboard")} aria-current={isActive("/dashboard") ? "page" : undefined}>Dashboard</Link>
-          <Link href="/alerts"    className={linkClass("/alerts")}    aria-current={isActive("/alerts")    ? "page" : undefined}>Alerts</Link>
-          <Link href="/compare"   className={linkClass("/compare")}   aria-current={isActive("/compare")   ? "page" : undefined}>Compare</Link>
+          <Link href="/dashboard" className={linkClass("/dashboard")} style={activeStyle("/dashboard")} aria-current={isActive("/dashboard") ? "page" : undefined}>Dashboard</Link>
+          <Link href="/alerts"    className={linkClass("/alerts")}    style={activeStyle("/alerts")}    aria-current={isActive("/alerts")    ? "page" : undefined}>Alerts</Link>
+          <Link href="/compare"   className={linkClass("/compare")}   style={activeStyle("/compare")}   aria-current={isActive("/compare")   ? "page" : undefined}>Compare</Link>
           <Link
             href="/account"
-            className={`transition-colors ${pathname === "/account" ? "text-white" : "text-gray-500 hover:text-white"}`}
+            className={`transition-colors ${pathname === "/account" ? "" : "text-gray-500 hover:text-white"}`}
+            style={pathname === "/account" ? { color: "var(--text)" } : undefined}
             aria-label="Account"
             aria-current={pathname === "/account" ? "page" : undefined}
           >
@@ -42,10 +47,10 @@ export default function NavLinks({ isLoggedIn }: Props) {
         </>
       ) : (
         <>
-          <Link href="/gold-price" className={linkClass("/gold-price")} aria-current={isActive("/gold-price") ? "page" : undefined}>Gold Price</Link>
-          <Link href="/silver-price" className={linkClass("/silver-price")} aria-current={isActive("/silver-price") ? "page" : undefined}>Silver Price</Link>
-          <Link href="/compare"    className={linkClass("/compare")}    aria-current={isActive("/compare")    ? "page" : undefined}>Compare</Link>
-          <Link href="/gold-ira"   className={linkClass("/gold-ira")}   aria-current={isActive("/gold-ira")   ? "page" : undefined}>Gold IRA</Link>
+          <Link href="/gold-price"   className={linkClass("/gold-price")}   style={activeStyle("/gold-price")}   aria-current={isActive("/gold-price")   ? "page" : undefined}>Gold Price</Link>
+          <Link href="/silver-price" className={linkClass("/silver-price")} style={activeStyle("/silver-price")} aria-current={isActive("/silver-price") ? "page" : undefined}>Silver Price</Link>
+          <Link href="/compare"      className={linkClass("/compare")}      style={activeStyle("/compare")}      aria-current={isActive("/compare")      ? "page" : undefined}>Compare</Link>
+          <Link href="/gold-ira"     className={linkClass("/gold-ira")}     style={activeStyle("/gold-ira")}     aria-current={isActive("/gold-ira")     ? "page" : undefined}>Gold IRA</Link>
           <Link href="/login" className="btn-gold px-4 py-1.5 text-xs">
             Get started
           </Link>

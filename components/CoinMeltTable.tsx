@@ -88,7 +88,7 @@ export function CoinMeltTable({ spots, updatedAt }: Props) {
               <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: t.dot }} />
               <span
                 className="text-xs font-bold uppercase tracking-widest"
-                style={{ color: t.id === activeTab ? "white" : "var(--text-dim)" }}
+                style={{ color: t.id === activeTab ? "var(--text)" : "var(--text-dim)" }}
               >
                 {t.label}
               </span>
@@ -111,7 +111,7 @@ export function CoinMeltTable({ spots, updatedAt }: Props) {
             key={t.id}
             onClick={() => setActiveTab(t.id)}
             className="px-5 py-2.5 text-sm font-bold relative transition-colors"
-            style={{ color: activeTab === t.id ? "white" : "var(--text-dim)" }}
+            style={{ color: activeTab === t.id ? "var(--text)" : "var(--text-dim)" }}
           >
             {t.label}
             {activeTab === t.id && (
@@ -175,7 +175,7 @@ export function CoinMeltTable({ spots, updatedAt }: Props) {
                 {/* Melt value */}
                 <span
                   className="text-sm font-bold tabular-nums text-right pr-4 whitespace-nowrap"
-                  style={{ color: active ? "white" : "var(--text-muted)" }}
+                  style={{ color: active ? "var(--text)" : "var(--text-muted)" }}
                 >
                   {fmt(melt)}
                 </span>

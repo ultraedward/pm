@@ -153,7 +153,7 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
 
                   <span
                     className="text-sm font-bold tabular-nums text-right pr-4 whitespace-nowrap"
-                    style={{ color: active ? "white" : "var(--text-muted)" }}
+                    style={{ color: active ? "var(--text)" : "var(--text-muted)" }}
                   >
                     {silverSpot > 0 ? fmt(melt) : "—"}
                   </span>

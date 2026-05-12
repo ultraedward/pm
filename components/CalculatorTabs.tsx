@@ -59,8 +59,9 @@ export function CalculatorTabs({ spots }: Props) {
             onClick={() => setTab(t.id)}
             onKeyDown={(e) => handleKeyDown(e, i)}
             className={`px-6 py-3 transition-colors flex flex-col items-start gap-0.5 ${
-              tab === t.id ? "text-white" : "hover:text-gray-300"
+              tab === t.id ? "" : "hover:text-gray-300"
             }`}
+            style={{ color: tab === t.id ? "var(--text)" : undefined }}
             style={{
               background: tab === t.id ? "var(--surface-2)" : "transparent",
               borderRight: "1px solid var(--border)",
