@@ -61,9 +61,9 @@ export function CalculatorTabs({ spots }: Props) {
             className={`px-6 py-3 transition-colors flex flex-col items-start gap-0.5 ${
               tab === t.id ? "" : "hover:text-gray-300"
             }`}
-            style={{ color: tab === t.id ? "var(--text)" : undefined }}
             style={{
-              background: tab === t.id ? "var(--surface-2)" : "transparent",
+              color:       tab === t.id ? "var(--text)" : undefined,
+              background:  tab === t.id ? "var(--surface-2)" : "transparent",
               borderRight: "1px solid var(--border)",
             }}
           >
