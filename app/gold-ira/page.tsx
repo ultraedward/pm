@@ -148,7 +148,7 @@ const COMPANIES = [
     id:         "goldco",
     name:       "Goldco",
     tagline:    "Strong alternative — lower minimum, fast onboarding",
-    verdict:    "A solid second choice with a lower minimum. Less educational depth than Augusta, but strong ratings and a straightforward process.",
+    verdict:    "A solid second choice with a lower minimum. Straightforward process with fewer pre-purchase educational materials, but strong ratings across the board.",
     bestFor:    "First-time IRA investors or smaller rollover accounts ($25k–$50k)",
     bestForShort: "$25k–$50k rollover, first-timers",
     founded:    2006,
