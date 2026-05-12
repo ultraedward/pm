@@ -361,10 +361,14 @@ export default function GoldIraPage() {
                     <th
                       key={c.id}
                       className="text-left px-4 py-3 text-xs font-bold"
-                      style={{ color: c.affiliate ? "#16a34a" : "var(--text)" }}
+                      style={{ color: "var(--text)" }}
                     >
-                      {c.name.split(" ").slice(0, 2).join(" ")}
-                      {c.affiliate && <span className="ml-1 font-normal text-[10px]" style={{ color: "#16a34a", opacity: 0.75 }}>★ partner</span>}
+                      <span>{c.name.split(" ").slice(0, 2).join(" ")}</span>
+                      {c.affiliate && (
+                        <span className="ml-2 inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider" style={{ background: "rgba(22,163,74,0.12)", color: "#16a34a", border: "1px solid rgba(22,163,74,0.25)" }}>
+                          partner
+                        </span>
+                      )}
                     </th>
                   ))}
                 </tr>
