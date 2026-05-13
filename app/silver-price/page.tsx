@@ -423,6 +423,9 @@ export default async function SilverPricePage() {
           <>
             <p className="text-sm text-gray-500">Tools for your stack</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
+              <Link href="/gold-price" className="text-gray-400 hover:text-gray-200 transition-colors">
+                Gold price today →
+              </Link>
               <Link href="/junk-silver-calculator" className="text-gray-400 hover:text-gray-200 transition-colors">
                 Junk silver calculator →
               </Link>
@@ -449,6 +452,8 @@ export default async function SilverPricePage() {
               </Link>
             </div>
             <div className="flex items-center justify-center gap-4 text-sm text-gray-600 pt-1">
+              <Link href="/gold-price" className="hover:text-gray-400 transition-colors">Gold price today</Link>
+              <span>·</span>
               <Link href="/junk-silver-calculator" className="hover:text-gray-400 transition-colors">Junk silver calculator</Link>
               <span>·</span>
               <Link href="/gram" className="hover:text-gray-400 transition-colors">Price per gram</Link>

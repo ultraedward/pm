@@ -17,6 +17,12 @@ export const metadata: Metadata = {
       "Lode is free forever: live prices, calculators, portfolio tracker, unlimited alerts, and a weekly Monday digest.",
     url: "https://lode.rocks/pricing",
   },
+  // Noindex: thin marketing/feature-list page — not a search landing page.
+  // Google crawled but chose not to index it; we confirm that intent here.
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 const FEATURES = [

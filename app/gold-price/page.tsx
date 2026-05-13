@@ -448,6 +448,9 @@ export default async function GoldPricePage() {
             <>
               <p className="text-sm text-gray-500">Tools for your stack</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
+                <Link href="/silver-price" className="text-gray-400 hover:text-gray-200 transition-colors">
+                  Silver price today →
+                </Link>
                 <Link href="/coin-melt-calculator" className="text-gray-400 hover:text-gray-200 transition-colors">
                   Coin melt calculator →
                 </Link>
@@ -474,6 +477,8 @@ export default async function GoldPricePage() {
                 </Link>
               </div>
               <div className="flex items-center justify-center gap-4 text-sm text-gray-600 pt-1">
+                <Link href="/silver-price" className="hover:text-gray-400 transition-colors">Silver price today</Link>
+                <span>·</span>
                 <Link href="/coin-melt-calculator" className="hover:text-gray-400 transition-colors">Coin melt values</Link>
                 <span>·</span>
                 <Link href="/gram" className="hover:text-gray-400 transition-colors">Price per gram</Link>

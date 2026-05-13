@@ -13,8 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/gram`,
-      lastModified: new Date("2026-04-13"),
-      changeFrequency: "daily",
+      lastModified: new Date(),
+      changeFrequency: "hourly",
       priority: 0.9,
     },
     {
@@ -54,12 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    {
-      url: `${base}/pricing`,
-      lastModified: new Date("2026-04-11"),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
+    // /pricing omitted — noindexed (thin marketing page, not a search landing page)
     // Trust / transparency pages — linked from footer
     {
       url: `${base}/about`,
@@ -93,7 +88,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.85,
     },
-    // Editorial / blog — removed /blog/junk-silver-guide (route not yet live → avoids 404 in crawl)
+    // Editorial / blog — earns links, builds topical authority
+    {
+      url: `${base}/blog/junk-silver-guide`,
+      lastModified: new Date("2026-05-01"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // Legal + contact pages — rarely change
     {
       url: `${base}/contact`,
