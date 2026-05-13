@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 
-// Affiliate URL — kept server-side only. All three Augusta placements read
-// from this env var so enabling/disabling is a single Vercel toggle.
-const AUGUSTA_URL = process.env.AFFILIATE_AUGUSTA_URL ?? null;
+// Affiliate URL — kept server-side only. Base URL set in Vercel env vars.
+// Sub-IDs appended per placement so we can see which CTA converts best
+// in the Augusta dashboard (Leads & Commissions → filter by sub_id).
+const AUGUSTA_BASE        = process.env.AFFILIATE_AUGUSTA_URL ?? null;
+const AUGUSTA_CARD        = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=card`        : null;
+const AUGUSTA_DEEPDIVE    = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=deepdive`    : null;
+const AUGUSTA_ELIGIBILITY = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=eligibility` : null;
 
 // ── Last reviewed date ─────────────────────────────────────────────────────
 const LAST_REVIEWED = "2026-05-08";
@@ -330,9 +334,9 @@ export default function GoldIraPage() {
                   {c.bestForShort}
                 </p>
 
-                {c.affiliate && AUGUSTA_URL && (
+                {c.affiliate && AUGUSTA_CARD && (
                   <a
-                    href={AUGUSTA_URL}
+                    href={AUGUSTA_CARD}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
                     className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 hover:text-amber-400 transition-colors"
@@ -504,10 +508,10 @@ export default function GoldIraPage() {
               <p className="text-sm text-gray-300">{augusta.bestFor}</p>
             </div>
 
-            {AUGUSTA_URL && (
+            {AUGUSTA_DEEPDIVE && (
               <div className="pt-1 space-y-2">
                 <a
-                  href={AUGUSTA_URL}
+                  href={AUGUSTA_DEEPDIVE}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
                   className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:text-amber-300 transition-all"
@@ -664,7 +668,7 @@ export default function GoldIraPage() {
               </div>
             ))}
           </div>
-          {AUGUSTA_URL && (
+          {AUGUSTA_ELIGIBILITY && (
             <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
               <p className="label">Not sure if you qualify?</p>
               <p className="text-sm text-gray-400 leading-relaxed">
@@ -672,7 +676,7 @@ export default function GoldIraPage() {
                 account type and walk you through the rollover process. There&apos;s no obligation to open an account.
               </p>
               <a
-                href={AUGUSTA_URL}
+                href={AUGUSTA_ELIGIBILITY}
                 target="_blank"
                 rel="noopener noreferrer sponsored"
                 className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
