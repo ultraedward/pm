@@ -196,79 +196,96 @@ export default async function ComparePage() {
         </div>
       </section>
 
-      {/* ── Editorial — server-rendered for indexability ───────── */}
-      <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-2xl space-y-10 text-sm text-gray-400 leading-relaxed">
+      {/* ── Editorial — collapsible, server-rendered for indexability */}
+      <section className="border-t px-4 sm:px-6 py-8" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-2xl">
+          <details className="group">
+            <summary
+              className="flex cursor-pointer select-none items-center justify-between py-3 text-xs font-semibold uppercase tracking-wider transition-colors hover:text-white"
+              style={{ color: "var(--text-dim)" }}
+            >
+              <span>About these dealers &amp; how we calculate prices</span>
+              <span
+                className="ml-4 flex-shrink-0 text-base transition-transform duration-200 group-open:rotate-180"
+                aria-hidden="true"
+              >
+                ↓
+              </span>
+            </summary>
 
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">How to compare bullion dealer prices</h2>
-            <p>
-              The sticker price on a dealer&rsquo;s website is not the real comparison point — the{" "}
-              <strong className="text-white">premium over spot</strong> is. Every dealer charges spot price
-              plus a markup that covers their minting costs, storage, shipping, and margin. A dealer advertising
-              a low per-coin price may still be more expensive overall if their premium is higher. This page
-              calculates total estimated cost as:{" "}
-              <em>live spot × coin weight + dealer premium</em>, then sorts low to high so the cheapest
-              option is always at the top.
-            </p>
-          </div>
+            <div className="space-y-10 pt-8 pb-6 text-sm text-gray-400 leading-relaxed">
 
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">About the dealers we track</h2>
-            <p>
-              <strong className="text-white">APMEX</strong> (American Precious Metals Exchange) is one of
-              the largest US bullion dealers by volume, with a wide coin and bar selection. Premiums tend to
-              run slightly higher than discount competitors, but product availability and customer service are
-              consistently strong.
-            </p>
-            <p>
-              <strong className="text-white">JM Bullion</strong> is a popular online dealer known for
-              competitive silver premiums and free shipping on orders over a minimum. Frequently among the
-              cheapest for American Silver Eagles and silver Maple Leafs.
-            </p>
-            <p>
-              <strong className="text-white">SD Bullion</strong> competes aggressively on price, particularly
-              for generic silver rounds and junk silver, but also carries Eagles and Maples. Worth checking
-              when buying larger quantities.
-            </p>
-            <p>
-              <strong className="text-white">Money Metals Exchange</strong> is a subscription-friendly dealer
-              with a recurring purchase program. Premiums are competitive and they carry an unusually broad
-              range of fractional gold coins.
-            </p>
-          </div>
+              <div className="space-y-3">
+                <h2 className="text-base font-bold text-white">How to compare bullion dealer prices</h2>
+                <p>
+                  The sticker price on a dealer&rsquo;s website is not the real comparison point — the{" "}
+                  <strong className="text-white">premium over spot</strong> is. Every dealer charges spot price
+                  plus a markup that covers their minting costs, storage, shipping, and margin. A dealer advertising
+                  a low per-coin price may still be more expensive overall if their premium is higher. This page
+                  calculates total estimated cost as:{" "}
+                  <em>live spot × coin weight + dealer premium</em>, then sorts low to high so the cheapest
+                  option is always at the top.
+                </p>
+              </div>
 
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">What affects the premium you pay?</h2>
-            <p>
-              Premiums vary by coin type, quantity, and payment method. Government-minted coins (Silver Eagles,
-              Gold Eagles, Maple Leafs) carry higher premiums than privately minted rounds or bars because of
-              the added minting and distribution costs. Buying in larger quantities — a full monster box of
-              500 Silver Eagles, for example — typically reduces the per-coin premium. Paying by check or bank
-              wire instead of credit card usually saves another 3–4% that dealers charge to offset card
-              processing fees.
-            </p>
-          </div>
+              <div className="space-y-3">
+                <h2 className="text-base font-bold text-white">About the dealers we track</h2>
+                <p>
+                  <strong className="text-white">APMEX</strong> (American Precious Metals Exchange) is one of
+                  the largest US bullion dealers by volume, with a wide coin and bar selection. Premiums tend to
+                  run slightly higher than discount competitors, but product availability and customer service are
+                  consistently strong.
+                </p>
+                <p>
+                  <strong className="text-white">JM Bullion</strong> is a popular online dealer known for
+                  competitive silver premiums and free shipping on orders over a minimum. Frequently among the
+                  cheapest for American Silver Eagles and silver Maple Leafs.
+                </p>
+                <p>
+                  <strong className="text-white">SD Bullion</strong> competes aggressively on price, particularly
+                  for generic silver rounds and junk silver, but also carries Eagles and Maples. Worth checking
+                  when buying larger quantities.
+                </p>
+                <p>
+                  <strong className="text-white">Money Metals Exchange</strong> is a subscription-friendly dealer
+                  with a recurring purchase program. Premiums are competitive and they carry an unusually broad
+                  range of fractional gold coins.
+                </p>
+              </div>
 
-          <div className="space-y-3">
-            <h2 className="text-base font-bold text-white">How Lode maintains premium data</h2>
-            <p>
-              Dealer premiums are not scraped automatically — they are reviewed by hand and updated when
-              dealers change their pricing. The "premiums verified" date shown at the top of the page is the
-              last time we checked each dealer&rsquo;s current prices. Live spot prices update on every page
-              load from Yahoo Finance futures data, so the estimated totals are always based on the current
-              market price even if the premium was last verified a few days ago.
-            </p>
-            <p>
-              If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email
-              us at{" "}
-              <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
-                hello@lode.rocks
-              </a>{" "}
-              and we&rsquo;ll update it.
-            </p>
-          </div>
+              <div className="space-y-3">
+                <h2 className="text-base font-bold text-white">What affects the premium you pay?</h2>
+                <p>
+                  Premiums vary by coin type, quantity, and payment method. Government-minted coins (Silver Eagles,
+                  Gold Eagles, Maple Leafs) carry higher premiums than privately minted rounds or bars because of
+                  the added minting and distribution costs. Buying in larger quantities — a full monster box of
+                  500 Silver Eagles, for example — typically reduces the per-coin premium. Paying by check or bank
+                  wire instead of credit card usually saves another 3–4% that dealers charge to offset card
+                  processing fees.
+                </p>
+              </div>
 
+              <div className="space-y-3">
+                <h2 className="text-base font-bold text-white">How Lode maintains premium data</h2>
+                <p>
+                  Dealer premiums are not scraped automatically — they are reviewed by hand and updated when
+                  dealers change their pricing. The "premiums verified" date shown at the top of the page is the
+                  last time we checked each dealer&rsquo;s current prices. Live spot prices update on every page
+                  load from Yahoo Finance futures data, so the estimated totals are always based on the current
+                  market price even if the premium was last verified a few days ago.
+                </p>
+                <p>
+                  If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email
+                  us at{" "}
+                  <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+                    hello@lode.rocks
+                  </a>{" "}
+                  and we&rsquo;ll update it.
+                </p>
+              </div>
+
+            </div>
+          </details>
         </div>
       </section>
 

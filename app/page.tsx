@@ -219,7 +219,7 @@ export default async function HomePage() {
     ],
   };
 
-  const features = [
+  const primaryFeatures = [
     {
       label: "Price alerts",
       body: "Set a target. One email when your metal crosses it. No noise, no daily digests.",
@@ -235,21 +235,12 @@ export default async function HomePage() {
       body: "See who's cheapest before you buy. Premiums tracked across major dealers.",
       href: "/compare",
     },
-    {
-      label: "Portfolio tracker",
-      body: "Log your holdings. See total stack value against live spot in real time.",
-      href: isLoggedIn ? "/dashboard/holdings" : "/login",
-    },
-    {
-      label: "Price history",
-      body: "30-day charts for all four metals. See the trend before you buy or sell.",
-      href: isLoggedIn ? "/dashboard/charts" : "/login",
-    },
-    {
-      label: "Gold IRA guide",
-      body: "Augusta, Goldco, Birch Gold — fees, minimums, and who each is best for.",
-      href: "/gold-ira",
-    },
+  ];
+
+  const secondaryFeatures = [
+    { label: "Portfolio tracker", href: isLoggedIn ? "/dashboard/holdings" : "/login" },
+    { label: "Price history",     href: isLoggedIn ? "/dashboard/charts"   : "/login" },
+    { label: "Gold IRA guide",    href: "/gold-ira" },
   ];
 
   return (
@@ -290,13 +281,6 @@ export default async function HomePage() {
           <div className="mt-9 flex flex-wrap items-center gap-4 animate-fade-up animate-delay-300">
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
               {isLoggedIn ? "Go to dashboard" : "Get started — it's free"}
-            </Link>
-            <Link
-              href="#calculator"
-              className="text-sm font-medium transition-colors"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Try the calculator ↓
             </Link>
           </div>
 
@@ -362,6 +346,53 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── FEATURES ─────────────────────────────────────────────── */}
+      <section className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl space-y-10">
+          <div className="reveal space-y-2">
+            <p className="label">What Lode does</p>
+            <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
+              Every tool a stacker needs.
+            </h2>
+          </div>
+
+          {/* Primary 3 — full cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
+            {primaryFeatures.map(({ label, body, href }, i) => (
+              <Link
+                key={label}
+                href={href}
+                className={`reveal reveal-delay-${i + 1} group p-7 hover:bg-white/[0.04] transition-colors duration-200 space-y-3`}
+                style={{ background: "var(--bg)" }}
+              >
+                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
+                  {label}
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  {body}
+                </p>
+                <p className="text-[11px] text-amber-700 group-hover:text-amber-400 transition-colors duration-150">
+                  Explore →
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          {/* Secondary — quiet text line */}
+          <p className="text-xs reveal" style={{ color: "var(--text-dim)" }}>
+            Also:{" "}
+            {secondaryFeatures.map(({ label, href }, i) => (
+              <span key={label}>
+                <Link href={href} className="hover:text-white transition-colors underline underline-offset-4" style={{ color: "var(--text-dim)" }}>
+                  {label}
+                </Link>
+                {i < secondaryFeatures.length - 1 && <span className="mx-2 opacity-30">·</span>}
+              </span>
+            ))}
+          </p>
+        </div>
+      </section>
+
       {/* ── CALCULATOR ───────────────────────────────────────────── */}
       <section id="calculator" className="border-t px-6 py-14 sm:py-20 reveal" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl space-y-8">
@@ -385,39 +416,6 @@ export default async function HomePage() {
               palladium: palladium.price,
             }}
           />
-        </div>
-      </section>
-
-      {/* ── FEATURES ─────────────────────────────────────────────── */}
-      <section className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl space-y-10">
-          <div className="reveal space-y-2">
-            <p className="label">What Lode does</p>
-            <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
-              Every tool a stacker needs.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
-            {features.map(({ label, body, href }, i) => (
-              <Link
-                key={label}
-                href={href}
-                className={`reveal reveal-delay-${Math.min(i + 1, 6)} group p-7 hover:bg-white/[0.04] transition-colors duration-200 space-y-3`}
-                style={{ background: "var(--bg)" }}
-              >
-                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
-                  {label}
-                </p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                  {body}
-                </p>
-                <p className="text-[11px] text-amber-700 group-hover:text-amber-400 transition-colors duration-150">
-                  Explore →
-                </p>
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
