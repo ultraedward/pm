@@ -59,7 +59,12 @@ export const COMPARE_COINS: CompareCoin[] = [
     metal: "gold",
     oz: 1.0,
     slugs: {
-      apmex: "201964/random-year-1-oz-gold-maple-leaf-99999-bu-w-assay-card",
+      // APMEX does not carry a standard .9999 random-year Gold Maple — their
+      // only random-year SKU is a .99999 + assay card product, which is a
+      // different (premium) item not comparable to what JM/SD/MM sell.
+      // Leaving blank so the UI skips the APMEX row on this coin tab rather
+      // than showing a misleading apples-to-oranges comparison.
+      apmex: "",
       jmbullion: "1-oz-canadian-gold-maple-leaf-any-year",
       sdbullion: "1-oz-canadian-gold-maple-leaf-coin-random-year",
       // MM currently only lists the KC3 1 oz Gold Maple, no "random year" SKU.

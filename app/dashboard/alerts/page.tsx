@@ -42,7 +42,7 @@ export default async function DashboardAlertsPage() {
               + New alert
             </Link>
           </div>
-          <p className="text-sm text-gray-500 mt-2">Get an email when a metal hits your target price — checked daily.</p>
+          <p className="text-sm text-gray-500 mt-2">Get an email when a metal hits your target price. Frequency is set per alert.</p>
         </div>
 
         {/* Content */}
@@ -52,7 +52,7 @@ export default async function DashboardAlertsPage() {
           <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-12 text-center space-y-4">
             <p className="text-xl font-black tracking-tight">No alerts yet</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-              Get an email when gold, silver, platinum, or palladium crosses your target price — checked daily.
+              Get an email when gold, silver, platinum, or palladium crosses your target price. Choose your frequency when you create an alert.
             </p>
             <div className="flex justify-center gap-3 pt-1">
               <Link href="/alerts/new" className="btn-gold px-6 py-2.5 text-sm">

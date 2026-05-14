@@ -29,9 +29,6 @@ export const PREMIUMS: PremiumTable = {
   // from $16.99 on May 4 as spot rose ~$7). JM/SD/MM estimated from typical
   // spreads vs. APMEX. Silver Maple adjusted proportionally (~$2 below Eagle).
   //
-  // Gold premiums held from 2026-05-04 ($4,537 spot). Search data for gold
-  // today returned stale cached prices — re-verify directly at apmex.com
-  // before next gold update.
   "silver-eagle": {
     apmex:       13.49,  // verified: $93.66 - $80.34 spot (2026-05-10)
     jmbullion:   11.49,  // ~$2 below APMEX (typical)
@@ -39,22 +36,30 @@ export const PREMIUMS: PremiumTable = {
     moneymetals: 10.49,  // ~$3 below APMEX
   },
   "gold-eagle": {
-    apmex:       214.99, // verified 2026-05-04: $4,752.39 - $4,537.40 spot
-    jmbullion:   189.99, // ~$25 below APMEX (typical)
-    sdbullion:   169.99, // ~$45 below APMEX (typically most aggressive)
-    moneymetals: 179.99, // ~$35 below APMEX
+    // Re-verified 2026-05-14 at ~$4,681 spot (JM Bullion live ticker).
+    // Single-piece check/wire prices: APMEX $4,902.59, JM $4,893.24,
+    // SD $4,863.97, MM $4,898.70 (MM lists $219 premium explicitly).
+    apmex:       221.99,
+    jmbullion:   211.99,
+    sdbullion:   182.99,
+    moneymetals: 219.00,
   },
   "silver-maple": {
-    apmex:       11.49,  // typically $1.50-2 below Silver Eagle at same dealer
+    apmex:       11.49,  // re-verified 2026-05-10 (silver premiums stable)
     jmbullion:    9.49,
     sdbullion:    7.49,
     moneymetals:  8.49,
   },
   "gold-maple": {
-    apmex:       184.99, // typically $20-30 below Gold Eagle at same dealer
-    jmbullion:   164.99,
-    sdbullion:   149.99,
-    moneymetals: 154.99,
+    // Re-verified 2026-05-14 at ~$4,681 spot (JM Bullion live ticker).
+    // Single-piece check/wire: JM $4,833.77, SD $4,738.84,
+    // MM $4,846.70 ($166 premium listed explicitly).
+    // APMEX row is hidden (empty slug in coins.ts) — they only carry a
+    // .99999 + assay card SKU, not a standard .9999 random-year Maple.
+    apmex:         0,    // unused — row hidden by empty slug in coins.ts
+    jmbullion:   152.99,
+    sdbullion:    57.99,
+    moneymetals: 166.00,
   },
 };
 
@@ -66,4 +71,4 @@ export function premiumFor(coinId: CompareCoin["id"], dealerId: Dealer["id"]): n
 // users can judge how fresh the comparison really is. Update whenever you
 // edit any value above. ISO format (YYYY-MM-DD) — the UI formats it for
 // display.
-export const PREMIUMS_LAST_REVIEWED = "2026-05-10";
+export const PREMIUMS_LAST_REVIEWED = "2026-05-14";

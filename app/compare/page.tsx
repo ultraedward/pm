@@ -98,6 +98,12 @@ export const metadata: Metadata = {
       "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Live spot plus hand-verified dealer premiums, sorted low to high.",
     url: "https://lode.rocks/compare",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
+    description:
+      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Live spot plus hand-verified dealer premiums, sorted low to high.",
+  },
 };
 
 // Build a sparse coin × dealer availability map. The client only needs to
