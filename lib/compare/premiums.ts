@@ -24,42 +24,44 @@ import type { Dealer } from "./dealers";
 type PremiumTable = Record<CompareCoin["id"], Record<Dealer["id"], number>>;
 
 export const PREMIUMS: PremiumTable = {
-  // Silver premiums re-verified 2026-05-10 against apmex.com at $80.34 spot.
-  // APMEX Silver Eagle MintDirect single: $93.66 → ~$13.32 premium (compressed
-  // from $16.99 on May 4 as spot rose ~$7). JM/SD/MM estimated from typical
-  // spreads vs. APMEX. Silver Maple adjusted proportionally (~$2 below Eagle).
-  //
+  // Silver Eagle re-verified 2026-05-19 via FindBullionPrices.com hourly data
+  // at ~$74.34 spot and moneymetals.com (MM states premium explicitly).
+  // Note: premiums widened vs. May 10 as spot fell ~$6 — dealers protect margin.
+  // FBP single-piece ACH/cash prices: APMEX $90.77, JM $91.32, SD $82.92.
+  // MM: $11.49 single-unit premium listed explicitly on product page.
   "silver-eagle": {
-    apmex:       13.49,  // verified: $93.66 - $80.34 spot (2026-05-10)
-    jmbullion:   11.49,  // ~$2 below APMEX (typical)
-    sdbullion:    9.49,  // ~$4 below APMEX (typically most aggressive)
-    moneymetals: 10.49,  // ~$3 below APMEX
+    apmex:       16.43,  // verified: $90.77 - $74.34 spot (2026-05-19)
+    jmbullion:   16.98,  // verified: $91.32 - $74.34 spot (2026-05-19)
+    sdbullion:    8.58,  // verified: $82.92 - $74.34 spot (2026-05-19)
+    moneymetals: 11.49,  // verified: explicit on moneymetals.com (2026-05-19)
   },
   "gold-eagle": {
-    // Re-verified 2026-05-14 at ~$4,681 spot (JM Bullion live ticker).
-    // Single-piece check/wire prices: APMEX $4,902.59, JM $4,893.24,
-    // SD $4,863.97, MM $4,898.70 (MM lists $219 premium explicitly).
-    apmex:       221.99,
-    jmbullion:   211.99,
-    sdbullion:   182.99,
-    moneymetals: 219.00,
+    // Re-verified 2026-05-19 via FindBullionPrices.com at ~$4,491.71 spot.
+    // Single-piece ACH/cash: SD $4,678.07, APMEX $4,692.89, JM $4,706.89.
+    // MM: $219.00 single-unit premium listed explicitly on product page.
+    apmex:       201.18,  // verified: $4,692.89 - $4,491.71 spot (2026-05-19)
+    jmbullion:   215.18,  // verified: $4,706.89 - $4,491.71 spot (2026-05-19)
+    sdbullion:   186.36,  // verified: $4,678.07 - $4,491.71 spot (2026-05-19)
+    moneymetals: 219.00,  // verified: explicit on moneymetals.com (2026-05-19)
   },
+  // Silver Maple re-verified 2026-05-19 via FindBullionPrices.com hourly data
+  // at ~$74.37 spot. SD notably aggressive on random-year Maples right now.
+  // FBP single-piece ACH/cash: SD $77.42, MM $81.25, APMEX $85.71, JM $87.74.
   "silver-maple": {
-    apmex:       11.49,  // re-verified 2026-05-10 (silver premiums stable)
-    jmbullion:    9.49,
-    sdbullion:    7.49,
-    moneymetals:  8.49,
+    apmex:       11.34,  // verified: $85.71 - $74.37 spot (2026-05-19)
+    jmbullion:   13.37,  // verified: $87.74 - $74.37 spot (2026-05-19)
+    sdbullion:    3.05,  // verified: $77.42 - $74.37 spot (2026-05-19)
+    moneymetals:  6.88,  // verified: $81.25 - $74.37 spot (2026-05-19)
   },
   "gold-maple": {
-    // Re-verified 2026-05-14 at ~$4,681 spot (JM Bullion live ticker).
-    // Single-piece check/wire: JM $4,833.77, SD $4,738.84,
-    // MM $4,846.70 ($166 premium listed explicitly).
+    // Re-verified 2026-05-19 via FindBullionPrices.com at ~$4,493.90 spot.
+    // Single-piece ACH/cash: SD $4,553.07, APMEX $4,571.59 (hidden), MM $4,645.65, JM $4,647.28.
     // APMEX row is hidden (empty slug in coins.ts) — they only carry a
     // .99999 + assay card SKU, not a standard .9999 random-year Maple.
     apmex:         0,    // unused — row hidden by empty slug in coins.ts
-    jmbullion:   152.99,
-    sdbullion:    57.99,
-    moneymetals: 166.00,
+    jmbullion:   153.38,  // verified: $4,647.28 - $4,493.90 spot (2026-05-19)
+    sdbullion:    59.17,  // verified: $4,553.07 - $4,493.90 spot (2026-05-19)
+    moneymetals: 151.75,  // verified: $4,645.65 - $4,493.90 spot (2026-05-19)
   },
 };
 
@@ -71,4 +73,4 @@ export function premiumFor(coinId: CompareCoin["id"], dealerId: Dealer["id"]): n
 // users can judge how fresh the comparison really is. Update whenever you
 // edit any value above. ISO format (YYYY-MM-DD) — the UI formats it for
 // display.
-export const PREMIUMS_LAST_REVIEWED = "2026-05-14";
+export const PREMIUMS_LAST_REVIEWED = "2026-05-19";
