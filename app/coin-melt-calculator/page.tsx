@@ -110,6 +110,22 @@ const jsonLd = {
         },
         {
           "@type": "Question",
+          "name": "What is the melt value of a silver quarter?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A pre-1965 Washington silver quarter contains 0.18084 troy ounces of silver (90% silver, 6.25g total weight). To find its melt value, multiply 0.18084 by the current silver spot price. At a $32 spot price, a silver quarter is worth about $5.79 in silver melt value. Four quarters ($1 face value) contain 0.7234 troy oz before wear adjustment.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "What is the melt value of a Mexican silver coin?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mexico has minted several silver coins across different eras. The modern Mexican Silver Libertad (1 oz .999 fine silver) has a melt value equal to the silver spot price — the same as an American Silver Eagle. The historic Mexican Onza (1 troy oz .925 silver) is worth spot × 0.925. Older Mexican pesos vary significantly: the large 8 Reales and peso coins from the late 1800s to 1918 are 90% silver. Identify the specific coin's year, denomination, and fineness to calculate the exact melt value — then multiply the silver content in troy ounces by the current spot price.",
+          },
+        },
+        {
+          "@type": "Question",
           "name": "What is the scrap value of a silver coin?",
           "acceptedAnswer": {
             "@type": "Answer",

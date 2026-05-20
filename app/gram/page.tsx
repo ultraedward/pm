@@ -14,7 +14,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Gold & Silver Price Per Gram Calculator — Live Spot",
   description:
-    "Calculate gold and silver price per gram instantly with live spot prices. Covers 24k, 22k, 18k, 14k, 10k gold and .999 fine, 925 sterling, coin 900, European 800 silver.",
+    "Calculate gold and silver price per gram instantly with live spot prices. Covers 24k, 22k, 18k, 14k, 10k gold and .999 fine, 925 (92.5%) sterling, coin 900, European 800 silver.",
   alternates: {
     canonical: "https://lode.rocks/gram",
   },
@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     "gold price per gram today",
     "sterling silver price per gram",
     "925 silver price per gram",
+    "92.5 silver price per gram",
+    "92.5 silver price per gram calculator",
     "14k gold price per gram",
     "18k gold price per gram",
     "silver melt value calculator",
@@ -115,7 +117,7 @@ export default async function GramPage() {
           },
           {
             "@type": "Question",
-            "name": "How much is sterling silver worth per gram?",
+            "name": "How much is 92.5 sterling silver worth per gram?",
             "acceptedAnswer": {
               "@type": "Answer",
               "text": `Sterling silver is 92.5% pure silver. At today's spot price${silverSpot > 0 ? `, sterling silver is worth approximately $${(silverSpot * 0.925 / 31.1035).toFixed(4)} per gram` : " — use the calculator above for the current value"}. Multiply the fine silver price per gram by 0.925 to get the sterling melt value.`,
@@ -250,9 +252,9 @@ export default async function GramPage() {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-bold text-white">How much is sterling silver worth per gram?</h3>
+              <h3 className="text-sm font-bold text-white">How much is 92.5 (sterling) silver worth per gram?</h3>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Sterling silver is 92.5% pure silver (marked &quot;925&quot;).
+                Sterling silver is 92.5% pure silver — stamped &quot;925&quot; or &quot;92.5&quot; on jewelry and flatware.
                 {silverSpot > 0
                   ? ` At today's spot price, sterling silver is worth ${formatCurrency(silverSpot * 0.925 / 31.1035)} per gram. To calculate it yourself: multiply the fine silver price per gram by 0.925.`
                   : " To calculate: multiply the fine .999 silver price per gram by 0.925. The calculator above does this automatically."}

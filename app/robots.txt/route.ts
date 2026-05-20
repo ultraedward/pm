@@ -2,7 +2,6 @@ export async function GET() {
   return new Response(
     `User-agent: *
 Allow: /
-Allow: /pricing
 
 Disallow: /dashboard
 Disallow: /account

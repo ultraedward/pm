@@ -14,7 +14,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Junk Silver Calculator — Live Melt Value for 90% Silver Coins",
   description:
-    "Free junk silver calculator with live spot prices. Instantly find the melt value of pre-1965 silver dimes, quarters, half dollars, and Morgan & Peace dollars. Enter face value or count by coin.",
+    "Free junk silver calculator with live spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars — and Canadian pre-1968 80% silver coins. Enter face value or count by coin.",
   keywords: [
     "junk silver calculator",
     "junk silver melt value",
@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     "junk silver price today",
     "90 percent silver coin value",
     "face value silver calculator",
+    "canadian junk silver calculator",
+    "canadian junk silver melt value",
+    "canadian 80 percent silver coins",
+    "canadian silver dime melt value",
+    "canadian silver quarter melt value",
   ],
   alternates: {
     canonical: "https://lode.rocks/junk-silver-calculator",
@@ -123,6 +128,14 @@ const jsonLd = {
         },
         {
           "@type": "Question",
+          "name": "What is the melt value of Canadian junk silver coins?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Canadian pre-1968 dimes, quarters, half dollars, and dollar coins are 80% silver (compared to 90% for US coins). A Canadian dime contains 0.0600 troy oz of silver, a quarter 0.1500 oz, a half dollar 0.3000 oz, and a dollar coin 0.6000 oz. $1 face value in Canadian 80% silver holds 0.600 troy oz — slightly less than the 0.715 oz in US 90% junk silver. Multiply any coin's silver content by the live spot price to find today's melt value.",
+          },
+        },
+        {
+          "@type": "Question",
           "name": "Do dealers pay melt value for junk silver?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -156,6 +169,16 @@ export default async function JunkSilverCalculatorPage() {
     { label: "$1 face value in 90% coins",         asw: OZ_PER_DOLLAR },
     { label: "$10 face value in 90% coins",        asw: OZ_PER_DOLLAR * 10 },
     { label: "$100 face value in 90% coins",       asw: OZ_PER_DOLLAR * 100 },
+  ];
+
+  // Canadian pre-1968 coins are 80% silver (vs 90% for US)
+  const CANADIAN_COINS = [
+    { label: "Canadian dime (pre-1968)",           asw: 0.06000 },
+    { label: "Canadian quarter (pre-1968)",        asw: 0.15000 },
+    { label: "Canadian half dollar (pre-1968)",    asw: 0.30000 },
+    { label: "Canadian dollar (pre-1968)",         asw: 0.60000 },
+    { label: "$1 face value in 80% Canadian coins", asw: 0.600   },
+    { label: "$10 face value in 80% Canadian coins", asw: 6.000  },
   ];
 
   return (
@@ -202,38 +225,79 @@ export default async function JunkSilverCalculatorPage() {
       {/* ── Reference table ──────────────────────────────────────── */}
       {silverSpot > 0 && (
         <section className="px-4 sm:px-6 pb-12">
-          <div className="mx-auto max-w-2xl space-y-4">
-            <h2 className="text-base font-bold text-white">Today&apos;s junk silver melt values</h2>
-            <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-              <div
-                className="grid px-5 py-2.5 border-b text-[10px] font-bold uppercase tracking-widest text-gray-600"
-                style={{ gridTemplateColumns: "1fr auto auto", borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}
-              >
-                <span>Coin / amount</span>
-                <span className="text-right pr-6">Oz silver</span>
-                <span className="text-right w-24">Melt value</span>
+          <div className="mx-auto max-w-2xl space-y-8">
+
+            {/* US junk silver table */}
+            <div className="space-y-4">
+              <h2 className="text-base font-bold text-white">Today&apos;s US junk silver melt values</h2>
+              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+                <div
+                  className="grid px-5 py-2.5 border-b text-[10px] font-bold uppercase tracking-widest text-gray-600"
+                  style={{ gridTemplateColumns: "1fr auto auto", borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}
+                >
+                  <span>Coin / amount</span>
+                  <span className="text-right pr-6">Oz silver</span>
+                  <span className="text-right w-24">Melt value</span>
+                </div>
+                <div className="divide-y" style={{ borderColor: "var(--border)" }}>
+                  {COINS.map(({ label, asw }) => (
+                    <div
+                      key={label}
+                      className="grid items-center px-5 py-3"
+                      style={{ gridTemplateColumns: "1fr auto auto" }}
+                    >
+                      <span className="text-sm text-gray-400">{label}</span>
+                      <span className="text-sm tabular-nums text-gray-500 text-right pr-6">
+                        {asw.toFixed(4)}
+                      </span>
+                      <span className="text-sm font-bold tabular-nums text-white text-right w-24">
+                        {formatCurrency(asw * silverSpot)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="divide-y" style={{ borderColor: "var(--border)" }}>
-                {COINS.map(({ label, asw }) => (
-                  <div
-                    key={label}
-                    className="grid items-center px-5 py-3"
-                    style={{ gridTemplateColumns: "1fr auto auto" }}
-                  >
-                    <span className="text-sm text-gray-400">{label}</span>
-                    <span className="text-sm tabular-nums text-gray-500 text-right pr-6">
-                      {asw.toFixed(4)}
-                    </span>
-                    <span className="text-sm font-bold tabular-nums text-white text-right w-24">
-                      {formatCurrency(asw * silverSpot)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-gray-700">
+                $1 face value uses 0.715 oz (industry standard for circulated 90% silver). Individual coin figures use actual specified weight.
+              </p>
             </div>
-            <p className="text-xs text-gray-700">
-              $1 face value uses 0.715 oz (industry standard for circulated 90% silver). Individual coin figures use actual specified weight.
-            </p>
+
+            {/* Canadian junk silver table */}
+            <div className="space-y-4">
+              <h2 className="text-base font-bold text-white">Canadian junk silver melt values (pre-1968)</h2>
+              <p className="text-xs text-gray-600">Canadian dimes, quarters, halves, and dollars minted before 1968 are 80% silver.</p>
+              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+                <div
+                  className="grid px-5 py-2.5 border-b text-[10px] font-bold uppercase tracking-widest text-gray-600"
+                  style={{ gridTemplateColumns: "1fr auto auto", borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}
+                >
+                  <span>Coin / amount</span>
+                  <span className="text-right pr-6">Oz silver</span>
+                  <span className="text-right w-24">Melt value</span>
+                </div>
+                <div className="divide-y" style={{ borderColor: "var(--border)" }}>
+                  {CANADIAN_COINS.map(({ label, asw }) => (
+                    <div
+                      key={label}
+                      className="grid items-center px-5 py-3"
+                      style={{ gridTemplateColumns: "1fr auto auto" }}
+                    >
+                      <span className="text-sm text-gray-400">{label}</span>
+                      <span className="text-sm tabular-nums text-gray-500 text-right pr-6">
+                        {asw.toFixed(4)}
+                      </span>
+                      <span className="text-sm font-bold tabular-nums text-white text-right w-24">
+                        {formatCurrency(asw * silverSpot)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-gray-700">
+                $1 face value in Canadian 80% silver = 0.600 oz (vs 0.715 oz for US 90% silver). Pre-1968 coins only; post-1968 Canadian coins contain no silver.
+              </p>
+            </div>
+
           </div>
         </section>
       )}
