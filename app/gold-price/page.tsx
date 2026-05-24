@@ -158,7 +158,7 @@ const jsonLd = {
           "name": "What is the difference between gold spot price and gold coin price?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The spot price is the raw market price for pure gold at this moment. When you buy a gold coin from a dealer, you pay the spot price plus a premium — typically $50–$100 per ounce for common coins like American Gold Eagles or Canadian Maple Leafs. The premium covers minting, distribution, and dealer margin. Use lode.rocks/compare to see current premiums across major dealers.",
+            "text": "The spot price is the raw market price for pure gold at this moment. When you buy a gold coin from a dealer, you pay the spot price plus a premium. For common government-minted coins like American Gold Eagles or Canadian Gold Maple Leafs, single-coin premiums typically run $150–$220 per ounce above spot — roughly 4–5% at current price levels. Premiums are lower on bars and when buying in larger quantities. Use lode.rocks/compare to see current premiums verified across major dealers.",
           },
         },
         {
@@ -408,9 +408,10 @@ export default async function GoldPricePage() {
                   market rate for refined .999+ gold. Dealers charge a{" "}
                   <strong className="text-white">premium over spot</strong> that covers minting,
                   distribution, and their margin. For common government-minted coins like American Gold
-                  Eagles or Canadian Gold Maple Leafs, premiums typically run $50–$100 per ounce above
-                  spot. Gold bars carry lower premiums than coins. Larger purchases (kilo bars, for
-                  example) often come with lower per-ounce premiums.
+                  Eagles or Canadian Gold Maple Leafs, single-coin premiums currently run roughly
+                  $150–$220 per ounce above spot — approximately 4–5% at today&rsquo;s price levels. Gold
+                  bars carry lower premiums than coins. Buying in larger quantities (kilo bars, for
+                  example) often reduces the per-ounce cost further.
                 </p>
                 <p>
                   The{" "}

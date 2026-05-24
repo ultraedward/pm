@@ -62,7 +62,7 @@ function buildWeightRows(spot: number) {
     { label: "Per gram (fine)", value: spot * TROY_PER_GRAM },
     { label: "Per kilogram",     value: spot * TROY_PER_KILO },
     { label: "Per pennyweight",  value: spot / 20 },
-    { label: "Per pound",        value: spot * (12 / 1) }, // troy pounds
+    { label: "Per grain",        value: spot / 480 }, // 1 troy oz = 480 grains
   ];
 }
 
@@ -145,7 +145,7 @@ const jsonLd = {
           "name": "What is the silver spot price per gram?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "To convert silver spot price per troy ounce to price per gram, divide by 31.1035 (the number of grams in a troy ounce). For example, if silver is $30.00 per troy ounce, it is $30.00 ÷ 31.1035 = $0.9646 per gram. Use the weight reference table on this page or the silver price per gram calculator at lode.rocks/gram for an interactive calculation.",
+            "text": "To convert silver spot price per troy ounce to price per gram, divide by 31.1035 (the number of grams in a troy ounce). For example, if silver is $30.00 per troy ounce, it is $30.00 ÷ 31.1035 = $0.9643 per gram. Use the weight reference table on this page or the silver price per gram calculator at lode.rocks/gram for an interactive calculation.",
           },
         },
         {
@@ -161,7 +161,7 @@ const jsonLd = {
           "name": "What is the difference between silver spot price and silver coin price?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The spot price is the raw market price for pure silver. When you buy a silver coin from a dealer, you pay the spot price plus a premium — typically $3–8 per ounce for common coins like American Silver Eagles, less for generic rounds. The premium covers minting, distribution, and dealer margin. Use lode.rocks/compare to see current premiums across major dealers.",
+            "text": "The spot price is the raw market price for pure silver. When you buy a silver coin from a dealer, you pay the spot price plus a premium — currently $8–$17 per ounce for American Silver Eagles at single-coin quantities. Generic silver rounds carry lower premiums, typically $1–4 per ounce. The premium covers minting, distribution, and dealer margin. Use lode.rocks/compare to see verified premiums across major dealers.",
           },
         },
         {
@@ -236,7 +236,7 @@ export default async function SilverPricePage() {
               <div className="flex items-baseline gap-3 flex-wrap">
                 <span
                   className="text-5xl sm:text-6xl font-black tabular-nums tracking-tighter"
-                  style={{ color: "var(--gold-bright)" }}
+                  style={{ color: "#C0C0C0" }}
                 >
                   {fmt(spot)}
                 </span>
@@ -323,7 +323,7 @@ export default async function SilverPricePage() {
                   <div key={label} className="flex items-center justify-between px-5 py-3">
                     <span className="text-sm text-gray-400">{label}</span>
                     <span className="text-sm font-bold tabular-nums text-white">
-                      {fmt(value, label.includes("gram") ? 4 : 2)}
+                      {fmt(value, label.includes("gram") || label.includes("grain") ? 4 : 2)}
                     </span>
                   </div>
                 ))}
@@ -395,9 +395,10 @@ export default async function SilverPricePage() {
                 The spot price shown on this page is not what you pay at a dealer — it&rsquo;s the raw market price
                 for pure silver. Dealers charge a <strong className="text-white">premium over spot</strong> that
                 covers minting costs, distribution, and their margin. For common government-minted coins like
-                American Silver Eagles, premiums typically run $3–8 per ounce above spot. Generic silver rounds
-                carry lower premiums. Buying in larger quantities (a full monster box of 500 Eagles, for example)
-                usually reduces the per-ounce premium.
+                American Silver Eagles, single-coin premiums currently run $8–$17 per ounce above spot.
+                Generic silver rounds carry lower premiums — often $1–4 per ounce. Buying in larger
+                quantities (a full monster box — the standard 500-coin bulk case — usually reduces
+                the per-coin premium meaningfully).
               </p>
               <p>
                 The{" "}

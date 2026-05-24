@@ -158,7 +158,7 @@ const jsonLd = {
           "name": "What drives the platinum price?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "About 40% of annual platinum demand comes from catalytic converters for gasoline and diesel vehicles (platinum is used in gasoline catalysts; palladium in most modern ones). South Africa produces roughly 70–75% of global platinum supply, so labor disputes, electricity shortages, and rand/dollar exchange rates heavily influence price. Investment demand (ETFs, coins, bars) and jewelry (especially in China and Japan) make up most of the remainder. Growing interest in hydrogen fuel cells — where platinum is the key catalyst — is an emerging long-term demand driver.",
+            "text": "Roughly 35–40% of annual platinum demand comes from catalytic converters — primarily in diesel vehicles, where platinum is the key active metal, and increasingly in hydrogen fuel cells. (Gasoline catalytic converters use palladium, not platinum.) South Africa produces roughly 70–75% of global platinum supply, so labor disputes, electricity shortages at mines, and the rand/dollar exchange rate can all move the platinum price significantly. Investment demand (ETFs, coins, bars) and jewelry — especially in Japan and China — make up most of the remainder.",
           },
         },
         {
@@ -367,8 +367,8 @@ export default async function PlatinumPricePage() {
               <div className="space-y-3">
                 <h3 className="text-base font-bold text-white">What moves the platinum price?</h3>
                 <p>
-                  Platinum is one of the rarest elements on Earth — roughly 30 times rarer than gold by
-                  annual mine production. Its price is driven by a split between{" "}
+                  Platinum is one of the rarest elements on Earth — global mine production is roughly
+                  15–20 times smaller than gold by weight each year. Its price is driven by a split between{" "}
                   <strong className="text-white">industrial demand</strong> and{" "}
                   <strong className="text-white">investment demand</strong>, with industry (primarily
                   automotive catalysts) typically accounting for 35–45% of total consumption.
@@ -376,8 +376,8 @@ export default async function PlatinumPricePage() {
                 <p>
                   Because <strong className="text-white">South Africa</strong> produces roughly 70–75% of
                   global platinum supply, local factors — labor strikes at mines, electricity rationing
-                  from Eskom, and the rand/dollar exchange rate — can move the platinum price
-                  significantly even when global demand is stable. This supply concentration makes
+                  from Eskom (South Africa&rsquo;s state power utility), and the rand/dollar exchange rate —
+                  can move the platinum price significantly even when global demand is stable. This supply concentration makes
                   platinum more volatile than gold on a per-event basis.
                 </p>
               </div>

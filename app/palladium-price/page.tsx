@@ -142,7 +142,7 @@ const jsonLd = {
           "name": "Why did palladium prices spike so dramatically?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Palladium prices surged from around $500/oz in 2016 to over $2,800/oz in early 2022 due to a sustained supply deficit. Palladium is primarily used in gasoline catalytic converters, and tightening global auto emissions standards drove record demand at a time when mine supply — concentrated in Russia and South Africa — was constrained. After peaking in 2022, prices fell sharply as EV adoption reduced gasoline vehicle sales and automakers worked down inventories.",
+            "text": "Palladium prices surged from around $500/oz in 2016 to nearly $3,000/oz in early 2022 due to a sustained supply deficit. Palladium is primarily used in gasoline catalytic converters, and tightening global auto emissions standards drove record demand at a time when mine supply — concentrated in Russia and South Africa — was constrained. After peaking in 2022, prices fell sharply as EV adoption reduced gasoline vehicle sales and automakers worked down inventories.",
           },
         },
         {
@@ -380,7 +380,7 @@ export default async function PalladiumPricePage() {
                   US — increased the amount of palladium required per vehicle throughout the 2010s,
                   driving sustained demand growth even as production volumes were relatively flat.
                   This mismatch between supply and demand produced the dramatic price spike from
-                  ~$500/oz in 2016 to over $2,800/oz in 2022.
+                  ~$500/oz in 2016 to nearly $3,000/oz in 2022.
                 </p>
               </div>
 
