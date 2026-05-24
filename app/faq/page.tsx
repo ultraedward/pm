@@ -2,14 +2,14 @@ import { FaqClient } from "./FaqClient";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "Precious Metals FAQ — Spot Prices, Troy Ounces, Junk Silver & More",
+  title: "Precious Metals FAQ — Spot Price, Coins & Junk Silver Explained",
   description:
     "Answers to common questions about precious metals and about Lode: what spot price means, how gold prices are set, troy oz vs regular oz, what junk silver is, how price alerts work, and more.",
   alternates: {
     canonical: "https://lode.rocks/faq",
   },
   openGraph: {
-    title: "Precious Metals FAQ — Spot Prices, Troy Ounces, Junk Silver & More",
+    title: "Precious Metals FAQ — Spot Price, Coins & Junk Silver Explained",
     description:
       "What is spot price? How is the gold price set? What's a troy ounce? What is junk silver? Direct answers to common precious metals questions.",
     url: "https://lode.rocks/faq",
@@ -26,6 +26,15 @@ const faqJsonLd = {
         { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lode.rocks" },
         { "@type": "ListItem", "position": 2, "name": "FAQ",  "item": "https://lode.rocks/faq" },
       ],
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://lode.rocks/faq#page",
+      "url": "https://lode.rocks/faq",
+      "name": "Precious Metals FAQ — Spot Price, Coins & Junk Silver Explained",
+      "description": "Answers to common questions about precious metals: spot price, troy ounces, junk silver, melt value, and how Lode works.",
+      "isPartOf": { "@id": "https://lode.rocks/#site" },
+      "dateModified": "2026-05-01",
     },
     {
       "@type": "FAQPage",

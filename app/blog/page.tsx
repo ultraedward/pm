@@ -18,6 +18,44 @@ export const metadata: Metadata = {
   },
 };
 
+const blogJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",              "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "Guides & Articles", "item": "https://lode.rocks/blog" },
+      ],
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://lode.rocks/blog#page",
+      "url": "https://lode.rocks/blog",
+      "name": "Precious Metals Guides & Resources",
+      "description": "In-depth guides on buying, valuing, and understanding precious metals — junk silver, coin melt values, gold IRAs, and more.",
+      "isPartOf": { "@id": "https://lode.rocks/#site" },
+      "hasPart": [
+        {
+          "@type": "Article",
+          "@id": "https://lode.rocks/blog/junk-silver-guide#article",
+          "headline": "The Complete Guide to Buying Junk Silver Coins (2026)",
+          "url": "https://lode.rocks/blog/junk-silver-guide",
+          "datePublished": "2026-05-01",
+          "dateModified": "2026-05-20",
+          "author": { "@type": "Organization", "name": "Lode", "url": "https://lode.rocks" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://lode.rocks/blog/junk-silver-guide/opengraph-image",
+            "width": 1200,
+            "height": 630,
+          },
+        },
+      ],
+    },
+  ],
+};
+
 const articles = [
   {
     slug: "junk-silver-guide",
@@ -33,6 +71,10 @@ const articles = [
 export default function BlogIndexPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
+      />
       <main
         className="overflow-x-hidden min-h-screen"
         style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}

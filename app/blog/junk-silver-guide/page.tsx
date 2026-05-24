@@ -49,8 +49,14 @@ const jsonLd = {
       "headline": "The Complete Guide to Buying Junk Silver Coins (2026)",
       "description": "Everything you need to know about junk silver: what it is, which coins qualify, how to calculate melt value, where to buy it, and what premiums to expect.",
       "url": "https://lode.rocks/blog/junk-silver-guide",
+      "image": {
+        "@type": "ImageObject",
+        "url": "https://lode.rocks/blog/junk-silver-guide/opengraph-image",
+        "width": 1200,
+        "height": 630,
+      },
       "datePublished": "2026-05-01",
-      "dateModified": "2026-05-01",
+      "dateModified": "2026-05-20",
       "author": {
         "@type": "Organization",
         "name": "Lode",

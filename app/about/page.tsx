@@ -17,10 +17,23 @@ export const metadata = {
 
 const aboutJsonLd = {
   "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home",  "item": "https://lode.rocks" },
-    { "@type": "ListItem", "position": 2, "name": "About", "item": "https://lode.rocks/about" },
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",  "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "About", "item": "https://lode.rocks/about" },
+      ],
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://lode.rocks/about#page",
+      "url": "https://lode.rocks/about",
+      "name": "About Lode — Independent Precious Metals Price Tracker",
+      "description": "Lode is an independent precious metals price tracker — live spot prices, a coin melt calculator, a portfolio tracker, and email price alerts. Built for people who hold physical metal.",
+      "isPartOf": { "@id": "https://lode.rocks/#site" },
+      "about": { "@id": "https://lode.rocks/#org" },
+    },
   ],
 };
 

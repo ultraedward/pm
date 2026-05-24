@@ -202,10 +202,10 @@ export default async function ComparePage() {
         <div className="mx-auto max-w-2xl">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
             <span>Live spot prices:</span>
-            <Link href="/gold-price"      className="hover:text-amber-400 transition-colors" style={{ color: "var(--gold-bright)" }}>Gold →</Link>
-            <Link href="/silver-price"    className="text-gray-400 hover:text-gray-200 transition-colors">Silver →</Link>
-            <Link href="/platinum-price"  className="text-gray-400 hover:text-gray-200 transition-colors">Platinum →</Link>
-            <Link href="/palladium-price" className="text-gray-400 hover:text-gray-200 transition-colors">Palladium →</Link>
+            <Link href="/gold-price"      className="hover:text-amber-400 transition-colors" style={{ color: "var(--gold-bright)" }}>Gold price →</Link>
+            <Link href="/silver-price"    className="text-gray-400 hover:text-gray-200 transition-colors">Silver price →</Link>
+            <Link href="/platinum-price"  className="text-gray-400 hover:text-gray-200 transition-colors">Platinum price →</Link>
+            <Link href="/palladium-price" className="text-gray-400 hover:text-gray-200 transition-colors">Palladium price →</Link>
           </div>
         </div>
       </section>
