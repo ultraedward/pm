@@ -47,10 +47,12 @@ export default function NavLinks({ isLoggedIn }: Props) {
         </>
       ) : (
         <>
-          <Link href="/gold-price"   className={linkClass("/gold-price")}   style={activeStyle("/gold-price")}   aria-current={isActive("/gold-price")   ? "page" : undefined}>Gold Price</Link>
-          <Link href="/silver-price" className={linkClass("/silver-price")} style={activeStyle("/silver-price")} aria-current={isActive("/silver-price") ? "page" : undefined}>Silver Price</Link>
-          <Link href="/compare"      className={linkClass("/compare")}      style={activeStyle("/compare")}      aria-current={isActive("/compare")      ? "page" : undefined}>Compare</Link>
-          <Link href="/gold-ira"     className={linkClass("/gold-ira")}     style={activeStyle("/gold-ira")}     aria-current={isActive("/gold-ira")     ? "page" : undefined}>Gold IRA</Link>
+          <Link href="/gold-price"      className={linkClass("/gold-price")}      style={activeStyle("/gold-price")}      aria-current={isActive("/gold-price")      ? "page" : undefined}>Gold</Link>
+          <Link href="/silver-price"    className={linkClass("/silver-price")}    style={activeStyle("/silver-price")}    aria-current={isActive("/silver-price")    ? "page" : undefined}>Silver</Link>
+          <Link href="/platinum-price"  className={`hidden lg:inline-flex ${linkClass("/platinum-price")}`}  style={activeStyle("/platinum-price")}  aria-current={isActive("/platinum-price")  ? "page" : undefined}>Platinum</Link>
+          <Link href="/palladium-price" className={`hidden lg:inline-flex ${linkClass("/palladium-price")}`} style={activeStyle("/palladium-price")} aria-current={isActive("/palladium-price") ? "page" : undefined}>Palladium</Link>
+          <Link href="/compare"         className={linkClass("/compare")}         style={activeStyle("/compare")}         aria-current={isActive("/compare")         ? "page" : undefined}>Compare</Link>
+          <Link href="/gold-ira"        className={linkClass("/gold-ira")}        style={activeStyle("/gold-ira")}        aria-current={isActive("/gold-ira")        ? "page" : undefined}>Gold IRA</Link>
           <Link href="/login" className="btn-gold px-4 py-1.5 text-xs">
             Get started
           </Link>

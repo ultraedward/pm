@@ -40,8 +40,74 @@ export async function SiteFooter() {
           </div>
         )}
 
-        {/* ── Main row: brand · product links · copyright ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* ── Main link grid ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pb-2">
+          {/* Spot prices */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Spot Prices</p>
+            {[
+              { href: "/gold-price",      label: "Gold Price"      },
+              { href: "/silver-price",    label: "Silver Price"    },
+              { href: "/platinum-price",  label: "Platinum Price"  },
+              { href: "/palladium-price", label: "Palladium Price" },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="block text-xs transition-colors hover:text-white" style={{ color: "var(--text-muted)" }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Tools */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Tools</p>
+            {[
+              { href: "/compare",              label: "Compare Dealers"    },
+              { href: "/coin-melt-calculator", label: "Coin Melt Value"    },
+              { href: "/junk-silver-calculator", label: "Junk Silver"      },
+              { href: "/gram",                 label: "Price Per Gram"     },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="block text-xs transition-colors hover:text-white" style={{ color: "var(--text-muted)" }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Investing */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Investing</p>
+            {[
+              { href: "/gold-ira",          label: "Gold IRA Guide"      },
+              { href: "/gold-price-alerts", label: "Price Alerts"        },
+              { href: "/portfolio-tracker", label: "Portfolio Tracker"   },
+              { href: "/blog",              label: "Guides & Articles"   },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="block text-xs transition-colors hover:text-white" style={{ color: "var(--text-muted)" }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Company */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Company</p>
+            {[
+              { href: "/about",       label: "About"       },
+              { href: "/methodology", label: "Methodology" },
+              { href: "/faq",         label: "FAQ"         },
+              { href: "/contact",     label: "Contact"     },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="block text-xs transition-colors hover:text-white" style={{ color: "var(--text-muted)" }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Bottom row: brand + copyright ── */}
+        <div
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t"
+          style={{ borderColor: "var(--border)" }}
+        >
           <Link
             href="/"
             className="font-black uppercase tracking-[0.28em] text-xs hover:opacity-60 transition-opacity"
@@ -49,28 +115,6 @@ export async function SiteFooter() {
           >
             Lode
           </Link>
-
-          {/* Product links — the ones people actually follow */}
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {[
-              { href: "/compare",              label: "Compare"        },
-              { href: "/coin-melt-calculator", label: "Melt Calculator" },
-              { href: "/gold-ira",             label: "Gold IRA"       },
-              { href: "/faq",                  label: "FAQ"            },
-              { href: "/about",                label: "About"          },
-              { href: "/contact",              label: "Contact"        },
-            ].map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-xs transition-colors hover:text-white"
-                style={{ color: "var(--text-muted)" }}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-
           <span className="text-xs" style={{ color: "var(--text-dim)" }}>
             © {year} Lode
           </span>
