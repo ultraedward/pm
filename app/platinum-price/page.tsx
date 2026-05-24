@@ -14,41 +14,41 @@ import { authOptions } from "@/lib/auth";
 
 export async function generateMetadata(): Promise<Metadata> {
   const spots = await fetchAllSpotPrices();
-  const price = spots.gold ?? 0;
+  const price = spots.platinum ?? 0;
   const priceStr = price > 0
     ? price.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })
     : null;
   const title = priceStr
-    ? `Gold Price Today: ${priceStr}/oz`
-    : "Gold Price Today — Live Spot Price Per Ounce";
+    ? `Platinum Price Today: ${priceStr}/oz`
+    : "Platinum Price Today — Live Spot Price Per Ounce";
 
   return {
     title,
     description:
-      "Live gold spot price per troy ounce, updated in real time. See today's gold price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
+      "Live platinum spot price per troy ounce, updated in real time. See today's platinum price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
     keywords: [
-      "gold price today",
-      "gold price per ounce",
-      "gold spot price",
-      "gold price per ounce today",
-      "gold price now",
-      "live gold price",
-      "gold price chart",
-      "gold price history",
-      "gold spot price today",
-      "current gold price",
-      "gold price per gram",
-      "gold price per kilo",
-      "XAU price",
+      "platinum price today",
+      "platinum price per ounce",
+      "platinum spot price",
+      "platinum price per ounce today",
+      "platinum price now",
+      "live platinum price",
+      "platinum price chart",
+      "platinum price history",
+      "platinum spot price today",
+      "current platinum price",
+      "platinum price per gram",
+      "platinum price per kilo",
+      "XPT price",
     ],
     alternates: {
-      canonical: "https://lode.rocks/gold-price",
+      canonical: "https://lode.rocks/platinum-price",
     },
     openGraph: {
       title,
       description:
-        "Live gold spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
-      url: "https://lode.rocks/gold-price",
+        "Live platinum spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+      url: "https://lode.rocks/platinum-price",
     },
   };
 }
@@ -62,7 +62,7 @@ function buildWeightRows(spot: number) {
     { label: "Per gram (fine)", value: spot * TROY_PER_GRAM },
     { label: "Per kilogram",    value: spot * TROY_PER_KILO },
     { label: "Per pennyweight", value: spot / 20 },
-    { label: "Per grain",       value: spot / 480 }, // 1 troy oz = 480 grains
+    { label: "Per grain",       value: spot / 480 },
   ];
 }
 
@@ -85,10 +85,10 @@ function fmtPct(n: number) {
   return `${sign}${n.toFixed(2)}%`;
 }
 
-async function getGoldStats() {
+async function getPlatinumStats() {
   try {
     const rows = await prisma.price.findMany({
-      where: { metal: "gold" },
+      where: { metal: "platinum" },
       orderBy: { timestamp: "desc" },
       take: 30,
       select: { price: true, timestamp: true },
@@ -96,10 +96,10 @@ async function getGoldStats() {
 
     if (rows.length === 0) return null;
 
-    const prices    = rows.map((r) => r.price);
-    const high30    = Math.max(...prices);
-    const low30     = Math.min(...prices);
-    const oldest    = rows[rows.length - 1]?.price ?? null;
+    const prices     = rows.map((r) => r.price);
+    const high30     = Math.max(...prices);
+    const low30      = Math.min(...prices);
+    const oldest     = rows[rows.length - 1]?.price ?? null;
     const price7dAgo = rows[6]?.price ?? null;
 
     return { high30, low30, oldest, price7dAgo, count: rows.length };
@@ -114,16 +114,16 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home",       "item": "https://lode.rocks" },
-        { "@type": "ListItem", "position": 2, "name": "Gold Price", "item": "https://lode.rocks/gold-price" },
+        { "@type": "ListItem", "position": 1, "name": "Home",            "item": "https://lode.rocks" },
+        { "@type": "ListItem", "position": 2, "name": "Platinum Price",  "item": "https://lode.rocks/platinum-price" },
       ],
     },
     {
       "@type": "WebPage",
-      "@id": "https://lode.rocks/gold-price#page",
-      "url": "https://lode.rocks/gold-price",
-      "name": "Gold Price Today — Live Spot Price Per Ounce",
-      "description": "Live gold spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
+      "@id": "https://lode.rocks/platinum-price#page",
+      "url": "https://lode.rocks/platinum-price",
+      "name": "Platinum Price Today — Live Spot Price Per Ounce",
+      "description": "Live platinum spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
     {
@@ -131,58 +131,58 @@ const jsonLd = {
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What is the gold price today?",
+          "name": "What is the platinum price today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The current gold spot price is shown at the top of this page and updates on every page load from Yahoo Finance futures data (GC=F). Gold prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.",
+            "text": "The current platinum spot price is shown at the top of this page and updates on every page load from Yahoo Finance futures data (PL=F). Platinum prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.",
           },
         },
         {
           "@type": "Question",
-          "name": "What is the gold spot price per gram?",
+          "name": "What is the platinum spot price per gram?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "To convert gold spot price per troy ounce to price per gram, divide by 31.1035 (the number of grams in a troy ounce). For example, if gold is $3,000 per troy ounce, it is $3,000 ÷ 31.1035 = $96.45 per gram. The weight reference table on this page shows today's gold price per gram for every common unit.",
+            "text": "To convert platinum spot price per troy ounce to price per gram, divide by 31.1035 (the number of grams in a troy ounce). For example, if platinum is $1,000 per troy ounce, it is $1,000 ÷ 31.1035 = $32.15 per gram. The weight reference table on this page shows today's platinum price per gram and kilogram.",
           },
         },
         {
           "@type": "Question",
-          "name": "Why does the gold price change every day?",
+          "name": "Why is platinum sometimes cheaper than gold?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Gold trades continuously on global futures markets. The price moves with inflation expectations, real interest rates, the strength of the US dollar, central bank buying and selling activity, geopolitical uncertainty, and demand for gold ETFs and physical coins and bars.",
+            "text": "Platinum and gold prices are determined by different supply and demand dynamics. Platinum is rarer than gold in the Earth's crust — about 30 times rarer — but its price is driven more by industrial demand (especially automotive catalysts) than investment demand. When auto production slows or diesel vehicle adoption falls, platinum demand weakens and its price can drop below gold. Historically platinum traded at a premium to gold; the reversal since 2015 is primarily due to the decline of diesel vehicles in Europe, where catalytic converters for diesel engines use platinum.",
           },
         },
         {
           "@type": "Question",
-          "name": "What is the difference between gold spot price and gold coin price?",
+          "name": "What drives the platinum price?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The spot price is the raw market price for pure gold at this moment. When you buy a gold coin from a dealer, you pay the spot price plus a premium — typically $50–$100 per ounce for common coins like American Gold Eagles or Canadian Maple Leafs. The premium covers minting, distribution, and dealer margin. Use lode.rocks/compare to see current premiums across major dealers.",
+            "text": "About 40% of annual platinum demand comes from catalytic converters for gasoline and diesel vehicles (platinum is used in gasoline catalysts; palladium in most modern ones). South Africa produces roughly 70–75% of global platinum supply, so labor disputes, electricity shortages, and rand/dollar exchange rates heavily influence price. Investment demand (ETFs, coins, bars) and jewelry (especially in China and Japan) make up most of the remainder. Growing interest in hydrogen fuel cells — where platinum is the key catalyst — is an emerging long-term demand driver.",
           },
         },
         {
           "@type": "Question",
-          "name": "What is the gold price per kilogram?",
+          "name": "Is platinum a good investment?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "To convert the gold price from troy ounces to kilograms, multiply by 32.1507 (the number of troy ounces in a kilogram). At $3,000 per troy ounce, one kilogram of gold is worth approximately $96,452. Kilo bars are a popular way for institutional and high-net-worth buyers to accumulate gold at lower premiums than coins.",
+            "text": "Lode provides price data, not investment advice. Platinum is more volatile than gold and more sensitive to industrial cycles. Whether it fits your portfolio depends on your goals and risk tolerance. The tools on Lode — price history, alerts, and dealer comparison — can help you make a more informed decision, but should not be treated as a buy or sell recommendation.",
           },
         },
         {
           "@type": "Question",
-          "name": "What is the gold-to-silver ratio?",
+          "name": "Where does platinum come from?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The gold-to-silver ratio is how many troy ounces of silver it takes to buy one troy ounce of gold. Historically it has ranged from about 15:1 to over 120:1. When the ratio is high (above 80), silver is considered cheap relative to gold. Precious metals investors watch the ratio to time shifts between the two metals.",
+            "text": "South Africa accounts for roughly 70–75% of annual global platinum mine supply, with Russia (10%) and Zimbabwe (8%) as significant secondary producers. The Bushveld Igneous Complex in South Africa is the largest known deposit of platinum group metals in the world. Because supply is so geographically concentrated, production disruptions have an outsized impact on price.",
           },
         },
         {
           "@type": "Question",
-          "name": "Is now a good time to buy gold?",
+          "name": "How does the platinum price compare to gold and palladium?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Lode provides price data, not investment advice. Whether gold is a good buy depends on your financial situation, goals, and time horizon. The tools on Lode — price history, alerts, and dealer comparison — can help you make a more informed decision, but should not be treated as a recommendation to buy or sell.",
+            "text": "Historically, platinum traded at a premium to gold. Since around 2015, gold has been more expensive than platinum, driven by gold's investment demand surge and platinum's struggles with diesel-emission scandals and EV adoption. Palladium, used primarily in gasoline catalytic converters, surpassed platinum dramatically in 2018–2022 due to supply shortages, but has since corrected sharply. Lode tracks all four spot prices on the homepage so you can compare them at a glance.",
           },
         },
       ],
@@ -190,15 +190,15 @@ const jsonLd = {
   ],
 };
 
-export default async function GoldPricePage() {
+export default async function PlatinumPricePage() {
   const [spots, stats, session] = await Promise.all([
     fetchAllSpotPrices(),
-    getGoldStats(),
+    getPlatinumStats(),
     getServerSession(authOptions),
   ]);
 
   const isLoggedIn = !!session?.user?.email;
-  const spot = spots.gold ?? 0;
+  const spot = spots.platinum ?? 0;
 
   const change30 = stats?.oldest && spot ? spot - stats.oldest : null;
   const pct30    = stats?.oldest && change30 != null ? (change30 / stats.oldest) * 100 : null;
@@ -217,6 +217,10 @@ export default async function GoldPricePage() {
     (qa) => ({ question: qa.name, answer: qa.acceptedAnswer.text })
   );
 
+  // Platinum color
+  const PLAT_COLOR = "#E5E4E2";
+  const PLAT_GLOW  = "rgba(229,228,226,0.12)";
+
   return (
     <>
       <main className="overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
@@ -230,13 +234,13 @@ export default async function GoldPricePage() {
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div
               className="absolute left-1/2 top-0 h-96 w-[600px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-8 blur-3xl"
-              style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
+              style={{ background: `radial-gradient(circle, ${PLAT_COLOR} 0%, transparent 70%)` }}
             />
           </div>
           <div className="relative z-10 mx-auto max-w-2xl space-y-3">
             <p className="label">Live spot</p>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-none">
-              Gold Price Today
+              Platinum Price Today
             </h1>
 
             {/* Big price */}
@@ -245,7 +249,7 @@ export default async function GoldPricePage() {
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span
                     className="text-5xl sm:text-6xl font-black tabular-nums tracking-tighter"
-                    style={{ color: "var(--gold-bright)" }}
+                    style={{ color: PLAT_COLOR }}
                   >
                     {fmt(spot)}
                   </span>
@@ -288,7 +292,7 @@ export default async function GoldPricePage() {
         {/* ── Chart ────────────────────────────────────────────────── */}
         <section className="px-4 sm:px-6 pb-8">
           <div className="mx-auto max-w-2xl">
-            <MetalPriceChart metal="gold" />
+            <MetalPriceChart metal="platinum" />
           </div>
         </section>
 
@@ -322,9 +326,9 @@ export default async function GoldPricePage() {
                   className="px-5 py-3 border-b flex items-center gap-2"
                   style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}
                 >
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#D4AF37" }} />
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: PLAT_COLOR }} />
                   <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                    Gold price by weight — today
+                    Platinum price by weight — today
                   </p>
                 </div>
                 <div className="divide-y" style={{ borderColor: "var(--border)" }}>
@@ -346,7 +350,7 @@ export default async function GoldPricePage() {
         {!isLoggedIn && (
           <section className="px-4 sm:px-6 pb-10">
             <div className="mx-auto max-w-2xl">
-              <EmailCapture source="gold-price" />
+              <EmailCapture source="platinum-price" />
             </div>
           </section>
         )}
@@ -356,85 +360,76 @@ export default async function GoldPricePage() {
           <div className="mx-auto max-w-2xl space-y-10">
             <div>
               <p className="label mb-1">Context &amp; background</p>
-              <h2 className="text-lg font-black tracking-tight">Understanding the gold market</h2>
+              <h2 className="text-lg font-black tracking-tight">Understanding the platinum market</h2>
             </div>
             <div className="space-y-10 text-sm text-gray-400 leading-relaxed">
 
               <div className="space-y-3">
-                <h3 className="text-base font-bold text-white">What moves the gold price?</h3>
+                <h3 className="text-base font-bold text-white">What moves the platinum price?</h3>
                 <p>
-                  Gold&rsquo;s spot price is set continuously by global futures markets, primarily{" "}
-                  <strong className="text-white">COMEX</strong> in New York and the{" "}
-                  <strong className="text-white">London Bullion Market Association (LBMA)</strong>, which
-                  publishes a benchmark twice daily. Unlike silver, gold&rsquo;s demand is overwhelmingly
-                  investment-driven — central banks, ETFs, coins, and bars account for most price movement.
-                  Industrial demand (electronics, dentistry, aerospace) is a smaller share.
+                  Platinum is one of the rarest elements on Earth — roughly 30 times rarer than gold by
+                  annual mine production. Its price is driven by a split between{" "}
+                  <strong className="text-white">industrial demand</strong> and{" "}
+                  <strong className="text-white">investment demand</strong>, with industry (primarily
+                  automotive catalysts) typically accounting for 35–45% of total consumption.
                 </p>
                 <p>
-                  The two most powerful macro drivers are{" "}
-                  <strong className="text-white">real interest rates</strong> and the{" "}
-                  <strong className="text-white">US dollar&rsquo;s strength</strong>. When real rates fall
-                  (inflation rises faster than Treasury yields), gold typically rises because holding
-                  non-yielding gold becomes less costly relative to bonds. When the dollar weakens,
-                  gold priced in dollars tends to rise as foreign buyers can afford more of it.
-                  Geopolitical uncertainty and central bank reserve diversification are increasingly
-                  important structural demand drivers as well.
+                  Because <strong className="text-white">South Africa</strong> produces roughly 70–75% of
+                  global platinum supply, local factors — labor strikes at mines, electricity rationing
+                  from Eskom, and the rand/dollar exchange rate — can move the platinum price
+                  significantly even when global demand is stable. This supply concentration makes
+                  platinum more volatile than gold on a per-event basis.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-base font-bold text-white">How to convert gold price to grams and kilos</h3>
+                <h3 className="text-base font-bold text-white">Platinum vs. gold: why the premium flipped</h3>
                 <p>
-                  Gold spot price is always quoted in US dollars per troy ounce. One troy ounce equals
-                  31.1035 grams — about 10% heavier than a standard avoirdupois ounce (28.35g). To get
-                  the per-gram price, divide by 31.1035. To get the per-kilogram price, multiply by
-                  32.1507 (the number of troy ounces in a kilogram).
+                  For most of modern history, platinum traded at a premium to gold — sometimes 2× or
+                  higher. That reversed around 2015 and gold has commanded a higher price ever since.
+                  The primary culprit is the collapse of diesel vehicle adoption in Europe following
+                  the Volkswagen emissions scandal in 2015. Diesel catalytic converters use platinum;
+                  gasoline converters use palladium. As diesel lost market share, platinum demand from
+                  auto manufacturers fell sharply. Gold, meanwhile, surged on investment demand
+                  throughout the late 2010s and 2020s.
                 </p>
                 <p>
-                  The weight reference table above shows today&rsquo;s gold price per gram, per kilogram,
-                  and per pennyweight (a unit used in jewelry). For custom weight and karat calculations,
-                  use the{" "}
-                  <Link href="/gram" className="text-amber-500 hover:text-amber-400 transition-colors">
-                    gold price per gram calculator
-                  </Link>
-                  {" "}which covers 24k, 22k, 18k, 14k, 10k, and 9k gold at live spot.
+                  The potential wildcard for platinum&rsquo;s recovery is{" "}
+                  <strong className="text-white">hydrogen fuel cells</strong>. Proton-exchange membrane
+                  (PEM) fuel cells — the type used in hydrogen vehicles and stationary power — require
+                  platinum as a catalyst. If green hydrogen adoption accelerates, platinum demand from
+                  this sector could grow substantially over the coming decade.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-base font-bold text-white">Buying gold: spot price vs. what you actually pay</h3>
+                <h3 className="text-base font-bold text-white">Buying platinum: coins and bars</h3>
                 <p>
-                  The spot price shown on this page is not what you pay at a dealer — it&rsquo;s the raw
-                  market rate for refined .999+ gold. Dealers charge a{" "}
-                  <strong className="text-white">premium over spot</strong> that covers minting,
-                  distribution, and their margin. For common government-minted coins like American Gold
-                  Eagles or Canadian Gold Maple Leafs, premiums typically run $50–$100 per ounce above
-                  spot. Gold bars carry lower premiums than coins. Larger purchases (kilo bars, for
-                  example) often come with lower per-ounce premiums.
+                  Physical platinum is available in coins (American Platinum Eagle, Canadian Platinum
+                  Maple Leaf, Australian Platinum Platypus) and bars from major refiners. Premiums
+                  over spot for platinum tend to be higher than gold — often 5–10% for coins and
+                  2–5% for larger bars — reflecting lower liquidity and smaller market size.
                 </p>
                 <p>
-                  The{" "}
+                  Use the{" "}
                   <Link href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">
                     dealer comparison page
                   </Link>{" "}
-                  tracks current premiums across APMEX, JM Bullion, SD Bullion, and Money Metals so you
-                  can see who&rsquo;s cheapest at today&rsquo;s spot before you buy.
+                  to see current premiums on gold and silver bullion. For platinum-specific pricing,
+                  check major dealers like APMEX and JM Bullion directly and compare to the spot
+                  price shown above.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-base font-bold text-white">Gold IRAs vs. physical gold</h3>
+                <h3 className="text-base font-bold text-white">Platinum in jewelry and industry</h3>
                 <p>
-                  Investors considering gold have two primary routes: physical ownership (coins and bars
-                  held in a home safe or third-party vault) and a Gold IRA (a self-directed retirement
-                  account that holds IRS-approved gold inside a tax-advantaged wrapper). Physical gold
-                  gives you direct possession with no annual fees; a Gold IRA provides tax-deferred or
-                  tax-free growth but requires a custodian and has storage fees. Many investors do both.
-                  If you have a 401k or IRA to roll over, see the{" "}
-                  <Link href="/gold-ira" className="text-amber-500 hover:text-amber-400 transition-colors">
-                    Gold IRA guide
-                  </Link>
-                  .
+                  Platinum&rsquo;s density, durability, and white luster make it prized in fine jewelry —
+                  especially in Japan, where platinum engagement rings have historically dominated the
+                  market. It is also used in laboratory equipment, electrical contacts, hard disk
+                  coatings, and cancer-treatment drugs (cisplatin and carboplatin are platinum-based
+                  chemotherapy agents). This broad industrial base means platinum price analysis
+                  requires watching multiple end-markets simultaneously.
                 </p>
               </div>
 
@@ -459,14 +454,14 @@ export default async function GoldPricePage() {
             <>
               <p className="text-sm text-gray-500">Tools for your stack</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
+                <Link href="/gold-price" className="text-gray-400 hover:text-gray-200 transition-colors">
+                  Gold price today →
+                </Link>
                 <Link href="/silver-price" className="text-gray-400 hover:text-gray-200 transition-colors">
                   Silver price today →
                 </Link>
-                <Link href="/coin-melt-calculator" className="text-gray-400 hover:text-gray-200 transition-colors">
-                  Coin melt calculator →
-                </Link>
-                <Link href="/gram" className="text-gray-400 hover:text-gray-200 transition-colors">
-                  Price per gram calculator →
+                <Link href="/palladium-price" className="text-gray-400 hover:text-gray-200 transition-colors">
+                  Palladium price today →
                 </Link>
                 <Link href="/compare" className="text-gray-400 hover:text-gray-200 transition-colors">
                   Compare dealers →
@@ -475,9 +470,9 @@ export default async function GoldPricePage() {
             </>
           ) : (
             <>
-              <p className="text-2xl font-black tracking-tight">Get alerts when gold moves</p>
+              <p className="text-2xl font-black tracking-tight">Get alerts when platinum moves</p>
               <p className="text-sm text-gray-400 max-w-sm mx-auto">
-                Set a target price and get one email when gold crosses it. Free account, no spam.
+                Set a target price and get one email when platinum crosses it. Free account, no spam.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/login" className="btn-gold px-10 inline-block">
@@ -488,11 +483,11 @@ export default async function GoldPricePage() {
                 </Link>
               </div>
               <div className="flex items-center justify-center gap-4 text-sm text-gray-600 pt-1">
+                <Link href="/gold-price" className="hover:text-gray-400 transition-colors">Gold price today</Link>
+                <span>·</span>
                 <Link href="/silver-price" className="hover:text-gray-400 transition-colors">Silver price today</Link>
                 <span>·</span>
-                <Link href="/coin-melt-calculator" className="hover:text-gray-400 transition-colors">Coin melt values</Link>
-                <span>·</span>
-                <Link href="/gram" className="hover:text-gray-400 transition-colors">Price per gram</Link>
+                <Link href="/palladium-price" className="hover:text-gray-400 transition-colors">Palladium price</Link>
                 <span>·</span>
                 <Link href="/gold-ira" className="hover:text-gray-400 transition-colors">Gold IRA guide</Link>
               </div>

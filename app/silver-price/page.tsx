@@ -12,34 +12,45 @@ import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export const metadata: Metadata = {
-  title: "Silver Price Today — Live Spot Price Per Ounce",
-  description:
-    "Live silver spot price per troy ounce, updated in real time. See today's silver price, 30-day chart, price per gram, and key stats. Free — no sign-up required.",
-  keywords: [
-    "silver price today",
-    "silver price per ounce",
-    "silver spot price",
-    "silver price per ounce today",
-    "silver price now",
-    "live silver price",
-    "silver price chart",
-    "silver price history",
-    "silver spot price today",
-    "current silver price",
-    "silver price per gram",
-    "silver price per kilo",
-  ],
-  alternates: {
-    canonical: "https://lode.rocks/silver-price",
-  },
-  openGraph: {
-    title: "Silver Price Today — Live Spot Price Per Ounce",
+export async function generateMetadata(): Promise<Metadata> {
+  const spots = await fetchAllSpotPrices();
+  const price = spots.silver ?? 0;
+  const priceStr = price > 0
+    ? price.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : null;
+  const title = priceStr
+    ? `Silver Price Today: ${priceStr}/oz`
+    : "Silver Price Today — Live Spot Price Per Ounce";
+
+  return {
+    title,
     description:
-      "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
-    url: "https://lode.rocks/silver-price",
-  },
-};
+      "Live silver spot price per troy ounce, updated in real time. See today's silver price, 30-day chart, price per gram, and key stats. Free — no sign-up required.",
+    keywords: [
+      "silver price today",
+      "silver price per ounce",
+      "silver spot price",
+      "silver price per ounce today",
+      "silver price now",
+      "live silver price",
+      "silver price chart",
+      "silver price history",
+      "silver spot price today",
+      "current silver price",
+      "silver price per gram",
+      "silver price per kilo",
+    ],
+    alternates: {
+      canonical: "https://lode.rocks/silver-price",
+    },
+    openGraph: {
+      title,
+      description:
+        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+      url: "https://lode.rocks/silver-price",
+    },
+  };
+}
 
 const TROY_PER_GRAM = 1 / 31.1035;
 const TROY_PER_KILO = 1000 / 31.1035;

@@ -74,12 +74,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    // Gold price detail page — mirrors /silver-price, highest-volume search
+    // Metal price detail pages — highest-volume searches
     {
       url: `${base}/gold-price`,
       lastModified: new Date(),
       changeFrequency: "hourly",
       priority: 1.0,
+    },
+    {
+      url: `${base}/platinum-price`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 0.95,
+    },
+    {
+      url: `${base}/palladium-price`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 0.9,
     },
     // Affiliate / editorial pages — high-intent, monetised
     {
@@ -90,8 +102,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     // Editorial / blog — earns links, builds topical authority
     {
+      url: `${base}/blog`,
+      lastModified: new Date("2026-05-24"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${base}/blog/junk-silver-guide`,
-      lastModified: new Date("2026-05-01"),
+      lastModified: new Date("2026-05-20"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
