@@ -603,7 +603,7 @@ export default function GoldIraPage() {
                   "Accessible at any time with no penalties",
                   "No tax shelter — gains taxed as collectibles (28% max rate)",
                   "No minimum — buy one coin at a time if you want",
-                  "Compare dealer prices at lode.rocks/compare",
+                  "Compare dealer prices at lode.rocks/compare →",
                 ],
               },
             ].map(({ title, best, points }) => (
@@ -736,20 +736,29 @@ export default function GoldIraPage() {
       {/* ── Cross-link to physical compare ───────────────────────────────── */}
       <section className="px-4 sm:px-6 py-8" style={{ borderTop: "1px solid var(--border)" }}>
         <div className="mx-auto max-w-3xl">
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="space-y-1">
-              <p className="label">Also tracking physical gold?</p>
-              <p className="text-sm text-gray-400">
-                Compare Silver Eagle, Gold Eagle, and Maple Leaf prices across APMEX, JM Bullion, SD Bullion,
-                and Money Metals — sorted by total cost at today&apos;s spot.
-              </p>
+          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-1">
+                <p className="label">Also tracking physical gold?</p>
+                <p className="text-sm text-gray-400">
+                  Compare Silver Eagle, Gold Eagle, and Maple Leaf prices across APMEX, JM Bullion, SD Bullion,
+                  and Money Metals — sorted by total cost at today&apos;s spot.
+                </p>
+              </div>
+              <Link
+                href="/compare"
+                className="flex-shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+              >
+                Compare bullion prices →
+              </Link>
             </div>
-            <Link
-              href="/compare"
-              className="flex-shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
-            >
-              Compare bullion prices →
-            </Link>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 pt-1 border-t" style={{ borderColor: "var(--border)" }}>
+              <span className="pt-3">Live spot prices:</span>
+              <Link href="/gold-price"      className="pt-3 hover:text-amber-400 transition-colors" style={{ color: "var(--gold-bright)" }}>Gold →</Link>
+              <Link href="/silver-price"    className="pt-3 text-gray-400 hover:text-gray-200 transition-colors">Silver →</Link>
+              <Link href="/platinum-price"  className="pt-3 text-gray-400 hover:text-gray-200 transition-colors">Platinum →</Link>
+              <Link href="/palladium-price" className="pt-3 text-gray-400 hover:text-gray-200 transition-colors">Palladium →</Link>
+            </div>
           </div>
         </div>
       </section>

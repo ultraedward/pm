@@ -230,6 +230,12 @@ export default async function CoinMeltCalculatorPage() {
                 Try the junk silver calculator →
               </Link>
             </p>
+            <p className="text-sm pt-1" style={{ color: "var(--text-dim)" }}>
+              Live prices:{" "}
+              <Link href="/silver-price" className="transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>Silver</Link>
+              {" · "}
+              <Link href="/gold-price" className="transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>Gold</Link>
+            </p>
           </>
         ) : (
           <>
@@ -250,6 +256,16 @@ export default async function CoinMeltCalculatorPage() {
               <Link href="/junk-silver-calculator" className="text-gray-500 hover:text-gray-300 transition-colors">
                 Try the junk silver calculator →
               </Link>
+            </p>
+            <p className="text-sm text-gray-600 pt-1">
+              Live prices:{" "}
+              <Link href="/silver-price" className="text-gray-500 hover:text-gray-300 transition-colors">Silver</Link>
+              {" · "}
+              <Link href="/gold-price" className="text-gray-500 hover:text-gray-300 transition-colors">Gold</Link>
+              {" · "}
+              <Link href="/platinum-price" className="text-gray-500 hover:text-gray-300 transition-colors">Platinum</Link>
+              {" · "}
+              <Link href="/palladium-price" className="text-gray-500 hover:text-gray-300 transition-colors">Palladium</Link>
             </p>
           </>
         )}

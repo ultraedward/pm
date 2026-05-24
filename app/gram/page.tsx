@@ -160,8 +160,12 @@ export default async function GramPage() {
             Enter any weight to see the live melt value of silver or gold — fine .999, sterling 925, coin 900, 14k, 18k, 24k, and more. Spot prices refresh on page load.
           </p>
           <div className="flex items-center justify-center gap-6 text-xs text-gray-600 pt-1">
-            <span>Gold spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(goldSpot)} / ozt</span></span>
-            <span>Silver spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(silverSpot)} / ozt</span></span>
+            <Link href="/gold-price" className="hover:text-gray-400 transition-colors">
+              Gold spot: <span className="tabular-nums font-semibold" style={{ color: "var(--gold-bright)" }}>{fmtSpot(goldSpot)} / ozt</span>
+            </Link>
+            <Link href="/silver-price" className="hover:text-gray-400 transition-colors">
+              Silver spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(silverSpot)} / ozt</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -294,6 +298,16 @@ export default async function GramPage() {
                 Calculate coin melt values →
               </Link>
             </p>
+            <p className="text-sm text-gray-500 pt-1">
+              Track the full market:{" "}
+              <Link href="/gold-price" className="text-gray-400 hover:text-gray-200 transition-colors">Gold</Link>
+              {" · "}
+              <Link href="/silver-price" className="text-gray-400 hover:text-gray-200 transition-colors">Silver</Link>
+              {" · "}
+              <Link href="/platinum-price" className="text-gray-400 hover:text-gray-200 transition-colors">Platinum</Link>
+              {" · "}
+              <Link href="/palladium-price" className="text-gray-400 hover:text-gray-200 transition-colors">Palladium</Link>
+            </p>
           </>
         ) : (
           <>
@@ -312,6 +326,16 @@ export default async function GramPage() {
               <Link href="/coin-melt-calculator" className="text-gray-500 hover:text-gray-300 transition-colors">
                 Calculate coin melt values →
               </Link>
+            </p>
+            <p className="text-sm text-gray-600 pt-1">
+              Live prices:{" "}
+              <Link href="/gold-price" className="text-gray-500 hover:text-gray-300 transition-colors">Gold</Link>
+              {" · "}
+              <Link href="/silver-price" className="text-gray-500 hover:text-gray-300 transition-colors">Silver</Link>
+              {" · "}
+              <Link href="/platinum-price" className="text-gray-500 hover:text-gray-300 transition-colors">Platinum</Link>
+              {" · "}
+              <Link href="/palladium-price" className="text-gray-500 hover:text-gray-300 transition-colors">Palladium</Link>
             </p>
           </>
         )}

@@ -365,6 +365,31 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
           <Accordion items={lodeFaq} />
         </div>
 
+        {/* Tools & prices grid */}
+        <section className="rounded-2xl border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+          <h2 className="text-base font-bold text-white">Lode tools &amp; live prices</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { href: "/gold-price",             label: "Gold Price Today",        desc: "Live spot, 30-day chart" },
+              { href: "/silver-price",           label: "Silver Price Today",      desc: "Live spot, 30-day chart" },
+              { href: "/compare",                label: "Compare Dealers",         desc: "Who's cheapest today" },
+              { href: "/coin-melt-calculator",   label: "Coin Melt Calculator",    desc: "Eagles, junk silver & more" },
+              { href: "/gram",                   label: "Price Per Gram",          desc: "Gold and silver by gram" },
+              { href: "/junk-silver-calculator", label: "Junk Silver Calculator",  desc: "Pre-1965 90% silver coins" },
+            ].map(({ href, label, desc }) => (
+              <Link
+                key={href}
+                href={href}
+                className="rounded-xl border p-3 space-y-1 transition-colors hover:border-white/20 block"
+                style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}
+              >
+                <p className="text-xs font-semibold text-white">{label}</p>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>{desc}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* Still have questions */}
         <section className="space-y-2 text-sm text-gray-400">
           <h2 className="text-base font-bold text-white">Still have questions?</h2>

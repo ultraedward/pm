@@ -2,6 +2,7 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { COMPARE_COINS } from "@/lib/compare/coins";
@@ -193,6 +194,19 @@ export default async function ComparePage() {
       <section className="px-4 sm:px-6 pt-6 pb-10">
         <div className="mx-auto max-w-2xl">
           <CompareClient spots={spots} available={available} />
+        </div>
+      </section>
+
+      {/* ── Spot price strip — quiet contextual cross-links ──────── */}
+      <section className="px-4 sm:px-6 pb-4">
+        <div className="mx-auto max-w-2xl">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
+            <span>Live spot prices:</span>
+            <Link href="/gold-price"      className="hover:text-amber-400 transition-colors" style={{ color: "var(--gold-bright)" }}>Gold →</Link>
+            <Link href="/silver-price"    className="text-gray-400 hover:text-gray-200 transition-colors">Silver →</Link>
+            <Link href="/platinum-price"  className="text-gray-400 hover:text-gray-200 transition-colors">Platinum →</Link>
+            <Link href="/palladium-price" className="text-gray-400 hover:text-gray-200 transition-colors">Palladium →</Link>
+          </div>
         </div>
       </section>
 

@@ -209,7 +209,9 @@ export default async function JunkSilverCalculatorPage() {
           {silverSpot > 0 && (
             <div className="flex items-center justify-center gap-2 text-xs text-gray-600 pt-1">
               <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-              <span>Silver spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(silverSpot)} / ozt</span></span>
+              <Link href="/silver-price" className="hover:text-gray-400 transition-colors">
+                Silver spot: <span className="text-gray-400 tabular-nums font-semibold">{fmtSpot(silverSpot)} / ozt</span>
+              </Link>
             </div>
           )}
         </div>
@@ -340,6 +342,11 @@ export default async function JunkSilverCalculatorPage() {
                 Calculate by gram weight →
               </Link>
             </p>
+            <p className="text-sm text-gray-500 pt-1">
+              <Link href="/silver-price" className="text-gray-400 hover:text-gray-200 transition-colors">
+                Silver price today with chart →
+              </Link>
+            </p>
           </>
         ) : (
           <>
@@ -359,6 +366,11 @@ export default async function JunkSilverCalculatorPage() {
               Calculating jewelry or scrap?{" "}
               <Link href="/gram" className="text-gray-500 hover:text-gray-300 transition-colors">
                 Calculate by gram weight →
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600 pt-1">
+              <Link href="/silver-price" className="text-gray-500 hover:text-gray-300 transition-colors">
+                Silver price today with 30-day chart →
               </Link>
             </p>
           </>
