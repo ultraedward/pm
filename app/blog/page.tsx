@@ -63,7 +63,7 @@ const articles = [
     description:
       "Everything you need to know about junk silver: what it is, which coins qualify, how to calculate melt value, where to buy it, and what premiums to expect.",
     date: "May 2026",
-    readTime: "12 min read",
+    readTime: "15 min read",
     tags: ["Silver", "Coins", "Beginner guide"],
   },
 ];

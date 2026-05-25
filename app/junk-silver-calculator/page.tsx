@@ -12,14 +12,18 @@ import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Junk Silver Calculator — Live Melt Value for 90% Silver Coins",
+  title: "Junk Silver Melt Value Calculator — 90% Silver Dimes, Quarters & Halves",
   description:
-    "Free junk silver calculator with live spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars — and Canadian pre-1968 80% silver coins. Enter face value or count by coin.",
+    "Free junk silver calculator with live spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars by face value or coin count — plus Canadian pre-1968 80% silver and war nickels.",
   keywords: [
     "junk silver calculator",
-    "junk silver melt value",
+    "junk silver melt value calculator",
+    "90 percent silver calculator",
+    "silver dime melt value calculator",
+    "silver quarter melt value calculator",
+    "90 silver face value calculator",
+    "90 silver coin face value calculator",
     "junk silver value calculator",
-    "90% silver calculator",
     "pre-1965 silver coin calculator",
     "junk silver per dollar face value",
     "silver dime melt value",
@@ -31,16 +35,16 @@ export const metadata: Metadata = {
     "canadian junk silver calculator",
     "canadian junk silver melt value",
     "canadian 80 percent silver coins",
-    "canadian silver dime melt value",
-    "canadian silver quarter melt value",
+    "war nickel melt value",
+    "silver nickel calculator",
   ],
   alternates: {
     canonical: "https://lode.rocks/junk-silver-calculator",
   },
   openGraph: {
-    title: "Junk Silver Calculator — Live Melt Value for 90% Silver Coins",
+    title: "Junk Silver Melt Value Calculator — 90% Silver Dimes, Quarters & Halves",
     description:
-      "Calculate the melt value of pre-1965 junk silver coins at live spot prices. Dimes, quarters, half dollars, and Morgan dollars. Enter face value or count coin by coin.",
+      "Calculate the melt value of pre-1965 junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, and Morgan dollars by face value or coin count.",
     url: "https://lode.rocks/junk-silver-calculator",
   },
 };
@@ -136,6 +140,14 @@ const jsonLd = {
         },
         {
           "@type": "Question",
+          "name": "Are war nickels junk silver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. War nickels — minted from mid-1942 through 1945 — are 35% silver and qualify as junk silver. They were made with silver to conserve nickel for the war effort. Each war nickel contains 0.05626 troy ounces of silver. You can identify them by the large mintmark (P, D, or S) above Monticello on the reverse. Standard nickels minted before 1942 and after 1945 contain no silver.",
+          },
+        },
+        {
+          "@type": "Question",
           "name": "Do dealers pay melt value for junk silver?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -165,6 +177,7 @@ export default async function JunkSilverCalculatorPage() {
     { label: "Silver quarter (pre-1965)",          asw: 0.18084 },
     { label: "Half dollar — 90% (pre-1965)",       asw: 0.36169 },
     { label: "Half dollar — 40% (1965–70)",        asw: 0.14792 },
+    { label: "War nickel (1942–45, 35% silver)",   asw: 0.05626 },
     { label: "Morgan / Peace dollar",              asw: 0.77344 },
     { label: "$1 face value in 90% coins",         asw: OZ_PER_DOLLAR },
     { label: "$10 face value in 90% coins",        asw: OZ_PER_DOLLAR * 10 },

@@ -19,6 +19,11 @@ export const metadata: Metadata = {
     "junk silver vs silver eagles",
     "best junk silver coins to buy",
     "junk silver for beginners",
+    "war nickel melt value",
+    "junk silver nickels",
+    "war nickels silver content",
+    "best place to buy junk silver",
+    "where to buy junk silver",
   ],
   alternates: {
     canonical: "https://lode.rocks/blog/junk-silver-guide",
@@ -56,7 +61,7 @@ const jsonLd = {
         "height": 630,
       },
       "datePublished": "2026-05-01",
-      "dateModified": "2026-05-20",
+      "dateModified": "2026-05-24",
       "author": {
         "@type": "Organization",
         "name": "Lode",
@@ -104,6 +109,14 @@ const jsonLd = {
             "text": "Junk silver is available from major online dealers (APMEX, JM Bullion, SD Bullion), local coin shops (LCS), estate sales, and coin shows. Online dealers offer the widest selection but charge shipping; local coin shops are best for smaller quantities and negotiating on price.",
           },
         },
+        {
+          "@type": "Question",
+          "name": "What are war nickels and how much silver do they contain?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "War nickels are US five-cent coins minted from mid-1942 through 1945. To conserve nickel for World War II, the US Mint switched to a 35% silver composition. Each war nickel contains 0.05626 troy ounces of silver. Identify them by the large P, D, or S mintmark above Monticello on the reverse. Standard nickels before 1942 and after 1945 contain no silver.",
+          },
+        },
       ],
     },
   ],
@@ -119,6 +132,7 @@ const coinData = [
   { coin: "Kennedy Half Dollar", years: "1965–1970", fineness: "40%", troyOz: "0.14792", faceValue: "$0.50" },
   { coin: "Morgan Dollar", years: "1878–1921", fineness: "90%", troyOz: "0.77344", faceValue: "$1.00" },
   { coin: "Peace Dollar", years: "1921–1935", fineness: "90%", troyOz: "0.77344", faceValue: "$1.00" },
+  { coin: "War Nickel", years: "1942–1945", fineness: "35%", troyOz: "0.05626", faceValue: "$0.05" },
 ];
 
 export default function JunkSilverGuidePage() {
@@ -142,7 +156,7 @@ export default function JunkSilverGuidePage() {
               The Complete Guide to Buying Junk Silver Coins
             </h1>
             <p className="text-gray-400 text-base">
-              Updated May 2026 · 8 min read
+              Updated May 2026 · 12 min read
             </p>
           </div>
         </div>
@@ -260,6 +274,41 @@ export default function JunkSilverGuidePage() {
             </div>
             <p className="text-gray-500 text-xs mt-2">
               * 1965–1970 Kennedy halves are 40% silver and priced differently from 90% coins.
+            </p>
+          </section>
+
+          {/* War nickels callout */}
+          <section>
+            <h2 className="text-2xl font-bold text-white mb-4">War Nickels: The Overlooked Junk Silver</h2>
+            <p className="text-gray-300 leading-relaxed mb-4">
+              Most new stackers skip right past the humble nickel. That&apos;s a mistake for one specific
+              window of US history: <strong className="text-white">1942–1945 war nickels</strong>. To
+              conserve nickel for the war effort, the US Mint switched the five-cent piece to a
+              composition of 56% copper, 35% silver, and 9% manganese. Each war nickel contains{" "}
+              <strong className="text-white">0.05626 troy ounces of silver</strong>.
+            </p>
+            <p className="text-gray-300 leading-relaxed mb-4">
+              The easy identifier: war nickels have a large mintmark (<strong className="text-white">P</strong>,{" "}
+              <strong className="text-white">D</strong>, or <strong className="text-white">S</strong>)
+              above Monticello on the reverse, whereas standard nickels have no mintmark or a small
+              mintmark to Monticello&apos;s right. The Philadelphia &ldquo;P&rdquo; mintmark is especially notable —
+              it was the first time Philadelphia ever used a mintmark on a US coin.
+            </p>
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-sm space-y-2">
+              <p className="text-gray-400"><span className="text-white font-semibold">Years:</span> mid-1942 through 1945 (only coins with the large mintmark above Monticello)</p>
+              <p className="text-gray-400"><span className="text-white font-semibold">Fineness:</span> 35% silver</p>
+              <p className="text-gray-400"><span className="text-white font-semibold">Silver content:</span> 0.05626 troy oz per coin</p>
+              <p className="text-gray-400"><span className="text-white font-semibold">How to spot them:</span> Large P, D, or S mintmark above the dome of Monticello on the reverse</p>
+            </div>
+            <p className="text-gray-300 leading-relaxed mt-4">
+              War nickels are less liquid than 90% silver coins — not every dealer stocks them — but
+              local coin shops and estate sales often price them at or below melt because they&apos;re
+              overlooked. At current silver prices, each one is worth several times its five-cent face
+              value. The{" "}
+              <Link href="/junk-silver-calculator" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">
+                junk silver calculator
+              </Link>{" "}
+              includes war nickels in its coin reference table.
             </p>
           </section>
 
@@ -426,6 +475,10 @@ export default function JunkSilverGuidePage() {
                 {
                   q: "What does '$1,000 face value' mean?",
                   a: "It means the nominal face value of the coins adds up to $1,000 in legal-tender dollars — for example, 10,000 dimes or 4,000 quarters. At the 0.715 ozt/dollar standard, a $1,000 face bag contains roughly 715 troy ounces of silver. This is the standard trading unit for dealers; smaller lots are sold in $100 and $500 face increments.",
+                },
+                {
+                  q: "Are war nickels worth collecting?",
+                  a: "Yes — war nickels (1942–1945) are 35% silver and contain 0.05626 troy ounces each. They're overlooked compared to 90% coins and sometimes trade below melt at local coin shops. Look for the large P, D, or S mintmark above Monticello on the reverse to identify them. Not all 1942 nickels are silver — production switched mid-year, so the mintmark is your tell.",
                 },
                 {
                   q: "Do I pay sales tax on junk silver?",

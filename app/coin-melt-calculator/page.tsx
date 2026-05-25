@@ -11,28 +11,31 @@ import { EmailCapture } from "@/components/EmailCapture";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const metadata: Metadata = {
-  title: "Coin Melt Value Calculator — Silver Eagles, Junk Silver & More",
+  title: "Silver Coin Melt Value Calculator — Dimes, Quarters, Dollars & Eagles",
   description:
-    "Free silver coin melt value calculator with live spot prices. Find melt values for pre-1965 junk silver (dimes, quarters, half dollars), American Silver Eagles, Morgan dollars, Canadian Maple Leafs, and gold coins.",
+    "Free silver coin melt value calculator with live spot prices. Instantly find melt values for silver dimes, quarters, half dollars, Morgan dollars, American Silver Eagles, Canadian Maple Leafs, and gold coins.",
   keywords: [
+    "silver coin melt value calculator",
+    "silver dime melt value calculator",
+    "silver quarter melt value calculator",
+    "silver dollar melt value calculator",
     "coin melt value calculator",
-    "silver coin melt value",
-    "junk silver melt value",
+    "junk silver melt value calculator",
     "silver eagle melt value",
     "gold coin melt value",
     "pre-1965 silver melt value",
     "morgan dollar melt value",
     "gold eagle melt value",
-    "silver dollar melt value calculator",
-    "precious metals melt calculator",
+    "scrap coin silver calculator",
+    "90 silver coins calculator",
   ],
   alternates: {
     canonical: "https://lode.rocks/coin-melt-calculator",
   },
   openGraph: {
-    title: "Coin Melt Value Calculator — Silver Eagles, Junk Silver & More",
+    title: "Silver Coin Melt Value Calculator — Dimes, Quarters, Dollars & Eagles",
     description:
-      "Instantly calculate the melt value of silver and gold coins at live spot prices. Eagles, Maple Leafs, junk silver, Morgan dollars, and more.",
+      "Instantly calculate the melt value of silver and gold coins at live spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
     url: "https://lode.rocks/coin-melt-calculator",
   },
 };
