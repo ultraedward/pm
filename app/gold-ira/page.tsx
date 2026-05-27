@@ -23,7 +23,7 @@ const COMPANY_CTAS: Record<string, { card: string | null; deepdive: string | nul
 };
 
 // ── Last reviewed date ─────────────────────────────────────────────────────
-const LAST_REVIEWED = "2026-05-08";
+const LAST_REVIEWED = "2026-05-27";
 
 function fmtReviewed(iso: string): string {
   const d = new Date(`${iso}T12:00:00Z`);
@@ -96,7 +96,7 @@ const jsonLd = {
           "name": "How much do I need to open a Gold IRA?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Minimums vary by company. Augusta Precious Metals and Goldco both require $50,000. Birch Gold Group accepts accounts from $10,000. Most companies work best for rollovers of existing retirement accounts (401k, 403b, TSP, IRA) rather than new cash contributions.",
+            "text": "Minimums vary by company. Birch Gold Group accepts accounts from $10,000. Noble Gold starts at $20,000. Goldco starts at $25,000. Augusta Precious Metals requires $50,000 but waives first-year fees on accounts over that threshold. Most companies work best for rollovers of existing retirement accounts (401k, 403b, TSP, IRA) rather than new cash contributions.",
           },
         },
         {
@@ -149,15 +149,14 @@ const COMPANIES = [
     moneyMag:    "Best Overall",
     affiliate:   true,
     pros: [
-      "Education directors are not commissioned salespeople — paid to educate, not to close",
-      "One-on-one web conference with Augusta's Harvard-trained economic analyst — no sales pressure",
-      "Zero BBB complaints on record — A+ accredited, in business since 2012",
-      "Pricing disclosed in writing before you open an account — no surprise fees",
-      "Lifetime customer support — same dedicated agent for the life of your account",
+      "Education directors are paid to educate, not sell — no commissioned salespeople, ever",
+      "Free one-on-one web conference with a Harvard-trained economic analyst before you commit",
+      "Zero BBB complaints on record · A+ accredited · Fees disclosed in writing before you open",
+      "Lifetime support — same dedicated account agent from opening through retirement",
     ],
     cons: [
-      "Higher minimum ($50,000) — not suitable for smaller rollover accounts",
-      "Focus is on premium coins over bullion bars",
+      "$50,000 minimum — not suitable for smaller rollover accounts",
+      "Focuses on premium coins over bullion bars, which carry higher per-ounce premiums",
     ],
   },
   {
@@ -197,22 +196,23 @@ const COMPANIES = [
     bestForShort: "$10k–$50k rollover, longest track record",
     founded:    2003,
     minimum:    "$10,000",
-    setupFee:   "Varies",
-    annualFees: "$100–$200/yr",
-    custodian:  "Equity Trust, GoldStar Trust",
-    storage:    "Delaware Depository, Brinks",
+    setupFee:   "$50 + $30 wire transfer",
+    annualFees: "$200/yr",
+    custodian:  "Equity Trust (works with any custodian)",
+    storage:    "Delaware Depository, Brinks, IDS (TX, LA, NYC)",
     bbb:        "A+",
     google:     "4.8 / 5",
     trustpilot: "4.7 / 5",
     moneyMag:   null,
     affiliate:  true,
     pros: [
-      "Lowest minimum in the category at $10,000",
-      "Longest track record — operating since 2003",
-      "Wide selection of IRS-approved metals",
+      "Lowest minimum in the category — $10,000 for both IRAs and cash purchases",
+      "Longest track record of any major Gold IRA company — operating since 2003",
+      "Up to $10,000 in free precious metals on qualified purchases · Buyback guarantee at no charge",
+      "Six US storage locations — Delaware, Brinks, and IDS facilities in TX, LA, NYC, and CA",
     ],
     cons: [
-      "Pricing not published online — requires a direct quote for exact fees",
+      "Less structured pre-purchase education than Augusta",
       "Customer service reviews more mixed at scale",
     ],
   },
@@ -514,12 +514,6 @@ export default function GoldIraPage() {
               </ul>
             </div>
 
-            {/* Who it's best for */}
-            <div className="rounded-xl border border-white/5 bg-black/20 p-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Best for</p>
-              <p className="text-sm text-gray-300">{augusta.bestFor}</p>
-            </div>
-
             {AUGUSTA_DEEPDIVE && (
               <div className="pt-1 space-y-2">
                 <a
@@ -569,11 +563,10 @@ export default function GoldIraPage() {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Why Birch Gold</p>
                 <ul className="space-y-2">
                   {[
-                    "Lowest minimum in the category at $10,000 — accessible to more retirement accounts",
-                    "Longest operating history of any major Gold IRA company — in business since 2003",
-                    "Wide selection of IRS-approved gold, silver, platinum, and palladium",
-                    "Works with Equity Trust and GoldStar Trust — two IRS-approved custodians",
-                    "Storage at Delaware Depository and Brinks — both industry-standard facilities",
+                    "Lowest minimum in the category — $10,000 for both IRAs and cash purchases",
+                    "Longest track record of any major Gold IRA company — operating since 2003",
+                    "Up to $10,000 in free precious metals on qualified purchases · Buyback guarantee at no charge",
+                    "Six US storage locations — Delaware, Brinks, and IDS facilities in TX, LA, NYC, and CA",
                   ].map((pro) => (
                     <li key={pro} className="flex items-start gap-2 text-sm text-gray-300">
                       <span className="text-amber-500 mt-0.5 flex-shrink-0">✓</span>
@@ -588,7 +581,7 @@ export default function GoldIraPage() {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Worth knowing</p>
                 <ul className="space-y-2">
                   {[
-                    "Pricing not published online — requires a direct quote for exact fees",
+                    "Less structured pre-purchase education than Augusta — lighter materials before account opening",
                     "Customer service reviews more mixed at scale than Augusta",
                   ].map((con) => (
                     <li key={con} className="flex items-start gap-2 text-sm text-gray-400">
@@ -597,12 +590,6 @@ export default function GoldIraPage() {
                     </li>
                   ))}
                 </ul>
-              </div>
-
-              {/* Who it's best for */}
-              <div className="rounded-xl border border-white/5 bg-black/20 p-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Best for</p>
-                <p className="text-sm text-gray-300">Investors starting with $10,000–$50,000, or anyone who needs to get started before reaching Augusta&apos;s $50k minimum</p>
               </div>
 
               <div className="pt-1 space-y-2">
@@ -634,36 +621,17 @@ export default function GoldIraPage() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="text-sm font-bold text-white">{c.name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Est. {c.founded} · Min {c.minimum}</p>
-                </div>
-                <div className="flex gap-2 text-[10px] text-gray-500">
-                  <span>BBB {c.bbb}</span>
-                  <span>⭐ {c.google}</span>
+                  <p className="text-xs text-gray-500 mt-0.5">Est. {c.founded} · Min {c.minimum} · BBB {c.bbb} · ⭐ {c.google}</p>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed">{c.bestFor}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Strengths</p>
-                  <ul className="space-y-1">
-                    {c.pros.map((p) => (
-                      <li key={p} className="text-xs text-gray-400 flex gap-1.5">
-                        <span className="text-gray-600 flex-shrink-0">+</span>{p}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Consider</p>
-                  <ul className="space-y-1">
-                    {c.cons.map((con) => (
-                      <li key={con} className="text-xs text-gray-400 flex gap-1.5">
-                        <span className="text-gray-600 flex-shrink-0">–</span>{con}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">{c.verdict}</p>
+              <ul className="space-y-1.5 pt-1">
+                {c.pros.slice(0, 3).map((p) => (
+                  <li key={p} className="text-xs text-gray-500 flex gap-1.5">
+                    <span className="text-gray-600 flex-shrink-0 mt-0.5">✓</span>{p}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
@@ -743,7 +711,7 @@ export default function GoldIraPage() {
             {[
               {
                 check: "Retirement account",
-                desc:  "You have a 401k, 403b, 457, TSP, or existing IRA with at least $50,000.",
+                desc:  "You have a 401k, 403b, 457, TSP, or existing IRA you can roll over. Minimums start at $10,000.",
               },
               {
                 check: "Left your employer",
@@ -817,7 +785,7 @@ export default function GoldIraPage() {
               },
               {
                 q: "How much do I need to open a Gold IRA?",
-                a: "Minimums vary: Augusta and Goldco both start at $50,000. Birch Gold accepts from $10,000. Noble Gold starts at $20,000. Most of the value comes from rolling over an existing retirement account (401k, 403b, TSP, IRA) rather than making new cash contributions, which are capped at IRS annual limits.",
+                a: "Minimums vary by company. Birch Gold accepts accounts from $10,000. Noble Gold starts at $20,000. Goldco starts at $25,000. Augusta requires $50,000 but waives first-year fees on accounts over that threshold. Most of the value comes from rolling over an existing retirement account (401k, 403b, TSP, IRA) rather than making new cash contributions, which are capped at IRS annual limits.",
               },
               {
                 q: "Can I roll over a 401k into a Gold IRA?",
