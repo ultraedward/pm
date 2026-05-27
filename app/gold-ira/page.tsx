@@ -2,13 +2,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 
-// Affiliate URL — kept server-side only. Base URL set in Vercel env vars.
+// Affiliate URLs — kept server-side only. Base URLs set in Vercel env vars.
 // Sub-IDs appended per placement so we can see which CTA converts best
-// in the Augusta dashboard (Leads & Commissions → filter by sub_id).
+// in each affiliate dashboard (filter by sub_id in their reporting).
 const AUGUSTA_BASE        = process.env.AFFILIATE_AUGUSTA_URL ?? null;
 const AUGUSTA_CARD        = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=card`        : null;
 const AUGUSTA_DEEPDIVE    = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=deepdive`    : null;
 const AUGUSTA_ELIGIBILITY = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=eligibility` : null;
+
+// Birch Gold — bitira.hasoffers.com offer_id=28, aff_id=2046, 3% CPS
+const BIRCH_BASE        = process.env.AFFILIATE_BIRCH_URL ?? null;
+const BIRCH_CARD        = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=card`        : null;
+const BIRCH_DEEPDIVE    = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=deepdive`    : null;
+const BIRCH_ELIGIBILITY = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=eligibility` : null;
+
+// Per-company CTA lookup — keeps COMPANIES array clean (no runtime values in `as const`)
+const COMPANY_CTAS: Record<string, { card: string | null; deepdive: string | null; eligibility: string | null }> = {
+  augusta: { card: AUGUSTA_CARD, deepdive: AUGUSTA_DEEPDIVE, eligibility: AUGUSTA_ELIGIBILITY },
+  birch:   { card: BIRCH_CARD,   deepdive: BIRCH_DEEPDIVE,   eligibility: BIRCH_ELIGIBILITY   },
+};
 
 // ── Last reviewed date ─────────────────────────────────────────────────────
 const LAST_REVIEWED = "2026-05-08";
@@ -179,10 +191,10 @@ const COMPANIES = [
   {
     id:         "birch",
     name:       "Birch Gold Group",
-    tagline:    "Lowest minimum — good for smaller accounts",
-    verdict:    "The most accessible entry point with a $10k minimum. Longest track record in the category, though pricing transparency lags the top two.",
-    bestFor:    "Investors starting with $10,000–$25,000 or adding to an existing IRA",
-    bestForShort: "$10k+ accounts, longer time horizons",
+    tagline:    "Lowest minimum — best for accounts under $50k",
+    verdict:    "The most accessible entry point with a $10k minimum and the longest track record in the category. Strong choice if your rollover is under the $50k Augusta threshold.",
+    bestFor:    "Investors starting with $10,000–$50,000 or rolling over a smaller retirement account",
+    bestForShort: "$10k–$50k rollover, longest track record",
     founded:    2003,
     minimum:    "$10,000",
     setupFee:   "Varies",
@@ -193,7 +205,7 @@ const COMPANIES = [
     google:     "4.8 / 5",
     trustpilot: "4.7 / 5",
     moneyMag:   null,
-    affiliate:  false,
+    affiliate:  true,
     pros: [
       "Lowest minimum in the category at $10,000",
       "Longest track record — operating since 2003",
@@ -334,14 +346,14 @@ export default function GoldIraPage() {
                   {c.bestForShort}
                 </p>
 
-                {c.affiliate && AUGUSTA_CARD && (
+                {c.affiliate && COMPANY_CTAS[c.id]?.card && (
                   <a
-                    href={AUGUSTA_CARD}
+                    href={COMPANY_CTAS[c.id].card!}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
                     className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 hover:text-amber-400 transition-colors"
                   >
-                    Get the free guide →
+                    {c.id === "birch" ? "Get a free info kit →" : "Get the free guide →"}
                   </a>
                 )}
               </div>
@@ -525,11 +537,95 @@ export default function GoldIraPage() {
         </div>
       </section>
 
+      {/* ── Birch Gold deep dive (affiliate) ────────────────────────────── */}
+      {BIRCH_DEEPDIVE && (
+        <section className="px-4 sm:px-6 py-8">
+          <div className="mx-auto max-w-3xl space-y-6">
+            <div>
+              <p className="label mb-1">Best for smaller rollovers</p>
+              <h2 className="text-2xl font-black tracking-tight text-white">Birch Gold Group</h2>
+              <p className="text-sm text-gray-500 mt-1">Lowest minimum in the category — strong choice for accounts under $50k</p>
+            </div>
+
+            <div className="rounded-2xl border p-6 space-y-5" style={{ borderColor: "rgba(212,175,55,0.15)", background: "rgba(212,175,55,0.02)" }}>
+              {/* Rating badges */}
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { label: "BBB",        value: "A+ Accredited" },
+                  { label: "Founded",    value: "2003" },
+                  { label: "Google",     value: "4.8 / 5" },
+                  { label: "Trustpilot", value: "4.7 / 5" },
+                  { label: "Minimum",    value: "$10,000" },
+                ].map(({ label, value }) => (
+                  <div key={label} className="rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-center min-w-[80px]">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</p>
+                    <p className="text-xs font-bold text-white mt-0.5">{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Why Birch */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Why Birch Gold</p>
+                <ul className="space-y-2">
+                  {[
+                    "Lowest minimum in the category at $10,000 — accessible to more retirement accounts",
+                    "Longest operating history of any major Gold IRA company — in business since 2003",
+                    "Wide selection of IRS-approved gold, silver, platinum, and palladium",
+                    "Works with Equity Trust and GoldStar Trust — two IRS-approved custodians",
+                    "Storage at Delaware Depository and Brinks — both industry-standard facilities",
+                  ].map((pro) => (
+                    <li key={pro} className="flex items-start gap-2 text-sm text-gray-300">
+                      <span className="text-amber-500 mt-0.5 flex-shrink-0">✓</span>
+                      {pro}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Worth knowing */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Worth knowing</p>
+                <ul className="space-y-2">
+                  {[
+                    "Pricing not published online — requires a direct quote for exact fees",
+                    "Customer service reviews more mixed at scale than Augusta",
+                  ].map((con) => (
+                    <li key={con} className="flex items-start gap-2 text-sm text-gray-400">
+                      <span className="text-gray-600 mt-0.5 flex-shrink-0">–</span>
+                      {con}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Who it's best for */}
+              <div className="rounded-xl border border-white/5 bg-black/20 p-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Best for</p>
+                <p className="text-sm text-gray-300">Investors starting with $10,000–$50,000, or anyone who needs to get started before reaching Augusta&apos;s $50k minimum</p>
+              </div>
+
+              <div className="pt-1 space-y-2">
+                <a
+                  href={BIRCH_DEEPDIVE}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:text-amber-300 transition-all"
+                >
+                  Get Birch Gold&apos;s free info kit →
+                </a>
+                <p className="text-[11px] text-gray-600">Birch Gold Group · Paid partner · No commitment required</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Other companies ──────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 py-4">
         <div className="mx-auto max-w-3xl space-y-4">
           <p className="label mb-2">Also reviewed</p>
-          {COMPANIES.slice(1).map((c) => (
+          {COMPANIES.slice(1).filter((c) => c.id !== "birch" || !BIRCH_DEEPDIVE).map((c) => (
             <div
               key={c.id}
               className="rounded-2xl border p-5 space-y-3"
@@ -668,22 +764,42 @@ export default function GoldIraPage() {
               </div>
             ))}
           </div>
-          {AUGUSTA_ELIGIBILITY && (
-            <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
-              <p className="label">Not sure if you qualify?</p>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Augusta offers a free, no-pressure web conference with a gold IRA specialist who can review your specific
-                account type and walk you through the rollover process. There&apos;s no obligation to open an account.
-              </p>
-              <a
-                href={AUGUSTA_ELIGIBILITY}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
-              >
-                Request the free guide →
-              </a>
-              <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
+          {(AUGUSTA_ELIGIBILITY || BIRCH_ELIGIBILITY) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {AUGUSTA_ELIGIBILITY && (
+                <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+                  <p className="label">Have $50k+ to roll over?</p>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    Augusta offers a free, no-pressure web conference with a Gold IRA specialist to review your account type and walk you through the process.
+                  </p>
+                  <a
+                    href={AUGUSTA_ELIGIBILITY}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+                  >
+                    Request Augusta&apos;s free guide →
+                  </a>
+                  <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
+                </div>
+              )}
+              {BIRCH_ELIGIBILITY && (
+                <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+                  <p className="label">Starting with $10k–$50k?</p>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    Birch Gold has the lowest minimum in the category at $10,000 and the longest track record. Request a free info kit with no obligation.
+                  </p>
+                  <a
+                    href={BIRCH_ELIGIBILITY}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+                  >
+                    Get Birch Gold&apos;s free info kit →
+                  </a>
+                  <p className="text-xs text-gray-600 mt-1">Birch Gold Group · Paid partner</p>
+                </div>
+              )}
             </div>
           )}
         </div>
