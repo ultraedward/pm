@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { COMPARE_COINS, type CompareCoin } from "@/lib/compare/coins";
 import { DEALERS } from "@/lib/compare/dealers";
-import { PREMIUMS } from "@/lib/compare/premiums";
+import type { PremiumTable } from "@/lib/compare/getPremiums";
 
 type Spots = { gold: number; silver: number };
 
@@ -15,7 +15,7 @@ type Spots = { gold: number; silver: number };
 // gives us a single point of truth for click metrics.
 export type DealerAvailabilityMap = Record<string, Record<string, boolean>>;
 
-type Props = { spots: Spots; available: DealerAvailabilityMap };
+type Props = { spots: Spots; available: DealerAvailabilityMap; premiums: PremiumTable };
 
 type Row = {
   dealerId: string;
@@ -35,13 +35,13 @@ function fmtUSD(n: number, opts: { cents?: boolean } = {}) {
   });
 }
 
-function buildRows(coin: CompareCoin, spots: Spots, available: DealerAvailabilityMap): Row[] {
+function buildRows(coin: CompareCoin, spots: Spots, available: DealerAvailabilityMap, premiums: PremiumTable): Row[] {
   const spot = coin.metal === "gold" ? spots.gold : spots.silver;
   const melt = coin.oz * spot;
   return DEALERS
     .filter((d) => available[coin.id]?.[d.id])
     .map((d) => {
-      const premium = PREMIUMS[coin.id]?.[d.id] ?? 0;
+      const premium = premiums[coin.id]?.[d.id] ?? 0;
       // Outbound URL is the tracker — the actual dealer URL (with affiliate
       // wrapper + sub-id) is resolved server-side inside /api/track/click.
       const trackedUrl =
@@ -60,13 +60,13 @@ function buildRows(coin: CompareCoin, spots: Spots, available: DealerAvailabilit
     .sort((a, b) => a.total - b.total);
 }
 
-export default function CompareClient({ spots, available }: Props) {
+export default function CompareClient({ spots, available, premiums }: Props) {
   const [coinId, setCoinId] = useState<CompareCoin["id"]>("silver-eagle");
   const coin = COMPARE_COINS.find((c) => c.id === coinId)!;
   const spot = coin.metal === "gold" ? spots.gold : spots.silver;
   const melt = coin.oz * spot;
 
-  const rows = useMemo(() => buildRows(coin, spots, available), [coin, spots, available]);
+  const rows = useMemo(() => buildRows(coin, spots, available, premiums), [coin, spots, available, premiums]);
   const best = rows[0];
 
   // Defensive: if we haven't wired up any dealer slugs for this coin yet,

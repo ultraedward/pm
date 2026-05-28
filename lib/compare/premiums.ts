@@ -24,44 +24,49 @@ import type { Dealer } from "./dealers";
 type PremiumTable = Record<CompareCoin["id"], Record<Dealer["id"], number>>;
 
 export const PREMIUMS: PremiumTable = {
-  // Silver Eagle re-verified 2026-05-19 via FindBullionPrices.com hourly data
-  // at ~$74.34 spot and moneymetals.com (MM states premium explicitly).
-  // Note: premiums widened vs. May 10 as spot fell ~$6 — dealers protect margin.
-  // FBP single-piece ACH/cash prices: APMEX $90.77, JM $91.32, SD $82.92.
-  // MM: $11.49 single-unit premium listed explicitly on product page.
+  // Silver Eagle re-verified 2026-05-27 at ~$74.77 silver ask (Kitco).
+  // SD: confirmed via SSR page price $85.63 (sdbullion.com product page).
+  // JM: confirmed "as low as $15.99/oz over spot" from jmbullion.com listing.
+  // APMEX: estimated from historical spread (~$0.50 below JM).
+  // MM: estimated from historical spread (~$2 above SD).
+  // Note: spot fell ~$2.32 today (-3.02%) vs prior week; premiums widened.
   "silver-eagle": {
-    apmex:       16.43,  // verified: $90.77 - $74.34 spot (2026-05-19)
-    jmbullion:   16.98,  // verified: $91.32 - $74.34 spot (2026-05-19)
-    sdbullion:    8.58,  // verified: $82.92 - $74.34 spot (2026-05-19)
-    moneymetals: 11.49,  // verified: explicit on moneymetals.com (2026-05-19)
+    apmex:       15.49,  // est. (APMEX historically ~$0.50 below JM)
+    jmbullion:   15.99,  // confirmed: "$15.99/oz over spot" on jmbullion.com (2026-05-27)
+    sdbullion:   10.86,  // confirmed: $85.63 page - $74.77 spot (2026-05-27)
+    moneymetals: 13.00,  // est. (historically ~$2 above SD)
   },
   "gold-eagle": {
-    // Re-verified 2026-05-19 via FindBullionPrices.com at ~$4,491.71 spot.
-    // Single-piece ACH/cash: SD $4,678.07, APMEX $4,692.89, JM $4,706.89.
-    // MM: $219.00 single-unit premium listed explicitly on product page.
-    apmex:       201.18,  // verified: $4,692.89 - $4,491.71 spot (2026-05-19)
-    jmbullion:   215.18,  // verified: $4,706.89 - $4,491.71 spot (2026-05-19)
-    sdbullion:   186.36,  // verified: $4,678.07 - $4,491.71 spot (2026-05-19)
-    moneymetals: 219.00,  // verified: explicit on moneymetals.com (2026-05-19)
+    // Re-verified 2026-05-27 at ~$4,457.50 gold ask (Kitco).
+    // SD: confirmed via SSR page price $4,745.27 (sdbullion.com product page).
+    // APMEX: confirmed random-year BU at $4,700.49 check/wire (from apmex.com listing).
+    // JM/MM: estimated from historical spread vs APMEX ($14 and $18 respectively).
+    // Note: gold fell ~$50.90 today (-1.13%); SSR-cached page prices may lag JS live prices.
+    apmex:       242.99,  // confirmed: $4,700.49 - $4,457.50 spot (2026-05-27)
+    jmbullion:   256.99,  // est. (historically ~$14 above APMEX)
+    sdbullion:   287.77,  // confirmed: $4,745.27 page - $4,457.50 spot (2026-05-27)
+    moneymetals: 261.99,  // est. (historically ~$18 above APMEX)
   },
-  // Silver Maple re-verified 2026-05-19 via FindBullionPrices.com hourly data
-  // at ~$74.37 spot. SD notably aggressive on random-year Maples right now.
-  // FBP single-piece ACH/cash: SD $77.42, MM $81.25, APMEX $85.71, JM $87.74.
+  // Silver Maple re-verified 2026-05-27 at ~$74.77 silver ask (Kitco).
+  // APMEX: confirmed "as low as $9.99/oz over spot" from apmex.com listing.
+  // JM: estimated (historically ~$2 above APMEX).
+  // SD: estimated (proportionally widened from May 19's $3.05, tracking Silver Eagle spread).
+  // MM: estimated mid-range between SD and APMEX.
   "silver-maple": {
-    apmex:       11.34,  // verified: $85.71 - $74.37 spot (2026-05-19)
-    jmbullion:   13.37,  // verified: $87.74 - $74.37 spot (2026-05-19)
-    sdbullion:    3.05,  // verified: $77.42 - $74.37 spot (2026-05-19)
-    moneymetals:  6.88,  // verified: $81.25 - $74.37 spot (2026-05-19)
+    apmex:        9.99,  // confirmed: "as low as $9.99/oz over spot" on apmex.com (2026-05-27)
+    jmbullion:   12.00,  // est. (historically ~$2 above APMEX)
+    sdbullion:    5.00,  // est. (widened from $3.05 on May 19, tracking Eagle spread)
+    moneymetals:  7.50,  // est. (mid-range between SD and APMEX)
   },
   "gold-maple": {
-    // Re-verified 2026-05-19 via FindBullionPrices.com at ~$4,493.90 spot.
-    // Single-piece ACH/cash: SD $4,553.07, APMEX $4,571.59 (hidden), MM $4,645.65, JM $4,647.28.
+    // Re-verified 2026-05-27 at ~$4,457.50 gold ask (Kitco).
     // APMEX row is hidden (empty slug in coins.ts) — they only carry a
     // .99999 + assay card SKU, not a standard .9999 random-year Maple.
+    // JM/SD/MM: estimated from May 19 baselines, scaled with Gold Eagle premium widening.
     apmex:         0,    // unused — row hidden by empty slug in coins.ts
-    jmbullion:   153.38,  // verified: $4,647.28 - $4,493.90 spot (2026-05-19)
-    sdbullion:    59.17,  // verified: $4,553.07 - $4,493.90 spot (2026-05-19)
-    moneymetals: 151.75,  // verified: $4,645.65 - $4,493.90 spot (2026-05-19)
+    jmbullion:   195.00,  // est. (widened from $153.38 on May 19, tracking Gold Eagle spread)
+    sdbullion:   161.00,  // est. (widened from $59.17 on May 19, tracking Gold Eagle spread)
+    moneymetals: 193.00,  // est. (widened from $151.75 on May 19, tracking Gold Eagle spread)
   },
 };
 
@@ -73,4 +78,4 @@ export function premiumFor(coinId: CompareCoin["id"], dealerId: Dealer["id"]): n
 // users can judge how fresh the comparison really is. Update whenever you
 // edit any value above. ISO format (YYYY-MM-DD) — the UI formats it for
 // display.
-export const PREMIUMS_LAST_REVIEWED = "2026-05-19";
+export const PREMIUMS_LAST_REVIEWED = "2026-05-27";

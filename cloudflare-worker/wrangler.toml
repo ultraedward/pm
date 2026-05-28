@@ -1,0 +1,20 @@
+name = "lode-premiums-worker"
+main = "premiums-worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# KV namespace for storing scraped premiums
+[[kv_namespaces]]
+binding = "PREMIUMS_KV"
+id = "4c1b8811035e472e81345c4fa089e035"
+
+[browser]
+binding = "BROWSER"
+
+[triggers]
+crons = ["0 9 * * 2"]
+
+# Routes (optional — set if deploying to a custom domain)
+# [[routes]]
+# pattern = "premiums.lode.rocks/*"
+# zone_name = "lode.rocks"

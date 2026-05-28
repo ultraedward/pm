@@ -7,19 +7,20 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { COMPARE_COINS } from "@/lib/compare/coins";
 import { DEALERS } from "@/lib/compare/dealers";
-import { PREMIUMS_LAST_REVIEWED } from "@/lib/compare/premiums";
+import { getLivePremiums } from "@/lib/compare/getPremiums";
 import CompareClient, { type DealerAvailabilityMap } from "./CompareClient";
 
-// Render PREMIUMS_LAST_REVIEWED ("YYYY-MM-DD") as a human-friendly date.
+// Render a date or ISO timestamp as a human-friendly date string.
 // We intentionally avoid showing relative time ("3 days ago") because it
 // re-renders on every load and a relative timestamp that ticks past
 // "1 week ago" silently degrades the trust signal — an absolute date
 // always shows the actual review cadence.
 function fmtPremiumsReviewed(iso: string): string {
-  // Append a fixed UTC time so server + client format it identically and
-  // we don't trip Next.js hydration warnings if the visitor's local TZ
-  // happens to push the date back by a day.
-  const d = new Date(`${iso}T12:00:00Z`);
+  // Handle both YYYY-MM-DD (static) and full ISO timestamps (worker).
+  // Append a fixed UTC time for date-only strings so server + client
+  // format it identically and we don't trip hydration warnings.
+  const normalized = iso.includes("T") ? iso : `${iso}T12:00:00Z`;
+  const d = new Date(normalized);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("en-US", {
     year: "numeric",
@@ -124,7 +125,10 @@ function buildAvailability(): DealerAvailabilityMap {
 }
 
 export default async function ComparePage() {
-  const live = await fetchAllSpotPrices();
+  const [live, { premiums, lastReviewed }] = await Promise.all([
+    fetchAllSpotPrices(),
+    getLivePremiums(),
+  ]);
   const spots = {
     gold:   live.gold   ?? 0,
     silver: live.silver ?? 0,
@@ -184,7 +188,7 @@ export default async function ComparePage() {
             <span className="text-gray-700">·</span>
             <span>
               Dealer premiums verified{" "}
-              <span className="text-gray-300">{fmtPremiumsReviewed(PREMIUMS_LAST_REVIEWED)}</span>
+              <span className="text-gray-300">{fmtPremiumsReviewed(lastReviewed)}</span>
             </span>
           </div>
         </div>
@@ -193,7 +197,7 @@ export default async function ComparePage() {
       {/* ── Compare ───────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 pt-6 pb-10">
         <div className="mx-auto max-w-2xl">
-          <CompareClient spots={spots} available={available} />
+          <CompareClient spots={spots} available={available} premiums={premiums} />
         </div>
       </section>
 
@@ -282,11 +286,11 @@ export default async function ComparePage() {
               <div className="space-y-3">
                 <h2 className="text-base font-bold text-white">How Lode maintains premium data</h2>
                 <p>
-                  Dealer premiums are not scraped automatically — they are reviewed by hand and updated when
-                  dealers change their pricing. The "premiums verified" date shown at the top of the page is the
-                  last time we checked each dealer&rsquo;s current prices. Live spot prices update on every page
-                  load from Yahoo Finance futures data, so the estimated totals are always based on the current
-                  market price even if the premium was last verified a few days ago.
+                  Dealer premiums are scraped automatically each week by a Cloudflare Worker that visits each
+                  dealer&rsquo;s product page and reads the current check/wire price. The "premiums verified"
+                  date shown at the top of the page reflects the last successful scrape. Live spot prices update
+                  on every page load from Yahoo Finance futures data, so estimated totals always reflect the
+                  current market even between weekly scrape runs.
                 </p>
                 <p>
                   If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email
