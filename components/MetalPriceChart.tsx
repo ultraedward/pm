@@ -14,11 +14,15 @@ type Metal = "gold" | "silver" | "platinum" | "palladium";
 type Range = "7d" | "30d" | "90d";
 type Point = { t: number; price: number };
 
-const METAL_COLOR: Record<Metal, string> = {
-  gold:      "#D4AF37",
-  silver:    "#C0C0C0",
-  platinum:  "#E5E4E2",
-  palladium: "#9FA8C7",
+// Gold is visible in both themes; silver/platinum/palladium use CSS variables
+// so that light mode can swap to higher-contrast values (see globals.css).
+const METAL_COLOR_FIXED: Partial<Record<Metal, string>> = {
+  gold: "#D4AF37",
+};
+const METAL_COLOR_VAR: Partial<Record<Metal, string>> = {
+  silver:    "var(--chart-silver)",
+  platinum:  "var(--chart-platinum)",
+  palladium: "var(--chart-palladium)",
 };
 
 const RANGES: { key: Range; label: string }[] = [
@@ -59,7 +63,7 @@ interface Props {
 }
 
 export function MetalPriceChart({ metal }: Props) {
-  const color = METAL_COLOR[metal];
+  const color = METAL_COLOR_FIXED[metal] ?? METAL_COLOR_VAR[metal] ?? "#C0C0C0";
   const gradId = `${metal}-grad`;
 
   const [range, setRange] = useState<Range>("30d");
@@ -99,8 +103,8 @@ export function MetalPriceChart({ metal }: Props) {
               className="px-3 py-1 rounded-lg text-xs font-bold transition-colors"
               style={{
                 background: range === key ? "rgba(212,175,55,0.15)" : "transparent",
-                color:      range === key ? "var(--gold-bright)" : "var(--text-dim)",
-                border:     `1px solid ${range === key ? "rgba(212,175,55,0.3)" : "transparent"}`,
+                color:      range === key ? "var(--gold-bright)" : "var(--text-muted)",
+                border:     `1px solid ${range === key ? "rgba(212,175,55,0.3)" : "var(--border-strong)"}`,
               }}
             >
               {label}
@@ -183,12 +187,12 @@ export function MetalPriceChart({ metal }: Props) {
               <p className="text-[10px] uppercase tracking-widest text-gray-600">{label}</p>
               <p
                 className="text-sm font-black tabular-nums"
-                style={{ color: accent ? (up ? "#4ade80" : "#f87171") : "white" }}
+                style={{ color: accent ? (up ? "var(--color-up)" : "var(--color-down)") : "var(--text)" }}
               >
                 {val}
               </p>
               {sub && (
-                <p className="text-xs tabular-nums" style={{ color: up ? "#4ade80" : "#f87171" }}>
+                <p className="text-xs tabular-nums" style={{ color: up ? "var(--color-up)" : "var(--color-down)" }}>
                   {sub}
                 </p>
               )}

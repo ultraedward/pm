@@ -267,7 +267,7 @@ export default async function PalladiumPricePage() {
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold tabular-nums"
                   style={{
                     background: change7 >= 0 ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)",
-                    color:      change7 >= 0 ? "#4ade80" : "#f87171",
+                    color:      change7 >= 0 ? "var(--color-up)" : "var(--color-down)",
                   }}
                 >
                   7D {fmtChange(change7)} ({fmtPct(pct7)})
@@ -278,7 +278,7 @@ export default async function PalladiumPricePage() {
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold tabular-nums"
                   style={{
                     background: change30 >= 0 ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)",
-                    color:      change30 >= 0 ? "#4ade80" : "#f87171",
+                    color:      change30 >= 0 ? "var(--color-up)" : "var(--color-down)",
                   }}
                 >
                   30D {fmtChange(change30)} ({fmtPct(pct30)})

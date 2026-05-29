@@ -19,11 +19,11 @@ export default function NavLinks({ isLoggedIn }: Props) {
   }
 
   function linkClass(href: string) {
-    return `label transition-colors ${isActive(href) ? "" : "hover:!text-white"}`;
+    return `label transition-colors`;
   }
 
   function activeStyle(href: string): React.CSSProperties | undefined {
-    return isActive(href) ? { color: "var(--text)" } : undefined;
+    return { color: isActive(href) ? "var(--text)" : "var(--text-muted)" };
   }
 
   return (

@@ -10,6 +10,11 @@
   --text:          #FFFFFF;
   --text-muted:    rgba(255, 255, 255, 0.32);
   --text-dim:      rgba(255, 255, 255, 0.10);
+  --color-up:      #4ade80;
+  --color-down:    #f87171;
+  --chart-silver:  #C0C0C0;
+  --chart-platinum: #E5E4E2;
+  --chart-palladium: #9FA8C7;
   --gold:          #FFC200;
   --gold-bright:   #FFC200;
   --gold-dim:      rgba(255, 194, 0, 0.07);
@@ -35,8 +40,13 @@
   --surface:       #FFFFFF;
   --surface-2:     #F0F0F0;
   --text:          #0A0A0A;
-  --text-muted:    rgba(0, 0, 0, 0.55);
-  --text-dim:      rgba(0, 0, 0, 0.36);
+  --text-muted:    rgba(0, 0, 0, 0.62);
+  --text-dim:      rgba(0, 0, 0, 0.50);
+  --color-up:      #16a34a;
+  --color-down:    #b91c1c;
+  --chart-silver:  #5B7FA6;
+  --chart-platinum: #6B7280;
+  --chart-palladium: #4B5EAA;
   --gold:          #C8860A;
   --gold-bright:   #E8970A;
   --gold-dim:      rgba(200, 134, 10, 0.08);
