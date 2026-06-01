@@ -391,11 +391,16 @@ export async function GET(req: Request) {
   }
 
   // ── 6. Email-only subscribers — always USD ────────────────────────────
+  // Exclude subscribers whose email already has a registered user account
+  // to prevent duplicate digests when someone is in both tables.
+  const registeredEmails = new Set(users.map((u) => u.email).filter(Boolean));
+
   const subscribers = await prisma.emailSubscriber.findMany({
     where: { active: true },
   });
 
   for (const sub of subscribers) {
+    if (registeredEmails.has(sub.email)) { skipped++; continue; }
     const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${sub.unsubscribeToken}`;
     const html = buildDigestHtml({
       firstName: "",
