@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
+import { isPromoActive, AMERICA_250_PROMO } from "@/lib/promo";
 
 // Affiliate URLs — kept server-side only. Base URLs set in Vercel env vars.
 // Sub-IDs appended per placement so we can see which CTA converts best
@@ -11,15 +12,21 @@ const AUGUSTA_DEEPDIVE    = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=deepdive`    
 const AUGUSTA_ELIGIBILITY = AUGUSTA_BASE ? `${AUGUSTA_BASE}&sub_id=eligibility` : null;
 
 // Birch Gold — bitira.hasoffers.com offer_id=28, aff_id=2046, 3% CPS
-const BIRCH_BASE        = process.env.AFFILIATE_BIRCH_URL ?? null;
-const BIRCH_CARD        = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=card`        : null;
-const BIRCH_DEEPDIVE    = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=deepdive`    : null;
-const BIRCH_ELIGIBILITY = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=eligibility` : null;
+const BIRCH_BASE               = process.env.AFFILIATE_BIRCH_URL ?? null;
+const BIRCH_CARD               = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=card`               : null;
+const BIRCH_CARD_PROMO         = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=america250_ira_card` : null;
+const BIRCH_DEEPDIVE           = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=deepdive`            : null;
+const BIRCH_DEEPDIVE_PROMO     = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=america250_ira_deep` : null;
+const BIRCH_ELIGIBILITY        = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=eligibility`         : null;
+const BIRCH_ELIGIBILITY_PROMO  = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=america250_ira_elig` : null;
+
+const promoActive = isPromoActive();
 
 // Per-company CTA lookup — keeps COMPANIES array clean (no runtime values in `as const`)
+// During the promo window, Birch URLs use promo-specific sub_ids for attribution.
 const COMPANY_CTAS: Record<string, { card: string | null; deepdive: string | null; eligibility: string | null }> = {
-  augusta: { card: AUGUSTA_CARD, deepdive: AUGUSTA_DEEPDIVE, eligibility: AUGUSTA_ELIGIBILITY },
-  birch:   { card: BIRCH_CARD,   deepdive: BIRCH_DEEPDIVE,   eligibility: BIRCH_ELIGIBILITY   },
+  augusta: { card: AUGUSTA_CARD,                                          deepdive: AUGUSTA_DEEPDIVE,                                        eligibility: AUGUSTA_ELIGIBILITY                                        },
+  birch:   { card: promoActive ? BIRCH_CARD_PROMO : BIRCH_CARD,          deepdive: promoActive ? BIRCH_DEEPDIVE_PROMO : BIRCH_DEEPDIVE,      eligibility: promoActive ? BIRCH_ELIGIBILITY_PROMO : BIRCH_ELIGIBILITY },
 };
 
 // ── Last reviewed date ─────────────────────────────────────────────────────
@@ -346,6 +353,12 @@ export default function GoldIraPage() {
                   {c.bestForShort}
                 </p>
 
+                {c.id === "birch" && promoActive && (
+                  <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2 space-y-0.5">
+                    <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">🇺🇸 America 250 · Limited offer</p>
+                    <p className="text-[11px] text-gray-300 leading-snug">{AMERICA_250_PROMO.body}</p>
+                  </div>
+                )}
                 {c.affiliate && COMPANY_CTAS[c.id]?.card && (
                   <a
                     href={COMPANY_CTAS[c.id].card!}
@@ -353,7 +366,9 @@ export default function GoldIraPage() {
                     rel="noopener noreferrer sponsored"
                     className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 hover:text-amber-400 transition-colors"
                   >
-                    {c.id === "birch" ? "Get a free info kit →" : "Get the free guide →"}
+                    {c.id === "birch"
+                      ? promoActive ? "Claim America 250 offer →" : "Get a free info kit →"
+                      : "Get the free guide →"}
                   </a>
                 )}
               </div>
@@ -592,14 +607,28 @@ export default function GoldIraPage() {
                 </ul>
               </div>
 
+              {promoActive && BIRCH_DEEPDIVE_PROMO && (
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/[0.06] p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span aria-hidden="true" className="text-base">🇺🇸</span>
+                    <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">{AMERICA_250_PROMO.headline}</p>
+                    <span className="ml-auto text-[10px] font-mono text-amber-500/60">Jun 8 – Jul 10</span>
+                  </div>
+                  <p className="text-sm text-gray-200 leading-relaxed">
+                    For a limited time, every customer referred through Lode receives a <strong className="text-white">free America 250 collectible silver round</strong> for every $10,000 purchased — gold IRA rollovers and physical purchases both qualify.
+                  </p>
+                  <p className="text-[11px] text-gray-500">Available while supplies last · No extra cost · Ends July 10, 2026</p>
+                </div>
+              )}
+
               <div className="pt-1 space-y-2">
                 <a
-                  href={BIRCH_DEEPDIVE}
+                  href={promoActive && BIRCH_DEEPDIVE_PROMO ? BIRCH_DEEPDIVE_PROMO : BIRCH_DEEPDIVE!}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
                   className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:text-amber-300 transition-all"
                 >
-                  Get Birch Gold&apos;s free info kit →
+                  {promoActive ? "Claim America 250 offer →" : "Get Birch Gold’s free info kit →"}
                 </a>
                 <p className="text-[11px] text-gray-600">Birch Gold Group · Paid partner · No commitment required</p>
               </div>

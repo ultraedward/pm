@@ -6,6 +6,7 @@ import { RevealObserver } from "@/components/RevealObserver";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import ThemeScript from "@/components/ThemeScript";
+import { America250Banner } from "@/components/America250Banner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -114,6 +115,7 @@ export default function RootLayout({
         </a>
 
         <Navbar />
+        <America250Banner subId="banner" />
         <div id="main-content" className="sm:pb-0 pb-20">
           {children}
         </div>

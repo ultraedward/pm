@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { SilverPriceChart } from "@/components/SilverPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
+import { isPromoActive, AMERICA_250_PROMO } from "@/lib/promo";
 import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -194,6 +195,9 @@ export default async function SilverPricePage() {
 
   const isLoggedIn = !!session?.user?.email;
   const spot = spots.silver ?? 0;
+  const promoActive = isPromoActive();
+  const birchBase = process.env.AFFILIATE_BIRCH_URL ?? null;
+  const birchPromoUrl = birchBase ? `${birchBase}&sub_id=america250_silver` : null;
 
   const change30 = stats?.oldest && spot ? spot - stats.oldest : null;
   const pct30    = stats?.oldest && change30 != null ? (change30 / stats.oldest) * 100 : null;
@@ -332,6 +336,40 @@ export default async function SilverPricePage() {
           )}
         </div>
       </section>
+
+      {/* ── America 250 promo callout ────────────────────────────── */}
+      {promoActive && birchPromoUrl && (
+        <section className="px-4 sm:px-6 pb-8">
+          <div className="mx-auto max-w-2xl">
+            <a
+              href={birchPromoUrl}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="group block rounded-2xl border p-5 transition-all hover:border-amber-500/40"
+              style={{ borderColor: "rgba(212,175,55,0.2)", background: "rgba(212,175,55,0.04)" }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1.5 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span aria-hidden="true" className="text-base leading-none">🇺🇸</span>
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">{AMERICA_250_PROMO.headline}</span>
+                    <span className="text-[10px] font-mono text-amber-500/50">· ends Jul 10</span>
+                  </div>
+                  <p className="text-sm font-semibold text-white leading-snug">
+                    Buying silver? Get a free America 250 collectible silver round with every $10,000 at Birch Gold.
+                  </p>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Available for both physical silver purchases and Precious Metals IRA rollovers.
+                    While supplies last — promotion runs through July 10, 2026.
+                  </p>
+                </div>
+                <span className="flex-shrink-0 self-center text-amber-500 group-hover:text-amber-400 transition-colors text-sm font-bold">→</span>
+              </div>
+              <p className="mt-3 text-[10px] text-gray-600">Birch Gold Group · Paid partner · No commitment required</p>
+            </a>
+          </div>
+        </section>
+      )}
 
       {/* ── Email capture ────────────────────────────────────────── */}
       {!isLoggedIn && (
