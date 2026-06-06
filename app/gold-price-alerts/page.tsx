@@ -3,27 +3,31 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Gold Price Alerts — Get Notified When Gold Hits Your Target",
+  title: "Precious Metals Price Alerts — Gold, Silver, Platinum & Palladium",
   description:
-    "Set custom gold price alerts and get an email when spot price crosses your target. Also covers silver, platinum, and palladium. No app required — works in any inbox.",
+    "Set custom price alerts for gold, silver, platinum, or palladium and get an email when spot crosses your target. No app required — works in any inbox.",
   keywords: [
     "gold price alert",
-    "gold price notification",
-    "gold spot price alert",
     "silver price alert",
     "precious metals price alert",
+    "gold price notification",
+    "silver price notification",
+    "gold spot price alert",
+    "silver spot price alert",
     "gold price email alert",
-    "gold price tracker alert",
     "set gold price alert",
+    "set silver price alert",
     "gold price target notification",
+    "platinum price alert",
+    "palladium price alert",
   ],
   alternates: {
     canonical: "https://lode.rocks/gold-price-alerts",
   },
   openGraph: {
-    title: "Gold Price Alerts — Get Notified When Gold Hits Your Target",
+    title: "Precious Metals Price Alerts — Gold, Silver, Platinum & Palladium",
     description:
-      "Set custom price targets for gold, silver, platinum, or palladium. Daily email check — when spot crosses your threshold, the alert hits your inbox.",
+      "Set custom price targets for gold, silver, platinum, or palladium. Email alert when spot crosses your threshold — no app required.",
     url: "https://lode.rocks/gold-price-alerts",
   },
 };
@@ -35,13 +39,13 @@ const jsonLd = {
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home",              "item": "https://lode.rocks" },
-        { "@type": "ListItem", "position": 2, "name": "Gold Price Alerts", "item": "https://lode.rocks/gold-price-alerts" },
+        { "@type": "ListItem", "position": 2, "name": "Precious Metals Price Alerts", "item": "https://lode.rocks/gold-price-alerts" },
       ],
     },
     {
       "@type": "WebApplication",
       "@id": "https://lode.rocks/gold-price-alerts#app",
-      "name": "Gold & Silver Price Alerts — Lode",
+      "name": "Precious Metals Price Alerts — Lode",
       "url": "https://lode.rocks/gold-price-alerts",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
@@ -151,10 +155,10 @@ export default function GoldPriceAlertsPage() {
           />
         </div>
         <div className="relative z-10 mx-auto max-w-2xl text-center space-y-5">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Price Alerts · Gold · Silver · Platinum</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Price Alerts · Gold · Silver · Platinum · Palladium</p>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-tight">
-            Gold Price Alerts<br />
-            <span style={{ color: "var(--gold-bright)" }}>Delivered to Your Inbox</span>
+            Precious Metals<br />
+            <span style={{ color: "var(--gold-bright)" }}>Price Alerts</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
             Set a target price for gold, silver, platinum, or palladium. Once a day, Lode checks spot against your target — if it crossed, you get one email. No app, no noise.

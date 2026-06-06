@@ -214,6 +214,55 @@ export default async function ComparePage() {
         </div>
       </section>
 
+      {/* ── Dealer head-to-head — always visible, targets "X vs Y" queries ── */}
+      <section className="border-t px-4 sm:px-6 py-10" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-2xl space-y-8 text-sm text-gray-400 leading-relaxed">
+          <h2 className="text-lg font-black text-white tracking-tight">Dealer head-to-head</h2>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white">JM Bullion vs APMEX</h3>
+            <p>
+              For American Silver Eagles, JM Bullion consistently edges out APMEX on per-coin price — typically
+              $0.50–$1.50 cheaper per coin depending on market conditions. APMEX&rsquo;s advantage is breadth: a larger
+              catalogue, more fractional gold options, and faster shipping to more locations. If you&rsquo;re buying
+              Silver Eagles or silver Maple Leafs in quantity, JM Bullion is usually the cheaper starting point.
+              For rare dates, specialty coins, or a one-stop shop for mixed orders, APMEX wins on selection.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white">SD Bullion vs JM Bullion</h3>
+            <p>
+              SD Bullion competes hardest on generic silver — rounds, bars, and junk silver — where it frequently
+              undercuts JM Bullion by a meaningful margin. For Silver Eagles and Gold Eagles, the two are usually
+              within $0.25–$0.75 of each other; the live table above shows who&rsquo;s cheaper today. SD Bullion&rsquo;s
+              free shipping threshold is similar to JM&rsquo;s; on large orders, both are close enough that spot
+              availability and shipping speed often become the deciding factor.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white">SD Bullion vs APMEX</h3>
+            <p>
+              SD Bullion is almost always cheaper than APMEX on Eagles and Maples — APMEX charges a premium for
+              its brand, service, and selection. The gap narrows on Gold Eagles (where premiums compress) and
+              widens on silver products (where SD is most aggressive). APMEX is worth the extra cost if you want
+              an in-stock guarantee on hard-to-find items or prefer a single dealer relationship.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white">Kitco vs APMEX</h3>
+            <p>
+              Kitco is primarily a spot price reference and commentary site — not a direct competitor to APMEX for
+              retail bullion. Kitco does sell gold and silver, but at premiums that are generally higher than
+              APMEX, JM Bullion, or SD Bullion for equivalent products. Most stackers use Kitco to cross-check
+              spot prices, then buy through one of the discount dealers tracked above.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Editorial — collapsible, server-rendered for indexability */}
       <section className="border-t px-4 sm:px-6 py-8" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-2xl">

@@ -109,7 +109,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/blog/junk-silver-guide`,
-      lastModified: new Date("2026-05-20"),
+      lastModified: new Date("2026-05-24"),
       changeFrequency: "monthly",
       priority: 0.8,
     },

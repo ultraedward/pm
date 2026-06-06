@@ -1,14 +1,14 @@
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata = {
-  title: "Methodology & Data Sources",
+  title: "How Lode Gets Precious Metals Spot Prices — Methodology & Sources",
   description:
-    "Where Lode's precious metals price data comes from, how often it refreshes, and how our calculators work. Full transparency on sources, formulas, and limitations.",
+    "Where Lode's gold, silver, platinum, and palladium spot prices come from, how often they refresh, and how every calculator works. Full transparency on sources, formulas, and limitations.",
   alternates: {
     canonical: "https://lode.rocks/methodology",
   },
   openGraph: {
-    title: "Methodology & Data Sources | Lode",
+    title: "How Lode Gets Precious Metals Spot Prices — Methodology & Sources",
     description:
       "Full transparency on where Lode's spot price data comes from and how every calculation is done.",
     url: "https://lode.rocks/methodology",
