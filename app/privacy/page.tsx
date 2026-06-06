@@ -58,8 +58,8 @@ export default function PrivacyPage() {
             <p>The dealer comparison page on lode.rocks contains affiliate links. When you click a dealer link, one of our affiliate networks may set a cookie in your browser to record the referral and attribute any resulting purchase to us. This allows us to earn a commission at no additional cost to you. Rankings and prices on the compare page are not affected by affiliate relationships — we sort strictly by estimated total cost.</p>
             <p>We currently use two affiliate networks depending on the dealer:</p>
             <ul className="list-disc list-inside space-y-1 pl-2">
-              <li><strong className="text-gray-300">Awin Ltd</strong> — used for SD Bullion, JM Bullion, and Money Metals. Awin's privacy policy and opt-out are available at <a href="https://www.awin.com/gb/privacy" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">awin.com/gb/privacy</a>.</li>
-              <li><strong className="text-gray-300">FlexOffers.com, LLC</strong> — used for APMEX. FlexOffers' privacy policy is available at <a href="https://www.flexoffers.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">flexoffers.com/privacy-policy</a>.</li>
+              <li><strong className="text-gray-300">Awin Ltd</strong> — used for SD Bullion, JM Bullion, and Money Metals. Awin's privacy policy and opt-out are available at <a href="https://www.awin.com/gb/privacy" target="_blank" rel="noopener noreferrer" className="link-gold">awin.com/gb/privacy</a>.</li>
+              <li><strong className="text-gray-300">FlexOffers.com, LLC</strong> — used for APMEX. FlexOffers' privacy policy is available at <a href="https://www.flexoffers.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="link-gold">flexoffers.com/privacy-policy</a>.</li>
             </ul>
             <p>Each network's own privacy policy governs how they collect and process data from their tracking cookies.</p>
           </section>
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
 
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">8. Contact</h2>
-            <p>Questions about this policy can be directed to <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">hello@lode.rocks</a>.</p>
+            <p>Questions about this policy can be directed to <a href="mailto:hello@lode.rocks" className="link-gold">hello@lode.rocks</a>.</p>
           </section>
 
         </div>

@@ -498,7 +498,7 @@ export default function JunkSilverGuidePage() {
           </section>
 
           {/* CTA */}
-          <section className="bg-gray-900 border border-amber-900/40 rounded-2xl p-6 sm:p-8 text-center">
+          <section className="border p-6 sm:p-8 text-center" style={{ borderColor: "rgba(212,175,55,0.25)", background: "var(--surface-2)" }}>
             <h2 className="text-xl font-bold text-white mb-2">Ready to calculate your melt value?</h2>
             <p className="text-gray-400 text-sm mb-5">
               Enter your face value or count coins individually. Spot prices update on every page load.

@@ -106,7 +106,7 @@ const metalsFaq: FaqItem[] = [
         collector premium — they trade purely on silver content.{" "}
         <strong className="text-white">$1 face value</strong> in 90% coins contains roughly 0.715 troy oz
         of silver (industry standard, adjusted for wear). Use the{" "}
-        <Link href="/junk-silver-calculator" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <Link href="/junk-silver-calculator" className="link-gold">
           junk silver calculator
         </Link>{" "}
         to find melt value by face amount or individual coin count.
@@ -131,7 +131,7 @@ const metalsFaq: FaqItem[] = [
         The markup a dealer charges above the spot price. If silver spot is $30/ozt and an American Silver
         Eagle sells for $35, the premium is $5 (≈ 16.7%). Premiums cover fabrication, distribution, and
         dealer margin. Generic rounds carry lower premiums than government-minted coins. The{" "}
-        <Link href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <Link href="/compare" className="link-gold">
           compare page
         </Link>{" "}
         tracks premiums across dealers in real time.
@@ -163,7 +163,7 @@ const lodeFaq: FaqItem[] = [
         <ul className="list-disc pl-5 space-y-1.5">
           <li>
             Our data sources are published openly on the{" "}
-            <Link href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/methodology" className="link-gold">
               Methodology
             </Link>{" "}
             page. Cross-check any spot price shown on Lode against Kitco or a broker terminal — the numbers
@@ -171,21 +171,21 @@ const lodeFaq: FaqItem[] = [
           </li>
           <li>
             We do not buy, sell, or broker metal. No funds ever move through Lode. See{" "}
-            <Link href="/about" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/about" className="link-gold">
               About
             </Link>
             .
           </li>
           <li>
             What we collect and how we handle it is in our{" "}
-            <Link href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/privacy" className="link-gold">
               Privacy Policy
             </Link>
             .
           </li>
           <li>
             You can reach a human at{" "}
-            <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <a href="mailto:hello@lode.rocks" className="link-gold">
               hello@lode.rocks
             </a>
             .
@@ -204,7 +204,7 @@ const lodeFaq: FaqItem[] = [
     a: (
       <p>
         Affiliate commissions on dealer outbound clicks from the{" "}
-        <Link href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <Link href="/compare" className="link-gold">
           compare
         </Link>{" "}
         page. When you click through to APMEX, JM Bullion, SD Bullion, or Money Metals and buy, Lode may
@@ -222,12 +222,12 @@ const lodeFaq: FaqItem[] = [
           href="https://finance.yahoo.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-amber-500 hover:text-amber-400 transition-colors"
+          className="link-gold"
         >
           Yahoo Finance
         </a>{" "}
         futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Full detail is on the{" "}
-        <Link href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <Link href="/methodology" className="link-gold">
           Methodology
         </Link>{" "}
         page.
@@ -260,7 +260,7 @@ const lodeFaq: FaqItem[] = [
       <p>
         No. No advertising, no third-party tracking cookies, no data broker relationships. The only
         third-party services we use are the ones operationally required to run the site, listed in the{" "}
-        <Link href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <Link href="/privacy" className="link-gold">
           Privacy Policy
         </Link>
         .
@@ -303,12 +303,12 @@ const lodeFaq: FaqItem[] = [
     a: (
       <p>
         Email us at{" "}
-        <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <a href="mailto:hello@lode.rocks" className="link-gold">
           hello@lode.rocks
         </a>{" "}
         from the address on your account, or use the account page when signed in. We process deletion
         requests within 30 days as described in the{" "}
-        <Link href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">
+        <Link href="/privacy" className="link-gold">
           Privacy Policy
         </Link>
         .
@@ -366,7 +366,7 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
         </div>
 
         {/* Tools & prices grid */}
-        <section className="rounded-2xl border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+        <section className="border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
           <h2 className="text-base font-bold text-white">Lode tools &amp; live prices</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
@@ -394,7 +394,7 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
         <section className="space-y-2 text-sm text-gray-400">
           <h2 className="text-base font-bold text-white">Still have questions?</h2>
           <p>
-            <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <a href="mailto:hello@lode.rocks" className="link-gold">
               hello@lode.rocks
             </a>{" "}
             — a human reads every message.

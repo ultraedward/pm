@@ -239,7 +239,7 @@ export default async function PlatinumPricePage() {
           </div>
           <div className="relative z-10 mx-auto max-w-2xl space-y-3">
             <p className="label">Live spot</p>
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-none">
+            <h1 className="font-black leading-none" style={{ fontSize: "clamp(2.25rem, 5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
               Platinum Price Today
             </h1>
 
@@ -309,11 +309,11 @@ export default async function PlatinumPricePage() {
                 ].map(({ label, value }) => (
                   <div
                     key={label}
-                    className="rounded-2xl border p-4 space-y-1"
-                    style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}
+                    className="border p-4 space-y-1"
+                    style={{ borderColor: "var(--border)", background: "var(--surface)" }}
                   >
-                    <p className="text-[10px] uppercase tracking-widest text-gray-600">{label}</p>
-                    <p className="text-lg font-black tabular-nums text-white">{value}</p>
+                    <p className="label">{label}</p>
+                    <p className="text-lg font-black tabular-nums" style={{ color: "var(--text)" }}>{value}</p>
                   </div>
                 ))}
               </div>
@@ -321,21 +321,19 @@ export default async function PlatinumPricePage() {
 
             {/* Weight reference table */}
             {weightRows.length > 0 && (
-              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+              <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
                 <div
                   className="px-5 py-3 border-b flex items-center gap-2"
-                  style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}
+                  style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
                 >
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: PLAT_COLOR }} />
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                    Platinum price by weight — today
-                  </p>
+                  <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ background: PLAT_COLOR }} />
+                  <p className="label">Platinum price by weight — today</p>
                 </div>
                 <div className="divide-y" style={{ borderColor: "var(--border)" }}>
                   {weightRows.map(({ label, value }) => (
                     <div key={label} className="flex items-center justify-between px-5 py-3">
-                      <span className="text-sm text-gray-400">{label}</span>
-                      <span className="text-sm font-bold tabular-nums text-white">
+                      <span className="text-sm" style={{ color: "var(--text-muted)" }}>{label}</span>
+                      <span className="text-sm font-bold tabular-nums" style={{ color: "var(--text)" }}>
                         {fmt(value, label.includes("gram") || label.includes("grain") ? 4 : 2)}
                       </span>
                     </div>
@@ -412,7 +410,7 @@ export default async function PlatinumPricePage() {
                 </p>
                 <p>
                   Use the{" "}
-                  <Link href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">
+                  <Link href="/compare" className="link-gold">
                     dealer comparison page
                   </Link>{" "}
                   to see current premiums on gold and silver bullion. For platinum-specific pricing,

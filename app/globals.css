@@ -210,6 +210,18 @@ textarea:focus-visible {
   .rainbow-accent {
     color: var(--text-muted);
   }
+
+  /* ── Inline hyperlink — gold accent, works in both themes ───
+     Usage: className="link-gold"
+     Replaces scattered text-amber-500 hover:text-amber-400 patterns.
+  ─────────────────────────────────────────────────────────── */
+  .link-gold {
+    color: var(--gold);
+    transition: opacity 0.15s ease;
+  }
+  .link-gold:hover {
+    opacity: 0.72;
+  }
 }
 
 /* Rainbow gradient — light mode only */

@@ -44,14 +44,14 @@ export default function MethodologyPage() {
 
         {/* Verification callout — lead with the invitation to audit us */}
         <section
-          className="rounded-2xl border p-6 space-y-3 text-sm"
+          className="border p-6 space-y-3 text-sm"
           style={{ borderColor: "var(--border)" }}
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Verify us in 30 seconds</p>
           <p className="text-gray-300">
             Don&rsquo;t take our word for anything. Pick any metal, pull the live price from Lode, and cross-check it against{" "}
-            <a href="https://www.kitco.com/charts/livegold.html" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Kitco</a>,{" "}
-            <a href="https://www.bullionvault.com/gold-price-chart.do" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">BullionVault</a>, or your broker during market hours. The numbers should match within pennies. If they don&rsquo;t, please tell us — we&rsquo;ll fix it.
+            <a href="https://www.kitco.com/charts/livegold.html" target="_blank" rel="noopener noreferrer" className="link-gold">Kitco</a>,{" "}
+            <a href="https://www.bullionvault.com/gold-price-chart.do" target="_blank" rel="noopener noreferrer" className="link-gold">BullionVault</a>, or your broker during market hours. The numbers should match within pennies. If they don&rsquo;t, please tell us — we&rsquo;ll fix it.
           </p>
         </section>
 
@@ -60,7 +60,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Spot price sources</h2>
             <p>
-              Live spot prices come from <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 transition-colors">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Yahoo Finance blocks direct requests from server infrastructure, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
+              Live spot prices come from <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="link-gold">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Yahoo Finance blocks direct requests from server infrastructure, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
             </p>
             <p>
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.
@@ -103,7 +103,7 @@ export default function MethodologyPage() {
               Holdings are valued at <span className="text-gray-300">quantity (troy oz) × current spot price</span>. The tracker does not estimate dealer premium, numismatic value, or resale spread — the figure is a clean spot-value floor, useful for checking how your stack has moved with the market.
             </p>
             <p>
-              Signed out, holdings are stored only in your browser&rsquo;s localStorage and never leave your device. Signed in, they&rsquo;re saved to our database solely to sync across devices. See the <a href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">Privacy Policy</a>.
+              Signed out, holdings are stored only in your browser&rsquo;s localStorage and never leave your device. Signed in, they&rsquo;re saved to our database solely to sync across devices. See the <a href="/privacy" className="link-gold">Privacy Policy</a>.
             </p>
           </section>
 
@@ -117,7 +117,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Dealer compare page</h2>
             <p>
-              The <a href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">compare</a> page shows an <em>estimated</em> total cost per coin, computed as <span className="text-gray-300">live spot × coin fine weight + dealer premium</span>. Dealer premiums are maintained by hand based on each dealer&rsquo;s typical over-spot pricing for 1–9 unit quantities; they are not scraped live from dealer sites.
+              The <a href="/compare" className="link-gold">compare</a> page shows an <em>estimated</em> total cost per coin, computed as <span className="text-gray-300">live spot × coin fine weight + dealer premium</span>. Dealer premiums are maintained by hand based on each dealer&rsquo;s typical over-spot pricing for 1–9 unit quantities; they are not scraped live from dealer sites.
             </p>
             <p>
               That means a dealer&rsquo;s real checkout price on any given day may differ from ours — especially during promotions, volume-tier discounts, or payment-method-specific pricing. Treat our number as a &ldquo;what you&rsquo;d typically pay here right now&rdquo; estimate, not a locked quote. We revisit the premiums regularly and when market conditions shift materially.
@@ -128,7 +128,7 @@ export default function MethodologyPage() {
           </section>
 
           <section
-            className="rounded-2xl border p-6 space-y-3 text-sm"
+            className="border p-6 space-y-3 text-sm"
             style={{ borderColor: "var(--border)" }}
           >
             <h2 className="text-base font-bold text-white">What this tool is not good for</h2>
@@ -148,7 +148,7 @@ export default function MethodologyPage() {
             <h2 className="text-base font-bold text-white">Corrections and feedback</h2>
             <p>
               If you spot a number that looks wrong, a coin spec that&rsquo;s off, or a calculation that disagrees with another source, please tell us:{" "}
-              <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+              <a href="mailto:hello@lode.rocks" className="link-gold">
                 hello@lode.rocks
               </a>
               . We&rsquo;d rather fix it than have it linger.

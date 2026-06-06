@@ -69,7 +69,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
           </p>
           <button
             onClick={() => router.push("/dashboard/alerts")}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+            className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
           >
             View my alerts →
           </button>
@@ -86,7 +86,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
               href={iraUrl}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+              className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
             >
               Get the free guide →
             </a>

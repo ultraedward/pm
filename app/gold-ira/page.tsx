@@ -364,7 +364,7 @@ export default function GoldIraPage() {
                     href={COMPANY_CTAS[c.id].card!}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-semibold link-gold"
                   >
                     {c.id === "birch"
                       ? promoActive ? "Claim America 250 offer →" : "Get a free info kit →"
@@ -773,7 +773,7 @@ export default function GoldIraPage() {
                     href={AUGUSTA_ELIGIBILITY}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
-                    className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+                    className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
                   >
                     Request Augusta&apos;s free guide →
                   </a>
@@ -790,7 +790,7 @@ export default function GoldIraPage() {
                     href={BIRCH_ELIGIBILITY}
                     target="_blank"
                     rel="noopener noreferrer sponsored"
-                    className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+                    className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
                   >
                     Get Birch Gold&apos;s free info kit →
                   </a>
@@ -860,7 +860,7 @@ export default function GoldIraPage() {
               </div>
               <Link
                 href="/compare"
-                className="flex-shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+                className="flex-shrink-0 inline-flex items-center gap-1 text-sm font-semibold link-gold"
               >
                 Compare bullion prices →
               </Link>

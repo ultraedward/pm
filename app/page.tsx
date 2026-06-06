@@ -99,7 +99,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       : null;
 
   return (
-    <div className="group px-5 py-6 sm:px-7 sm:py-8 flex flex-col gap-5 transition-colors duration-200 hover:bg-white/[0.015]" style={{ borderLeft: "2px solid transparent" }}>
+    <div className="group px-5 py-6 sm:px-7 sm:py-8 flex flex-col gap-5 transition-colors duration-200 hover:bg-white/[0.03]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
@@ -258,7 +258,20 @@ export default async function HomePage() {
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="px-6 pt-16 pb-14 sm:pt-32 sm:pb-24">
+      <section className="px-6 pt-16 pb-14 sm:pt-32 sm:pb-24 relative">
+        {/* Gold accent line — 1px gradient rule above the hero text */}
+        <div
+          aria-hidden="true"
+          className="absolute top-0 left-6 right-6 sm:left-auto sm:right-auto"
+          style={{
+            height: "1px",
+            maxWidth: "72rem",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "linear-gradient(90deg, transparent 0%, var(--gold) 40%, var(--gold) 60%, transparent 100%)",
+            opacity: 0.35,
+          }}
+        />
         <div className="mx-auto max-w-6xl">
 
           <p className="label mb-6 animate-fade-up">Precious metals tracker</p>
@@ -358,7 +371,7 @@ export default async function HomePage() {
           </div>
 
           {/* Primary 3 — full cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px overflow-hidden border border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
             {primaryFeatures.map(({ label, body, href }, i) => (
               <Link
                 key={label}
@@ -372,8 +385,8 @@ export default async function HomePage() {
                 <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
                   {body}
                 </p>
-                <p className="text-[11px] text-amber-700 group-hover:text-amber-400 transition-colors duration-150">
-                  Explore →
+                <p className="text-[11px] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>
+                  <span className="group-hover:text-amber-400 transition-colors duration-150">Explore →</span>
                 </p>
               </Link>
             ))}

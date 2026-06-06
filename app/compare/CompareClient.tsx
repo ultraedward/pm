@@ -83,12 +83,10 @@ export default function CompareClient({ spots, available, premiums }: Props) {
               <button
                 key={c.id}
                 onClick={() => setCoinId(c.id)}
-                className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-colors border ${
-                  active
-                    ? "bg-amber-500/15 border-amber-500/40 text-amber-500"
-                    : "border-white/[0.08] text-gray-500 hover:text-white hover:border-white/20"
-                }`}
-                style={active ? { borderColor: "rgba(212, 175, 55, 0.4)" } : undefined}
+                className="px-4 py-2 text-xs font-bold tracking-wide transition-colors border"
+                style={active
+                  ? { background: "var(--gold-dim)", borderColor: "var(--gold-glow)", color: "var(--gold)" }
+                  : { background: "transparent", borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
               >
                 {c.label}
               </button>
@@ -162,7 +160,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
 
       {/* Sorted dealer list */}
       <div
-        className="rounded-2xl border overflow-hidden"
+        className="border overflow-hidden"
         style={{ borderColor: "var(--border)" }}
       >
         <div className="divide-y" style={{ borderColor: "var(--border)" }}>
@@ -184,7 +182,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-white truncate">{r.dealerName}</span>
                     {isBest && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">
+                      <span className="label px-2 py-0.5" style={{ background: "var(--gold-dim)", color: "var(--gold)" }}>
                         Best
                       </span>
                     )}
@@ -218,10 +216,8 @@ export default function CompareClient({ spots, available, premiums }: Props) {
                   href={r.trackedUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className={`hidden sm:inline-flex items-center justify-center rounded-lg px-4 py-2 text-xs font-bold transition-colors ${
-                    isBest
-                      ? "bg-amber-500 text-black hover:bg-amber-400"
-                      : "border border-white/[0.12] text-gray-300 hover:text-white hover:border-white/30"
+                  className={`hidden sm:inline-flex items-center justify-center px-4 py-2 text-[10px] font-black tracking-widest uppercase transition-colors ${
+                    isBest ? "btn-gold" : "btn-ghost"
                   }`}
                   aria-label={`View ${coin.label} at ${r.dealerName}`}
                 >
@@ -233,7 +229,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
                   href={r.trackedUrl}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="sm:hidden col-span-2 text-[11px] font-bold tracking-wide text-amber-300 hover:text-amber-200"
+                  className="sm:hidden col-span-2 text-[11px] font-bold tracking-wide link-gold"
                   aria-label={`View ${coin.label} at ${r.dealerName}`}
                 >
                   View at {r.dealerName} →

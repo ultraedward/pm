@@ -37,7 +37,7 @@ export default function ContactPage() {
               The fastest way to reach us is{" "}
               <a
                 href="mailto:hello@lode.rocks"
-                className="text-amber-500 hover:text-amber-400 transition-colors"
+                className="link-gold"
               >
                 hello@lode.rocks
               </a>
@@ -58,14 +58,14 @@ export default function ContactPage() {
               Account-related questions can also be sent from the{" "}
               <a
                 href="/account"
-                className="text-amber-500 hover:text-amber-400 transition-colors"
+                className="link-gold"
               >
                 Account
               </a>{" "}
               page once you&rsquo;re signed in. Privacy or data-deletion requests are handled the same way — see our{" "}
               <a
                 href="/privacy"
-                className="text-amber-500 hover:text-amber-400 transition-colors"
+                className="link-gold"
               >
                 Privacy Policy
               </a>

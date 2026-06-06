@@ -344,7 +344,7 @@ export default async function ComparePage() {
                 <p>
                   If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email
                   us at{" "}
-                  <a href="mailto:hello@lode.rocks" className="text-amber-500 hover:text-amber-400 transition-colors">
+                  <a href="mailto:hello@lode.rocks" className="link-gold">
                     hello@lode.rocks
                   </a>{" "}
                   and we&rsquo;ll update it.

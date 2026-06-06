@@ -37,7 +37,7 @@ export function QuickCalculator({ spots }: Props) {
     <div className="space-y-3">
       {/* Input tiles — each has a sr-only label so screen readers can identify
           the field ("Gold troy ounces") without relying on the visual dot + text */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09] rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.09] border overflow-hidden" style={{ borderColor: "var(--border)" }}>
         {METALS.map((metal) => {
           const { label, dot } = METAL_META[metal];
           const inputId = `quick-calc-${metal}`;
@@ -95,7 +95,7 @@ export function QuickCalculator({ spots }: Props) {
         aria-live="polite"
         aria-atomic="true"
         aria-label="Calculator result"
-        className="rounded-xl border overflow-hidden"
+        className="border overflow-hidden"
         style={{ borderColor: "var(--border)", display: hasAny ? undefined : "none" }}
       >
         <div className="divide-y divide-white/5">

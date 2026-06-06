@@ -57,15 +57,15 @@ export default function AboutPage() {
 
         {/* At-a-glance — the things a skeptical visitor needs to see first */}
         <section
-          className="rounded-2xl border p-6 space-y-3 text-sm"
+          className="border p-6 space-y-3 text-sm"
           style={{ borderColor: "var(--border)" }}
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">At a glance</p>
           <ul className="space-y-2 text-gray-300">
             <li><span className="text-white font-semibold">What it is:</span> live spot prices for gold, silver, platinum, palladium — plus a coin melt calculator, gram converter, portfolio tracker, and email price alerts.</li>
             <li><span className="text-white font-semibold">What it isn&rsquo;t:</span> a dealer, a broker, an exchange, or financial advice. We don&rsquo;t hold anything for you.</li>
-            <li><span className="text-white font-semibold">How we fund it:</span> affiliate commissions on dealer clicks from the <a href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">compare</a> page. No ads, no data sales. Rankings sort by price, not by who pays us.</li>
-            <li><span className="text-white font-semibold">How to verify it:</span> cross-check any spot price against Kitco or a broker terminal — numbers should match within pennies. See <a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">methodology</a>.</li>
+            <li><span className="text-white font-semibold">How we fund it:</span> affiliate commissions on dealer clicks from the <a href="/compare" className="link-gold">compare</a> page. No ads, no data sales. Rankings sort by price, not by who pays us.</li>
+            <li><span className="text-white font-semibold">How to verify it:</span> cross-check any spot price against Kitco or a broker terminal — numbers should match within pennies. See <a href="/methodology" className="link-gold">methodology</a>.</li>
           </ul>
         </section>
 
@@ -84,7 +84,7 @@ export default function AboutPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">How we make money</h2>
             <p>
-              When you click a dealer link on the <a href="/compare" className="text-amber-500 hover:text-amber-400 transition-colors">compare</a> page and end up buying, Lode may earn an affiliate commission at no cost to you. That&rsquo;s disclosed on the page itself (the FTC requires it) and it&rsquo;s currently our only revenue stream — no ads, no tracking cookies sold to third parties, no data-broker relationships.
+              When you click a dealer link on the <a href="/compare" className="link-gold">compare</a> page and end up buying, Lode may earn an affiliate commission at no cost to you. That&rsquo;s disclosed on the page itself (the FTC requires it) and it&rsquo;s currently our only revenue stream — no ads, no tracking cookies sold to third parties, no data-broker relationships.
             </p>
             <p>
               <span className="text-white font-semibold">Commissions do not affect rankings.</span> The compare page sorts by estimated total cost — live spot × coin weight + a hand-maintained dealer premium. A cheaper dealer that pays us nothing still ranks ahead of a more expensive dealer that pays us.
@@ -94,9 +94,9 @@ export default function AboutPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Dig deeper</h2>
             <ul className="list-disc pl-5 space-y-1.5">
-              <li><a href="/methodology" className="text-amber-500 hover:text-amber-400 transition-colors">Methodology</a> — where prices come from and how calculations work.</li>
-              <li><a href="/faq" className="text-amber-500 hover:text-amber-400 transition-colors">FAQ</a> — how alerts work, what happens to your data, and common questions.</li>
-              <li><a href="/privacy" className="text-amber-500 hover:text-amber-400 transition-colors">Privacy</a> — what we collect and what we don&rsquo;t.</li>
+              <li><a href="/methodology" className="link-gold">Methodology</a> — where prices come from and how calculations work.</li>
+              <li><a href="/faq" className="link-gold">FAQ</a> — how alerts work, what happens to your data, and common questions.</li>
+              <li><a href="/privacy" className="link-gold">Privacy</a> — what we collect and what we don&rsquo;t.</li>
             </ul>
           </section>
 
@@ -104,7 +104,7 @@ export default function AboutPage() {
             Questions, bug reports, or press:{" "}
             <a
               href="mailto:hello@lode.rocks"
-              className="text-amber-500 hover:text-amber-400 transition-colors"
+              className="link-gold"
             >
               hello@lode.rocks
             </a>

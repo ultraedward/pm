@@ -67,7 +67,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
       <div className="grid gap-6 md:grid-cols-2">
 
         {/* Free */}
-        <div className="rounded-2xl border border-white/10 p-8 space-y-8">
+        <div className="border p-8 space-y-8" style={{ borderColor: "var(--border)" }}>
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Free</p>
             <div className="flex items-end gap-1">
@@ -88,18 +88,18 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
           <div>
             {isLoggedIn ? (
               isPro ? (
-                <div className="rounded-full border border-white/10 py-2.5 text-center text-sm text-gray-500">
+                <div className="border py-2.5 text-center text-sm" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
                   Not your plan
                 </div>
               ) : (
-                <div className="rounded-full border border-white/10 py-2.5 text-center text-sm text-gray-400">
+                <div className="border py-2.5 text-center text-sm" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
                   Current plan
                 </div>
               )
             ) : (
               <Link
                 href="/login"
-                className="block rounded-full border border-white/10 py-2.5 text-center text-sm text-white hover:bg-white/5 transition-colors"
+                className="block btn-ghost py-2.5 text-center text-sm"
               >
                 Get started
               </Link>
@@ -108,7 +108,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
         </div>
 
         {/* Pro */}
-        <div className="relative rounded-2xl border border-amber-500/40 p-8 space-y-8 overflow-hidden">
+        <div className="relative border p-8 space-y-8 overflow-hidden" style={{ borderColor: "var(--gold-glow)" }}>
           <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
 
           <div className="relative">
@@ -142,24 +142,18 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
 
           <div className="relative">
             {isPro ? (
-              <div className="rounded-full bg-amber-500/20 py-2.5 text-center text-sm font-semibold text-amber-400">
+              <div className="py-2.5 text-center text-sm font-bold" style={{ background: "var(--gold-dim)", color: "var(--gold)" }}>
                 Active plan
               </div>
             ) : isLoggedIn ? (
               <form action="/api/billing/checkout" method="POST">
                 <input type="hidden" name="interval" value={annual ? "year" : "month"} />
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-amber-500 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
-                >
+                <button type="submit" className="btn-gold w-full py-2.5 text-[10px]">
                   Upgrade to Pro
                 </button>
               </form>
             ) : (
-              <Link
-                href="/login"
-                className="block rounded-full bg-amber-500 py-2.5 text-center text-sm font-bold text-black hover:bg-amber-400 transition-colors"
-              >
+              <Link href="/login" className="btn-gold block text-center py-2.5 text-[10px]">
                 Start with Pro
               </Link>
             )}

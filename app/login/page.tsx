@@ -58,7 +58,7 @@ export default function LoginPage() {
         {state === "sent" ? (
           /* ── Sent confirmation ── */
           <div className="space-y-4">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-8 space-y-3">
+            <div className="border px-6 py-8 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
               <p className="text-xl font-black tracking-tight" style={{ color: "var(--text)" }}>
                 Check your inbox.
               </p>
@@ -81,7 +81,7 @@ export default function LoginPage() {
             {/* Google */}
             <button
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-              className="google-signin-btn flex w-full items-center justify-center gap-3 rounded-full px-6 py-4 text-sm font-semibold transition-colors"
+              className="google-signin-btn flex w-full items-center justify-center gap-3 px-6 py-4 text-sm font-semibold transition-colors"
             >
               <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
                 <path d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.2c-.6 3-2.3 5.5-4.8 7.2v6h7.7c4.5-4.2 7.4-10.3 7.4-17.5z" fill="#4285F4"/>
@@ -108,12 +108,14 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={state === "loading"}
-                className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-4 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500/40 transition-colors disabled:opacity-50"
+                data-placeholder-muted
+                className="w-full border px-5 py-4 text-sm focus:outline-none transition-colors disabled:opacity-50"
+                style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
               />
               <button
                 type="submit"
                 disabled={state === "loading" || !email.trim()}
-                className="w-full rounded-full border border-white/10 bg-white/5 px-6 py-4 text-sm font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-ghost w-full py-4 text-xs disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {state === "loading" ? "Sending…" : "Send sign-in link"}
               </button>

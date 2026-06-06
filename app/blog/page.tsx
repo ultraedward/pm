@@ -99,7 +99,7 @@ export default function BlogIndexPage() {
               <Link
                 key={article.slug}
                 href={`/blog/${article.slug}`}
-                className="block rounded-2xl border p-6 transition-colors hover:border-gray-600 group"
+                className="block border p-6 transition-colors hover:border-gray-600 group"
                 style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.15)" }}
               >
                 <div className="flex flex-wrap items-center gap-2 mb-3">

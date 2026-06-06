@@ -97,7 +97,7 @@ export function CalculatorTabs({ spots }: Props) {
           <GramCalculator spots={{ gold: spots.gold, silver: spots.silver }} />
           <p className="text-center text-xs text-gray-600">
             Want karat reference tables and a shareable link?{" "}
-            <Link href="/gram" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/gram" className="link-gold">
               Open full calculator →
             </Link>
           </p>

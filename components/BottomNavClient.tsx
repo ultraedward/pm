@@ -76,9 +76,8 @@ export function BottomNavClient() {
               key={href}
               href={href}
               aria-current={isActive ? "page" : undefined}
-              className={`relative flex flex-col items-center justify-center gap-1 py-3 min-h-[56px] transition-colors ${
-                isActive ? "text-amber-400" : "text-gray-500"
-              }`}
+              className="relative flex flex-col items-center justify-center gap-1 py-3 min-h-[56px] transition-colors"
+              style={{ color: isActive ? "var(--gold)" : "var(--text-muted)" }}
             >
               {/* Active indicator — gold rule at top */}
               {isActive && (

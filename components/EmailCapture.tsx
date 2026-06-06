@@ -27,18 +27,24 @@ export function EmailCapture({ source }: { source: string }) {
 
   if (state === "success") {
     return (
-      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-6 py-5 text-center space-y-1">
-        <p className="text-sm font-bold text-amber-400">You&apos;re in.</p>
-        <p className="text-xs text-gray-500">Spot prices land in your inbox every Monday.</p>
+      <div
+        className="border px-6 py-5 text-center space-y-1"
+        style={{ borderColor: "var(--gold-glow)", background: "var(--gold-dim)" }}
+      >
+        <p className="text-sm font-bold" style={{ color: "var(--gold)" }}>You&apos;re in.</p>
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>Spot prices land in your inbox every Monday.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-gray-950 px-6 py-5 space-y-3">
+    <div
+      className="border px-6 py-5 space-y-3"
+      style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+    >
       <div>
-        <p className="text-sm font-bold text-white">Get Monday spot prices — free</p>
-        <p className="text-xs text-gray-500 mt-0.5">Gold, silver, platinum &amp; palladium in your inbox every week. No account needed.</p>
+        <p className="text-sm font-bold" style={{ color: "var(--text)" }}>Get Monday spot prices — free</p>
+        <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>Gold, silver, platinum &amp; palladium in your inbox every week. No account needed.</p>
       </div>
       <form onSubmit={handleSubmit} className="flex gap-2">
         {/* sr-only label associates the input with its purpose for screen readers */}
@@ -53,12 +59,14 @@ export function EmailCapture({ source }: { source: string }) {
           placeholder="your@email.com"
           required
           aria-describedby={state === "error" ? "email-capture-error" : undefined}
-          className="flex-1 min-w-0 rounded-full bg-black border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+          data-placeholder-muted
+          className="flex-1 min-w-0 border px-4 py-2.5 text-sm focus:outline-none transition-colors"
+          style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
         />
         <button
           type="submit"
           disabled={state === "loading"}
-          className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors disabled:opacity-60 whitespace-nowrap"
+          className="btn-gold px-5 py-2.5 text-[10px] disabled:opacity-60 whitespace-nowrap"
         >
           {state === "loading" ? (
             <><span aria-hidden="true">…</span><span className="sr-only">Subscribing…</span></>

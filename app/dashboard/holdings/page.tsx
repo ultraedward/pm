@@ -294,7 +294,7 @@ export default async function HoldingsPage() {
               href={process.env.AFFILIATE_AUGUSTA_URL}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors"
+              className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
             >
               See how it works →
             </a>

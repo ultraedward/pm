@@ -15,8 +15,8 @@ type SparklineProps = {
 function CustomTooltip({ active, payload }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-lg bg-black border border-white/10 px-3 py-2 text-sm shadow-xl">
-        <div className="text-white font-medium tabular-nums">
+      <div className="border px-3 py-2 text-sm shadow-xl" style={{ background: "var(--surface)", borderColor: "var(--border-strong)" }}>
+        <div className="font-bold tabular-nums" style={{ color: "var(--text)" }}>
           ${payload[0].value.toFixed(2)}
         </div>
       </div>
