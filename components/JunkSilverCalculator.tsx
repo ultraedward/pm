@@ -185,7 +185,6 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
                 </div>
               );
             })}
-          </div>
 
             {/* Canadian section divider */}
             <div
