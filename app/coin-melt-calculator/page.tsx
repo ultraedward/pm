@@ -188,6 +188,64 @@ export default async function CoinMeltCalculatorPage() {
         </div>
       </section>
 
+      {/* ── Editorial: live melt value breakdowns ─────────────────── */}
+      {silverPrice > 0 && (
+        <section className="border-t px-4 sm:px-6 py-12" style={{ borderColor: "var(--border)" }}>
+          <div className="mx-auto max-w-2xl space-y-10 text-sm text-gray-400 leading-relaxed">
+
+            <div className="space-y-3">
+              <h2 className="text-base font-black text-white tracking-tight">Silver dime melt value today</h2>
+              <p>
+                A pre-1965 Roosevelt or Mercury dime is <strong className="text-white">90% silver</strong> with a gross weight of 2.5 grams (0.07234 troy oz of pure silver).
+                At today&apos;s silver spot price of <span className="text-white font-semibold tabular-nums">${(silverPrice).toFixed(2)}/ozt</span>,
+                one silver dime has a melt value of{" "}
+                <span className="text-white font-bold tabular-nums">${(0.07234 * silverPrice).toFixed(2)}</span>.
+                A roll of 50 silver dimes ($5 face value) contains approximately 3.617 troy oz of silver — melt value <span className="text-white font-semibold tabular-nums">${(3.617 * silverPrice).toFixed(2)}</span>.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-base font-black text-white tracking-tight">Silver quarter melt value today</h2>
+              <p>
+                Pre-1965 Washington quarters are <strong className="text-white">90% silver</strong>, 6.25g gross (0.18084 troy oz fine silver each).
+                At today&apos;s spot price, a silver quarter&apos;s melt value is{" "}
+                <span className="text-white font-bold tabular-nums">${(0.18084 * silverPrice).toFixed(2)}</span>.
+                A roll of 40 quarters ($10 face value) contains 7.234 troy oz — melt value <span className="text-white font-semibold tabular-nums">${(7.234 * silverPrice).toFixed(2)}</span>.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-base font-black text-white tracking-tight">Silver dollar melt value today</h2>
+              <p>
+                Morgan and Peace silver dollars are <strong className="text-white">90% silver</strong>, 26.73g gross (0.77344 troy oz fine silver each).
+                At today&apos;s spot price, one Morgan or Peace dollar has a melt value of{" "}
+                <span className="text-white font-bold tabular-nums">${(0.77344 * silverPrice).toFixed(2)}</span>.
+                Note: numismatic premiums on common-date Morgans typically add $15–$40 above melt. The calculator above shows melt value only.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-base font-black text-white tracking-tight">American Silver Eagle melt value today</h2>
+              <p>
+                The American Silver Eagle (ASE) contains exactly <strong className="text-white">1 troy oz of .999 fine silver</strong>.
+                Its melt value equals the silver spot price: <span className="text-white font-bold tabular-nums">${silverPrice.toFixed(2)}</span>.
+                ASEs typically trade at a $3–$8 premium over melt (dealer-dependent), so expect to pay more to buy and receive slightly less than melt when selling.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-base font-black text-white tracking-tight">What is coin melt value?</h2>
+              <p>
+                Melt value is the intrinsic worth of a coin&apos;s metal content at current spot prices — calculated as <span className="text-white">(fine troy oz content) × (spot price per troy oz)</span>.
+                It&apos;s the floor value: what the metal itself is worth if the coin were melted down. Actual sale prices almost always carry a premium above melt for bullion coins, and can be significantly higher for numismatic pieces.
+                For junk silver (circulated pre-1965 US coins), dealers typically pay 90–97% of melt, depending on quantity and current demand.
+              </p>
+            </div>
+
+          </div>
+        </section>
+      )}
+
       {/* ── Email capture — non-converts only.
           Logged-in users already gave us their email at signup; prompting
           them again under their own tool is awkward. ───────────────── */}
