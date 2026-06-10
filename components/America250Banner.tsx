@@ -43,19 +43,19 @@ export function America250Banner({ subId = "banner" }: Props) {
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap min-w-0">
           <span aria-hidden="true" className="text-base leading-none flex-shrink-0">🇺🇸</span>
 
-          <span className="text-[11px] sm:text-xs font-bold text-white tracking-wide whitespace-nowrap">
+          <span className="text-[11px] sm:text-xs font-bold tracking-wide whitespace-nowrap" style={{ color: "#ffffff" }}>
             {AMERICA_250_PROMO.headline}
           </span>
 
-          <span aria-hidden="true" className="hidden sm:inline text-[10px] text-gray-300">·</span>
+          <span aria-hidden="true" className="hidden sm:inline text-[10px]" style={{ color: "#aaaaaa" }}>·</span>
 
-          <span className="hidden sm:inline text-[11px] text-white/90 leading-snug">
+          <span className="hidden sm:inline text-[11px] leading-snug" style={{ color: "#eeeeee" }}>
             Free silver round with every $10K at Birch Gold
           </span>
 
-          <span aria-hidden="true" className="hidden md:inline text-[10px] text-gray-300">·</span>
+          <span aria-hidden="true" className="hidden md:inline text-[10px]" style={{ color: "#aaaaaa" }}>·</span>
 
-          <span className="hidden md:inline text-[10px] font-mono text-amber-400 tracking-wider">
+          <span className="hidden md:inline text-[10px] font-mono tracking-wider" style={{ color: "#fbbf24" }}>
             Jun 8 – Jul 10
           </span>
         </div>
