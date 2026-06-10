@@ -49,18 +49,18 @@ export function America250Banner({ subId = "banner" }: Props) {
 
           <span
             aria-hidden="true"
-            className="hidden sm:inline text-[10px] text-gray-600"
+            className="hidden sm:inline text-[10px] text-gray-400"
           >
             ·
           </span>
 
-          <span className="hidden sm:inline text-[11px] text-gray-300 leading-snug">
+          <span className="hidden sm:inline text-[11px] text-gray-200 leading-snug">
             Free silver round with every $10K at Birch Gold
           </span>
 
           <span
             aria-hidden="true"
-            className="hidden md:inline text-[10px] text-gray-600"
+            className="hidden md:inline text-[10px] text-gray-400"
           >
             ·
           </span>
