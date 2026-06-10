@@ -11,11 +11,19 @@ type CoinSpec = {
 };
 
 const JUNK_COINS: CoinSpec[] = [
-  { id: "dime_90",  name: "Silver Dime",          note: "Roosevelt or Mercury · pre-1965 · 90%",  asw: 0.07234, face: 0.10 },
-  { id: "qtr_90",   name: "Silver Quarter",        note: "Washington · pre-1965 · 90%",            asw: 0.18084, face: 0.25 },
-  { id: "half_90",  name: "Half Dollar (90%)",     note: "Walking Liberty, Franklin, or 1964 Kennedy · 90%", asw: 0.36169, face: 0.50 },
-  { id: "half_40",  name: "Half Dollar (40%)",     note: "Kennedy · 1965–1970 · 40%",             asw: 0.14792, face: 0.50 },
-  { id: "dollar_90",name: "Silver Dollar (90%)",   note: "Morgan or Peace · 90%",                  asw: 0.77344, face: 1.00 },
+  { id: "dime_90",   name: "Silver Dime",           note: "Roosevelt or Mercury · pre-1965 · 90%",           asw: 0.07234, face: 0.10 },
+  { id: "qtr_90",    name: "Silver Quarter",         note: "Washington · pre-1965 · 90%",                     asw: 0.18084, face: 0.25 },
+  { id: "half_90",   name: "Half Dollar (90%)",      note: "Walking Liberty, Franklin, or 1964 Kennedy · 90%",asw: 0.36169, face: 0.50 },
+  { id: "half_40",   name: "Half Dollar (40%)",      note: "Kennedy · 1965–1970 · 40%",                       asw: 0.14792, face: 0.50 },
+  { id: "war_nickel",name: "War Nickel",              note: "1942–1945 · 35% silver · large mintmark above Monticello", asw: 0.05626, face: 0.05 },
+  { id: "dollar_90", name: "Silver Dollar (90%)",    note: "Morgan or Peace · 90%",                            asw: 0.77344, face: 1.00 },
+];
+
+const CANADIAN_COINS: CoinSpec[] = [
+  { id: "can_dime",  name: "Canadian Dime",          note: "pre-1968 · 80% silver",                            asw: 0.06000, face: 0.10 },
+  { id: "can_qtr",   name: "Canadian Quarter",       note: "pre-1968 · 80% silver",                            asw: 0.15000, face: 0.25 },
+  { id: "can_half",  name: "Canadian Half Dollar",   note: "pre-1968 · 80% silver",                            asw: 0.30000, face: 0.50 },
+  { id: "can_dollar",name: "Canadian Dollar",        note: "pre-1968 · 80% silver",                            asw: 0.60000, face: 1.00 },
 ];
 
 function fmt(n: number) {
@@ -36,9 +44,10 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
 
   const getQty = (id: string) => Math.max(0, parseFloat(qty[id] || "") || 0);
 
-  // Per-coin totals
-  const totalOz   = JUNK_COINS.reduce((sum, c) => sum + getQty(c.id) * c.asw, 0);
-  const totalFace = JUNK_COINS.reduce((sum, c) => sum + getQty(c.id) * c.face, 0);
+  // Per-coin totals (US + Canadian combined)
+  const ALL_COINS = [...JUNK_COINS, ...CANADIAN_COINS];
+  const totalOz   = ALL_COINS.reduce((sum, c) => sum + getQty(c.id) * c.asw, 0);
+  const totalFace = ALL_COINS.reduce((sum, c) => sum + getQty(c.id) * c.face, 0);
   const totalMelt = totalOz * silverSpot;
   const hasCoins  = totalOz > 0;
 
@@ -121,7 +130,7 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600 text-center w-14">Qty</span>
           </div>
 
-          {/* Rows */}
+          {/* Rows — US coins */}
           <div className="divide-y" style={{ borderColor: "var(--border)" }}>
             {JUNK_COINS.map((coin) => {
               const q      = getQty(coin.id);
@@ -158,6 +167,66 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
                     {silverSpot > 0 ? fmt(melt) : "—"}
                   </span>
 
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    step="1"
+                    placeholder="0"
+                    value={qty[coin.id] ?? ""}
+                    onChange={(e) => handleQty(coin.id, e.target.value)}
+                    className="w-14 rounded-lg border bg-white/5 px-2 py-1.5 text-center text-sm font-bold tabular-nums text-white placeholder:text-white/15 focus:outline-none transition-colors"
+                    style={{
+                      borderColor: active
+                        ? "rgba(212,175,55,0.4)"
+                        : "rgba(255,255,255,0.08)",
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+            {/* Canadian section divider */}
+            <div
+              className="px-5 py-2"
+              style={{ background: "rgba(0,0,0,0.3)", borderColor: "var(--border)" }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                Canadian silver · pre-1968 · 80%
+              </p>
+            </div>
+
+            {CANADIAN_COINS.map((coin) => {
+              const q       = getQty(coin.id);
+              const melt    = coin.asw * silverSpot;
+              const lineTot = q * melt;
+              const active  = q > 0;
+
+              return (
+                <div
+                  key={coin.id}
+                  className="grid items-center px-5 py-4 gap-3 transition-colors"
+                  style={{
+                    gridTemplateColumns: "1fr auto auto",
+                    background: active ? "rgba(212,175,55,0.03)" : undefined,
+                  }}
+                >
+                  <div>
+                    <p className="text-sm font-bold text-white leading-tight">{coin.name}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{coin.note}</p>
+                    {active && (
+                      <p className="text-xs font-semibold tabular-nums mt-1" style={{ color: "var(--gold-bright)" }}>
+                        {q} × {fmt(melt)} = {fmt(lineTot)}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className="text-sm font-bold tabular-nums text-right pr-4 whitespace-nowrap"
+                    style={{ color: active ? "var(--text)" : "var(--text-muted)" }}
+                  >
+                    {silverSpot > 0 ? fmt(melt) : "—"}
+                  </span>
                   <input
                     type="number"
                     inputMode="numeric"

@@ -12,9 +12,9 @@ import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Junk Silver Melt Value Calculator — 90% Silver Dimes, Quarters & Halves",
+  title: "Junk Silver Calculator — US 90% & Canadian 80% Silver Coins",
   description:
-    "Free junk silver calculator with live spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars by face value or coin count — plus Canadian pre-1968 80% silver and war nickels.",
+    "Free junk silver calculator with live spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars, war nickels, and Canadian pre-1968 80% silver coins by face value or coin count.",
   keywords: [
     "junk silver calculator",
     "junk silver melt value calculator",
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     canonical: "https://lode.rocks/junk-silver-calculator",
   },
   openGraph: {
-    title: "Junk Silver Melt Value Calculator — 90% Silver Dimes, Quarters & Halves",
+    title: "Junk Silver Calculator — US 90% & Canadian 80% Silver Coins",
     description:
-      "Calculate the melt value of pre-1965 junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, and Morgan dollars by face value or coin count.",
+      "Calculate the melt value of pre-1965 US and Canadian junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
     url: "https://lode.rocks/junk-silver-calculator",
   },
 };
@@ -216,7 +216,7 @@ export default async function JunkSilverCalculatorPage() {
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto">
-            Live melt values for pre-1965 silver dimes, quarters, half dollars, and Morgan &amp; Peace dollars.
+            Live melt values for US 90% silver coins, Canadian 80% pre-1968 silver coins, and war nickels.
             Enter a face value amount or count coin by coin.
           </p>
           {silverSpot > 0 && (

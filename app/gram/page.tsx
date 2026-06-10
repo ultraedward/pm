@@ -240,6 +240,27 @@ export default async function GramPage() {
         </section>
       )}
 
+      {/* ── Sterling silver callout ───────────────────────────────── */}
+      {silverSpot > 0 && (
+        <section className="border-t px-4 sm:px-6 py-10" style={{ borderColor: "var(--border)" }}>
+          <div className="mx-auto max-w-2xl space-y-4">
+            <h2 className="text-base font-black tracking-tight text-white">
+              Sterling silver (92.5%) price per gram — today
+            </h2>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              Sterling silver is 92.5% pure silver (stamped &quot;925&quot; or &quot;92.5&quot; on jewelry and flatware).
+              At today&apos;s silver spot price of <span className="text-white font-semibold">{fmtSpot(silverSpot)}/ozt</span>,
+              sterling silver is worth <span className="text-white font-semibold tabular-nums">{formatCurrency(silverSpot * 0.925 / 31.1035)}/g</span>.
+            </p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Formula: (spot price ÷ 31.1035 g/ozt) × 0.925 = sterling price per gram.
+              The reference table above also shows European 800 silver (80% purity) and Britannia 958 silver (95.8%).
+              Use the calculator at the top to enter any gram weight and see the full melt value.
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-16" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-2xl space-y-8">
