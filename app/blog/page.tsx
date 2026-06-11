@@ -113,7 +113,7 @@ export default function BlogIndexPage() {
                     </span>
                   ))}
                 </div>
-                <h2 className="text-base font-black tracking-tight text-white leading-snug mb-2 group-hover:text-amber-400 transition-colors">
+                <h2 className="text-base font-black tracking-tight text-white leading-snug mb-2 group-hover:[color:var(--gold)] transition-colors">
                   {article.title}
                 </h2>
                 <p className="text-sm text-gray-500 leading-relaxed mb-4">
@@ -123,7 +123,7 @@ export default function BlogIndexPage() {
                   <span>{article.date}</span>
                   <span>·</span>
                   <span>{article.readTime}</span>
-                  <span className="ml-auto text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "var(--gold)" }}>
                     Read →
                   </span>
                 </div>

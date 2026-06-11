@@ -152,7 +152,7 @@ export default async function GramPage() {
           />
         </div>
         <div className="relative z-10 mx-auto max-w-2xl text-center space-y-4">
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-tight">
+          <h1 className="font-black leading-none" style={{ fontSize: "clamp(2.25rem, 5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
             Silver Price Per Gram<br />
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
@@ -182,9 +182,9 @@ export default async function GramPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {/* Gold table */}
             {goldSpot > 0 && (
-              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+              <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
                 <div className="px-5 py-3 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
-                  <span className="h-2 w-2 rounded-full bg-amber-400" />
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--gold)" }} />
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Gold</p>
                 </div>
                 <div className="divide-y" style={{ borderColor: "var(--border)" }}>
@@ -205,7 +205,7 @@ export default async function GramPage() {
 
             {/* Silver table */}
             {silverSpot > 0 && (
-              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+              <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
                 <div className="px-5 py-3 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
                   <span className="h-2 w-2 rounded-full bg-gray-400" />
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Silver</p>

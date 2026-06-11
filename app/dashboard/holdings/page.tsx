@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { SiteFooter } from "@/components/SiteFooter";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { type SupportedCurrency } from "@/lib/fx";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +90,7 @@ export default async function HoldingsPage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
+    select: { id: true, name: true, preferredCurrency: true },
   });
 
   if (!user) {
@@ -96,6 +100,8 @@ export default async function HoldingsPage() {
       </div>
     );
   }
+
+  const currency = (user.preferredCurrency ?? "USD") as SupportedCurrency;
 
   const holdings = await prisma.holding.findMany({
     where: { userId: user.id },
@@ -234,7 +240,8 @@ export default async function HoldingsPage() {
           </div>
           <Link
             href="/dashboard"
-            className="rounded-full border border-white/10 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
+            className="border px-4 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
+            style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
           >
             ← Dashboard
           </Link>
@@ -372,16 +379,16 @@ export default async function HoldingsPage() {
                     <div>
                       <p className="text-sm font-bold">{meta.label}</p>
                       <p className="text-xs text-gray-500 tabular-nums">
-                        {s.totalOz.toFixed(3)} oz · avg ${s.avgCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {s.totalOz.toFixed(3)} oz · avg {formatCurrency(s.avgCost, currency)}
                       </p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-bold tabular-nums">
-                      ${s.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {formatCurrency(s.currentValue, currency)}
                     </p>
                     <p className="text-xs tabular-nums font-medium" style={{ color: isUp ? "var(--gold)" : "#f87171" }}>
-                      {isUp ? "+" : ""}${s.gainLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({isUp ? "+" : ""}{s.gainPct.toFixed(2)}%)
+                      {isUp ? "+" : ""}{formatCurrency(s.gainLoss, currency)} ({isUp ? "+" : ""}{s.gainPct.toFixed(2)}%)
                     </p>
                   </div>
                 </div>
@@ -411,16 +418,16 @@ export default async function HoldingsPage() {
                     <div>
                       <p className="text-lg font-black tracking-tight capitalize">{h.metal}</p>
                       <p className="text-sm text-gray-500 mt-0.5 tabular-nums">
-                        {h.ounces.toFixed(2)} oz @ ${h.purchasePrice.toFixed(2)}
+                        {h.ounces.toFixed(2)} oz @ {formatCurrency(h.purchasePrice, currency)}
                       </p>
                       <p className="text-xs text-gray-600 mt-0.5">
                         Purchased {new Date(h.purchaseDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-black tabular-nums">${value.toFixed(2)}</p>
+                      <p className="text-lg font-black tabular-nums">{formatCurrency(value, currency)}</p>
                       <p className="text-sm font-medium tabular-nums mt-0.5" style={{ color: gainLoss >= 0 ? "var(--gold)" : "#f87171" }}>
-                        {gainLoss >= 0 ? "+" : ""}${gainLoss.toFixed(2)} ({percent.toFixed(2)}%)
+                        {gainLoss >= 0 ? "+" : ""}{formatCurrency(gainLoss, currency)} ({percent.toFixed(2)}%)
                       </p>
                       <div className="mt-2 h-px w-24 ml-auto overflow-hidden bg-white/5">
                         <div
@@ -434,7 +441,7 @@ export default async function HoldingsPage() {
                   <form action={deleteHolding.bind(null, h.id)}>
                     <button
                       type="submit"
-                      className="rounded-full border border-red-500/20 px-4 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-colors"
+                      className="border border-red-500/20 px-4 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-colors"
                     >
                       Remove
                     </button>
@@ -445,6 +452,7 @@ export default async function HoldingsPage() {
           </div>
         )}
       </div>
+      <SiteFooter />
     </main>
   );
 }

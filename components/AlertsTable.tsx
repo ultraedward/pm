@@ -103,20 +103,20 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               </div>
               <div className="flex items-center gap-2">
                 {isTriggered && (
-                  <span className="text-xs px-2.5 py-1 rounded-full font-semibold text-amber-400 border border-amber-400/20 bg-amber-400/5">
+                  <span className="text-xs px-2.5 py-1 font-semibold border" style={{ color: "var(--gold)", borderColor: "var(--gold-glow)", background: "var(--gold-dim)" }}>
                     At threshold
                   </span>
                 )}
                 {approaching && !isTriggered && (
-                  <span className="text-xs px-2.5 py-1 rounded-full font-semibold text-amber-400 border border-amber-400/20 bg-amber-400/5">
+                  <span className="text-xs px-2.5 py-1 font-semibold border" style={{ color: "var(--gold)", borderColor: "var(--gold-glow)", background: "var(--gold-dim)" }}>
                     Approaching
                   </span>
                 )}
-                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
-                  alert.active
-                    ? "text-amber-400 border border-amber-400/20 bg-amber-400/5"
-                    : "text-gray-500 border border-white/10 bg-white/5"
-                }`}>
+                <span className="text-xs px-2.5 py-1 font-semibold border"
+                  style={alert.active
+                    ? { color: "var(--gold)", borderColor: "var(--gold-glow)", background: "var(--gold-dim)" }
+                    : { color: "var(--text-muted)", borderColor: "var(--border)", background: "var(--surface-2)" }}
+                >
                   {alert.active ? "Active" : "Paused"}
                 </span>
               </div>
@@ -133,23 +133,21 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
                     </span>
                   </span>
                   {!isTriggered && diff !== null && pct !== null && (
-                    <span className={approaching ? "text-amber-400 font-medium" : "text-gray-500"}>
+                    <span className="font-medium" style={{ color: approaching ? "var(--gold)" : "var(--text-dim)" }}>
                       ${diff.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} away · {pct.toFixed(1)}%
                     </span>
                   )}
                   {isTriggered && (
-                    <span className="text-amber-400 font-semibold">Threshold reached</span>
+                    <span className="font-semibold" style={{ color: "var(--gold)" }}>Threshold reached</span>
                   )}
                 </div>
 
                 {/* Progress bar */}
                 {!isTriggered && (
-                  <div className="h-0.5 w-full rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-0.5 w-full bg-white/5 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        approaching ? "bg-amber-500/70" : "bg-white/20"
-                      }`}
-                      style={{ width: `${progressFill}%` }}
+                      className="h-full transition-all duration-500"
+                      style={{ width: `${progressFill}%`, backgroundColor: approaching ? "var(--gold)" : "rgba(255,255,255,0.2)" }}
                     />
                   </div>
                 )}
@@ -175,8 +173,8 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               <button
                 onClick={() => handleToggle(alert.id)}
                 disabled={isLoading}
-                className="rounded-full border px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition disabled:opacity-40 min-h-[44px]"
-                style={{ borderColor: "var(--border)" }}
+                className="border px-4 py-2.5 text-xs font-semibold hover:bg-white/5 hover:text-white transition disabled:opacity-40 min-h-[44px]"
+                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
               >
                 {isLoading ? "…" : alert.active ? "Pause" : "Resume"}
               </button>
@@ -184,8 +182,8 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
               {triggerCount > 0 && (
                 <button
                   onClick={() => setOpenId(isOpen ? null : alert.id)}
-                  className="rounded-full border px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-white/5 hover:text-white transition min-h-[44px]"
-                  style={{ borderColor: "var(--border)" }}
+                  className="border px-4 py-2.5 text-xs font-semibold hover:bg-white/5 hover:text-white transition min-h-[44px]"
+                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                 >
                   {isOpen ? "Hide history" : `History (${triggerCount})`}
                 </button>
@@ -206,7 +204,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
 
             {/* Expandable trigger history */}
             {isOpen && (
-              <div className="rounded-xl border p-3 space-y-2" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+              <div className="border p-3 space-y-2" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Trigger history</p>
                 {alert.triggers.map((trigger) => (
                   <div key={trigger.id} className="flex justify-between text-xs">

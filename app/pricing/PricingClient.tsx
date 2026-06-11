@@ -15,7 +15,7 @@ const FREE_FEATURES = [
   "Portfolio tracker — holdings & P&L",
   "30-day price charts",
   "Weekly Monday digest — spot prices in your inbox",
-  "1 price alert",
+  "Unlimited price alerts",
 ];
 
 const PRO_FEATURES = [

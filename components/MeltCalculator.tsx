@@ -132,8 +132,8 @@ export function MeltCalculator({ spots }: Props) {
                       placeholder="0"
                       value={qty[metal][coin.id]}
                       onChange={(e) => setQtyFor(metal, coin.id, e.target.value)}
-                      className="w-16 shrink-0 rounded-lg border bg-white/5 px-2 py-1.5 text-right text-sm font-bold tabular-nums text-white placeholder:text-white/15 focus:outline-none focus:border-amber-500/40 transition-colors"
-                      style={{ borderColor: "rgba(255,255,255,0.08)" }}
+                      className="w-16 shrink-0 border px-2 py-1.5 text-right text-sm font-bold tabular-nums focus:outline-none transition-colors"
+                      style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
                     />
                   </div>
                 ))}
@@ -141,7 +141,7 @@ export function MeltCalculator({ spots }: Props) {
 
               {/* Spot reference */}
               {spots[metal] > 0 && (
-                <p className="text-[10px] tabular-nums text-gray-700 mt-auto pt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.04)" }}>
+                <p className="text-[10px] tabular-nums mt-auto pt-1 border-t" style={{ color: "var(--text-dim)", borderColor: "rgba(255,255,255,0.04)" }}>
                   Spot: {fmt(spots[metal])} / oz
                 </p>
               )}
@@ -153,7 +153,7 @@ export function MeltCalculator({ spots }: Props) {
       {/* Result bar — only when at least one coin has a quantity */}
       {hasAny && (
         <div
-          className="rounded-xl border overflow-hidden"
+          className="border overflow-hidden"
           style={{ borderColor: "var(--border)" }}
         >
           <div className="divide-y divide-white/5">
@@ -164,7 +164,7 @@ export function MeltCalculator({ spots }: Props) {
                   <div className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: dot }} />
                     <span className="text-sm text-gray-400">{label}</span>
-                    <span className="text-xs text-gray-700 tabular-nums">{totalOz.toFixed(4)} oz</span>
+                    <span className="text-xs tabular-nums" style={{ color: "var(--text-dim)" }}>{totalOz.toFixed(4)} oz</span>
                   </div>
                   <span className="text-sm tabular-nums font-medium">{fmt(value)}</span>
                 </div>

@@ -133,15 +133,15 @@ export function ChartsClient() {
 
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-4">
-        <div className="flex gap-1 rounded-full border border-white/10 p-1">
+        <div className="flex gap-px border overflow-hidden" style={{ borderColor: "var(--border-strong)" }}>
           {RANGES.map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-colors ${
-                r === range ? "text-black" : "text-gray-500 hover:text-white"
-              }`}
-              style={r === range ? { background: "var(--gold)" } : {}}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors"
+              style={r === range
+                ? { background: "var(--gold)", color: "#000" }
+                : { background: "var(--input-bg)", color: "var(--text-muted)" }}
             >
               {RANGE_LABELS[r]}
             </button>
@@ -154,13 +154,11 @@ export function ChartsClient() {
               <button
                 key={metal}
                 onClick={() => toggleMetal(metal)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                  visibleMetals.has(metal) ? "border-transparent" : "border-white/10 opacity-40"
-                }`}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold border transition-all"
                 style={
                   visibleMetals.has(metal)
                     ? { backgroundColor: METAL_COLORS[metal] + "22", borderColor: METAL_COLORS[metal], color: METAL_COLORS[metal] }
-                    : {}
+                    : { borderColor: "var(--border)", color: "var(--text-dim)", opacity: 0.5 }
                 }
               >
                 <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: METAL_COLORS[metal] }} />
@@ -173,7 +171,7 @@ export function ChartsClient() {
 
       {loading && (
         <div className="flex items-center gap-3 text-gray-500 text-sm">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/10 border-t-amber-500" />
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/10" style={{ borderTopColor: "var(--gold)" }} />
           Loading price data…
         </div>
       )}

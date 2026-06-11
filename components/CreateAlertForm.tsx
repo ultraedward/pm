@@ -97,8 +97,11 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
     );
   }
 
-  const inputClass =
-    "w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors";
+  const inputStyle = {
+    background: "var(--input-bg)",
+    borderColor: "var(--input-border)",
+    color: "var(--text)",
+  };
 
   return (
     <form onSubmit={submit} className="border p-6 space-y-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
@@ -113,11 +116,10 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
               type="button"
               onClick={() => setMetal(value)}
               aria-pressed={metal === value}
-              className={`rounded-xl border px-4 min-h-[52px] text-sm font-semibold text-left transition-all ${
-                metal === value
-                  ? "border-white/10 bg-white/5 text-white"
-                  : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
-              }`}
+              className="border px-4 min-h-[52px] text-sm font-semibold text-left transition-all"
+              style={metal === value
+                ? { borderColor: "var(--gold-glow)", background: "var(--gold-dim)", color: "var(--text)" }
+                : { borderColor: "var(--border)", background: "var(--input-bg)", color: "var(--text-muted)" }}
             >
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
@@ -175,7 +177,8 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
             onChange={e => setPrice(e.target.value)}
             placeholder="0.00"
             aria-describedby={error ? "alert-form-error" : undefined}
-            className={`${inputClass} pl-7`}
+            className="w-full border px-3 py-2.5 text-base focus:outline-none transition-colors pl-7"
+            style={inputStyle}
           />
         </div>
         {currency !== "USD" && (
@@ -186,7 +189,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
       </div>
 
       {error && (
-        <p id="alert-form-error" role="alert" className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">
+        <p id="alert-form-error" role="alert" className="border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">
           {error}
         </p>
       )}
