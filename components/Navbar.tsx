@@ -15,8 +15,8 @@ export default async function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 
         {/* Logo */}
-        <Link href="/" className="font-black uppercase hover:opacity-60 transition-opacity" style={{ letterSpacing: "0.3em", fontSize: "13px", color: "var(--text)" }}>
-          <span className="rainbow-text">Lode</span>
+        <Link href="/" className="font-black uppercase hover:opacity-50 transition-opacity" style={{ letterSpacing: "0.32em", fontSize: "13px", color: "var(--text)" }}>
+          Lode
         </Link>
 
         {/* Desktop */}

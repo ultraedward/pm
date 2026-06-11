@@ -99,7 +99,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       : null;
 
   return (
-    <div className="group px-5 py-6 sm:px-7 sm:py-8 flex flex-col gap-5 transition-colors duration-200 hover:bg-white/[0.03]">
+    <div className="group px-6 py-7 sm:px-8 sm:py-10 flex flex-col gap-5 transition-colors duration-200 hover:bg-white/[0.03]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
@@ -111,7 +111,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
       <div>
         <div
           className="font-black tabular-nums leading-none"
-          style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.25rem)", letterSpacing: "-0.04em" }}
+          style={{ fontSize: "clamp(1.75rem, 3.8vw, 2.5rem)", letterSpacing: "-0.04em" }}
         >
           {data.price > 0
             ? `$${data.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -258,51 +258,79 @@ export default async function HomePage() {
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="px-6 pt-16 pb-14 sm:pt-32 sm:pb-24 relative">
-        {/* Gold accent line — 1px gradient rule above the hero text */}
+      <section className="px-6 pt-20 pb-16 sm:pt-40 sm:pb-28 relative overflow-hidden">
+
+        {/* Ghost price — massive ambient gold number as texture */}
+        {gold.price > 0 && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 select-none hidden sm:block"
+            style={{
+              fontSize: "clamp(9rem, 22vw, 18rem)",
+              fontWeight: 900,
+              letterSpacing: "-0.06em",
+              lineHeight: 1,
+              color: "var(--gold)",
+              opacity: 0.035,
+              userSelect: "none",
+              whiteSpace: "nowrap",
+              right: "-2rem",
+            }}
+          >
+            ${gold.price.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          </div>
+        )}
+
+        {/* Left gold rule — a single vertical accent */}
         <div
           aria-hidden="true"
-          className="absolute top-0 left-6 right-6 sm:left-auto sm:right-auto"
+          className="absolute left-0 top-16 bottom-16 w-px hidden sm:block"
           style={{
-            height: "1px",
-            maxWidth: "72rem",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "linear-gradient(90deg, transparent 0%, var(--gold) 40%, var(--gold) 60%, transparent 100%)",
-            opacity: 0.35,
+            background: "linear-gradient(180deg, transparent 0%, var(--gold) 30%, var(--gold) 70%, transparent 100%)",
+            opacity: 0.22,
           }}
         />
-        <div className="mx-auto max-w-6xl">
 
-          <p className="label mb-6 animate-fade-up">Precious metals tracker</p>
+        <div className="mx-auto max-w-6xl relative">
+
+          <p className="label mb-8 animate-fade-up">Precious metals tracker</p>
 
           <h1
             className="font-black text-white animate-fade-up animate-delay-100"
-            style={{ fontSize: "clamp(2.8rem, 7vw, 5.75rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}
+            style={{ fontSize: "clamp(3rem, 7.5vw, 6.25rem)", letterSpacing: "-0.04em", lineHeight: "0.91" }}
           >
             Know what your<br />stack is worth.
           </h1>
 
           <p
-            className="mt-7 text-base leading-relaxed max-w-lg animate-fade-up animate-delay-200"
+            className="mt-8 text-base leading-relaxed max-w-md animate-fade-up animate-delay-200"
             style={{ color: "var(--text-muted)" }}
           >
             Email alerts when prices hit your target. Coin melt calculator. Dealer comparison.
             Portfolio tracker. Free forever.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4 animate-fade-up animate-delay-300">
+          <div className="mt-10 flex flex-wrap items-center gap-4 animate-fade-up animate-delay-300">
             <Link href={isLoggedIn ? "/dashboard" : "/login"} className="btn-gold">
               {isLoggedIn ? "Go to dashboard" : "Get started — it's free"}
             </Link>
+            {!isLoggedIn && (
+              <Link
+                href="#calculator"
+                className="text-xs font-bold uppercase tracking-widest transition-colors"
+                style={{ color: "var(--text-dim)" }}
+              >
+                Try the calculator →
+              </Link>
+            )}
           </div>
 
-          {/* Compact metal price strip — credibility, not the product */}
+          {/* Live price strip */}
           <div
-            className="mt-14 pt-7 border-t animate-fade-up animate-delay-400"
+            className="mt-16 pt-7 border-t animate-fade-up animate-delay-400"
             style={{ borderColor: "var(--border)" }}
           >
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-x-8 gap-y-4">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-x-10 gap-y-4">
               {prices.map(([metal, data]) => {
                 const { label, dot } = METAL_META[metal];
                 const isUp = (data.percentChange ?? 0) >= 0;
@@ -365,7 +393,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl space-y-10">
           <div className="reveal space-y-2">
             <p className="label">What Lode does</p>
-            <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
+            <h2 className="font-black" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}>
               Every tool a stacker needs.
             </h2>
           </div>
@@ -376,9 +404,15 @@ export default async function HomePage() {
               <Link
                 key={label}
                 href={href}
-                className={`reveal reveal-delay-${i + 1} group p-7 hover:bg-white/[0.04] transition-colors duration-200 flex flex-col gap-3`}
+                className={`reveal reveal-delay-${i + 1} group p-7 hover:bg-white/[0.04] transition-colors duration-200 flex flex-col gap-3 relative overflow-hidden`}
                 style={{ background: "var(--bg)" }}
               >
+                {/* Left-edge gold tick — appears on hover */}
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ background: "var(--gold)" }}
+                />
                 <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>
                   0{i + 1}
                 </p>
@@ -421,7 +455,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl space-y-8">
           <div className="space-y-2">
             <p className="label">Melt calculator</p>
-            <h2 className="text-2xl sm:text-3xl font-black" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
+            <h2 className="font-black" style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}>
               What&apos;s it worth at today&apos;s spot?
             </h2>
             <p className="text-sm mt-3" style={{ color: "var(--text-muted)" }}>
@@ -451,7 +485,20 @@ export default async function HomePage() {
               className="font-black text-white"
               style={{ fontSize: "clamp(2rem, 6vw, 4.25rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}
             >
-              Tell me when<br />gold hits $____
+              Tell me when<br />
+              gold hits{" "}
+              <span
+                className="inline-block tabular-nums"
+                style={{
+                  color: "var(--gold)",
+                  borderBottom: "3px solid var(--gold)",
+                  paddingBottom: "0.05em",
+                  minWidth: "3ch",
+                  opacity: 0.7,
+                }}
+              >
+                $____
+              </span>
             </p>
             <p className="text-sm max-w-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
               One email. Your target price crossed. No noise, no daily digests.
