@@ -97,8 +97,8 @@ export function MeltCalculator({ spots }: Props) {
           return (
             <div
               key={metal}
-              className="rounded-2xl border bg-black/20 px-5 py-5 flex flex-col gap-4"
-              style={{ borderColor: "var(--border)" }}
+              className="border px-5 py-5 flex flex-col gap-4"
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}
             >
               {/* Tile header */}
               <div className="flex items-center justify-between">

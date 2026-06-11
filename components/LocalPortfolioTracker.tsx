@@ -202,7 +202,7 @@ export default function LocalPortfolioTracker() {
       </div>
 
       {/* Spot prices row */}
-      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+      <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
         <div className="px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
           <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Live Spot Prices</p>
         </div>
@@ -217,9 +217,9 @@ export default function LocalPortfolioTracker() {
                   <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{meta.label}</p>
                 </div>
                 <p className="text-xl font-black tabular-nums">
-                  {pricesLoading ? <span className="text-gray-700 animate-pulse">···</span>
+                  {pricesLoading ? <span className="animate-pulse" style={{ color: "var(--text-dim)" }}>···</span>
                    : price ? fmt(price)
-                   : <span className="text-gray-700">—</span>}
+                   : <span style={{ color: "var(--text-dim)" }}>—</span>}
                 </p>
               </div>
             );
@@ -234,13 +234,13 @@ export default function LocalPortfolioTracker() {
 
       {/* Portfolio total */}
       {holdings.length > 0 && (
-        <div className="rounded-2xl border border-white/5 bg-gray-950 px-6 py-7 space-y-2">
+        <div className="border border-white/5 px-6 py-7 space-y-2" style={{ background: "var(--surface)" }}>
           <p className="text-xs text-gray-600 font-medium uppercase tracking-widest">Total Portfolio Value</p>
           <p className="text-5xl font-black tracking-tightest tabular-nums leading-none">
             {fmt(totalValue)}
           </p>
           {totalInvested > 0 && (
-            <p className={`text-sm font-medium tabular-nums ${isUp ? "text-amber-400" : "text-red-400"}`}>
+            <p className="text-sm font-medium tabular-nums" style={{ color: isUp ? "var(--gold)" : "#f87171" }}>
               {isUp ? "+" : ""}{fmt(gainLoss)} ({isUp ? "+" : ""}{gainPct.toFixed(2)}%) vs cost basis
             </p>
           )}
@@ -249,7 +249,7 @@ export default function LocalPortfolioTracker() {
 
       {/* Allocation bars */}
       {holdings.length > 0 && totalValue > 0 && (
-        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+        <div className="border border-white/5 p-6 space-y-4" style={{ background: "var(--surface)" }}>
           <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Allocation</p>
           {metalValues.filter(({ value }) => value > 0).map(({ metal: m, value }) => {
             const pct  = (value / totalValue) * 100;
@@ -260,8 +260,8 @@ export default function LocalPortfolioTracker() {
                   <span className="font-medium" style={{ color: meta.dot }}>{meta.label}</span>
                   <span className="tabular-nums text-gray-400">{pct.toFixed(1)}%</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: meta.dot }} />
+                <div className="h-px w-full overflow-hidden bg-white/5">
+                  <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: meta.dot }} />
                 </div>
               </div>
             );
@@ -271,7 +271,7 @@ export default function LocalPortfolioTracker() {
 
       {/* Per-metal summary */}
       {metalSummaries.length > 0 && (
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+        <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
           {metalSummaries.map((s, i) => {
             const meta  = METAL_META[s.metal];
             const isUp  = s.gl >= 0;
@@ -292,7 +292,7 @@ export default function LocalPortfolioTracker() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-bold tabular-nums">{fmt(s.currentValue)}</p>
-                  <p className={`text-xs tabular-nums font-medium ${isUp ? "text-amber-400" : "text-red-400"}`}>
+                  <p className="text-xs tabular-nums font-medium" style={{ color: isUp ? "var(--gold)" : "#f87171" }}>
                     {isUp ? "+" : ""}{fmt(s.gl)} ({isUp ? "+" : ""}{s.glPct.toFixed(2)}%)
                   </p>
                 </div>
@@ -303,7 +303,7 @@ export default function LocalPortfolioTracker() {
       )}
 
       {/* Add holding form */}
-      <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+      <div className="border border-white/5 p-6 space-y-4" style={{ background: "var(--surface)" }}>
         <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Add Holding</p>
 
         <form onSubmit={addHolding} className="space-y-3">
@@ -314,7 +314,8 @@ export default function LocalPortfolioTracker() {
                 id="lpt-metal"
                 value={metal}
                 onChange={(e) => setMetal(e.target.value as Metal)}
-                className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                className="w-full border px-3 py-2.5 text-sm transition-colors"
+                style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
               >
                 <option value="gold">Gold</option>
                 <option value="silver">Silver</option>
@@ -334,7 +335,7 @@ export default function LocalPortfolioTracker() {
                 onChange={(e) => setOunces(e.target.value)}
                 placeholder="e.g. 1.000"
                 required
-                className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+                className="w-full border px-3 py-2.5 text-sm transition-colors" style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
               />
             </div>
 
@@ -349,7 +350,7 @@ export default function LocalPortfolioTracker() {
                 onChange={(e) => setPurchasePrice(e.target.value)}
                 placeholder={spotMap[metal] ? `e.g. ${spotMap[metal].toFixed(2)}` : "e.g. 3200.00"}
                 required
-                className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+                className="w-full border px-3 py-2.5 text-sm transition-colors" style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
               />
             </div>
 
@@ -361,29 +362,30 @@ export default function LocalPortfolioTracker() {
                 value={purchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
                 required
-                className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+                className="w-full border px-3 py-2.5 text-sm transition-colors"
+                style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="lpt-notes" className="block text-xs text-gray-500 mb-1">Notes <span className="text-gray-700">(optional)</span></label>
+            <label htmlFor="lpt-notes" className="block text-xs text-gray-500 mb-1">Notes <span style={{ color: "var(--text-dim)" }}>(optional)</span></label>
             <input
               id="lpt-notes"
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Costco 1oz bar"
-              className="w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-sm text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="w-full border px-3 py-2.5 text-sm transition-colors" style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
             />
           </div>
 
           {formError && <p role="alert" className="text-xs text-red-400">{formError}</p>}
-          {formOk    && <p role="status" className="text-xs text-amber-400">Holding added ✓</p>}
+          {formOk    && <p role="status" className="text-xs" style={{ color: "var(--gold)" }}>Holding added ✓</p>}
 
           <button
             type="submit"
-            className="w-full rounded-full bg-amber-500 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+            className="w-full btn-gold py-2.5"
           >
             Add to stack
           </button>
@@ -392,7 +394,7 @@ export default function LocalPortfolioTracker() {
 
       {/* Holdings list */}
       {holdings.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-2">
+        <div className="border border-dashed border-white/10 p-10 text-center space-y-2" style={{ background: "var(--surface)" }}>
           <p className="text-lg font-black tracking-tight">No holdings yet</p>
           <p className="text-sm text-gray-500">Add your first position above to see your portfolio value.</p>
         </div>
@@ -409,7 +411,7 @@ export default function LocalPortfolioTracker() {
             const isUp      = gl >= 0;
 
             return (
-              <div key={h.id} className="rounded-2xl border border-white/5 bg-gray-950 p-5 space-y-3">
+              <div key={h.id} className="border border-white/5 p-5 space-y-3" style={{ background: "var(--surface)" }}>
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-2">
@@ -426,7 +428,7 @@ export default function LocalPortfolioTracker() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold tabular-nums">{fmt(value)}</p>
-                    <p className={`text-xs tabular-nums font-medium mt-0.5 ${isUp ? "text-amber-400" : "text-red-400"}`}>
+                    <p className="text-xs tabular-nums font-medium mt-0.5" style={{ color: isUp ? "var(--gold)" : "#f87171" }}>
                       {isUp ? "+" : ""}{fmt(gl)} ({isUp ? "+" : ""}{glPct.toFixed(2)}%)
                     </p>
                   </div>
@@ -445,14 +447,14 @@ export default function LocalPortfolioTracker() {
       )}
 
       {/* Sync upsell */}
-      <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 text-center space-y-3">
+      <div className="border border-white/5 p-6 text-center space-y-3" style={{ background: "var(--surface)" }}>
         <p className="text-sm font-bold text-white">Want to sync across devices?</p>
         <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
           Create an account to save your stack to the cloud — accessible from any device, with price alerts included.
         </p>
         <Link
           href="/login"
-          className="inline-block rounded-full border border-white/10 px-6 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+          className="btn-ghost px-6 py-2 text-sm"
         >
           Get started →
         </Link>

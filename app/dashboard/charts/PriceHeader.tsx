@@ -47,7 +47,7 @@ export default function PriceHeader({ metal, range }: Props) {
 
         <div
           className={`text-sm font-semibold ${
-            positive ? "text-amber-400" : "text-red-400"
+            positive ? "text-up" : "text-down"
           }`}
         >
           {positive ? "+" : ""}

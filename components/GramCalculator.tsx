@@ -86,7 +86,7 @@ export function GramCalculator({ spots }: Props) {
         aria-atomic="true"
         aria-label="Melt value result"
         className={`rounded-xl border px-5 py-4 transition-all duration-200 ${
-          hasValue ? "border-amber-500/20 bg-amber-500/5" : ""
+          hasValue ? "" : ""
         }`}
         style={!hasValue ? { borderColor: "var(--border)", backgroundColor: "var(--surface-2)" } : {}}
       >
@@ -129,11 +129,8 @@ export function GramCalculator({ spots }: Props) {
             key={m}
             onClick={() => setMetal(m)}
             aria-pressed={metal === m}
-            className={`flex-1 min-h-[44px] text-sm font-bold capitalize transition-colors ${
-              metal === m
-                ? "bg-amber-500/15 text-amber-400"
-                : "text-gray-500 hover:text-gray-300"
-            }`}
+            className="flex-1 min-h-[44px] text-sm font-bold capitalize transition-colors"
+            style={{ color: metal === m ? "var(--gold)" : "var(--text-muted)" }}
           >
             <span aria-hidden="true">{m === "gold" ? "🥇" : "🥈"}</span>
             {" "}{m === "gold" ? "Gold" : "Silver"}
@@ -153,7 +150,7 @@ export function GramCalculator({ spots }: Props) {
           placeholder="0.00"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          className="w-full bg-transparent rounded-xl border px-4 py-3 font-black tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
+          className="w-full bg-transparent border px-4 py-3 font-black tabular-nums focus:outline-none transition-colors"
           style={{ borderColor: "var(--border-strong)", color: "var(--text)", fontSize: "clamp(1rem, 5vw, 1.5rem)" }}
           data-placeholder-muted
         />
@@ -161,7 +158,7 @@ export function GramCalculator({ spots }: Props) {
         <div
           role="group"
           aria-label="Weight unit"
-          className="flex rounded-lg border overflow-hidden"
+          className="flex border overflow-hidden"
           style={{ borderColor: "var(--border-strong)" }}
         >
           {(["g", "dwt", "ozt"] as const).map((u) => (
@@ -169,11 +166,10 @@ export function GramCalculator({ spots }: Props) {
               key={u}
               onClick={() => setUnit(u)}
               aria-pressed={unit === u}
-              className={`flex-1 text-xs font-bold transition-colors min-h-[44px] ${
-                unit === u
-                  ? "bg-amber-500/15 text-amber-400"
-                  : "text-gray-600 hover:text-gray-400"
-              }`}
+              className="flex-1 text-xs font-bold transition-colors min-h-[44px]"
+              style={unit === u
+                ? { background: "var(--gold-dim)", color: "var(--gold)" }
+                : { color: "var(--text-dim)" }}
             >
               {u === "g" ? "Grams (g)" : u === "dwt" ? "Pennyweight" : "Troy oz"}
             </button>
@@ -190,12 +186,10 @@ export function GramCalculator({ spots }: Props) {
               key={k.id}
               onClick={() => setKarat(k.id)}
               aria-pressed={currentKarat === k.id}
-              className={`rounded-lg py-2.5 px-1 text-center transition-colors min-h-[44px] flex flex-col items-center justify-center ${
-                currentKarat === k.id
-                  ? "bg-amber-500/20 border border-amber-500/40 text-amber-400"
-                  : "border text-gray-500 hover:text-gray-300 hover:border-white/20"
-              }`}
-              style={currentKarat !== k.id ? { borderColor: "var(--border-strong)" } : {}}
+              className="py-2.5 px-1 text-center transition-colors min-h-[44px] flex flex-col items-center justify-center border"
+              style={currentKarat === k.id
+                ? { background: "var(--gold-dim)", borderColor: "var(--gold-glow)", color: "var(--gold)" }
+                : { borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
             >
               <span className="block text-xs font-bold">{k.label}</span>
               {k.pct && (
@@ -218,7 +212,7 @@ export function GramCalculator({ spots }: Props) {
               placeholder="e.g. 75.0"
               value={customPct}
               onChange={(e) => setCustomPct(e.target.value)}
-              className="w-32 bg-transparent rounded-lg border px-3 py-2 font-bold tabular-nums focus:outline-none focus:border-amber-500/40 transition-colors"
+              className="w-32 bg-transparent border px-3 py-2 font-bold tabular-nums focus:outline-none transition-colors"
               style={{ borderColor: "var(--border-strong)", color: "var(--text)", fontSize: "16px" }}
               data-placeholder-muted
             />

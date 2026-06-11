@@ -49,7 +49,7 @@ export default async function DashboardAlertsPage() {
         {hasAlerts ? (
           <AlertsTable alerts={alerts} spots={spots} />
         ) : (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-12 text-center space-y-4">
+          <div className="border border-dashed border-white/10 p-12 text-center space-y-4" style={{ background: "var(--surface)" }}>
             <p className="text-xl font-black tracking-tight">No alerts yet</p>
             <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
               Get an email when gold, silver, platinum, or palladium crosses your target price. Choose your frequency when you create an alert.

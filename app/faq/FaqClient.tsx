@@ -24,9 +24,8 @@ function Accordion({ items }: { items: FaqItem[] }) {
               className="w-full flex items-start justify-between gap-4 py-5 text-left group"
             >
               <h3
-                className={`text-sm font-bold transition-colors duration-150 group-hover:text-amber-400 ${
-                  isOpen ? "text-amber-400" : "text-white"
-                }`}
+                className="text-sm font-bold transition-colors duration-150"
+                style={{ color: isOpen ? "var(--gold)" : "var(--text)" }}
               >
                 {item.q}
               </h3>

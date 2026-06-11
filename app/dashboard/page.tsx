@@ -141,7 +141,7 @@ export default async function DashboardPage() {
 
   const gainLoss = totalValue - totalInvested;
   const pctReturn = totalInvested > 0 ? (gainLoss / totalInvested) * 100 : 0;
-  const gainColor = gainLoss >= 0 ? "text-amber-400" : "text-red-400";
+  const gainColor = gainLoss >= 0 ? "var(--gold)" : "#f87171";
 
   // 30-day portfolio equity sparkline (gold + silver only — most likely to have history)
   const goldOz    = holdings.filter((h) => h.metal === "gold").reduce((s, h) => s + Number(h.ounces), 0);
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
   const lastValue  = portfolioHistory[portfolioHistory.length - 1] ?? totalValue;
   const change30d  = lastValue - firstValue;
   const pct30d     = firstValue > 0 ? (change30d / firstValue) * 100 : 0;
-  const changeColor30d = change30d >= 0 ? "text-amber-400" : "text-red-400";
+  const changeColor30d = change30d >= 0 ? "var(--gold)" : "#f87171";
 
   return (
     <main
@@ -287,7 +287,7 @@ export default async function DashboardPage() {
             >
               {formatCurrency(totalValue, currency)}
             </p>
-            <p className={`text-sm mt-3 font-medium tabular-nums ${gainColor}`}>
+            <p className="text-sm mt-3 font-medium tabular-nums" style={{ color: gainColor }}>
               {gainLoss >= 0 ? "+" : ""}{formatCurrency(gainLoss, currency)}
               {" "}({fmtPct(pctReturn)}){" "}
               <span className="font-normal" style={{ color: "var(--text-dim)" }}>all-time</span>
@@ -303,7 +303,7 @@ export default async function DashboardPage() {
           >
             <div className="flex justify-between items-center">
               <p className="label">Portfolio · 30 days</p>
-              <p className={`text-xs font-semibold tabular-nums ${changeColor30d}`}>
+              <p className="text-xs font-semibold tabular-nums" style={{ color: changeColor30d }}>
                 {change30d >= 0 ? "+" : ""}{formatCurrency(change30d, currency)}{" "}
                 <span className="font-normal" style={{ color: "var(--text-dim)" }}>({fmtPct(pct30d)})</span>
               </p>
@@ -355,7 +355,7 @@ export default async function DashboardPage() {
               className="group p-5 hover:bg-white/[0.04] transition-colors duration-150"
               style={{ background: "var(--bg)" }}
             >
-              <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
+              <p className="text-sm font-bold text-white group-hover:[color:var(--gold)] transition-colors duration-150">
                 {label}
               </p>
               <p className="text-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{sub}</p>

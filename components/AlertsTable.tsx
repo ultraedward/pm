@@ -84,7 +84,7 @@ export function AlertsTable({ alerts, spots = {} }: { alerts: Alert[]; spots?: R
         return (
           <div
             key={alert.id}
-            className="rounded-2xl border p-5 space-y-4 transition-colors"
+            className="border p-5 space-y-4 transition-colors"
             style={{ borderColor: borderStyle }}
           >
             {/* Row 1: Metal + direction + status */}

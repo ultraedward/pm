@@ -139,7 +139,7 @@ export default function AddHoldingForm({ onCreated }: Props) {
         </div>
 
         {error ? <p role="alert" className="text-sm text-red-400">{error}</p> : null}
-        {ok ? <p role="status" className="text-sm text-amber-400">{ok}</p> : null}
+        {ok ? <p role="status" className="text-sm" style={{ color: "var(--gold)" }}>{ok}</p> : null}
 
         <button
           type="submit"

@@ -115,7 +115,7 @@ export function MetalPriceChart({ metal }: Props) {
 
       {/* Chart */}
       <div
-        className="rounded-2xl border overflow-hidden"
+        className="border overflow-hidden"
         style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)", height: 200 }}
       >
         {loading ? (

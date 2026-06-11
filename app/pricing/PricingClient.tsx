@@ -45,11 +45,12 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
           aria-label="Annual billing"
           aria-describedby="billing-monthly-label billing-annual-label"
           onClick={() => setAnnual((v) => !v)}
-          className={`relative h-6 w-11 rounded-full transition-colors duration-200 ${annual ? "bg-amber-500" : "bg-white/15"}`}
+          className="relative h-6 w-11 transition-colors duration-200"
+          style={{ backgroundColor: annual ? "var(--gold)" : "rgba(255,255,255,0.15)" }}
         >
           <span
             aria-hidden="true"
-            className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${annual ? "translate-x-5" : "translate-x-0"}`}
+            className={`absolute top-0.5 left-0.5 h-5 w-5 bg-white shadow transition-transform duration-200 ${annual ? "translate-x-5" : "translate-x-0"}`}
           />
         </button>
         <span
@@ -57,7 +58,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
           className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-gray-500"}`}
         >
           Annual
-          <span aria-hidden="true" className="ml-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-400">
+          <span aria-hidden="true" className="ml-2 px-2 py-0.5 text-xs font-semibold" style={{ background: "var(--gold-dim)", color: "var(--gold)" }}>
             Save $11
           </span>
         </span>
@@ -80,7 +81,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
           <ul className="space-y-3 text-sm text-gray-300">
             {FREE_FEATURES.map((f) => (
               <li key={f} className="flex items-center gap-2">
-                <span className="text-amber-500">✓</span> {f}
+                <span style={{ color: "var(--gold)" }}>✓</span> {f}
               </li>
             ))}
           </ul>
@@ -109,10 +110,10 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
 
         {/* Pro */}
         <div className="relative border p-8 space-y-8 overflow-hidden" style={{ borderColor: "var(--gold-glow)" }}>
-          <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full blur-3xl" style={{ background: "var(--gold-dim)" }} />
 
           <div className="relative">
-            <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 mb-2">Pro</p>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--gold)" }}>Pro</p>
             <div className="flex items-end gap-1">
               {annual ? (
                 <>
@@ -135,7 +136,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
           <ul className="relative space-y-3 text-sm text-gray-300">
             {PRO_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2">
-                <span className="text-amber-500 mt-0.5">✓</span> {f}
+                <span className="mt-0.5" style={{ color: "var(--gold)" }}>✓</span> {f}
               </li>
             ))}
           </ul>

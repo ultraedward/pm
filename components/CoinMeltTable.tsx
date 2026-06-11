@@ -125,7 +125,7 @@ export function CoinMeltTable({ spots, updatedAt }: Props) {
       </div>
 
       {/* ── Coin table ─────────────────────────────────────────── */}
-      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+      <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
 
         {/* Header row */}
         <div

@@ -275,7 +275,7 @@ export default async function SilverPricePage() {
                 30D {fmtChange(change30)} ({fmtPct(pct30)})
               </span>
             )}
-            <span className="text-xs text-gray-700">Updated {updatedTime}</span>
+            <span className="text-xs" style={{ color: "var(--text-dim)" }}>Updated {updatedTime}</span>
           </div>
         </div>
       </section>
@@ -350,7 +350,7 @@ export default async function SilverPricePage() {
                 <div className="space-y-1.5 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span aria-hidden="true" className="text-base leading-none">🇺🇸</span>
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">{AMERICA_250_PROMO.headline}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--gold)" }}>{AMERICA_250_PROMO.headline}</span>
                     <span className="text-[10px] font-mono text-amber-500/50">· ends Jul 10</span>
                   </div>
                   <p className="text-sm font-semibold text-white leading-snug">
@@ -361,7 +361,7 @@ export default async function SilverPricePage() {
                     While supplies last — promotion runs through July 10, 2026.
                   </p>
                 </div>
-                <span className="flex-shrink-0 self-center text-amber-500 group-hover:text-amber-400 transition-colors text-sm font-bold">→</span>
+                <span className="flex-shrink-0 self-center text-sm font-bold link-gold">→</span>
               </div>
               <p className="mt-3 text-[10px] text-gray-600">Birch Gold Group · Paid partner · No commitment required</p>
             </a>

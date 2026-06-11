@@ -245,7 +245,7 @@ export default async function JunkSilverCalculatorPage() {
             {/* US junk silver table */}
             <div className="space-y-4">
               <h2 className="text-base font-bold text-white">Today&apos;s US junk silver melt values</h2>
-              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+              <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
                 <div
                   className="grid px-5 py-2.5 border-b text-[10px] font-bold uppercase tracking-widest text-gray-600"
                   style={{ gridTemplateColumns: "1fr auto auto", borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}
@@ -281,7 +281,7 @@ export default async function JunkSilverCalculatorPage() {
             <div className="space-y-4">
               <h2 className="text-base font-bold text-white">Canadian junk silver melt values (pre-1968)</h2>
               <p className="text-xs text-gray-600">Canadian dimes, quarters, halves, and dollars minted before 1968 are 80% silver.</p>
-              <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+              <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
                 <div
                   className="grid px-5 py-2.5 border-b text-[10px] font-bold uppercase tracking-widest text-gray-600"
                   style={{ gridTemplateColumns: "1fr auto auto", borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}

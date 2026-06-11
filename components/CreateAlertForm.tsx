@@ -62,7 +62,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
   if (created) {
     return (
       <div className="space-y-4">
-        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+        <div className="border border-white/5 p-6 space-y-3" style={{ background: "var(--surface)" }}>
           <p className="label">Alert set</p>
           <p className="text-sm text-gray-400">
             We&apos;ll email you when {metal} {direction === "above" ? "rises above" : "drops below"} {currencySymbol}{Number(price).toLocaleString()}.
@@ -77,7 +77,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
 
         {/* IRA nudge — only shown for gold alerts when affiliate is configured */}
         {metal === "gold" && iraUrl && (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+          <div className="border border-white/5 p-6 space-y-3" style={{ background: "var(--surface)" }}>
             <p className="label">Planning a larger gold purchase?</p>
             <p className="text-sm text-gray-400 leading-relaxed">
               A self-directed Gold IRA lets you hold physical bullion with potential tax advantages. Augusta Precious Metals offers a free guide — no commitment.
@@ -101,7 +101,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
     "w-full rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors";
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border p-6 space-y-6" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.3)" }}>
+    <form onSubmit={submit} className="border p-6 space-y-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
 
       {/* Metal picker */}
       <div className="space-y-2" role="group" aria-labelledby="alert-metal-label">
@@ -144,11 +144,10 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
               type="button"
               onClick={() => setDirection(value)}
               aria-pressed={direction === value}
-              className={`flex-1 rounded-full border min-h-[44px] text-sm font-semibold transition-all ${
-                direction === value
-                  ? "border-amber-500/40 bg-amber-500/10 text-white"
-                  : "border-white/5 bg-black text-gray-500 hover:border-white/10 hover:text-gray-300"
-              }`}
+              className="flex-1 border min-h-[44px] text-sm font-semibold transition-all"
+              style={direction === value
+                ? { borderColor: "var(--gold-glow)", background: "var(--gold-dim)", color: "var(--text)" }
+                : { borderColor: "var(--border)", background: "var(--input-bg)", color: "var(--text-muted)" }}
             >
               {label}
             </button>

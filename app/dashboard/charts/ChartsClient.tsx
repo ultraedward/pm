@@ -179,20 +179,20 @@ export function ChartsClient() {
       )}
 
       {error && (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 text-sm text-red-400">
+        <div className="border border-red-500/20 p-5 text-sm text-red-400" style={{ background: "rgba(239,68,68,0.04)" }}>
           Failed to load prices. Please try refreshing.
         </div>
       )}
 
       {!loading && !error && data && !hasAnyData && (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-12 text-center space-y-3">
+        <div className="border border-dashed border-white/10 p-12 text-center space-y-3" style={{ background: "var(--surface)" }}>
           <p className="text-xl font-black tracking-tight">No price data yet</p>
           <p className="text-sm text-gray-500">Prices will appear here once the daily ingestion runs.</p>
         </div>
       )}
 
       {!loading && merged.length > 0 && (
-        <div className="rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}>
+        <div className="border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
           {multiMode && (
             <p className="text-xs text-gray-500 mb-4">
               Showing % change from start of period. Select a single metal for price view.

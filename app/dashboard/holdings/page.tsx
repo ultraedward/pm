@@ -241,7 +241,7 @@ export default async function HoldingsPage() {
         </div>
 
         {/* Performance chart */}
-        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+        <div className="border border-white/5 p-6 space-y-4" style={{ background: "var(--surface)" }}>
           <p className="label">Portfolio Performance</p>
           <div className="h-40 w-full">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
@@ -260,7 +260,7 @@ export default async function HoldingsPage() {
 
         {/* Allocation — stacked percentage bars */}
         {totalValue > 0 && (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+          <div className="border border-white/5 p-6 space-y-4" style={{ background: "var(--surface)" }}>
             <p className="label">Allocation</p>
             <div className="space-y-3">
               {[
@@ -285,7 +285,7 @@ export default async function HoldingsPage() {
 
         {/* IRA callout — shown only when gold holdings exceed $5k in value */}
         {goldValue >= 5000 && process.env.AFFILIATE_AUGUSTA_URL && (
-          <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
+          <div className="border border-white/5 p-6 space-y-3" style={{ background: "var(--surface)" }}>
             <p className="label">Tax-advantaged gold</p>
             <p className="text-sm text-gray-400 leading-relaxed">
               You&apos;re holding significant gold. A self-directed IRA lets you hold physical bullion with potential tax advantages — no liquidation required.
@@ -303,14 +303,15 @@ export default async function HoldingsPage() {
         )}
 
         {/* Add Holding form */}
-        <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-5">
+        <div className="border border-white/5 p-6 space-y-5" style={{ background: "var(--surface)" }}>
           <p className="label">Add Holding</p>
 
           <form action={addHolding} className="grid gap-3 md:grid-cols-4">
             <select
               name="metal"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="border px-3 py-2.5 text-base transition-colors"
+              style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
             >
               <option value="">Select Metal</option>
               <option value="gold">Gold</option>
@@ -325,7 +326,7 @@ export default async function HoldingsPage() {
               step="0.01"
               placeholder="Ounces"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="border px-3 py-2.5 text-base transition-colors" style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
             />
 
             <input
@@ -334,19 +335,20 @@ export default async function HoldingsPage() {
               step="0.01"
               placeholder="Price per oz"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white placeholder:text-gray-700 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="border px-3 py-2.5 text-base transition-colors" style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
             />
 
             <input
               name="purchaseDate"
               type="date"
               required
-              className="rounded-lg bg-black border border-white/10 px-3 py-2.5 text-base text-white focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="border px-3 py-2.5 text-base transition-colors"
+              style={{ background: "var(--input-bg)", borderColor: "var(--input-border)", color: "var(--text)" }}
             />
 
             <button
               type="submit"
-              className="md:col-span-4 rounded-full bg-amber-500 py-2.5 text-sm font-bold text-black hover:bg-amber-400 transition-colors"
+              className="md:col-span-4 btn-gold py-2.5"
             >
               Add Holding
             </button>
@@ -355,7 +357,7 @@ export default async function HoldingsPage() {
 
         {/* Per-metal summary */}
         {metalSummaries.length > 0 && (
-          <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+          <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
             {metalSummaries.map((s, i) => {
               const meta = METAL_META[s.metal];
               const isUp = s.gainLoss >= 0;
@@ -378,7 +380,7 @@ export default async function HoldingsPage() {
                     <p className="text-sm font-bold tabular-nums">
                       ${s.currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
-                    <p className={`text-xs tabular-nums font-medium ${isUp ? "text-amber-400" : "text-red-400"}`}>
+                    <p className="text-xs tabular-nums font-medium" style={{ color: isUp ? "var(--gold)" : "#f87171" }}>
                       {isUp ? "+" : ""}${s.gainLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({isUp ? "+" : ""}{s.gainPct.toFixed(2)}%)
                     </p>
                   </div>
@@ -390,7 +392,7 @@ export default async function HoldingsPage() {
 
         {/* Holdings list */}
         {holdings.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-gray-950 p-10 text-center space-y-3">
+          <div className="border border-dashed border-white/10 p-10 text-center space-y-3" style={{ background: "var(--surface)" }}>
             <p className="text-xl font-black tracking-tight">No holdings yet</p>
             <p className="text-sm text-gray-500">Use the form above to add your first position.</p>
           </div>
@@ -404,7 +406,7 @@ export default async function HoldingsPage() {
               const percent = invested > 0 ? (gainLoss / invested) * 100 : 0;
 
               return (
-                <div key={h.id} className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-4">
+                <div key={h.id} className="border border-white/5 p-6 space-y-4" style={{ background: "var(--surface)" }}>
                   <div className="flex justify-between">
                     <div>
                       <p className="text-lg font-black tracking-tight capitalize">{h.metal}</p>
@@ -417,13 +419,13 @@ export default async function HoldingsPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-black tabular-nums">${value.toFixed(2)}</p>
-                      <p className={`text-sm font-medium tabular-nums mt-0.5 ${gainLoss >= 0 ? "text-amber-400" : "text-red-400"}`}>
+                      <p className="text-sm font-medium tabular-nums mt-0.5" style={{ color: gainLoss >= 0 ? "var(--gold)" : "#f87171" }}>
                         {gainLoss >= 0 ? "+" : ""}${gainLoss.toFixed(2)} ({percent.toFixed(2)}%)
                       </p>
-                      <div className="mt-2 h-1 w-24 ml-auto overflow-hidden rounded-full bg-white/5">
+                      <div className="mt-2 h-px w-24 ml-auto overflow-hidden bg-white/5">
                         <div
-                          className={`h-full rounded-full ${percent >= 0 ? "bg-amber-500" : "bg-red-500"}`}
-                          style={{ width: `${Math.min(Math.abs(percent), 100)}%` }}
+                          className="h-full"
+                          style={{ width: `${Math.min(Math.abs(percent), 100)}%`, backgroundColor: percent >= 0 ? "var(--gold)" : "#f87171" }}
                         />
                       </div>
                     </div>

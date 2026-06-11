@@ -42,7 +42,7 @@ export default async function AccountPage() {
         {/* Usage */}
         <div className="space-y-3">
           <p className="label">Activity</p>
-          <div className="grid grid-cols-2 divide-x rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+          <div className="grid grid-cols-2 divide-x border overflow-hidden" style={{ borderColor: "var(--border)" }}>
             <Link href="/dashboard/alerts" className="group px-6 py-4 hover:bg-white/5 transition-colors">
               <p className="text-2xl font-black tabular-nums">{alertCount}</p>
               <p className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{alertCount === 1 ? "Alert" : "Alerts"} →</p>

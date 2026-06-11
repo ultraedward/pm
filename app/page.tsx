@@ -105,7 +105,7 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
           <span className="label">{label}</span>
         </div>
-        <span aria-hidden="true" className="text-[10px] font-mono tracking-widest text-gray-700">{symbol}</span>
+        <span aria-hidden="true" className="text-[10px] font-mono tracking-widest" style={{ color: "var(--text-dim)" }}>{symbol}</span>
       </div>
 
       <div>
@@ -123,19 +123,19 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
             <span aria-hidden="true">{isUp ? "▲" : "▼"}</span>
             <span className="sr-only">{isUp ? "Up" : "Down"}</span>
             {" "}{Math.abs(data.percentChange).toFixed(2)}%
-            <span className="ml-1.5 font-normal text-gray-700 tracking-normal">24H</span>
+            <span className="ml-1.5 font-normal tracking-normal" style={{ color: "var(--text-dim)" }}>24H</span>
           </div>
         )}
       </div>
 
       {spark.length > 1 && (
-        <div className="opacity-50 group-hover:opacity-100 transition-opacity duration-400">
+        <div className="opacity-75 group-hover:opacity-100 transition-opacity duration-400">
           <Sparkline data={spark} color={dot} />
         </div>
       )}
 
       {rangePos !== null && data.week52Low && data.week52High && (
-        <div className="space-y-1.5 pt-0.5 opacity-30 group-hover:opacity-80 transition-opacity duration-400">
+        <div className="space-y-1.5 pt-0.5 opacity-55 group-hover:opacity-90 transition-opacity duration-400">
           <div className="relative h-px w-full bg-white/[0.08]">
             <div
               className="absolute top-1/2 -translate-y-1/2 h-1.5 w-1.5 -translate-x-1/2"
@@ -143,11 +143,11 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
             />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] tabular-nums text-gray-700">
+            <span className="text-[10px] tabular-nums" style={{ color: "var(--text-dim)" }}>
               ${data.week52Low.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
             <span className="label">52W</span>
-            <span className="text-[10px] tabular-nums text-gray-700">
+            <span className="text-[10px] tabular-nums" style={{ color: "var(--text-dim)" }}>
               ${data.week52High.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>
@@ -337,10 +337,10 @@ export default async function HomePage() {
           <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
             <p className="label">Today&apos;s spot prices</p>
             <div className="flex items-center gap-4">
-              <Link href="/gold-price"      className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">Gold →</Link>
-              <Link href="/silver-price"    className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors">Silver →</Link>
-              <Link href="/platinum-price"  className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors hidden sm:inline">Platinum →</Link>
-              <Link href="/palladium-price" className="text-[11px] text-gray-700 hover:text-gray-400 transition-colors hidden sm:inline">Palladium →</Link>
+              <Link href="/gold-price"      className="link-gold text-[11px]">Gold →</Link>
+              <Link href="/silver-price"    className="link-gold text-[11px]">Silver →</Link>
+              <Link href="/platinum-price"  className="link-gold text-[11px] hidden sm:inline">Platinum →</Link>
+              <Link href="/palladium-price" className="link-gold text-[11px] hidden sm:inline">Palladium →</Link>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
@@ -355,7 +355,7 @@ export default async function HomePage() {
           </div>
           <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
             <span className="label">Spot prices · 30-day trend</span>
-            <span className="text-[10px] text-gray-700 tracking-wide uppercase">{fmtUpdated(lastUpdated)}</span>
+            <span className="text-[10px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{fmtUpdated(lastUpdated)}</span>
           </div>
         </div>
       </section>
@@ -376,34 +376,43 @@ export default async function HomePage() {
               <Link
                 key={label}
                 href={href}
-                className={`reveal reveal-delay-${i + 1} group p-7 hover:bg-white/[0.04] transition-colors duration-200 space-y-3`}
+                className={`reveal reveal-delay-${i + 1} group p-7 hover:bg-white/[0.04] transition-colors duration-200 flex flex-col gap-3`}
                 style={{ background: "var(--bg)" }}
               >
-                <p className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
-                  {label}
+                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>
+                  0{i + 1}
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                <p className="text-sm font-bold text-white transition-colors duration-150" style={{ transition: "color 0.15s ease" }}
+                  onMouseEnter={undefined}
+                >
+                  <span className="group-hover:[color:var(--gold)] transition-colors duration-150">{label}</span>
+                </p>
+                <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--text-muted)" }}>
                   {body}
                 </p>
-                <p className="text-[11px] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>
-                  <span className="group-hover:text-amber-400 transition-colors duration-150">Explore →</span>
+                <p className="text-[11px] group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>
+                  Explore →
                 </p>
               </Link>
             ))}
           </div>
 
-          {/* Secondary — quiet text line */}
-          <p className="text-xs reveal" style={{ color: "var(--text-dim)" }}>
-            Also:{" "}
-            {secondaryFeatures.map(({ label, href }, i) => (
-              <span key={label}>
-                <Link href={href} className="hover:text-white transition-colors underline underline-offset-4" style={{ color: "var(--text-dim)" }}>
+          {/* Secondary — borderless nav strip */}
+          <div className="reveal grid grid-cols-3 gap-px border overflow-hidden border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
+            {secondaryFeatures.map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="group px-5 py-4 hover:bg-white/[0.04] transition-colors duration-150 flex items-center justify-between"
+                style={{ background: "var(--bg)" }}
+              >
+                <span className="text-xs font-semibold group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-muted)" }}>
                   {label}
-                </Link>
-                {i < secondaryFeatures.length - 1 && <span className="mx-2 opacity-30">·</span>}
-              </span>
+                </span>
+                <span className="text-xs group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>→</span>
+              </Link>
             ))}
-          </p>
+          </div>
         </div>
       </section>
 

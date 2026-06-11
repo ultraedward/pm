@@ -65,7 +65,7 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
 
       {/* ── Face-value shortcut ─────────────────────────────────── */}
       <div
-        className="rounded-2xl border p-5 space-y-4"
+        className="border p-5 space-y-4"
         style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.25)" }}
       >
         <div>
@@ -114,7 +114,7 @@ export function JunkSilverCalculator({ silverSpot }: Props) {
       {/* ── Coin-by-coin calculator ─────────────────────────────── */}
       <div>
         <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Or count coin by coin</p>
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+        <div className="border overflow-hidden" style={{ borderColor: "var(--border)" }}>
 
           {/* Header */}
           <div

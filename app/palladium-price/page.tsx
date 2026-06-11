@@ -284,7 +284,7 @@ export default async function PalladiumPricePage() {
                   30D {fmtChange(change30)} ({fmtPct(pct30)})
                 </span>
               )}
-              <span className="text-xs text-gray-700">Updated {updatedTime}</span>
+              <span className="text-xs" style={{ color: "var(--text-dim)" }}>Updated {updatedTime}</span>
             </div>
           </div>
         </section>

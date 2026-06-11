@@ -201,7 +201,7 @@ export default async function PortfolioTrackerPage() {
             {FEATURES.map(({ icon, title, body }) => (
               <div
                 key={title}
-                className="rounded-2xl border p-6 space-y-3"
+                className="border p-6 space-y-3"
                 style={{ borderColor: "var(--border)" }}
               >
                 <div

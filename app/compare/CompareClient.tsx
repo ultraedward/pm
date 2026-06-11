@@ -110,12 +110,10 @@ export default function CompareClient({ spots, available, premiums }: Props) {
             <button
               key={c.id}
               onClick={() => setCoinId(c.id)}
-              className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-colors border ${
-                active
-                  ? "bg-amber-500/15 border-amber-500/40 text-amber-500"
-                  : "border-white/[0.08] text-gray-500 hover:text-white hover:border-white/20"
-              }`}
-              style={active ? { borderColor: "rgba(212, 175, 55, 0.4)" } : undefined}
+              className="px-4 py-2 text-xs font-bold tracking-wide transition-colors border"
+              style={active
+                ? { background: "var(--gold-dim)", borderColor: "var(--gold-glow)", color: "var(--gold)" }
+                : { background: "transparent", borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
             >
               {c.label}
             </button>
@@ -195,7 +193,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
                       )}&body=${encodeURIComponent(
                         `Coin: ${coin.label}\nDealer: ${r.dealerName}\nPremium shown on Lode: $${r.premium.toFixed(2)}\nWhat you saw at checkout: \n\nNotes: `
                       )}`}
-                      className="ml-2 text-gray-700 hover:text-gray-400 underline underline-offset-2 sm:opacity-0 sm:group-hover/row:opacity-100 transition-opacity"
+                      className="ml-2 link-gold underline underline-offset-2 sm:opacity-0 sm:group-hover/row:opacity-100 transition-opacity"
                     >
                       Report wrong
                     </a>
@@ -241,7 +239,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
       </div>
 
       {/* Footnote */}
-      <p className="text-[11px] text-gray-700 leading-relaxed max-w-md">
+      <p className="text-[11px] leading-relaxed max-w-md" style={{ color: "var(--text-dim)" }}>
         Prices update as spot moves. Dealer premiums shown are typical single-piece
         list prices; bulk and wire-transfer discounts may apply at checkout.{" "}
         <Link href="/#calculator" className="underline hover:text-gray-400 transition-colors">
