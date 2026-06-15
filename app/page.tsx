@@ -492,8 +492,6 @@ export default async function HomePage() {
                 className="inline-block tabular-nums"
                 style={{
                   color: "var(--gold)",
-                  borderBottom: "3px solid var(--gold)",
-                  paddingBottom: "0.05em",
                   minWidth: "3ch",
                   opacity: 0.7,
                 }}
