@@ -27,6 +27,7 @@ export default function NavMobile({ isLoggedIn }: Props) {
     { href: "/compare",         label: "Compare"         },
     { href: "/gram",            label: "Calculator"      },
     { href: "/gold-ira",        label: "Gold IRA"        },
+    { href: "/pricing",         label: "Pricing"         },
     { href: "/faq",             label: "FAQ"             },
     { href: "/login",           label: "Get started"     },
   ];

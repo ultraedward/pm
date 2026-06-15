@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InlineSignup } from "@/components/InlineSignup";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -236,12 +237,14 @@ export default async function PortfolioTrackerPage() {
       {/* ── CTA ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-2xl font-black tracking-tight">Sync your stack across devices</p>
-        <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
-          Create a free account to save your holdings to the cloud and access them from anywhere.
-        </p>
-        <Link href="/login" className="btn-gold px-10 inline-block">
-          Save your stack
-        </Link>
+        <div className="flex justify-center">
+          <div className="text-left">
+            <InlineSignup
+              subtext="Create a free account to save your holdings to the cloud and access them from anywhere."
+              callbackUrl="/dashboard?onboarding=1"
+            />
+          </div>
+        </div>
       </section>
 
       <SiteFooter />

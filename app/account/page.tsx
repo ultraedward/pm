@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { SignOutButton } from "@/components/SignOutButton";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CurrencyPicker } from "@/components/CurrencyPicker";
+import { hasProAccess } from "@/lib/entitlements";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +20,19 @@ export default async function AccountPage() {
         name: true,
         createdAt: true,
         preferredCurrency: true,
+        subscriptionStatus: true,
+        proUntil: true,
       },
     }),
     prisma.alert.count({ where: { userId: user.id } }),
     prisma.holding.count({ where: { userId: user.id } }),
   ]);
+
+  const isPro = dbUser ? hasProAccess({ stripeStatus: dbUser.subscriptionStatus, proUntil: dbUser.proUntil }) : false;
+  const isTrial = isPro && !dbUser?.subscriptionStatus && !!dbUser?.proUntil;
+  const trialDaysLeft = isTrial && dbUser?.proUntil
+    ? Math.max(0, Math.ceil((new Date(dbUser.proUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
 
   if (!dbUser?.email) redirect("/");
 
@@ -70,6 +79,56 @@ export default async function AccountPage() {
           <p className="text-sm text-gray-500">
             Price alert emails are sent when your target is hit. The weekly digest arrives each Monday. Manage preferences via the unsubscribe link in any email.
           </p>
+        </div>
+
+        {/* Plan */}
+        <div className="space-y-3">
+          <p className="label">Plan</p>
+          {isPro ? (
+            <div className="border px-5 py-4 space-y-3" style={{ borderColor: "var(--gold-glow)", background: "var(--gold-dim)" }}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold" style={{ color: "var(--gold)" }}>
+                    {isTrial ? "Lode Pro — Trial" : "Lode Pro"}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>Extended charts, CSV export, annual tax snapshot.</p>
+                </div>
+                {!isTrial && (
+                  <Link href="/api/billing/portal" className="text-xs font-bold uppercase tracking-widest transition-colors hover:text-white" style={{ color: "var(--text-dim)" }}>
+                    Manage →
+                  </Link>
+                )}
+              </div>
+              {isTrial && trialDaysLeft !== null && (
+                <div className="flex items-center justify-between">
+                  <p className="text-xs" style={{ color: "var(--gold)" }}>
+                    {trialDaysLeft === 0 ? "Trial ends today" : `${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left in trial`}
+                  </p>
+                  <Link
+                    href="/pricing"
+                    className="text-xs font-bold uppercase tracking-widest px-3 py-1.5 border transition-colors hover:bg-white/5"
+                    style={{ borderColor: "var(--gold-glow)", color: "var(--gold)" }}
+                  >
+                    Upgrade →
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between border px-5 py-4" style={{ borderColor: "var(--border)" }}>
+              <div>
+                <p className="text-sm font-bold text-white">Free</p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>Unlimited alerts, portfolio tracker, melt calculators.</p>
+              </div>
+              <Link
+                href="/pricing"
+                className="shrink-0 text-xs font-bold uppercase tracking-widest px-4 py-2 border transition-colors hover:bg-white/5"
+                style={{ borderColor: "var(--gold-glow)", color: "var(--gold)" }}
+              >
+                Upgrade →
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Footer row — sign out + feedback */}

@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 
 type Props = {
   isLoggedIn: boolean;
+  isPro?: boolean;
 };
 
-export default function NavLinks({ isLoggedIn }: Props) {
+export default function NavLinks({ isLoggedIn, isPro = false }: Props) {
   const pathname = usePathname();
 
   function isActive(href: string) {
@@ -33,6 +34,9 @@ export default function NavLinks({ isLoggedIn }: Props) {
           <Link href="/dashboard" className={linkClass("/dashboard")} style={activeStyle("/dashboard")} aria-current={isActive("/dashboard") ? "page" : undefined}>Dashboard</Link>
           <Link href="/alerts"    className={linkClass("/alerts")}    style={activeStyle("/alerts")}    aria-current={isActive("/alerts")    ? "page" : undefined}>Alerts</Link>
           <Link href="/compare"   className={linkClass("/compare")}   style={activeStyle("/compare")}   aria-current={isActive("/compare")   ? "page" : undefined}>Compare</Link>
+          {!isPro && (
+            <Link href="/pricing" className={linkClass("/pricing")} style={activeStyle("/pricing")} aria-current={isActive("/pricing") ? "page" : undefined}>Pro</Link>
+          )}
           <Link
             href="/account"
             className={`transition-colors ${pathname === "/account" ? "" : "text-gray-500 hover:text-white"}`}

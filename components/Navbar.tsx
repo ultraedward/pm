@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/entitlements";
 import NavMobile from "@/components/NavMobile";
 import NavLinks from "@/components/NavLinks";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -9,6 +11,15 @@ export default async function Navbar() {
   const session = await getServerSession(authOptions);
 
   const isLoggedIn = !!session?.user;
+
+  let isPro = false;
+  if (isLoggedIn && session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { subscriptionStatus: true, proUntil: true },
+    });
+    isPro = hasProAccess({ stripeStatus: dbUser?.subscriptionStatus, proUntil: dbUser?.proUntil });
+  }
 
   return (
     <nav aria-label="Main navigation" className="sticky top-0 z-40 border-b" style={{ borderColor: "var(--nav-border)", backgroundColor: "var(--nav-bg)", backdropFilter: "blur(12px)" }}>
@@ -20,7 +31,7 @@ export default async function Navbar() {
         </Link>
 
         {/* Desktop */}
-        <NavLinks isLoggedIn={isLoggedIn} />
+        <NavLinks isLoggedIn={isLoggedIn} isPro={isPro} />
 
         {/* Theme toggle
             - Desktop: always visible (right of nav links)

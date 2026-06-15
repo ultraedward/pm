@@ -91,6 +91,7 @@ export async function SiteFooter() {
           <div className="space-y-2">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Company</p>
             {[
+              { href: "/pricing",     label: "Pricing"     },
               { href: "/about",       label: "About"       },
               { href: "/methodology", label: "Methodology" },
               { href: "/faq",         label: "FAQ"         },

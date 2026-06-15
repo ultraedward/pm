@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { DashboardCalculatorTabs } from "@/components/DashboardCalculatorTabs";
+import { OnboardingBanner } from "@/components/OnboardingBanner";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -78,11 +79,13 @@ export default async function DashboardPage() {
   // Fetch live spot prices + prev-day DB rows (for 24H delta) + history in parallel
   const [
     holdings,
+    alertCount,
     liveSpots,
     goldPrev, silverPrev, platinumPrev, palladiumPrev,
     goldHistory, silverHistory, platinumHistory, palladiumHistory,
   ] = await Promise.all([
     prisma.holding.findMany({ where: { userId: user.id } }),
+    prisma.alert.count({ where: { userId: user.id } }),
     fetchAllSpotPrices(),
     getPrevDayPrice("gold"),
     getPrevDayPrice("silver"),
@@ -190,6 +193,9 @@ export default async function DashboardPage() {
             Manage Holdings
           </Link>
         </div>
+
+        {/* Onboarding banner — shown until user sets their first alert */}
+        {alertCount === 0 && <OnboardingBanner />}
 
         {/* Daily spot prices */}
         <div

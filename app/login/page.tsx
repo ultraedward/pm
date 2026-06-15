@@ -16,7 +16,7 @@ export default function LoginPage() {
     try {
       const result = await signIn("email", {
         email: email.trim(),
-        callbackUrl: "/dashboard",
+        callbackUrl: "/dashboard?onboarding=1",
         redirect: false,
       });
       setState(result?.error ? "error" : "sent");
@@ -50,7 +50,7 @@ export default function LoginPage() {
             Track your stack.
           </h1>
           <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Free alerts, portfolio tracking, and a weekly digest.
+            Start with a 7-day Pro trial — no card needed.
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export default function LoginPage() {
           <div className="space-y-4 animate-fade-up animate-delay-100">
             {/* Google */}
             <button
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+              onClick={() => signIn("google", { callbackUrl: "/dashboard?onboarding=1" })}
               className="google-signin-btn flex w-full items-center justify-center gap-3 px-6 py-4 text-sm font-semibold transition-colors"
             >
               <svg width="18" height="18" viewBox="0 0 48 48" fill="none">

@@ -7,6 +7,7 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { prisma } from "@/lib/prisma";
 import { MetalPriceChart } from "@/components/MetalPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
+import { InlineSignup } from "@/components/InlineSignup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
@@ -473,29 +474,18 @@ export default async function GoldPricePage() {
               </div>
             </>
           ) : (
-            <>
-              <p className="text-2xl font-black tracking-tight">Get alerts when gold moves</p>
-              <p className="text-sm text-gray-400 max-w-sm mx-auto">
-                Set a target price and get one email when gold crosses it. Free account, no spam.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/login" className="btn-gold px-10 inline-block">
-                  Get started
-                </Link>
-                <Link href="/compare" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-                  Compare dealer prices →
-                </Link>
-              </div>
-              <div className="flex items-center justify-center gap-4 text-sm text-gray-600 pt-1">
-                <Link href="/silver-price" className="hover:text-gray-400 transition-colors">Silver price today</Link>
-                <span>·</span>
-                <Link href="/coin-melt-calculator" className="hover:text-gray-400 transition-colors">Coin melt values</Link>
-                <span>·</span>
-                <Link href="/gram" className="hover:text-gray-400 transition-colors">Price per gram</Link>
-                <span>·</span>
+            <div className="text-left max-w-sm">
+              <InlineSignup
+                heading="Get alerts when gold moves"
+                subtext="Set a target price and get one email when gold crosses it. Free — 30 seconds."
+                callbackUrl="/dashboard?onboarding=1"
+              />
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">
+                <Link href="/compare" className="hover:text-gray-400 transition-colors">Compare dealers →</Link>
+                <Link href="/silver-price" className="hover:text-gray-400 transition-colors">Silver price</Link>
                 <Link href="/gold-ira" className="hover:text-gray-400 transition-colors">Gold IRA guide</Link>
               </div>
-            </>
+            </div>
           )}
         </section>
 

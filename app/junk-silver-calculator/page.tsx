@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InlineSignup } from "@/components/InlineSignup";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
@@ -362,31 +363,17 @@ export default async function JunkSilverCalculatorPage() {
             </p>
           </>
         ) : (
-          <>
-            <p className="text-2xl font-black tracking-tight">Track your silver stack on Lode</p>
-            <p className="text-sm text-gray-400 max-w-sm mx-auto">
-              Portfolio tracker, price alerts, and live spot for gold, silver, platinum &amp; palladium.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/login" className="btn-gold px-10 inline-block">
-                Get started
-              </Link>
-              <Link href="/coin-melt-calculator" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-                See all coin melt values →
-              </Link>
+          <div className="text-left max-w-sm">
+            <InlineSignup
+              heading="Track your silver stack on Lode"
+              subtext="Portfolio tracker, price alerts, and live spot for all four metals. Free — 30 seconds."
+              callbackUrl="/dashboard?onboarding=1"
+            />
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">
+              <Link href="/coin-melt-calculator" className="hover:text-gray-400 transition-colors">All coin melt values →</Link>
+              <Link href="/silver-price" className="hover:text-gray-400 transition-colors">Silver price today</Link>
             </div>
-            <p className="text-sm text-gray-600">
-              Calculating jewelry or scrap?{" "}
-              <Link href="/gram" className="text-gray-500 hover:text-gray-300 transition-colors">
-                Calculate by gram weight →
-              </Link>
-            </p>
-            <p className="text-sm text-gray-600 pt-1">
-              <Link href="/silver-price" className="text-gray-500 hover:text-gray-300 transition-colors">
-                Silver price today with 30-day chart →
-              </Link>
-            </p>
-          </>
+          </div>
         )}
       </section>
 

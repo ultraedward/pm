@@ -100,6 +100,14 @@ export const authOptions: NextAuthOptions = {
   events: {
     // Fires exactly once per user — on account creation, not on every sign-in
     async createUser({ user }) {
+      // Grant 7-day Pro trial to all new accounts
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 7);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { proUntil: trialEnd },
+      });
+
       if (user.email) {
         await sendWelcomeEmail(user.email, user.name ?? null);
       }

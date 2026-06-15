@@ -10,6 +10,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { SiteFooter } from "@/components/SiteFooter";
+import { InlineSignup } from "@/components/InlineSignup";
 
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
@@ -479,10 +480,10 @@ export default async function HomePage() {
       {/* ── ALERT CTA ────────────────────────────────────────────── */}
       {!isLoggedIn && (
         <section className="border-t px-6 py-24 sm:py-32 reveal" style={{ borderColor: "var(--border)" }}>
-          <div className="mx-auto max-w-6xl space-y-7">
-            <p className="label">Price alerts</p>
+          <div className="mx-auto max-w-6xl">
+            <p className="label mb-6">Price alerts</p>
             <p
-              className="font-black text-white"
+              className="font-black text-white mb-8"
               style={{ fontSize: "clamp(2rem, 6vw, 4.25rem)", letterSpacing: "-0.04em", lineHeight: "0.93" }}
             >
               Tell me when<br />
@@ -500,13 +501,10 @@ export default async function HomePage() {
                 $____
               </span>
             </p>
-            <p className="text-sm max-w-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              One email. Your target price crossed. No noise, no daily digests.
-              Free — takes 30 seconds.
-            </p>
-            <Link href="/login" className="btn-gold">
-              Set your first alert
-            </Link>
+            <InlineSignup
+              subtext="One email. Your target price crossed. No noise, no daily digests."
+              callbackUrl="/dashboard?onboarding=1"
+            />
           </div>
         </section>
       )}

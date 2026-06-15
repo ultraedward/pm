@@ -6,7 +6,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { SiteFooter } from "@/components/SiteFooter";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { type SupportedCurrency } from "@/lib/fx";
+import { convertPricesFromUSD, type SupportedCurrency } from "@/lib/fx";
+import { hasProAccess } from "@/lib/entitlements";
+import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
 export const dynamic = "force-dynamic";
 
@@ -90,8 +92,10 @@ export default async function HoldingsPage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { id: true, name: true, preferredCurrency: true },
+    select: { id: true, name: true, preferredCurrency: true, subscriptionStatus: true, proUntil: true },
   });
+
+  const isPro = user ? hasProAccess({ stripeStatus: user.subscriptionStatus, proUntil: user.proUntil }) : false;
 
   if (!user) {
     return (
@@ -108,11 +112,12 @@ export default async function HoldingsPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  const [goldPrice, silverPrice, platinumPrice, palladiumPrice] = await Promise.all([
+  const [goldPrice, silverPrice, platinumPrice, palladiumPrice, liveSpots] = await Promise.all([
     getLatestPrice("gold"),
     getLatestPrice("silver"),
     getLatestPrice("platinum"),
     getLatestPrice("palladium"),
+    fetchAllSpotPrices(),
   ]);
 
   const [goldHistory, silverHistory, platinumHistory, palladiumHistory] = await Promise.all([
@@ -142,11 +147,23 @@ export default async function HoldingsPage() {
     return sum + h.ounces * h.purchasePrice;
   }, 0);
 
+  const spotsUSD: Record<string, number> = {
+    gold:      liveSpots.gold      ?? goldPrice?.price      ?? 0,
+    silver:    liveSpots.silver    ?? silverPrice?.price    ?? 0,
+    platinum:  liveSpots.platinum  ?? platinumPrice?.price  ?? 0,
+    palladium: liveSpots.palladium ?? palladiumPrice?.price ?? 0,
+  };
+
+  const convertedSpots = await convertPricesFromUSD(
+    { Gold: spotsUSD.gold, Silver: spotsUSD.silver, Platinum: spotsUSD.platinum, Palladium: spotsUSD.palladium },
+    currency
+  );
+
   const spotMap: Record<string, number> = {
-    gold:      goldPrice?.price      ?? 0,
-    silver:    silverPrice?.price    ?? 0,
-    platinum:  platinumPrice?.price  ?? 0,
-    palladium: palladiumPrice?.price ?? 0,
+    gold:      convertedSpots.Gold,
+    silver:    convertedSpots.Silver,
+    platinum:  convertedSpots.Platinum,
+    palladium: convertedSpots.Palladium,
   };
 
   const totalValue = holdings.reduce((sum, h) => {
@@ -233,18 +250,45 @@ export default async function HoldingsPage() {
       <div className="mx-auto max-w-5xl space-y-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="label mb-1">Holdings</p>
             <h1 className="text-3xl font-black tracking-tight">Your Portfolio</h1>
           </div>
-          <Link
-            href="/dashboard"
-            className="border px-4 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
-            style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
-          >
-            ← Dashboard
-          </Link>
+          <div className="flex items-center gap-3">
+            {isPro ? (
+              <a
+                href="/api/portfolio/export"
+                className="border px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-white/5 min-h-[44px] flex items-center gap-2"
+                style={{ borderColor: "var(--gold-glow)", color: "var(--gold)" }}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M6 1v7M3 5l3 3 3-3M1 9v1a1 1 0 001 1h8a1 1 0 001-1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Export CSV
+              </a>
+            ) : (
+              <Link
+                href="/pricing"
+                className="border px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-white/5 min-h-[44px] flex items-center gap-2"
+                style={{ borderColor: "var(--border)", color: "var(--text-dim)" }}
+                title="Upgrade to Pro to export your portfolio"
+              >
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <rect x="2" y="5" width="8" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M4 5V3.5a2 2 0 1 1 4 0V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                Export CSV
+              </Link>
+            )}
+            <Link
+              href="/dashboard"
+              className="border px-4 py-3 text-sm font-medium hover:bg-white/5 hover:text-white transition-colors min-h-[44px] flex items-center"
+              style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
+            >
+              ← Dashboard
+            </Link>
+          </div>
         </div>
 
         {/* Performance chart */}
@@ -290,24 +334,32 @@ export default async function HoldingsPage() {
           </div>
         )}
 
-        {/* IRA callout — shown only when gold holdings exceed $5k in value */}
-        {goldValue >= 5000 && process.env.AFFILIATE_AUGUSTA_URL && (
-          <div className="border border-white/5 p-6 space-y-3" style={{ background: "var(--surface)" }}>
-            <p className="label">Tax-advantaged gold</p>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              You&apos;re holding significant gold. A self-directed IRA lets you hold physical bullion with potential tax advantages — no liquidation required.
-            </p>
-            <a
-              href={process.env.AFFILIATE_AUGUSTA_URL}
-              target="_blank"
-              rel="noopener noreferrer sponsored"
-              className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
-            >
-              See how it works →
-            </a>
-            <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
-          </div>
-        )}
+        {/* IRA callout — shown when total portfolio exceeds $10k (Birch Gold minimum) */}
+        {totalValue >= 10000 && (process.env.AFFILIATE_BIRCH_URL || process.env.AFFILIATE_AUGUSTA_URL) && (() => {
+          // Birch starts at $10K, Augusta at $50K — show the right partner based on portfolio size
+          const showAugusta = totalValue >= 50000 && !!process.env.AFFILIATE_AUGUSTA_URL;
+          const href = showAugusta
+            ? `${process.env.AFFILIATE_AUGUSTA_URL}&sub_id=holdings`
+            : `${process.env.AFFILIATE_BIRCH_URL}&sub_id=holdings`;
+          const partner = showAugusta ? "Augusta Precious Metals" : "Birch Gold Group";
+          return (
+            <div className="border border-white/5 p-6 space-y-3" style={{ background: "var(--surface)" }}>
+              <p className="label">Tax-advantaged metals</p>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Your stack is large enough to consider a self-directed IRA — hold physical bullion with potential tax advantages, no liquidation required.
+              </p>
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
+              >
+                See how it works →
+              </a>
+              <p className="text-xs text-gray-600 mt-1">{partner} · Paid partner</p>
+            </div>
+          );
+        })()}
 
         {/* Add Holding form */}
         <div className="border border-white/5 p-6 space-y-5" style={{ background: "var(--surface)" }}>

@@ -25,7 +25,7 @@ export function buildWelcomeHtml(params: {
 <body style="margin:0;padding:0;background:#0a0907;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 
   <!-- Preheader — hidden inbox preview text -->
-  <div style="display:none;max-height:0;overflow:hidden;color:#0a0907;">Your stack tracker is live. Set your first price alert in 30 seconds — free forever.&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;</div>
+  <div style="display:none;max-height:0;overflow:hidden;color:#0a0907;">Your 7-day Pro trial is live. Set your first price alert in 30 seconds.&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;&nbsp;&#8204;</div>
 
   <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
@@ -45,7 +45,7 @@ export function buildWelcomeHtml(params: {
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:900;color:#fff;line-height:1.2;">
                 ${greeting}
               </h1>
-              <p style="margin:0;font-size:14px;color:#666;">Your stack tracker is live. Here's what to do first.</p>
+              <p style="margin:0;font-size:14px;color:#666;">Your stack tracker is live — and your 7-day Pro trial has started. Here's what to do first.</p>
             </td>
           </tr>
 

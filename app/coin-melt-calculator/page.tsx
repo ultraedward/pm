@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InlineSignup } from "@/components/InlineSignup";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -299,36 +300,17 @@ export default async function CoinMeltCalculatorPage() {
             </p>
           </>
         ) : (
-          <>
-            <p className="text-2xl font-black tracking-tight">Know what your stack is worth — right now</p>
-            <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
-              Live spot prices, price alerts, and portfolio tracker.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/login" className="btn-gold px-10">
-                Get started
-              </Link>
-              <Link href="/gram" className="text-sm transition-colors hover:text-gray-300" style={{ color: "var(--text-dim)" }}>
-                Calculate by gram weight →
-              </Link>
+          <div className="text-left max-w-sm">
+            <InlineSignup
+              heading="Know what your stack is worth"
+              subtext="Live spot prices, price alerts, and portfolio tracker. Free — 30 seconds."
+              callbackUrl="/dashboard?onboarding=1"
+            />
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">
+              <Link href="/gram" className="hover:text-gray-400 transition-colors">Price per gram →</Link>
+              <Link href="/compare" className="hover:text-gray-400 transition-colors">Compare dealers</Link>
             </div>
-            <p className="text-sm text-gray-600">
-              Only have junk silver?{" "}
-              <Link href="/junk-silver-calculator" className="text-gray-500 hover:text-gray-300 transition-colors">
-                Try the junk silver calculator →
-              </Link>
-            </p>
-            <p className="text-sm text-gray-600 pt-1">
-              Live prices:{" "}
-              <Link href="/silver-price" className="text-gray-500 hover:text-gray-300 transition-colors">Silver</Link>
-              {" · "}
-              <Link href="/gold-price" className="text-gray-500 hover:text-gray-300 transition-colors">Gold</Link>
-              {" · "}
-              <Link href="/platinum-price" className="text-gray-500 hover:text-gray-300 transition-colors">Platinum</Link>
-              {" · "}
-              <Link href="/palladium-price" className="text-gray-500 hover:text-gray-300 transition-colors">Palladium</Link>
-            </p>
-          </>
+          </div>
         )}
       </section>
 

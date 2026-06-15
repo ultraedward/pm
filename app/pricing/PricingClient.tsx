@@ -10,21 +10,23 @@ type Props = {
 
 const FREE_FEATURES = [
   "Live spot prices — gold, silver, platinum & palladium",
-  "Coin melt calculator — all metals, all coin types",
-  "Gram calculator — jewelry & scrap, any karat",
-  "Portfolio tracker — holdings & P&L",
-  "30-day price charts",
-  "Weekly Monday digest — spot prices in your inbox",
-  "Unlimited price alerts",
+  "Unlimited price alerts — email when your target is hit",
+  "Coin & gram melt calculators",
+  "Portfolio tracker — holdings & P&L at live spot",
+  "7-day & 30-day price charts",
+  "Dealer comparison — APMEX, JM Bullion, SD Bullion",
+  "Weekly Monday digest",
 ];
 
 const PRO_FEATURES = [
-  "Unlimited price alerts — set targets across any metal",
-  "Everything in Free",
+  "90-day & all-time price charts",
+  "Portfolio CSV export — cost basis & gain/loss for your accountant",
+  "Annual tax snapshot — Dec 31 value emailed on Jan 1",
+  "Everything in Free — unlimited alerts, calculators, tracker",
 ];
 
 export function PricingClient({ isPro, isLoggedIn }: Props) {
-  const [annual, setAnnual] = useState(false);
+  const [annual, setAnnual] = useState(true);
 
   return (
     <div className="space-y-10">
@@ -127,7 +129,7 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
                 </>
               )}
             </div>
-            <p className="text-sm text-gray-400 mt-2">For serious stackers watching the market.</p>
+            <p className="text-sm text-gray-400 mt-2">Extended history, tax reports, and CSV export.</p>
             {annual && (
               <p className="text-xs text-gray-600 mt-1">~$2.08 / month</p>
             )}
@@ -154,9 +156,12 @@ export function PricingClient({ isPro, isLoggedIn }: Props) {
                 </button>
               </form>
             ) : (
-              <Link href="/login" className="btn-gold block text-center py-2.5 text-[10px]">
-                Start with Pro
-              </Link>
+              <>
+                <Link href="/login" className="btn-gold block text-center py-2.5 text-[10px]">
+                  Start free — 7-day trial
+                </Link>
+                <p className="text-center text-xs mt-2" style={{ color: "var(--text-muted)" }}>No credit card required</p>
+              </>
             )}
           </div>
         </div>

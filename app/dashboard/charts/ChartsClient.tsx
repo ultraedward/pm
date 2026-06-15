@@ -27,10 +27,12 @@ type MergedPoint = {
   palladium?: number;
 };
 
-const RANGES = ["7d", "30d"] as const;
-type Range = (typeof RANGES)[number];
+const FREE_RANGES  = ["7d", "30d"] as const;
+const PRO_RANGES   = ["90d", "all"] as const;
+const ALL_RANGES   = [...FREE_RANGES, ...PRO_RANGES] as const;
+type Range = (typeof ALL_RANGES)[number];
 
-const RANGE_LABELS: Record<Range, string> = { "7d": "7D", "30d": "30D" };
+const RANGE_LABELS: Record<Range, string> = { "7d": "7D", "30d": "30D", "90d": "90D", "all": "All" };
 
 const METAL_COLORS: Record<string, string> = {
   gold:      "#f59e0b",
@@ -91,7 +93,7 @@ function normaliseToPct(merged: MergedPoint[]): MergedPoint[] {
   });
 }
 
-export function ChartsClient() {
+export function ChartsClient({ isPro = false }: { isPro?: boolean }) {
   const [range, setRange]                 = useState<Range>("30d");
   const [data, setData]                   = useState<ChartResponse | null>(null);
   const [loading, setLoading]             = useState(false);
@@ -134,18 +136,36 @@ export function ChartsClient() {
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex gap-px border overflow-hidden" style={{ borderColor: "var(--border-strong)" }}>
-          {RANGES.map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors"
-              style={r === range
-                ? { background: "var(--gold)", color: "#000" }
-                : { background: "var(--input-bg)", color: "var(--text-muted)" }}
-            >
-              {RANGE_LABELS[r]}
-            </button>
-          ))}
+          {ALL_RANGES.map((r) => {
+            const isProRange = (PRO_RANGES as readonly string[]).includes(r);
+            const locked = isProRange && !isPro;
+            return locked ? (
+              <a
+                key={r}
+                href="/pricing"
+                title="Upgrade to Pro"
+                className="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
+                style={{ background: "var(--input-bg)", color: "var(--text-dim)", opacity: 0.5 }}
+              >
+                {RANGE_LABELS[r]}
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <rect x="2" y="5" width="8" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M4 5V3.5a2 2 0 1 1 4 0V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </a>
+            ) : (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors"
+                style={r === range
+                  ? { background: "var(--gold)", color: "#000" }
+                  : { background: "var(--input-bg)", color: "var(--text-muted)" }}
+              >
+                {RANGE_LABELS[r]}
+              </button>
+            );
+          })}
         </div>
 
         {availableMetals.length > 0 && (

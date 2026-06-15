@@ -4,19 +4,26 @@ import { getUserAlerts } from "@/lib/alerts/getUserAlerts";
 import { AlertsTable } from "@/components/AlertsTable";
 import { prisma } from "@/lib/prisma";
 import { SiteFooter } from "@/components/SiteFooter";
+import { hasProAccess } from "@/lib/entitlements";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardAlertsPage() {
   const user = await requireUser();
-  const [alerts, spotRows] = await Promise.all([
+  const [alerts, spotRows, dbUser] = await Promise.all([
     getUserAlerts(user.id),
     prisma.price.findMany({
       where: { metal: { in: ["gold", "silver", "platinum", "palladium"] } },
       orderBy: { timestamp: "desc" },
       distinct: ["metal"],
     }),
+    prisma.user.findUnique({
+      where: { id: user.id },
+      select: { subscriptionStatus: true, proUntil: true },
+    }),
   ]);
+
+  const isPro = hasProAccess({ stripeStatus: dbUser?.subscriptionStatus, proUntil: dbUser?.proUntil });
 
   const spots: Record<string, number> = Object.fromEntries(
     spotRows.map((r) => [r.metal, r.price])
@@ -44,6 +51,26 @@ export default async function DashboardAlertsPage() {
           </div>
           <p className="text-sm text-gray-500 mt-2">Get an email when a metal hits your target price. Frequency is set per alert.</p>
         </div>
+
+        {/* Pro upsell — shown to free users who have at least one alert set */}
+        {!isPro && hasAlerts && (
+          <div
+            className="flex items-center justify-between gap-4 border px-5 py-4"
+            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+          >
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              <span className="font-semibold text-white">Lode Pro</span>
+              {" "}— 90-day & all-time charts, portfolio CSV export, annual tax snapshot.
+            </p>
+            <Link
+              href="/pricing"
+              className="shrink-0 text-xs font-bold uppercase tracking-widest px-4 py-2 border transition-colors hover:bg-white/5"
+              style={{ borderColor: "var(--gold-glow)", color: "var(--gold)" }}
+            >
+              $3 / mo →
+            </Link>
+          </div>
+        )}
 
         {/* Content */}
         {hasAlerts ? (

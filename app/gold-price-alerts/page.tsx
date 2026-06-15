@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InlineSignup } from "@/components/InlineSignup";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
@@ -163,13 +164,18 @@ export default function GoldPriceAlertsPage() {
           <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
             Set a target price for gold, silver, platinum, or palladium. Once a day, Lode checks spot against your target — if it crossed, you get one email. No app, no noise.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link href="/login" className="btn-gold px-10">
-              Set an alert
-            </Link>
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-              View live spot prices →
-            </Link>
+          <div className="flex justify-center pt-2">
+            <div className="text-left">
+              <InlineSignup
+                subtext="Set a target price — we email you once when it crosses. Free, 30 seconds."
+                callbackUrl="/dashboard?onboarding=1"
+              />
+              <div className="mt-4">
+                <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+                  View live spot prices →
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -217,12 +223,14 @@ export default function GoldPriceAlertsPage() {
       {/* ── CTA ───────────────────────────────────────────────── */}
       <section className="border-t px-6 py-16 text-center space-y-5" style={{ borderColor: "var(--border)" }}>
         <p className="text-2xl font-black tracking-tight">Set it once. Lode watches so you don&rsquo;t have to.</p>
-        <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--text-muted)" }}>
-          Create a free account and set your first alert in under a minute.
-        </p>
-        <Link href="/login" className="btn-gold px-10 inline-block">
-          Set your first alert
-        </Link>
+        <div className="flex justify-center">
+          <div className="text-left">
+            <InlineSignup
+              subtext="Create a free account and set your first alert in under a minute."
+              callbackUrl="/dashboard?onboarding=1"
+            />
+          </div>
+        </div>
       </section>
 
       <SiteFooter />
