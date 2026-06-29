@@ -23,6 +23,8 @@ model User {
   stripeCurrentPeriodEnd DateTime?
   proUntil               DateTime? // gifted pro access — null means not gifted
   preferredCurrency      String    @default("USD") // "USD" | "AUD" | "CAD" | "GBP" | "EUR"
+  unsubscribeToken       String?   @unique // lazily generated on first digest send
+  digestOptOut           Boolean   @default(false) // set true when user clicks unsubscribe in a digest email
   accounts               Account[]
   alerts                 Alert[]
   holdings               Holding[]

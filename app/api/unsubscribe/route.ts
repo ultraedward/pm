@@ -6,18 +6,32 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get("token");
+  const userToken = searchParams.get("userToken");
 
-  if (!token) {
+  if (!token && !userToken) {
     return new NextResponse("Missing token", { status: 400 });
   }
 
-  try {
-    await prisma.emailSubscriber.update({
-      where: { unsubscribeToken: token },
-      data: { active: false },
-    });
-  } catch {
-    // Token not found — treat as already unsubscribed
+  if (token) {
+    try {
+      await prisma.emailSubscriber.update({
+        where: { unsubscribeToken: token },
+        data: { active: false },
+      });
+    } catch {
+      // Token not found — treat as already unsubscribed
+    }
+  }
+
+  if (userToken) {
+    try {
+      await prisma.user.update({
+        where: { unsubscribeToken: userToken },
+        data: { digestOptOut: true },
+      });
+    } catch {
+      // Token not found — treat as already unsubscribed
+    }
   }
 
   // Return a simple HTML confirmation

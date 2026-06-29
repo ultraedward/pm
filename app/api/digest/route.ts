@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import {
@@ -324,12 +325,13 @@ export async function GET(req: Request) {
 
   // ── 5. Send per-user digest ───────────────────────────────────────────
   const users = await prisma.user.findMany({
-    where: { email: { not: null } },
+    where: { email: { not: null }, digestOptOut: false },
     select: {
       id: true,
       email: true,
       name: true,
       preferredCurrency: true,
+      unsubscribeToken: true,
       holdings: {
         select: { metal: true, ounces: true, purchasePrice: true },
       },
@@ -361,6 +363,22 @@ export async function GET(req: Request) {
 
     const firstName = user.name?.split(" ")[0] ?? "";
 
+    // Lazily generate + persist an unsubscribe token for users who don't
+    // have one yet (e.g. accounts created before this field existed).
+    let unsubscribeToken = user.unsubscribeToken;
+    if (!unsubscribeToken) {
+      unsubscribeToken = randomUUID();
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { unsubscribeToken },
+        });
+      } catch (err) {
+        console.error(`Failed to persist unsubscribe token for ${user.email}:`, err);
+      }
+    }
+    const unsubscribeUrl = `${baseUrl}/api/unsubscribe?userToken=${unsubscribeToken}`;
+
     const html = buildDigestHtml({
       firstName,
       spots,
@@ -371,6 +389,7 @@ export async function GET(req: Request) {
       hasHoldings,
       cheapestPicks,
       currency,
+      unsubscribeUrl,
       preheader: digestPreheader,
       iraUrl:   AFFILIATE_IRA_URL,
       iraLabel: AFFILIATE_IRA_LABEL,
