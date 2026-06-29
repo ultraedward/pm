@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
-import { prisma } from "@/lib/prisma";
+import { getMetalRangeStats } from "@/lib/metalRangeStats";
 import { SilverPriceChart } from "@/components/SilverPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
 import { InlineSignup } from "@/components/InlineSignup";
@@ -87,32 +87,6 @@ function fmtPct(n: number) {
   return `${sign}${n.toFixed(2)}%`;
 }
 
-async function getSilverStats() {
-  try {
-    // Last 30 daily snapshots, newest first
-    const rows = await prisma.price.findMany({
-      where: { metal: "silver" },
-      orderBy: { timestamp: "desc" },
-      take: 30,
-      select: { price: true, timestamp: true },
-    });
-
-    if (rows.length === 0) return null;
-
-    const prices = rows.map((r) => r.price);
-    const high30  = Math.max(...prices);
-    const low30   = Math.min(...prices);
-    const oldest  = rows[rows.length - 1]?.price ?? null;
-
-    // 7-day: index 6 (7 snapshots ago)
-    const price7dAgo = rows[6]?.price ?? null;
-
-    return { high30, low30, oldest, price7dAgo, count: rows.length };
-  } catch {
-    return null;
-  }
-}
-
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -190,7 +164,7 @@ const jsonLd = {
 export default async function SilverPricePage() {
   const [spots, stats, session] = await Promise.all([
     fetchAllSpotPrices(),
-    getSilverStats(),
+    getMetalRangeStats("silver"),
     getServerSession(authOptions),
   ]);
 
@@ -284,7 +258,7 @@ export default async function SilverPricePage() {
       {/* ── Chart ────────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 pb-8">
         <div className="mx-auto max-w-2xl">
-          <SilverPriceChart />
+          <SilverPriceChart livePrice={spot > 0 ? spot : undefined} />
         </div>
       </section>
 

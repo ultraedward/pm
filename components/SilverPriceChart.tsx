@@ -3,6 +3,6 @@
 "use client";
 import { MetalPriceChart } from "./MetalPriceChart";
 
-export function SilverPriceChart() {
-  return <MetalPriceChart metal="silver" />;
+export function SilverPriceChart({ livePrice }: { livePrice?: number }) {
+  return <MetalPriceChart metal="silver" livePrice={livePrice} />;
 }

@@ -60,9 +60,14 @@ function CustomTooltip({ active, payload, label }: any) {
 
 interface Props {
   metal: Metal;
+  /** Live spot price, if available. When set, this is used as the "current"
+   *  value for the change/% stat box instead of the last DB-bucketed point,
+   *  so this figure agrees with the live price pills shown elsewhere on the
+   *  page rather than lagging behind the once-daily price ingestion. */
+  livePrice?: number;
 }
 
-export function MetalPriceChart({ metal }: Props) {
+export function MetalPriceChart({ metal, livePrice }: Props) {
   const color = METAL_COLOR_FIXED[metal] ?? METAL_COLOR_VAR[metal] ?? "#C0C0C0";
   const gradId = `${metal}-grad`;
 
@@ -85,7 +90,7 @@ export function MetalPriceChart({ metal }: Props) {
   const high   = prices.length ? Math.max(...prices) : null;
   const low    = prices.length ? Math.min(...prices) : null;
   const first  = prices[0] ?? null;
-  const last   = prices[prices.length - 1] ?? null;
+  const last   = livePrice ?? prices[prices.length - 1] ?? null;
   const change = first && last ? last - first : null;
   const pct    = first && change != null ? (change / first) * 100 : null;
   const up     = change != null && change >= 0;

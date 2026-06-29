@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
-import { prisma } from "@/lib/prisma";
+import { getMetalRangeStats } from "@/lib/metalRangeStats";
 import { MetalPriceChart } from "@/components/MetalPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
 import { InlineSignup } from "@/components/InlineSignup";
@@ -84,29 +84,6 @@ function fmtChange(n: number) {
 function fmtPct(n: number) {
   const sign = n >= 0 ? "+" : "";
   return `${sign}${n.toFixed(2)}%`;
-}
-
-async function getGoldStats() {
-  try {
-    const rows = await prisma.price.findMany({
-      where: { metal: "gold" },
-      orderBy: { timestamp: "desc" },
-      take: 30,
-      select: { price: true, timestamp: true },
-    });
-
-    if (rows.length === 0) return null;
-
-    const prices    = rows.map((r) => r.price);
-    const high30    = Math.max(...prices);
-    const low30     = Math.min(...prices);
-    const oldest    = rows[rows.length - 1]?.price ?? null;
-    const price7dAgo = rows[6]?.price ?? null;
-
-    return { high30, low30, oldest, price7dAgo, count: rows.length };
-  } catch {
-    return null;
-  }
 }
 
 const jsonLd = {
@@ -194,7 +171,7 @@ const jsonLd = {
 export default async function GoldPricePage() {
   const [spots, stats, session] = await Promise.all([
     fetchAllSpotPrices(),
-    getGoldStats(),
+    getMetalRangeStats("gold"),
     getServerSession(authOptions),
   ]);
 
@@ -289,7 +266,7 @@ export default async function GoldPricePage() {
         {/* ── Chart ────────────────────────────────────────────────── */}
         <section className="px-4 sm:px-6 pb-8">
           <div className="mx-auto max-w-2xl">
-            <MetalPriceChart metal="gold" />
+            <MetalPriceChart metal="gold" livePrice={spot > 0 ? spot : undefined} />
           </div>
         </section>
 
