@@ -35,6 +35,12 @@ export const metadata: Metadata = {
     url: "https://lode.rocks/blog/junk-silver-guide",
     type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Complete Guide to Buying Junk Silver Coins (2026)",
+    description:
+      "What is junk silver, which coins count, how to calculate melt value, where to buy it, and what premiums to pay. The definitive reference for stackers.",
+  },
 };
 
 const jsonLd = {
@@ -332,7 +338,11 @@ export default function JunkSilverGuidePage() {
                 Lode junk silver calculator
               </Link>{" "}
               pulls live spot prices and lets you enter either a face value amount or count coins
-              individually — useful if you have a mixed bag with both 90% and 40% halves.
+              individually — useful if you have a mixed bag with both 90% and 40% halves. For melt
+              values on gold and modern bullion coins too, see the{" "}
+              <Link href="/blog/coin-melt-value-guide" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">
+                full coin melt value guide
+              </Link>.
             </p>
           </section>
 

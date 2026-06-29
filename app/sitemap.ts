@@ -113,6 +113,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${base}/blog/coin-melt-value-guide`,
+      lastModified: new Date("2026-06-29"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // Legal + contact pages — rarely change
     {
       url: `${base}/contact`,

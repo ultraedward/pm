@@ -16,6 +16,12 @@ export const metadata: Metadata = {
     url: "https://lode.rocks/blog",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Precious Metals Guides & Resources",
+    description:
+      "In-depth guides on buying, valuing, and understanding precious metals. Junk silver, coin melt values, gold IRAs, and more.",
+  },
 };
 
 const blogJsonLd = {
@@ -51,12 +57,36 @@ const blogJsonLd = {
             "height": 630,
           },
         },
+        {
+          "@type": "Article",
+          "@id": "https://lode.rocks/blog/coin-melt-value-guide#article",
+          "headline": "Coin Melt Value: What Your Gold & Silver Coins Are Really Worth (2026)",
+          "url": "https://lode.rocks/blog/coin-melt-value-guide",
+          "datePublished": "2026-06-29",
+          "dateModified": "2026-06-29",
+          "author": { "@type": "Organization", "name": "Lode", "url": "https://lode.rocks" },
+          "image": {
+            "@type": "ImageObject",
+            "url": "https://lode.rocks/blog/coin-melt-value-guide/opengraph-image",
+            "width": 1200,
+            "height": 630,
+          },
+        },
       ],
     },
   ],
 };
 
 const articles = [
+  {
+    slug: "coin-melt-value-guide",
+    title: "Coin Melt Value: What Your Gold & Silver Coins Are Really Worth (2026)",
+    description:
+      "Exact metal content for Gold Eagles, Silver Eagles, Krugerrands, Maples, Morgan Dollars, and more — plus how melt value differs from market price.",
+    date: "June 2026",
+    readTime: "11 min read",
+    tags: ["Gold", "Silver", "Reference guide"],
+  },
   {
     slug: "junk-silver-guide",
     title: "The Complete Guide to Buying Junk Silver Coins (2026)",

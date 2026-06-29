@@ -9,7 +9,7 @@ export async function SiteFooter() {
 
   return (
     <footer
-      className={`border-t px-6 pt-7 pb-8 ${isLoggedIn ? "hidden sm:block" : "block"}`}
+      className="border-t px-6 pt-7 pb-8 block"
       style={{ borderColor: "var(--border)" }}
     >
       <div className="mx-auto max-w-6xl space-y-5">

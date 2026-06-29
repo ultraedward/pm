@@ -39,6 +39,12 @@ export const metadata: Metadata = {
       "Instantly calculate the melt value of silver and gold coins at live spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
     url: "https://lode.rocks/coin-melt-calculator",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Silver Coin Melt Value Calculator — Dimes, Quarters, Dollars & Eagles",
+    description:
+      "Instantly calculate the melt value of silver and gold coins at live spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
+  },
 };
 
 const jsonLd = {
@@ -240,6 +246,11 @@ export default async function CoinMeltCalculatorPage() {
                 Melt value is the intrinsic worth of a coin&apos;s metal content at current spot prices — calculated as <span className="text-white">(fine troy oz content) × (spot price per troy oz)</span>.
                 It&apos;s the floor value: what the metal itself is worth if the coin were melted down. Actual sale prices almost always carry a premium above melt for bullion coins, and can be significantly higher for numismatic pieces.
                 For junk silver (circulated pre-1965 US coins), dealers typically pay 90–97% of melt, depending on quantity and current demand.
+              </p>
+              <p>
+                <Link href="/blog/coin-melt-value-guide" className="text-sm font-medium transition-colors hover:text-gray-300" style={{ color: "var(--gold-bright)" }}>
+                  Read the full melt value guide → (Gold Eagles, Krugerrands, Maples &amp; more)
+                </Link>
               </p>
             </div>
 

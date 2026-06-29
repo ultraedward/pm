@@ -78,6 +78,12 @@ const siteJsonLd = {
       "email": "hello@lode.rocks",
       "description":
         "Live gold, silver, platinum, and palladium spot prices. Precious metals portfolio tracker, email price alerts, and dealer-pricing comparison.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://lode.rocks/logo",
+        "width": 512,
+        "height": 512,
+      },
     },
     {
       "@type": "WebSite",
