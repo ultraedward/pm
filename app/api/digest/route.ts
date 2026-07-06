@@ -341,9 +341,13 @@ export async function GET(req: Request) {
   let sent = 0;
   let skipped = 0;
   const errors: string[] = [];
+  // Tracks every address we've already sent to — checked across both loops
+  // so duplicates within emailSubscriber or across tables are both caught.
+  const sentEmails = new Set<string>();
 
   for (const user of users) {
     if (!user.email) { skipped++; continue; }
+    if (sentEmails.has(user.email.toLowerCase())) { skipped++; continue; }
 
     const currency = user.preferredCurrency ?? "USD";
     const rate = fxRates[currency] ?? 1;
@@ -402,6 +406,7 @@ export async function GET(req: Request) {
         subject: digestSubject,
         html,
       });
+      sentEmails.add(user.email.toLowerCase());
       sent++;
     } catch (err) {
       console.error(`Digest email failed for ${user.email}:`, err);
@@ -410,20 +415,15 @@ export async function GET(req: Request) {
   }
 
   // ── 6. Email-only subscribers — always USD ────────────────────────────
-  // Exclude subscribers whose email already has a registered user account
-  // to prevent duplicate digests when someone is in both tables. Compared
-  // case-insensitively since User emails (from OAuth) aren't normalized
-  // the same way subscribe/route.ts lowercases EmailSubscriber rows.
-  const registeredEmails = new Set(
-    users.map((u) => u.email?.toLowerCase()).filter(Boolean)
-  );
-
+  // sentEmails already contains all registered-user addresses, so this
+  // naturally deduplicates against both that set and any duplicate rows
+  // within emailSubscriber itself.
   const subscribers = await prisma.emailSubscriber.findMany({
     where: { active: true },
   });
 
   for (const sub of subscribers) {
-    if (registeredEmails.has(sub.email.toLowerCase())) { skipped++; continue; }
+    if (sentEmails.has(sub.email.toLowerCase())) { skipped++; continue; }
     const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${sub.unsubscribeToken}`;
     const html = buildDigestHtml({
       firstName: "",
@@ -448,6 +448,7 @@ export async function GET(req: Request) {
         subject: digestSubject,
         html,
       });
+      sentEmails.add(sub.email.toLowerCase());
       sent++;
     } catch (err) {
       console.error(`Digest email failed for subscriber ${sub.email}:`, err);
