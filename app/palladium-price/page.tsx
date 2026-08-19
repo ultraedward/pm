@@ -51,6 +51,12 @@ export async function generateMetadata(): Promise<Metadata> {
         "Live palladium spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
       url: "https://lode.rocks/palladium-price",
     },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description:
+        "Live palladium spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+    },
   };
 }
 
@@ -183,6 +189,13 @@ export default async function PalladiumPricePage() {
   const change7  = stats?.price7dAgo && spot ? spot - stats.price7dAgo : null;
   const pct7     = stats?.price7dAgo && change7 != null ? (change7 / stats.price7dAgo) * 100 : null;
 
+  // The 30-day high/low box below is seeded from once-daily DB snapshots, so an
+  // intraday move past that snapshot can leave the box stale relative to the
+  // live spot price shown at the top of this page. Fold today's live spot into
+  // the high/low so the two numbers never contradict each other.
+  const high30 = stats ? (spot > 0 ? Math.max(stats.high30, spot) : stats.high30) : null;
+  const low30  = stats ? (spot > 0 ? Math.min(stats.low30,  spot) : stats.low30)  : null;
+
   const weightRows = spot > 0 ? buildWeightRows(spot) : [];
 
   const updatedTime = new Date(spots.fetchedAt).toLocaleTimeString("en-US", {
@@ -279,11 +292,11 @@ export default async function PalladiumPricePage() {
           <div className="mx-auto max-w-2xl space-y-6">
 
             {/* 30-day high / low */}
-            {stats && (stats.high30 || stats.low30) && (
+            {high30 != null && low30 != null && (high30 || low30) && (
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: "30-day high", value: fmt(stats.high30) },
-                  { label: "30-day low",  value: fmt(stats.low30)  },
+                  { label: "30-day high", value: fmt(high30) },
+                  { label: "30-day low",  value: fmt(low30)  },
                 ].map(({ label, value }) => (
                   <div
                     key={label}
