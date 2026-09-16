@@ -51,7 +51,7 @@ const faqJsonLd = {
           "name": "What is spot price?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Spot price is the current market price to buy or sell one troy ounce of a metal for immediate delivery. It is set continuously by futures markets (primarily COMEX in the US) based on supply, demand, and the nearest active futures contract. The 'spot price' you see on Lode reflects the front-month futures price from Yahoo Finance — it is not a dealer price. Dealers add a premium above spot to cover minting, shipping, and profit margin.",
+            "text": `Spot price is the current market price to buy or sell one troy ounce of a metal for immediate delivery. It is set continuously by futures markets (primarily COMEX in the US) based on supply, demand, and the nearest active futures contract. On Lode, gold and silver prices reflect ${PRICE_SOURCES.gold.provider}'s true-spot feed; platinum and palladium currently reflect ${PRICE_SOURCES.platinum.provider} futures pricing, which ${FUTURES_GAP_NOTE}. None of these are dealer prices — dealers add a premium above spot to cover minting, shipping, and profit margin.`,
           },
         },
         {
