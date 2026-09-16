@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { PricingClient } from "./PricingClient";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free & Pro | Lode",
+  title: "Pricing — Free & Pro",
   description:
     "Lode is free for every stacker. Upgrade to Pro for extended price history, portfolio CSV export, and annual tax snapshots.",
   robots: {

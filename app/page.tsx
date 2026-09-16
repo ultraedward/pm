@@ -25,6 +25,12 @@ export const metadata: Metadata = {
       "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
     url: "https://lode.rocks",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
+    description:
+      "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
+  },
 };
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -239,9 +245,9 @@ export default async function HomePage() {
   ];
 
   const secondaryFeatures = [
-    { label: "Portfolio tracker", href: isLoggedIn ? "/dashboard/holdings" : "/login" },
-    { label: "Price history",     href: isLoggedIn ? "/dashboard/charts"   : "/login" },
-    { label: "Gold IRA guide",    href: "/gold-ira" },
+    { label: "Portfolio tracker", body: "Holdings valued at live spot, P&L in your currency.", href: isLoggedIn ? "/dashboard/holdings" : "/login" },
+    { label: "Price history",     body: "30-day and 90-day charts for all four metals.",        href: isLoggedIn ? "/dashboard/charts"   : "/login" },
+    { label: "Gold IRA guide",    body: "Compare custodians and understand tax advantages.",    href: "/gold-ira" },
   ];
 
   return (
@@ -432,19 +438,22 @@ export default async function HomePage() {
             ))}
           </div>
 
-          {/* Secondary — borderless nav strip */}
-          <div className="reveal grid grid-cols-3 gap-px border overflow-hidden border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
-            {secondaryFeatures.map(({ label, href }) => (
+          {/* Secondary — compact cards with one-line descriptions */}
+          <div className="reveal grid grid-cols-1 sm:grid-cols-3 gap-px border overflow-hidden border-white/5" style={{ background: "rgba(255,255,255,0.04)" }}>
+            {secondaryFeatures.map(({ label, body, href }) => (
               <Link
                 key={label}
                 href={href}
-                className="group px-5 py-4 hover:bg-white/[0.04] transition-colors duration-150 flex items-center justify-between"
+                className="group px-5 py-5 hover:bg-white/[0.04] transition-colors duration-150 flex flex-col gap-1.5"
                 style={{ background: "var(--bg)" }}
               >
-                <span className="text-xs font-semibold group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-muted)" }}>
-                  {label}
-                </span>
-                <span className="text-xs group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>→</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold group-hover:[color:var(--gold)] transition-colors duration-150 text-white">
+                    {label}
+                  </span>
+                  <span className="text-xs group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>→</span>
+                </div>
+                <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-dim)" }}>{body}</p>
               </Link>
             ))}
           </div>
@@ -479,7 +488,7 @@ export default async function HomePage() {
 
       {/* ── ALERT CTA ────────────────────────────────────────────── */}
       {!isLoggedIn && (
-        <section className="border-t px-6 py-24 sm:py-32 reveal" style={{ borderColor: "var(--border)" }}>
+        <section className="border-t px-6 py-14 sm:py-20 reveal" style={{ borderColor: "var(--border)" }}>
           <div className="mx-auto max-w-6xl">
             <p className="label mb-6">Price alerts</p>
             <p

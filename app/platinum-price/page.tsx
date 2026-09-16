@@ -347,10 +347,7 @@ export default async function PlatinumPricePage() {
         {/* ── Editorial ────────────────────────────────────────────── */}
         <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>
           <div className="mx-auto max-w-2xl space-y-10">
-            <div>
-              <p className="label mb-1">Context &amp; background</p>
-              <h2 className="text-lg font-black tracking-tight">Understanding the platinum market</h2>
-            </div>
+            <h2 className="text-lg font-black tracking-tight">Understanding the platinum market</h2>
             <div className="space-y-10 text-sm text-gray-400 leading-relaxed">
 
               <div className="space-y-3">

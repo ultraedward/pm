@@ -154,11 +154,8 @@ export default async function ComparePage() {
             <span style={{ color: "var(--gold-bright)" }}>at today&rsquo;s spot.</span>
           </h1>
           <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — today&rsquo;s live spot price plus dealer premiums we maintain by hand. Sorted low to high.
-          </p>
-          {/* FTC affiliate disclosure — required for sponsored outbound links */}
-          <p className="text-xs text-gray-500 leading-relaxed">
-            Dealer links on this page are affiliate links. Lode may earn a commission if you buy — at no extra cost to you. Prices and rankings are not influenced by affiliate relationships.
+            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — live spot plus verified dealer premiums, sorted low to high.{" "}
+            <span className="text-gray-600">Some links are affiliate — Lode may earn a commission at no extra cost to you; rankings are not influenced.</span>
           </p>
 
           {/* Freshness + verify strip. Two trust micro-signals at the top of
