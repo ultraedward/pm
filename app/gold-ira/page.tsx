@@ -374,7 +374,7 @@ export default function GoldIraPage() {
                   >
                     {c.id === "birch"
                       ? promoActive ? "Claim America 250 offer →" : "Get a free info kit →"
-                      : "Get the free guide →"}
+                      : "Get the free Info Kit →"}
                   </a>
                 )}
               </div>
@@ -839,7 +839,7 @@ export default function GoldIraPage() {
                 a: "Most companies charge an annual storage fee of $100–$200, plus a custodian fee of $50–$100 per year. Some, like Augusta, waive the first year. Storage is either commingled (your metal pooled with others) or segregated (your specific bars and coins stored separately, typically slightly more expensive).",
               },
               {
-                q: "What happens when I request Augusta's free Gold IRA guide?",
+                q: "What happens when I request Augusta's free Gold & Silver IRA Info Kit?",
                 a: "You receive Augusta's 2026 Gold & Silver IRA Info Kit — a four-guide decision toolkit covering how gold and silver IRAs work, why Americans hold physical metals, how to vet a gold company, and why Augusta is rated America's top gold IRA company. You'll then be offered a complimentary one-on-one web conference with an Augusta education director, a specialist who reviews your specific account type and situation. Education directors are not commissioned salespeople; they're paid regardless of whether you open an account. There's no obligation at any step.",
               },
             ].map(({ q, a }) => (

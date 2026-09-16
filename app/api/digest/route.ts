@@ -131,8 +131,8 @@ function buildDigestHtml(params: {
         <tr>
           <td style="padding:20px;">
             <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#555;">Protect your stack</p>
-            <p style="margin:0 0 14px;font-size:13px;color:#aaa;line-height:1.6;">Gold at $${Math.round(spots.gold).toLocaleString()}. A self-directed IRA lets you hold physical bullion with potential tax advantages — ${iraLabel} offers a free guide, no commitment.</p>
-            <a href="${iraUrl}" style="display:inline-block;padding:10px 20px;border:1px solid rgba(212,175,55,0.3);border-radius:999px;color:#D4AF37;font-size:13px;font-weight:700;text-decoration:none;">Get the free guide →</a>
+            <p style="margin:0 0 14px;font-size:13px;color:#aaa;line-height:1.6;">Gold at $${Math.round(spots.gold).toLocaleString()}. A self-directed IRA lets you hold physical bullion with potential tax advantages — ${iraLabel} offers a free Gold &amp; Silver IRA Info Kit, no commitment.</p>
+            <a href="${iraUrl}" style="display:inline-block;padding:10px 20px;border:1px solid rgba(212,175,55,0.3);border-radius:999px;color:#D4AF37;font-size:13px;font-weight:700;text-decoration:none;">Get the free Info Kit →</a>
             <p style="margin:12px 0 0;font-size:10px;color:#444;">${iraLabel} · Paid partner</p>
           </td>
         </tr>

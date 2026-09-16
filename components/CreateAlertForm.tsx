@@ -88,7 +88,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
               rel="noopener noreferrer sponsored"
               className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
             >
-              Get the free guide →
+              Get the free Info Kit →
             </a>
             <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
           </div>
