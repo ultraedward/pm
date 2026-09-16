@@ -70,13 +70,29 @@ export default function MethodologyPage() {
               Gold and silver spot prices come from <a href={PRICE_SOURCES.gold.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.gold.provider}</a>&rsquo;s live rate feed — true spot, not futures — routed through a Cloudflare Worker. {PRICE_SOURCES.gold.provider} requires request headers that only work from a server, not a browser, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
             </p>
             <p>
-              Platinum and palladium currently come from <a href={PRICE_SOURCES.platinum.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.platinum.provider}</a> futures data ({PRICE_SOURCES.platinum.ticker}, {PRICE_SOURCES.palladium.ticker}) instead of true spot — we haven&rsquo;t found an equally reliable free spot source for these two yet. Futures track spot closely, but {FUTURES_GAP_NOTE}. If precise platinum or palladium pricing matters for a purchase decision, cross-check against Kitco first. We moved gold and silver off futures pricing in September 2026 after a user flagged the gap; closing it for platinum and palladium the same way is next.
+              Platinum and palladium currently come from <a href={PRICE_SOURCES.platinum.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.platinum.provider}</a> futures data ({PRICE_SOURCES.platinum.ticker}, {PRICE_SOURCES.palladium.ticker}) instead of true spot — we haven&rsquo;t found a free spot source for these two that&rsquo;s reliable and openly documented (rather than an undocumented feed we&rsquo;d be depending on staying available). Futures track spot closely, but {FUTURES_GAP_NOTE}. If precise platinum or palladium pricing matters for a purchase decision, cross-check against Kitco first. See the note below on the gold/silver pricing bug we fixed in September 2026.
             </p>
             <p>
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.
             </p>
             <p>
               If the price source is unreachable, the site returns the last cached value rather than showing a $0 price. Over-the-weekend and holiday prices reflect the last traded value.
+            </p>
+          </section>
+
+          <section
+            className="border p-6 space-y-3 text-sm"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <h2 className="text-base font-bold text-white">A note on a pricing bug we found and fixed (September 2026)</h2>
+            <p className="text-gray-300">
+              From roughly May to September 2026, gold and silver spot prices on Lode were sourced from Yahoo Finance&rsquo;s COMEX futures contracts (GC=F, SI=F) instead of true spot. Futures track spot closely but run 1&ndash;2% above or below it depending on market conditions &mdash; so prices shown during that window were off from Kitco or a broker terminal by a small, systematic amount.
+            </p>
+            <p className="text-gray-300">
+              A Reddit user flagged the gap on September 16, 2026. We verified it against Kitco the same day, switched gold and silver to {PRICE_SOURCES.gold.provider}&rsquo;s true-spot feed, and backfilled the historical price records used for 7-day/30-day change and charts for the affected weeks. We&rsquo;ve also added automated monitoring so a gap like this gets caught by us next time, not by a user having to notice.
+            </p>
+            <p className="text-gray-300">
+              Platinum and palladium are still on {PRICE_SOURCES.platinum.provider} futures pricing &mdash; see above.
             </p>
           </section>
 
