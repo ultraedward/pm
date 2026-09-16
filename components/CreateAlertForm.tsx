@@ -80,7 +80,7 @@ export function CreateAlertForm({ currency, iraUrl }: Props) {
           <div className="border border-white/5 p-6 space-y-3" style={{ background: "var(--surface)" }}>
             <p className="label">Planning a larger gold purchase?</p>
             <p className="text-sm text-gray-400 leading-relaxed">
-              A self-directed Gold IRA lets you hold physical bullion with potential tax advantages. Augusta Precious Metals offers a free guide — no commitment.
+              A self-directed Gold IRA lets you hold physical bullion with potential tax advantages. Augusta Precious Metals offers a free Gold &amp; Silver IRA Info Kit — no commitment.
             </p>
             <a
               href={iraUrl}

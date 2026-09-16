@@ -64,6 +64,12 @@ export const metadata: Metadata = {
       "Side-by-side comparison of Augusta Precious Metals, Goldco, Birch Gold, and Noble Gold — fees, minimums, ratings, and who each is best for.",
     url: "https://lode.rocks/gold-ira",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Best Gold IRA Companies 2026 — Reviewed & Compared",
+    description:
+      "Side-by-side comparison of Augusta Precious Metals, Goldco, Birch Gold, and Noble Gold — fees, minimums, ratings, and who each is best for.",
+  },
 };
 
 // ── Structured data ────────────────────────────────────────────────────────
@@ -124,10 +130,10 @@ const jsonLd = {
         },
         {
           "@type": "Question",
-          "name": "What happens when I request Augusta's free Gold IRA guide?",
+          "name": "What happens when I request Augusta's free Gold & Silver IRA Info Kit?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You receive Augusta's educational materials by email or mail — a written breakdown of how gold IRAs work, IRS eligibility rules, and fee structures. You'll then be offered a complimentary one-on-one web conference with an Augusta education director, a specialist who reviews your specific account type. Education directors are not commissioned salespeople and are paid regardless of whether you open an account. There is no obligation at any step.",
+            "text": "You receive Augusta's 2026 Gold & Silver IRA Info Kit — a four-guide decision toolkit covering how gold and silver IRAs work, why Americans hold physical metals, how to vet a gold company, and why Augusta is rated America's top gold IRA company. You'll then be offered a complimentary one-on-one web conference with an Augusta education director, a specialist who reviews your specific account type. Education directors are not commissioned salespeople and are paid regardless of whether you open an account. There is no obligation at any step.",
           },
         },
       ],
@@ -463,8 +469,8 @@ export default function GoldIraPage() {
                 {[
                   {
                     step: "1",
-                    title: "Request the free guide",
-                    desc: "Receive Augusta's educational materials — no commitment, no sales call.",
+                    title: "Request the free Info Kit",
+                    desc: "Receive Augusta's 2026 Gold & Silver IRA Info Kit — four decision guides, no commitment, no sales call.",
                   },
                   {
                     step: "2",
@@ -537,7 +543,7 @@ export default function GoldIraPage() {
                   rel="noopener noreferrer sponsored"
                   className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-400 hover:bg-amber-500/15 hover:text-amber-300 transition-all"
                 >
-                  Get Augusta&apos;s free Gold IRA guide →
+                  Get Augusta&apos;s free Gold &amp; Silver IRA Info Kit →
                 </a>
                 <p className="text-[11px] text-gray-600">Augusta Precious Metals · Paid partner · No commitment required</p>
               </div>
@@ -767,7 +773,7 @@ export default function GoldIraPage() {
                 <div className="rounded-2xl border border-white/5 bg-gray-950 p-6 space-y-3">
                   <p className="label">Have $50k+ to roll over?</p>
                   <p className="text-sm text-gray-400 leading-relaxed">
-                    Augusta offers a free, no-pressure web conference with a Gold IRA specialist to review your account type and walk you through the process.
+                    Augusta offers a free Gold & Silver IRA Info Kit — four decision guides — plus a no-pressure web conference with a Gold IRA specialist to review your account type and walk you through the process.
                   </p>
                   <a
                     href={AUGUSTA_ELIGIBILITY}
@@ -775,7 +781,7 @@ export default function GoldIraPage() {
                     rel="noopener noreferrer sponsored"
                     className="inline-flex items-center gap-1 text-sm font-semibold link-gold"
                   >
-                    Request Augusta&apos;s free guide →
+                    Request Augusta&apos;s free Gold &amp; Silver IRA Info Kit →
                   </a>
                   <p className="text-xs text-gray-600 mt-1">Augusta Precious Metals · Paid partner</p>
                 </div>
@@ -834,7 +840,7 @@ export default function GoldIraPage() {
               },
               {
                 q: "What happens when I request Augusta's free Gold IRA guide?",
-                a: "You receive Augusta's educational materials by email or mail — a written breakdown of how gold IRAs work, IRS eligibility rules, and fee structures. You'll then be offered a complimentary one-on-one web conference with an Augusta education director, a specialist who reviews your specific account type and situation. Education directors are not commissioned salespeople; they're paid regardless of whether you open an account. There's no obligation at any step.",
+                a: "You receive Augusta's 2026 Gold & Silver IRA Info Kit — a four-guide decision toolkit covering how gold and silver IRAs work, why Americans hold physical metals, how to vet a gold company, and why Augusta is rated America's top gold IRA company. You'll then be offered a complimentary one-on-one web conference with an Augusta education director, a specialist who reviews your specific account type and situation. Education directors are not commissioned salespeople; they're paid regardless of whether you open an account. There's no obligation at any step.",
               },
             ].map(({ q, a }) => (
               <div key={q} className="space-y-1" style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
