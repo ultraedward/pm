@@ -1,5 +1,4 @@
 import { fetchYahooFinancePrice } from "@/lib/prices/fetchYahooFinance";
-import { fetchMetalsApiPrices } from "@/lib/prices/fetchMetalsApi";
 
 type PriceMap = {
   Gold: number;
@@ -8,7 +7,7 @@ type PriceMap = {
   Palladium: number;
 };
 
-export type PriceSource = "metals-api" | "yahoo" | "fallback";
+export type PriceSource = "yahoo" | "fallback";
 
 export type PriceResult = PriceMap & { source: PriceSource };
 
@@ -37,34 +36,7 @@ export async function getLivePrices(): Promise<PriceResult> {
     return _priceCache.result;
   }
 
-  // 1️⃣ metals-api.com — true spot (LBMA-style), primary price source
-  try {
-    const rates = await fetchMetalsApiPrices();
-    if (
-      rates &&
-      typeof rates.USDXAU === "number" &&
-      typeof rates.USDXAG === "number" &&
-      rates.USDXAU > 0 &&
-      rates.USDXAG > 0
-    ) {
-      const result: PriceResult = {
-        Gold: rates.USDXAU,
-        Silver: rates.USDXAG,
-        Platinum: rates.USDXPT ?? FALLBACK_PRICES.Platinum,
-        Palladium: rates.USDXPD ?? FALLBACK_PRICES.Palladium,
-        source: "metals-api",
-      };
-      _priceCache = { result, ts: now };
-      return result;
-    }
-  } catch {
-    // fall through to Yahoo futures
-  }
-
-  // 2️⃣ CF Worker / Yahoo Finance futures — secondary source. NOTE: these are
-  // COMEX futures (GC=F, SI=F, ...), not true spot — they can run ~1-2% off
-  // real spot due to contango/backwardation. Only used if metals-api.com is
-  // unavailable or METALS_API_KEY isn't set.
+  // 1️⃣ CF Worker / Yahoo Finance — primary price source
   try {
     const [gold, silver, platinum, palladium] = await Promise.all([
       fetchYahooFinancePrice("gold"),
@@ -88,7 +60,7 @@ export async function getLivePrices(): Promise<PriceResult> {
     // fall through to hardcoded fallback
   }
 
-  // 3️⃣ Last resort: hardcoded prices (accurate as of April 2026).
+  // 2️⃣ Last resort: hardcoded prices (accurate as of April 2026).
   // Do NOT cache this so the next request retries live sources immediately.
   console.error("[prices] Live source failed — returning hardcoded fallback prices");
   return { ...FALLBACK_PRICES, source: "fallback" };
