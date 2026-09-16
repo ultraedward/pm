@@ -48,6 +48,12 @@ export const metadata: Metadata = {
       "Calculate the melt value of pre-1965 US and Canadian junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
     url: "https://lode.rocks/junk-silver-calculator",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Junk Silver Calculator — US 90% & Canadian 80% Silver Coins",
+    description:
+      "Calculate the melt value of pre-1965 US and Canadian junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
+  },
 };
 
 const jsonLd = {
@@ -326,6 +332,27 @@ export default async function JunkSilverCalculatorPage() {
           </div>
         </section>
       )}
+
+      {/* ── Blog cross-link ──────────────────────────────────────── */}
+      <section className="border-t px-4 sm:px-6 py-8" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-2xl">
+          <Link
+            href="/blog/junk-silver-guide"
+            className="group flex items-start gap-4 p-5 border transition-colors hover:border-gray-600"
+            style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.15)" }}
+          >
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-1">Guide</p>
+              <p className="text-sm font-bold text-white group-hover:[color:var(--gold)] transition-colors leading-snug">
+                The Complete Guide to Buying Junk Silver Coins →
+              </p>
+              <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                What to buy, where to buy it, how to spot fakes, and what premiums to expect. 15 min read.
+              </p>
+            </div>
+          </Link>
+        </div>
+      </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="border-t px-4 sm:px-6 py-14" style={{ borderColor: "var(--border)" }}>

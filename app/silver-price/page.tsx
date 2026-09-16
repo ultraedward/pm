@@ -471,6 +471,9 @@ export default async function SilverPricePage() {
               <Link href="/compare" className="text-gray-400 hover:text-gray-200 transition-colors">
                 Compare dealers →
               </Link>
+              <Link href="/blog/junk-silver-guide" className="text-gray-400 hover:text-gray-200 transition-colors">
+                Junk silver buying guide →
+              </Link>
             </div>
           </>
         ) : (
@@ -484,6 +487,7 @@ export default async function SilverPricePage() {
               <Link href="/compare" className="hover:text-gray-400 transition-colors">Compare dealers →</Link>
               <Link href="/gold-price" className="hover:text-gray-400 transition-colors">Gold price</Link>
               <Link href="/junk-silver-calculator" className="hover:text-gray-400 transition-colors">Junk silver calculator</Link>
+              <Link href="/blog/junk-silver-guide" className="hover:text-gray-400 transition-colors">Junk silver guide</Link>
             </div>
           </div>
         )}

@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   title: "Pricing — Free & Pro | Lode",
   description:
     "Lode is free for every stacker. Upgrade to Pro for extended price history, portfolio CSV export, and annual tax snapshots.",
+  robots: {
+    index: false,
+    follow: false,
+  },
   alternates: {
     canonical: "https://lode.rocks/pricing",
   },
@@ -18,6 +22,12 @@ export const metadata: Metadata = {
     description:
       "Free: live spot prices, unlimited alerts, portfolio tracker, melt calculators. Pro: 90-day charts, CSV export, tax snapshots.",
     url: "https://lode.rocks/pricing",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing — Free & Pro | Lode",
+    description:
+      "Free: live spot prices, unlimited alerts, portfolio tracker, melt calculators. Pro: 90-day charts, CSV export, tax snapshots.",
   },
 };
 
