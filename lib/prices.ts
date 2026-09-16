@@ -1,4 +1,4 @@
-import { fetchYahooFinancePrice } from "@/lib/prices/fetchYahooFinance";
+import { fetchYahooFinancePrice, getLastGoldSilverSource } from "@/lib/prices/fetchYahooFinance";
 
 type PriceMap = {
   Gold: number;
@@ -9,7 +9,15 @@ type PriceMap = {
 
 export type PriceSource = "yahoo" | "fallback";
 
-export type PriceResult = PriceMap & { source: PriceSource };
+export type PriceResult = PriceMap & {
+  source: PriceSource;
+  // Worker's own source for gold/silver specifically: "goldprice-spot" (true
+  // spot, the fixed path), "yahoo-futures" (goldprice.org failed, fell back
+  // to futures), or null (worker unreachable — numbers below, if any, came
+  // from the per-metal direct-Yahoo fallback instead). See
+  // lib/monitoring/priceHealth.ts, which alerts when this isn't "goldprice-spot".
+  goldSilverSource: string | null;
+};
 
 // Last-resort fallback — only used if the CF Worker / Yahoo Finance fails.
 // Updated April 2026. If you see these values in production, the live source is down.
@@ -52,6 +60,7 @@ export async function getLivePrices(): Promise<PriceResult> {
         Platinum: platinum ?? FALLBACK_PRICES.Platinum,
         Palladium: palladium ?? FALLBACK_PRICES.Palladium,
         source: "yahoo",
+        goldSilverSource: getLastGoldSilverSource(),
       };
       _priceCache = { result, ts: now };
       return result;
@@ -63,5 +72,5 @@ export async function getLivePrices(): Promise<PriceResult> {
   // 2️⃣ Last resort: hardcoded prices (accurate as of April 2026).
   // Do NOT cache this so the next request retries live sources immediately.
   console.error("[prices] Live source failed — returning hardcoded fallback prices");
-  return { ...FALLBACK_PRICES, source: "fallback" };
+  return { ...FALLBACK_PRICES, source: "fallback", goldSilverSource: null };
 }

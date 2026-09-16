@@ -101,9 +101,24 @@ model Price {
   metal     String
   price     Float
   timestamp DateTime
+  source    String?  // e.g. "goldprice-spot", "yahoo-futures", "fallback" — which
+                      // upstream this row actually came from. Nullable because rows
+                      // written before Sep 2026 predate this column. See
+                      // lib/monitoring/priceHealth.ts, which alerts when gold/silver
+                      // fall back to "yahoo-futures" (the pre-fix, non-spot path).
 
   @@unique([metal, timestamp], name: "metal_timestamp")
   @@index([metal, timestamp(sort: Desc)])
+}
+
+// De-dupe table for ops alert emails (see lib/monitoring/alert.ts) so a
+// sustained issue (e.g. goldprice.org down for hours) sends one email, not
+// one per cron run.
+model SystemAlert {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  lastSentAt DateTime
+  detail     String?
 }
 
 model Prediction {

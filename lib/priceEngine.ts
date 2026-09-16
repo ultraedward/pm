@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getLivePrices } from "@/lib/prices";
+import { checkPriceHealth } from "@/lib/monitoring/priceHealth";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 
@@ -28,18 +29,45 @@ export async function updateMetalsPrices() {
     }
 
     // Fetch prices: CF Worker / Yahoo Finance → hardcoded fallback
-    const { Gold: gold, Silver: silver, Platinum: platinum, Palladium: palladium } = await getLivePrices();
+    const live = await getLivePrices();
+    const { Gold: gold, Silver: silver, Platinum: platinum, Palladium: palladium } = live;
 
     const timestamp = new Date();
 
-    const priceData: { metal: string; price: number; timestamp: Date }[] = [
-      { metal: "gold",      price: gold,      timestamp },
-      { metal: "silver",    price: silver,    timestamp },
-      { metal: "platinum",  price: platinum,  timestamp },
-      { metal: "palladium", price: palladium, timestamp },
+    // Tag each row with the upstream it actually came from, so "was this
+    // period affected by a source bug" is a query, not git archaeology.
+    // Gold/silver: whatever the worker reported ("goldprice-spot" |
+    // "yahoo-futures" | unknown if the worker was unreachable). Platinum/
+    // palladium: always yahoo-futures today — there's no spot feed for them
+    // yet — except when the whole pipeline fell back to hardcoded prices.
+    const goldSilverSource = live.source === "fallback" ? "fallback" : (live.goldSilverSource ?? "unknown");
+    const otherMetalsSource = live.source === "fallback" ? "fallback" : "yahoo-futures";
+
+    const priceData: { metal: string; price: number; timestamp: Date; source: string }[] = [
+      { metal: "gold",      price: gold,      timestamp, source: goldSilverSource },
+      { metal: "silver",    price: silver,    timestamp, source: goldSilverSource },
+      { metal: "platinum",  price: platinum,  timestamp, source: otherMetalsSource },
+      { metal: "palladium", price: palladium, timestamp, source: otherMetalsSource },
     ];
 
+    // Previous per-metal prices, for the day-over-day sanity check below —
+    // fetched before the insert so it's genuinely "previous."
+    const priorRows = await prisma.price.findMany({
+      where: { metal: { in: ["gold", "silver", "platinum", "palladium"] } },
+      orderBy: { timestamp: "desc" },
+      distinct: ["metal"],
+    });
+    const priorByMetal = Object.fromEntries(priorRows.map((r) => [r.metal, r.price]));
+
     await prisma.price.createMany({ data: priceData });
+
+    // Best-effort: never let a monitoring failure block the price write above.
+    await checkPriceHealth(live, {
+      gold: priorByMetal.gold,
+      silver: priorByMetal.silver,
+      platinum: priorByMetal.platinum,
+      palladium: priorByMetal.palladium,
+    });
 
     // Compression: prune old data (runs at most once per hour)
     const shouldRunCompression =

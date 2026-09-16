@@ -13,8 +13,18 @@ const YAHOO_SYMBOLS: Record<string, string> = {
   palladium: "PA=F",
 };
 
+// The worker's `source` field describes where GOLD/SILVER actually came from
+// on this response — "goldprice-spot" (true spot, the fixed path) or
+// "yahoo-futures" (goldprice.org failed and it fell back to the old,
+// ~1%-off futures path). Platinum/palladium are always yahoo-futures
+// regardless. See cloudflare-worker/prices-worker.js.
+type WorkerResponse = Record<string, number | null> & {
+  source?: string;
+  fetchedAt?: string;
+};
+
 /** Fetch all 4 metals at once via the CF Worker. Returns null if unavailable. */
-async function fetchAllViaWorker(): Promise<Record<string, number | null> | null> {
+async function fetchAllViaWorker(): Promise<WorkerResponse | null> {
   const workerUrl = process.env.PRICE_WORKER_URL;
   if (!workerUrl) return null;
 
@@ -23,14 +33,24 @@ async function fetchAllViaWorker(): Promise<Record<string, number | null> | null
     if (!res.ok) return null;
     const data = await res.json() as Record<string, unknown>;
     if (!data.ok) return null;
-    return data as Record<string, number | null>;
+    return data as WorkerResponse;
   } catch {
     return null;
   }
 }
 
 // Worker result cache so we don't call it 4× per price refresh
-let _workerCache: { data: Record<string, number | null>; ts: number } | null = null;
+let _workerCache: { data: WorkerResponse; ts: number } | null = null;
+
+/**
+ * The gold/silver source string from the most recent worker fetch this
+ * process made ("goldprice-spot" | "yahoo-futures"), or null if we haven't
+ * hit the worker yet / it's unreachable. Used by lib/priceEngine.ts to tag
+ * Price rows and by lib/monitoring/priceHealth.ts to decide whether to alert.
+ */
+export function getLastGoldSilverSource(): string | null {
+  return _workerCache?.data?.source ?? null;
+}
 
 export async function fetchYahooFinancePrice(metal: string): Promise<number | null> {
   // Try CF Worker first (all metals in one call, cached for this invocation)
