@@ -30,7 +30,7 @@ const COMPANY_CTAS: Record<string, { card: string | null; deepdive: string | nul
 };
 
 // ── Last reviewed date ─────────────────────────────────────────────────────
-const LAST_REVIEWED = "2026-05-27";
+const LAST_REVIEWED = "2026-09-16";
 
 function fmtReviewed(iso: string): string {
   const d = new Date(`${iso}T12:00:00Z`);
@@ -222,6 +222,7 @@ const COMPANIES = [
       "Lowest minimum in the category — $10,000 for both IRAs and cash purchases",
       "Longest track record of any major Gold IRA company — operating since 2003",
       "Up to $10,000 in free precious metals on qualified purchases · Buyback guarantee at no charge",
+      "First-year fees waived on accounts over $50,000",
       "Six US storage locations — Delaware, Brinks, and IDS facilities in TX, LA, NYC, and CA",
     ],
     cons: [
