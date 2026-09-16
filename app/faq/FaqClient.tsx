@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { PRICE_SOURCES, FUTURES_GAP_NOTE } from "@/lib/priceSourceInfo";
 
 // ─── Accordion primitive ───────────────────────────────────────────────────────
 
@@ -56,10 +57,11 @@ const metalsFaq: FaqItem[] = [
     q: "What is spot price?",
     a: (
       <p>
-        The current market price to buy or sell one troy ounce of a metal for immediate delivery. It is set
-        continuously by futures markets — primarily COMEX in New York — based on the nearest active futures
-        contract. The price you see on Lode comes from Yahoo Finance futures data and is{" "}
-        <strong className="text-white">not a dealer price</strong>. Dealers add a premium above spot to cover
+        The current market price to buy or sell one troy ounce of a metal for immediate delivery. Gold and
+        silver prices on Lode come from a true-spot feed ({PRICE_SOURCES.gold.provider}); platinum and
+        palladium currently come from {PRICE_SOURCES.platinum.provider} futures data, which {FUTURES_GAP_NOTE}.
+        None of these are{" "}
+        <strong className="text-white">dealer prices</strong>. Dealers add a premium above spot to cover
         minting, shipping, and margin.
       </p>
     ),
@@ -216,16 +218,19 @@ const lodeFaq: FaqItem[] = [
     q: "Where does the price data come from?",
     a: (
       <p>
-        Live spot prices come from{" "}
+        Gold and silver spot prices come from {PRICE_SOURCES.gold.provider}&rsquo;s live rate feed (true
+        spot, not futures). Platinum and palladium currently come from{" "}
         <a
-          href="https://finance.yahoo.com"
+          href={PRICE_SOURCES.platinum.providerUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="link-gold"
         >
-          Yahoo Finance
+          {PRICE_SOURCES.platinum.provider}
         </a>{" "}
-        futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Full detail is on the{" "}
+        futures data ({PRICE_SOURCES.platinum.ticker}, {PRICE_SOURCES.palladium.ticker}), which{" "}
+        {FUTURES_GAP_NOTE} — we haven&rsquo;t found an equally reliable free spot source for those two yet.
+        All four are routed through a Cloudflare Worker. Full detail is on the{" "}
         <Link href="/methodology" className="link-gold">
           Methodology
         </Link>{" "}

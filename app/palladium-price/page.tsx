@@ -12,6 +12,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { PRICE_SOURCES, FUTURES_GAP_NOTE } from "@/lib/priceSourceInfo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const spots = await fetchAllSpotPrices();
@@ -118,7 +119,7 @@ const jsonLd = {
           "name": "What is the palladium price today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The current palladium spot price is shown at the top of this page and updates on every page load from Yahoo Finance futures data (PA=F). Palladium prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.",
+            "text": `The current palladium price is shown at the top of this page and updates on every page load from ${PRICE_SOURCES.palladium.provider} futures data (${PRICE_SOURCES.palladium.ticker}) — a close proxy for true spot, but it ${FUTURES_GAP_NOTE}. Palladium prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.`,
           },
         },
         {
@@ -229,7 +230,7 @@ export default async function PalladiumPricePage() {
             />
           </div>
           <div className="relative z-10 mx-auto max-w-2xl space-y-3">
-            <p className="label">Live spot</p>
+            <p className="label">Live price</p>
             <h1 className="font-black leading-none" style={{ fontSize: "clamp(2.25rem, 5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
               Palladium Price Today
             </h1>
@@ -277,6 +278,11 @@ export default async function PalladiumPricePage() {
               )}
               <span className="text-xs" style={{ color: "var(--text-dim)" }}>Updated {updatedTime}</span>
             </div>
+
+            <p className="text-xs" style={{ color: "var(--text-dim)" }}>
+              Futures-based (COMEX), not true spot — {FUTURES_GAP_NOTE}.{" "}
+              <Link href="/methodology" className="link-gold">Why →</Link>
+            </p>
           </div>
         </section>
 

@@ -8,6 +8,7 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { COMPARE_COINS } from "@/lib/compare/coins";
 import { DEALERS } from "@/lib/compare/dealers";
 import { getLivePremiums } from "@/lib/compare/getPremiums";
+import { PRICE_SOURCES } from "@/lib/priceSourceInfo";
 import CompareClient, { type DealerAvailabilityMap } from "./CompareClient";
 
 // Render a date or ISO timestamp as a human-friendly date string.
@@ -334,9 +335,10 @@ export default async function ComparePage() {
                 <p>
                   Dealer premiums are scraped automatically each week by a Cloudflare Worker that visits each
                   dealer&rsquo;s product page and reads the current check/wire price. The "premiums verified"
-                  date shown at the top of the page reflects the last successful scrape. Live spot prices update
-                  on every page load from Yahoo Finance futures data, so estimated totals always reflect the
-                  current market even between weekly scrape runs.
+                  date shown at the top of the page reflects the last successful scrape. Live spot prices for
+                  gold and silver — the metals compared on this page — come from {PRICE_SOURCES.gold.provider}&rsquo;s
+                  true-spot feed and update on every page load, so estimated totals always reflect the current
+                  market even between weekly scrape runs.
                 </p>
                 <p>
                   If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email

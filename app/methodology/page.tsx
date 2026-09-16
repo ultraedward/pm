@@ -1,4 +1,5 @@
 import { SiteFooter } from "@/components/SiteFooter";
+import { PRICE_SOURCES, FUTURES_GAP_NOTE } from "@/lib/priceSourceInfo";
 
 export const metadata = {
   title: "How Lode Gets Precious Metals Spot Prices — Methodology & Sources",
@@ -12,6 +13,12 @@ export const metadata = {
     description:
       "Full transparency on where Lode's spot price data comes from and how every calculation is done.",
     url: "https://lode.rocks/methodology",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How Lode Gets Precious Metals Spot Prices — Methodology & Sources",
+    description:
+      "Full transparency on where Lode's spot price data comes from and how every calculation is done.",
   },
 };
 
@@ -60,7 +67,10 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Spot price sources</h2>
             <p>
-              Live spot prices come from <a href="https://finance.yahoo.com" target="_blank" rel="noopener noreferrer" className="link-gold">Yahoo Finance</a> futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Yahoo Finance blocks direct requests from server infrastructure, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
+              Gold and silver spot prices come from <a href={PRICE_SOURCES.gold.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.gold.provider}</a>&rsquo;s live rate feed — true spot, not futures — routed through a Cloudflare Worker. {PRICE_SOURCES.gold.provider} requires request headers that only work from a server, not a browser, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
+            </p>
+            <p>
+              Platinum and palladium currently come from <a href={PRICE_SOURCES.platinum.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.platinum.provider}</a> futures data ({PRICE_SOURCES.platinum.ticker}, {PRICE_SOURCES.palladium.ticker}) instead of true spot — we haven&rsquo;t found an equally reliable free spot source for these two yet. Futures track spot closely, but {FUTURES_GAP_NOTE}. If precise platinum or palladium pricing matters for a purchase decision, cross-check against Kitco first. We moved gold and silver off futures pricing in September 2026 after a user flagged the gap; closing it for platinum and palladium the same way is next.
             </p>
             <p>
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.

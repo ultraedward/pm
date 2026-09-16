@@ -1,5 +1,6 @@
 import { FaqClient } from "./FaqClient";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PRICE_SOURCES, FUTURES_GAP_NOTE } from "@/lib/priceSourceInfo";
 
 export const metadata = {
   title: "Precious Metals FAQ — Spot Price, Coins & Junk Silver Explained",
@@ -13,6 +14,12 @@ export const metadata = {
     description:
       "What is spot price? How is the gold price set? What's a troy ounce? What is junk silver? Direct answers to common precious metals questions.",
     url: "https://lode.rocks/faq",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Precious Metals FAQ — Spot Price, Coins & Junk Silver Explained",
+    description:
+      "What is spot price? How is the gold price set? What's a troy ounce? What is junk silver? Direct answers to common precious metals questions.",
   },
 };
 
@@ -108,7 +115,7 @@ const faqJsonLd = {
           "name": "Is Lode legit?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Lode is an independent precious metals price tracker. It does not buy, sell, or broker metal — no funds ever move through the site. Spot prices come from Yahoo Finance futures data, routed through a Cloudflare Worker, and can be cross-checked against Kitco or any broker terminal. Data collection and usage are documented in the Privacy Policy at lode.rocks/privacy.",
+            "text": `Yes. Lode is an independent precious metals price tracker. It does not buy, sell, or broker metal — no funds ever move through the site. Gold and silver prices come from a true-spot feed (${PRICE_SOURCES.gold.provider}); platinum and palladium currently come from ${PRICE_SOURCES.platinum.provider} futures data, which ${FUTURES_GAP_NOTE}. Both routed through a Cloudflare Worker, and can be cross-checked against Kitco or any broker terminal. Data collection and usage are documented in the Privacy Policy at lode.rocks/privacy.`,
           },
         },
         {
@@ -116,7 +123,7 @@ const faqJsonLd = {
           "name": "Where does the spot price data come from?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Live spot prices come from Yahoo Finance futures data (GC=F, SI=F, PL=F, PA=F), routed through a Cloudflare Worker. Full methodology is published at lode.rocks/methodology.",
+            "text": `Gold and silver spot prices come from ${PRICE_SOURCES.gold.provider}'s true-spot feed. Platinum and palladium currently come from ${PRICE_SOURCES.platinum.provider} futures data (${PRICE_SOURCES.platinum.ticker}, ${PRICE_SOURCES.palladium.ticker}), which ${FUTURES_GAP_NOTE}. Both routed through a Cloudflare Worker. Full methodology is published at lode.rocks/methodology.`,
           },
         },
         {

@@ -10,6 +10,7 @@ import { EmailCapture } from "@/components/EmailCapture";
 import { InlineSignup } from "@/components/InlineSignup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { isPromoActive, AMERICA_250_PROMO } from "@/lib/promo";
+import { PRICE_SOURCES } from "@/lib/priceSourceInfo";
 import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -119,7 +120,7 @@ const jsonLd = {
           "name": "What is the silver price today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The current silver spot price is shown at the top of this page and updates on every page load from Yahoo Finance futures data (SI=F). Silver prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.",
+            "text": `The current silver spot price is shown at the top of this page and updates on every page load from ${PRICE_SOURCES.silver.provider}'s live rate feed — true spot, not futures. Silver prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.`,
           },
         },
         {
