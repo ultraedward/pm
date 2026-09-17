@@ -99,7 +99,7 @@ const faqJsonLd = {
           "name": "What is the premium over spot?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Premium over spot is the markup dealers charge above the spot price. For example, if silver spot is $30/ozt and an American Silver Eagle sells for $35, the premium is $5 (about 16.7%). Premiums cover fabrication, distribution, dealer margin, and market liquidity. Generic rounds carry lower premiums than government-minted coins. The Lode compare page at lode.rocks/compare tracks dealer premiums in real time.",
+            "text": "Premium over spot is the markup dealers charge above the spot price. For example, if silver spot is $30/ozt and an American Silver Eagle sells for $35, the premium is $5 (about 16.7%). Premiums cover fabrication, distribution, dealer margin, and market liquidity. Generic rounds carry lower premiums than government-minted coins. The Lode compare page at lode.rocks/compare tracks dealer premiums.",
           },
         },
         {
@@ -131,7 +131,7 @@ const faqJsonLd = {
           "name": "How fresh are the precious metals prices?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Prices are fetched live when you load a page, cached on Lode's servers for up to 10 minutes, then refetched. During active market hours the displayed price is at most a few minutes old. On weekends and holidays the price reflects the last traded value — markets are closed.",
+            "text": "We fetch a new price once a day and store it — every page reads that same stored value, rather than fetching fresh on each visit. Every price on Lode shows exactly when it was last updated (e.g. 'Updated 6h ago') so you can see its age rather than assume it's real-time. On weekends and holidays the price reflects the last traded value — markets are closed.",
           },
         },
         {

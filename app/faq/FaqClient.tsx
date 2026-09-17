@@ -242,9 +242,10 @@ const lodeFaq: FaqItem[] = [
     q: "How fresh are the prices?",
     a: (
       <p>
-        Fetched live on page load, cached for up to 10 minutes, then refetched. During market hours
-        you&rsquo;ll see a price that&rsquo;s at most a few minutes old. On weekends and holidays the price
-        reflects the last traded value — markets are closed.
+        We fetch a new price once a day and store it — every page reads that same stored value rather
+        than fetching fresh on each visit. Every price on Lode shows exactly when it was last updated
+        (e.g. &ldquo;Updated 6h ago&rdquo;), so you can see its age instead of assuming it&rsquo;s
+        real-time. On weekends and holidays the price reflects the last traded value — markets are closed.
       </p>
     ),
   },
@@ -252,9 +253,10 @@ const lodeFaq: FaqItem[] = [
     q: "Why don't the sparklines move during the day?",
     a: (
       <p>
-        The sparklines are built from daily close snapshots in our database, not intraday ticks. Intraday
-        history from paid data APIs gets expensive quickly, and daily closes are enough to see the meaningful
-        trend. The live price on the tile is fresh; the chart shows the last 30 days of daily closes.
+        Both the sparkline and the price tile next to it come from the same daily snapshot in our
+        database, not intraday ticks — see &ldquo;How fresh are the prices?&rdquo; above. Intraday
+        history from paid data APIs gets expensive quickly, and daily closes are enough to see the
+        meaningful trend.
       </p>
     ),
   },

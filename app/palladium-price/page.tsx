@@ -23,12 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
     : null;
   const title = priceStr
     ? `Palladium Price Today: ${priceStr}/oz`
-    : "Palladium Price Today — Live Spot Price Per Ounce";
+    : "Palladium Price Today — Live Price Per Ounce";
 
   return {
     title,
     description:
-      "Live palladium spot price per troy ounce, updated in real time. See today's palladium price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
+      "Live palladium price per troy ounce, updated daily. Sourced from futures data, not true spot — see today's palladium price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
     keywords: [
       "palladium price today",
       "palladium price per ounce",
@@ -50,14 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description:
-        "Live palladium spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+        "Live palladium price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
       url: "https://lode.rocks/palladium-price",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description:
-        "Live palladium spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+        "Live palladium price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
     },
   };
 }
@@ -108,7 +108,7 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://lode.rocks/palladium-price#page",
       "url": "https://lode.rocks/palladium-price",
-      "name": "Palladium Price Today — Live Spot Price Per Ounce",
+      "name": "Palladium Price Today — Live Price Per Ounce",
       "description": "Live palladium spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
@@ -120,7 +120,7 @@ const jsonLd = {
           "name": "What is the palladium price today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `The current palladium price is shown at the top of this page and updates on every page load from ${PRICE_SOURCES.palladium.provider} futures data (${PRICE_SOURCES.palladium.ticker}) — a close proxy for true spot, but it ${FUTURES_GAP_NOTE}. Palladium prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.`,
+            "text": `The current palladium price is shown at the top of this page, refreshed once a day from ${PRICE_SOURCES.palladium.provider} futures data (${PRICE_SOURCES.palladium.ticker}) — a close proxy for true spot, but it ${FUTURES_GAP_NOTE}. The exact time it was last updated is shown alongside the price. Palladium's underlying market price changes continuously during market hours (Sunday 6pm to Friday 5pm ET); on weekends and holidays it reflects the last traded value.`,
           },
         },
         {
@@ -144,7 +144,7 @@ const jsonLd = {
           "name": "What is the palladium spot price per gram?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "To convert palladium spot price per troy ounce to price per gram, divide by 31.1035 (the number of grams in a troy ounce). The weight reference table on this page shows today's palladium price per gram, per kilogram, and per pennyweight, calculated live from the current spot price.",
+            "text": "To convert palladium price per troy ounce to price per gram, divide by 31.1035 (the number of grams in a troy ounce). The weight reference table on this page shows today's palladium price per gram, per kilogram, and per pennyweight, calculated from the current price shown above (futures-based, not true spot — see above).",
           },
         },
         {

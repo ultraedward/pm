@@ -43,6 +43,12 @@ export const metadata: Metadata = {
       "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900 silver and 24k–10k gold.",
     url: "https://lode.rocks/gram",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Silver & Gold Price Per Gram Calculator — Live Spot",
+    description:
+      "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900 silver and 24k–10k gold.",
+  },
 };
 
 export default async function GramPage() {
@@ -158,7 +164,7 @@ export default async function GramPage() {
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto">
-            Enter any weight to see the live melt value of silver or gold — fine .999, sterling 925, coin 900, 14k, 18k, 24k, and more. Spot prices refresh on page load.
+            Enter any weight to see the melt value of silver or gold at today's spot price — fine .999, sterling 925, coin 900, 14k, 18k, 24k, and more. Spot prices refresh daily.
           </p>
           <div className="flex items-center justify-center gap-6 text-xs text-gray-600 pt-1">
             <Link href="/gold-price" className="hover:text-gray-400 transition-colors">

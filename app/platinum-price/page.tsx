@@ -23,12 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
     : null;
   const title = priceStr
     ? `Platinum Price Today: ${priceStr}/oz`
-    : "Platinum Price Today — Live Spot Price Per Ounce";
+    : "Platinum Price Today — Live Price Per Ounce";
 
   return {
     title,
     description:
-      "Live platinum spot price per troy ounce, updated in real time. See today's platinum price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
+      "Live platinum price per troy ounce, updated daily. Sourced from futures data, not true spot — see today's platinum price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
     keywords: [
       "platinum price today",
       "platinum price per ounce",
@@ -50,14 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description:
-        "Live platinum spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+        "Live platinum price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
       url: "https://lode.rocks/platinum-price",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description:
-        "Live platinum spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+        "Live platinum price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
     },
   };
 }
@@ -108,7 +108,7 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://lode.rocks/platinum-price#page",
       "url": "https://lode.rocks/platinum-price",
-      "name": "Platinum Price Today — Live Spot Price Per Ounce",
+      "name": "Platinum Price Today — Live Price Per Ounce",
       "description": "Live platinum spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
@@ -120,7 +120,7 @@ const jsonLd = {
           "name": "What is the platinum price today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `The current platinum price is shown at the top of this page and updates on every page load from ${PRICE_SOURCES.platinum.provider} futures data (${PRICE_SOURCES.platinum.ticker}) — a close proxy for true spot, but it ${FUTURES_GAP_NOTE}. Platinum prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.`,
+            "text": `The current platinum price is shown at the top of this page, refreshed once a day from ${PRICE_SOURCES.platinum.provider} futures data (${PRICE_SOURCES.platinum.ticker}) — a close proxy for true spot, but it ${FUTURES_GAP_NOTE}. The exact time it was last updated is shown alongside the price. Platinum's underlying market price changes continuously during market hours (Sunday 6pm to Friday 5pm ET); on weekends and holidays it reflects the last traded value.`,
           },
         },
         {

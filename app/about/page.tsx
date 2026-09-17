@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata = {
   title: "About Lode — Independent Precious Metals Price Tracker",
   description:
-    "Lode is an independent precious metals price tracker — live spot prices, a coin melt calculator, a portfolio tracker, and email price alerts. Built for people who hold physical metal.",
+    "Lode is an independent precious metals price tracker — gold, silver, platinum, and palladium prices, a coin melt calculator, a portfolio tracker, and email price alerts. Built for people who hold physical metal.",
   alternates: {
     canonical: "https://lode.rocks/about",
   },
@@ -12,6 +12,12 @@ export const metadata = {
     description:
       "An independent precious metals price tracker built for people who hold physical metal. No dealer affiliation, no ads.",
     url: "https://lode.rocks/about",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Lode — Independent Precious Metals Price Tracker",
+    description:
+      "An independent precious metals price tracker built for people who hold physical metal. No dealer affiliation, no ads.",
   },
 };
 
@@ -30,7 +36,7 @@ const aboutJsonLd = {
       "@id": "https://lode.rocks/about#page",
       "url": "https://lode.rocks/about",
       "name": "About Lode — Independent Precious Metals Price Tracker",
-      "description": "Lode is an independent precious metals price tracker — live spot prices, a coin melt calculator, a portfolio tracker, and email price alerts. Built for people who hold physical metal.",
+      "description": "Lode is an independent precious metals price tracker — gold, silver, platinum, and palladium prices, a coin melt calculator, a portfolio tracker, and email price alerts. Built for people who hold physical metal.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
       "about": { "@id": "https://lode.rocks/#org" },
     },
@@ -62,7 +68,7 @@ export default function AboutPage() {
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">At a glance</p>
           <ul className="space-y-2 text-gray-300">
-            <li><span className="text-white font-semibold">What it is:</span> live spot prices for gold, silver, platinum, palladium — plus a coin melt calculator, gram converter, portfolio tracker, and email price alerts.</li>
+            <li><span className="text-white font-semibold">What it is:</span> gold and silver spot prices, plus platinum and palladium — a coin melt calculator, gram converter, portfolio tracker, and email price alerts.</li>
             <li><span className="text-white font-semibold">What it isn&rsquo;t:</span> a dealer, a broker, an exchange, or financial advice. We don&rsquo;t hold anything for you.</li>
             <li><span className="text-white font-semibold">How we fund it:</span> affiliate commissions on dealer clicks from the <a href="/compare" className="link-gold">compare</a> page. No ads, no data sales. Rankings sort by price, not by who pays us.</li>
             <li><span className="text-white font-semibold">How to verify it:</span> cross-check any spot price against Kitco or a broker terminal — numbers should match within pennies. See <a href="/methodology" className="link-gold">methodology</a>.</li>
@@ -74,7 +80,7 @@ export default function AboutPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">What Lode does</h2>
             <p>
-              Lode tracks live spot prices for gold, silver, platinum, and palladium. It lets you calculate coin melt values, convert between troy ounces and grams, track a physical-metal portfolio at current spot, and get an email when a price target you set is crossed.
+              Lode tracks gold and silver spot prices, plus platinum and palladium (futures-based — see our methodology page). It lets you calculate coin melt values, convert between troy ounces and grams, track a physical-metal portfolio at current prices, and get an email when a price target you set is crossed.
             </p>
             <p>
               It&rsquo;s built as a small, focused tool for the person holding the metal — not the person selling it to you.

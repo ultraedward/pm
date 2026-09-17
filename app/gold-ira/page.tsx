@@ -873,7 +873,7 @@ export default function GoldIraPage() {
               </Link>
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 pt-1 border-t" style={{ borderColor: "var(--border)" }}>
-              <span className="pt-3">Live spot prices:</span>
+              <span className="pt-3">Metal prices:</span>
               <Link href="/gold-price"      className="pt-3 hover:text-amber-400 transition-colors" style={{ color: "var(--gold-bright)" }}>Gold price today →</Link>
               <Link href="/silver-price"    className="pt-3 text-gray-400 hover:text-gray-200 transition-colors">Silver price today →</Link>
               <Link href="/platinum-price"  className="pt-3 text-gray-400 hover:text-gray-200 transition-colors">Platinum price →</Link>

@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description:
-      "Live silver spot price per troy ounce, updated in real time. See today's silver price, 30-day chart, price per gram, and key stats. Free — no sign-up required.",
+      "Live silver spot price per troy ounce, updated daily. See today's silver price, 30-day chart, price per gram, and key stats. Free — no sign-up required.",
     keywords: [
       "silver price today",
       "silver price per ounce",
@@ -50,14 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description:
-        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
       url: "https://lode.rocks/silver-price",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description:
-        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated on every page load.",
+        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
     },
   };
 }
@@ -121,7 +121,7 @@ const jsonLd = {
           "name": "What is the silver price today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": `The current silver spot price is shown at the top of this page and updates on every page load from ${PRICE_SOURCES.silver.provider}'s live rate feed — true spot, not futures. Silver prices change continuously during market hours (Sunday 6pm to Friday 5pm ET). On weekends and holidays the price shown reflects the last traded value.`,
+            "text": `The current silver spot price is shown at the top of this page, refreshed once a day from ${PRICE_SOURCES.silver.provider}'s rate feed — true spot, not futures. The exact time it was last updated is shown alongside the price. Silver's underlying market price changes continuously during market hours (Sunday 6pm to Friday 5pm ET); on weekends and holidays it reflects the last traded value.`,
           },
         },
         {

@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Precious Metals Portfolio Tracker — Track Gold & Silver Holdings",
   description:
-    "Track your gold, silver, platinum, and palladium holdings at live spot prices. See total portfolio value, P&L, and allocation — no account needed. Your data stays on your device.",
+    "Track your gold, silver, platinum, and palladium holdings at today's prices. See total portfolio value, P&L, and allocation — no account needed. Your data stays on your device.",
   keywords: [
     "precious metals portfolio tracker",
     "gold portfolio tracker",
@@ -38,6 +38,12 @@ export const metadata: Metadata = {
     description:
       "Log your oz, see your total value and P&L at current spot prices. No account needed — your data stays on your device.",
     url: "https://lode.rocks/portfolio-tracker",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Precious Metals Portfolio Tracker — Track Gold & Silver at Live Spot",
+    description:
+      "Log your oz, see your total value and P&L at current spot prices. No account needed — your data stays on your device.",
   },
 };
 
@@ -63,7 +69,7 @@ const jsonLd = {
       "featureList": [
         "Gold portfolio tracker",
         "Silver holdings tracker",
-        "Live spot price valuation",
+        "Daily spot price valuation",
         "P&L at current prices",
         "Multi-metal portfolio",
         "Platinum and palladium support",
@@ -95,7 +101,7 @@ const jsonLd = {
           "name": "How does the precious metals portfolio tracker work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at live spot prices. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup. Whether you hold American Eagles, Maple Leafs, generic rounds, or bars, log them by troy ounce weight.",
+            "text": "Log your holdings — ounces of gold, silver, platinum, or palladium and the price you paid — and Lode values them at today's price, updated daily. You see your total portfolio value, P&L since purchase, and allocation across metals, without ever doing a manual price lookup. Whether you hold American Eagles, Maple Leafs, generic rounds, or bars, log them by troy ounce weight.",
           },
         },
       ],
@@ -121,8 +127,8 @@ const FEATURES = [
         <polyline points="17 6 23 6 23 12" />
       </svg>
     ),
-    title: "Live P&L at spot",
-    body: "Log your cost basis and see your gain or loss at today's live spot price, refreshed on every page load.",
+    title: "P&L at spot",
+    body: "Log your cost basis and see your gain or loss at today's spot price, updated daily.",
   },
   {
     icon: (

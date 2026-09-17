@@ -4,7 +4,7 @@ import { PRICE_SOURCES, FUTURES_GAP_NOTE } from "@/lib/priceSourceInfo";
 export const metadata = {
   title: "How Lode Gets Precious Metals Spot Prices — Methodology & Sources",
   description:
-    "Where Lode's gold, silver, platinum, and palladium spot prices come from, how often they refresh, and how every calculator works. Full transparency on sources, formulas, and limitations.",
+    "Where Lode's gold, silver, platinum, and palladium prices come from — including which are true spot and which are futures-based — how often they refresh, and how every calculator works. Full transparency on sources, formulas, and limitations.",
   alternates: {
     canonical: "https://lode.rocks/methodology",
   },

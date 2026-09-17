@@ -16,21 +16,21 @@ import { formatUpdated } from "@/lib/formatUpdated";
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
   description:
-    "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
+    "Gold and silver spot prices, plus platinum and palladium. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
   alternates: {
     canonical: "https://lode.rocks",
   },
   openGraph: {
     title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
+      "Gold and silver spot prices, plus platinum and palladium. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
     url: "https://lode.rocks",
   },
   twitter: {
     card: "summary_large_image",
     title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
     description:
-      "Live gold, silver, platinum, and palladium spot prices. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
+      "Gold and silver spot prices, plus platinum and palladium. Set email price alerts, calculate coin melt values, and track your precious metals portfolio.",
   },
 };
 
@@ -209,7 +209,7 @@ export default async function HomePage() {
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "Unlimited price alerts, portfolio tracker, live spot prices, weekly digest",
+            "description": "Unlimited price alerts, portfolio tracker, daily spot prices, weekly digest",
           },
         ],
       },
@@ -224,7 +224,7 @@ export default async function HomePage() {
     },
     {
       label: "Coin melt value",
-      body: "Eagles, Maple Leafs, Morgans, junk silver — melt value at today's live spot.",
+      body: "Eagles, Maple Leafs, Morgans, junk silver — melt value at today's price.",
       href: "/coin-melt-calculator",
     },
     {
@@ -235,7 +235,7 @@ export default async function HomePage() {
   ];
 
   const secondaryFeatures = [
-    { label: "Portfolio tracker", body: "Holdings valued at live spot, P&L in your currency.", href: isLoggedIn ? "/dashboard/holdings" : "/login" },
+    { label: "Portfolio tracker", body: "Holdings valued at today's price, P&L in your currency.", href: isLoggedIn ? "/dashboard/holdings" : "/login" },
     { label: "Price history",     body: "30-day and 90-day charts for all four metals.",        href: isLoggedIn ? "/dashboard/charts"   : "/login" },
     { label: "Gold IRA guide",    body: "Compare custodians and understand tax advantages.",    href: "/gold-ira" },
   ];

@@ -203,7 +203,7 @@ export default async function ComparePage() {
       <section className="px-4 sm:px-6 pb-4">
         <div className="mx-auto max-w-2xl">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
-            <span>Live spot prices:</span>
+            <span>Metal prices:</span>
             <Link href="/gold-price"      className="link-gold">Gold price →</Link>
             <Link href="/silver-price"    className="text-gray-400 hover:text-gray-200 transition-colors">Silver price →</Link>
             <Link href="/platinum-price"  className="text-gray-400 hover:text-gray-200 transition-colors">Platinum price →</Link>
@@ -335,10 +335,10 @@ export default async function ComparePage() {
                 <p>
                   Dealer premiums are scraped automatically each week by a Cloudflare Worker that visits each
                   dealer&rsquo;s product page and reads the current check/wire price. The "premiums verified"
-                  date shown at the top of the page reflects the last successful scrape. Live spot prices for
-                  gold and silver — the metals compared on this page — come from {PRICE_SOURCES.gold.provider}&rsquo;s
-                  true-spot feed and update on every page load, so estimated totals always reflect the current
-                  market even between weekly scrape runs.
+                  date shown at the top of the page reflects the last successful scrape. Gold and silver spot
+                  prices — the metals compared on this page — come from {PRICE_SOURCES.gold.provider}&rsquo;s
+                  true-spot feed and refresh once a day, so estimated totals stay current with the market
+                  between weekly scrape runs without each pageview independently fetching a new price.
                 </p>
                 <p>
                   If you notice a dealer&rsquo;s actual price is meaningfully different from our estimate, email

@@ -72,7 +72,7 @@ const jsonLd = {
         "Morgan and Peace dollar melt value",
         "Gold Eagle melt value",
         "Canadian Maple Leaf melt value",
-        "Live spot price on every page load",
+        "Spot price, updated daily",
       ],
     },
     {

@@ -31,6 +31,12 @@ export const metadata: Metadata = {
       "Set custom price targets for gold, silver, platinum, or palladium. Email alert when spot crosses your threshold — no app required.",
     url: "https://lode.rocks/gold-price-alerts",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Precious Metals Price Alerts — Gold, Silver, Platinum & Palladium",
+    description:
+      "Set custom price targets for gold, silver, platinum, or palladium. Email alert when spot crosses your threshold — no app required.",
+  },
 };
 
 const jsonLd = {

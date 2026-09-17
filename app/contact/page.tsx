@@ -13,6 +13,12 @@ export const metadata = {
       "Reach the Lode team at hello@lode.rocks — questions, feedback, partnerships, or press.",
     url: "https://lode.rocks/contact",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact | Lode",
+    description:
+      "Reach the Lode team at hello@lode.rocks — questions, feedback, partnerships, or press.",
+  },
 };
 
 export default function ContactPage() {

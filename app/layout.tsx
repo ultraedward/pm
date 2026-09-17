@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Lode",
   },
   description:
-    "Live gold, silver, platinum, and palladium spot prices. Track your precious metals portfolio, set email price alerts, and calculate coin melt values.",
+    "Gold and silver spot prices, plus platinum and palladium. Track your precious metals portfolio, set email price alerts, and calculate coin melt values.",
   keywords: [
     "gold spot price",
     "silver spot price",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Live gold, silver, platinum, and palladium spot prices. Track your precious metals portfolio, set email price alerts, and calculate coin melt values.",
+      "Gold and silver spot prices, plus platinum and palladium. Track your precious metals portfolio, set email price alerts, and calculate coin melt values.",
     type: "website",
     url: "https://lode.rocks",
     siteName: "Lode",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lode — Gold & Silver Spot Prices, Alerts & Portfolio Tracker",
     description:
-      "Live gold, silver, platinum, and palladium spot prices. Track your precious metals portfolio, set email price alerts, and calculate coin melt values.",
+      "Gold and silver spot prices, plus platinum and palladium. Track your precious metals portfolio, set email price alerts, and calculate coin melt values.",
   },
   verification: {
     google: "9e0574274bbeb821",
@@ -77,7 +77,7 @@ const siteJsonLd = {
       "url": "https://lode.rocks",
       "email": "hello@lode.rocks",
       "description":
-        "Live gold, silver, platinum, and palladium spot prices. Precious metals portfolio tracker, email price alerts, and dealer-pricing comparison.",
+        "Gold and silver spot prices, plus platinum and palladium. Precious metals portfolio tracker, email price alerts, and dealer-pricing comparison.",
       "logo": {
         "@type": "ImageObject",
         "url": "https://lode.rocks/logo",

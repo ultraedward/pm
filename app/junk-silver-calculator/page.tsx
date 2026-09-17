@@ -74,7 +74,7 @@ const jsonLd = {
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "description":
-        "Calculate the live melt value of pre-1965 junk silver coins. Enter a face value amount or count individual coins — silver dimes, quarters, half dollars (90% and 40%), and Morgan & Peace dollars. Spot prices refresh on every page load.",
+        "Calculate the melt value of pre-1965 junk silver coins at today's silver spot price. Enter a face value amount or count individual coins — silver dimes, quarters, half dollars (90% and 40%), and Morgan & Peace dollars.",
       "featureList": [
         "Junk silver face value calculator",
         "Pre-1965 silver dime melt value",
@@ -82,7 +82,7 @@ const jsonLd = {
         "Walking Liberty and Franklin half dollar melt value",
         "Kennedy half dollar (90% and 40%) melt value",
         "Morgan and Peace silver dollar melt value",
-        "Live silver spot price on every page load",
+        "Silver spot price, updated daily",
       ],
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },

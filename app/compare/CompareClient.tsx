@@ -240,7 +240,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
 
       {/* Footnote */}
       <p className="text-[11px] leading-relaxed max-w-md" style={{ color: "var(--text-dim)" }}>
-        Prices update as spot moves. Dealer premiums shown are typical single-piece
+        Spot prices refresh daily. Dealer premiums shown are typical single-piece
         list prices; bulk and wire-transfer discounts may apply at checkout.{" "}
         <Link href="/#calculator" className="underline hover:text-gray-400 transition-colors">
           Calculate melt value →

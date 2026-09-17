@@ -1,23 +1,19 @@
 import { ImageResponse } from "next/og";
+import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 
-export const runtime = "edge";
-export const alt = "Platinum Price Today — Live Spot Price | Lode";
+// Not edge runtime: fetchAllSpotPrices() reads from Postgres via Prisma,
+// which needs the Node runtime (no edge driver adapter configured). Was
+// previously fetching PRICE_WORKER_URL live at image-render time — that
+// bypassed the once-daily DB-read path every other page uses (see commit
+// 1a72417), so the OG image's price could drift from what the actual page
+// shows. Now reads the same stored value as the page itself.
+export const alt = "Platinum Price Today — Live Price | Lode";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 async function fetchPlatinumPrice(): Promise<number | null> {
-  const workerUrl = process.env.PRICE_WORKER_URL;
-  if (!workerUrl) return null;
-  try {
-    const res = await fetch(workerUrl, { cache: "no-store" });
-    if (!res.ok) return null;
-    const data = await res.json() as Record<string, unknown>;
-    if (!data.ok) return null;
-    const price = (data as Record<string, number>).platinum;
-    return typeof price === "number" && price > 0 ? price : null;
-  } catch {
-    return null;
-  }
+  const spots = await fetchAllSpotPrices();
+  return spots.platinum;
 }
 
 function fmtPrice(n: number) {
@@ -101,7 +97,7 @@ export default async function OGImage() {
               textTransform: "uppercase",
             }}
           >
-            Platinum · XPT · Live spot
+            Platinum · XPT · Futures-based
           </span>
         </div>
 
