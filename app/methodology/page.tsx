@@ -99,10 +99,10 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Refresh cadence</h2>
             <p>
-              Live prices are fetched on demand when you load a page, cached for up to 10 minutes on our servers to avoid exhausting upstream API quotas, then refetched. During active market hours you&rsquo;ll see prices updated within that 10-minute window on any new page load.
+              We pull a fresh price once a day and store it — every page reads that stored value rather than each fetching live on every visit. That&rsquo;s a deliberate choice, not a limitation we&rsquo;re working around: Lode&rsquo;s calculators, portfolio tracker, and dealer comparison don&rsquo;t need sub-hour price precision to be useful, and fetching live on every one of the thousands of pageviews a day this site gets would put far more load on free upstream sources than a supporting number justifies. Every price on the site shows exactly when it was last updated (e.g. &ldquo;Updated 6h ago&rdquo;) so you always know its age rather than assuming it&rsquo;s real-time.
             </p>
             <p>
-              Historical sparklines, 52-week high/low, and 24-hour percent change are computed from daily snapshots we record to our own database at 00:00 UTC. Over time this gives us an independent history series we can plot without depending on a paid history API.
+              Historical sparklines, 52-week high/low, and 24-hour percent change are computed from that same daily snapshot series. Over time this gives us an independent history series we can plot without depending on a paid history API.
             </p>
           </section>
 

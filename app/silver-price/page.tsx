@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
+import { formatUpdated } from "@/lib/formatUpdated";
 import { getMetalRangeStats } from "@/lib/metalRangeStats";
 import { SilverPriceChart } from "@/components/SilverPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
@@ -195,11 +196,7 @@ export default async function SilverPricePage() {
 
   const weightRows = spot > 0 ? buildWeightRows(spot) : [];
 
-  const updatedTime = new Date(spots.fetchedAt).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+  const updatedLabel = formatUpdated(spots.fetchedAt);
 
   return (
     <>
@@ -264,7 +261,7 @@ export default async function SilverPricePage() {
                 30D {fmtChange(change30)} ({fmtPct(pct30)})
               </span>
             )}
-            <span className="text-xs" style={{ color: "var(--text-dim)" }}>Updated {updatedTime}</span>
+            <span className="text-xs" style={{ color: "var(--text-dim)" }}>{updatedLabel}</span>
           </div>
         </div>
       </section>

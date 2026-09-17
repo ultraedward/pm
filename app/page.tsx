@@ -11,6 +11,7 @@ import { authOptions } from "@/lib/auth";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 import { SiteFooter } from "@/components/SiteFooter";
 import { InlineSignup } from "@/components/InlineSignup";
+import { formatUpdated } from "@/lib/formatUpdated";
 
 export const metadata: Metadata = {
   title: "Gold & Silver Spot Prices Today — Precious Metals Tracker",
@@ -165,17 +166,6 @@ function PriceTile({ metal, data }: { metal: Metal; data: MetalData }) {
 }
 
 // ─── page ─────────────────────────────────────────────────────────────────────
-
-function fmtUpdated(date: Date | null): string {
-  if (!date) return "Updating…";
-  const diffMs  = Date.now() - date.getTime();
-  const diffH   = diffMs / 1000 / 60 / 60;
-  if (diffH < 1)  return "Updated just now";
-  if (diffH < 24) return `Updated ${Math.floor(diffH)}h ago`;
-  const diffD = Math.floor(diffH / 24);
-  if (diffD === 1) return "Updated yesterday";
-  return `Updated ${diffD}d ago`;
-}
 
 export default async function HomePage() {
   const [session, liveSpots] = await Promise.all([
@@ -358,9 +348,9 @@ export default async function HomePage() {
                   </div>
                 );
               })}
-              <span className="hidden sm:block label ml-auto">{fmtUpdated(lastUpdated)}</span>
+              <span className="hidden sm:block label ml-auto">{formatUpdated(lastUpdated)}</span>
             </div>
-            <p className="mt-3 sm:hidden label">{fmtUpdated(lastUpdated)}</p>
+            <p className="mt-3 sm:hidden label">{formatUpdated(lastUpdated)}</p>
           </div>
 
         </div>
@@ -481,7 +471,7 @@ export default async function HomePage() {
           </div>
           <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
             <span className="label">Spot prices · 30-day trend</span>
-            <span className="text-[10px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{fmtUpdated(lastUpdated)}</span>
+            <span className="text-[10px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{formatUpdated(lastUpdated)}</span>
           </div>
         </div>
       </section>

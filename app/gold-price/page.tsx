@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
+import { formatUpdated } from "@/lib/formatUpdated";
 import { getMetalRangeStats } from "@/lib/metalRangeStats";
 import { MetalPriceChart } from "@/components/MetalPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
@@ -200,11 +201,7 @@ export default async function GoldPricePage() {
 
   const weightRows = spot > 0 ? buildWeightRows(spot) : [];
 
-  const updatedTime = new Date(spots.fetchedAt).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+  const updatedLabel = formatUpdated(spots.fetchedAt);
 
   const faqItems = (jsonLd["@graph"][2] as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }).mainEntity.map(
     (qa) => ({ question: qa.name, answer: qa.acceptedAnswer.text })
@@ -273,7 +270,7 @@ export default async function GoldPricePage() {
                   30D {fmtChange(change30)} ({fmtPct(pct30)})
                 </span>
               )}
-              <span className="text-xs" style={{ color: "var(--text-dim)" }}>Updated {updatedTime}</span>
+              <span className="text-xs" style={{ color: "var(--text-dim)" }}>{updatedLabel}</span>
             </div>
           </div>
         </section>
