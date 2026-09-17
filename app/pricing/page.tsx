@@ -20,14 +20,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Pricing — Free & Pro | Lode",
     description:
-      "Free: live spot prices, unlimited alerts, portfolio tracker, melt calculators. Pro: 90-day charts, CSV export, tax snapshots.",
+      "Free: live prices, unlimited alerts, portfolio tracker, melt calculators. Pro: 90-day charts, CSV export, tax snapshots.",
     url: "https://lode.rocks/pricing",
   },
   twitter: {
     card: "summary_large_image",
     title: "Pricing — Free & Pro | Lode",
     description:
-      "Free: live spot prices, unlimited alerts, portfolio tracker, melt calculators. Pro: 90-day charts, CSV export, tax snapshots.",
+      "Free: live prices, unlimited alerts, portfolio tracker, melt calculators. Pro: 90-day charts, CSV export, tax snapshots.",
   },
 };
 

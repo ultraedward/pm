@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/entitlements";
 
 export const dynamic = "force-dynamic";
+
+const PRO_RANGES = new Set(["90d", "all"]);
 
 type RangeKey = "24h" | "7d" | "30d" | "90d" | "all";
 type MetalKey = "gold" | "silver" | "platinum" | "palladium";
@@ -93,6 +98,33 @@ export async function GET(req: NextRequest) {
         { error: "Invalid range. Use 24h, 7d, 30d, 90d, or all." },
         { status: 400 }
       );
+    }
+
+    // 90d/all are Pro-only (see app/pricing). The chart UI already hides/locks
+    // these behind /pricing for non-Pro users, but that's client-side only —
+    // without this check, anyone could call this route directly with
+    // range=all and get the full history for free. Belt and suspenders.
+    if (PRO_RANGES.has(range)) {
+      const session = await getServerSession(authOptions);
+      let isPro = false;
+
+      if (session?.user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { subscriptionStatus: true, proUntil: true },
+        });
+        isPro = hasProAccess({
+          stripeStatus: dbUser?.subscriptionStatus,
+          proUntil: dbUser?.proUntil,
+        });
+      }
+
+      if (!isPro) {
+        return NextResponse.json(
+          { error: "Pro required for this range. Upgrade at /pricing." },
+          { status: 403 }
+        );
+      }
     }
 
     const since = getRangeStart(range);
