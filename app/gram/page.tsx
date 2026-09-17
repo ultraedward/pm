@@ -13,9 +13,9 @@ import { EmailCapture } from "@/components/EmailCapture";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Silver & Gold Price Per Gram Calculator — Live Spot",
+  title: "Silver & Gold Price Per Gram Calculator — Spot Price",
   description:
-    "Calculate silver and gold price per gram instantly with live spot prices. Covers .999 fine, 925 sterling (92.5%), coin 900, European 800 silver — plus 24k, 22k, 18k, 14k, 10k gold.",
+    "Calculate silver and gold price per gram instantly with today's spot prices. Covers .999 fine, 925 sterling (92.5%), coin 900, European 800 silver — plus 24k, 22k, 18k, 14k, 10k gold.",
   alternates: {
     canonical: "https://lode.rocks/gram",
   },
@@ -38,16 +38,16 @@ export const metadata: Metadata = {
     "gold price grams calculator",
   ],
   openGraph: {
-    title: "Silver & Gold Price Per Gram Calculator — Live Spot",
+    title: "Silver & Gold Price Per Gram Calculator — Spot Price",
     description:
-      "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900 silver and 24k–10k gold.",
+      "Instantly calculate silver and gold price per gram with today's spot prices. Covers .999 fine, sterling 925, coin 900 silver and 24k–10k gold.",
     url: "https://lode.rocks/gram",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Silver & Gold Price Per Gram Calculator — Live Spot",
+    title: "Silver & Gold Price Per Gram Calculator — Spot Price",
     description:
-      "Instantly calculate silver and gold price per gram with live spot prices. Covers .999 fine, sterling 925, coin 900 silver and 24k–10k gold.",
+      "Instantly calculate silver and gold price per gram with today's spot prices. Covers .999 fine, sterling 925, coin 900 silver and 24k–10k gold.",
   },
 };
 
@@ -101,10 +101,10 @@ export default async function GramPage() {
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "description":
-          "Calculate the live melt value of silver and gold by weight. Supports grams, pennyweights, and troy ounces. Covers sterling .925, fine .999, coin .900 silver, and 24k through 9k gold.",
+          "Calculate the melt value of silver and gold by weight at today's spot price. Supports grams, pennyweights, and troy ounces. Covers sterling .925, fine .999, coin .900 silver, and 24k through 9k gold.",
         "featureList": [
-          "Live silver price per gram",
-          "Live gold price per gram",
+          "Silver price per gram, updated daily",
+          "Gold price per gram, updated daily",
           "Sterling silver melt value",
           "14k, 18k, 24k gold melt value",
           "Gram, pennyweight, and troy oz support",
@@ -119,7 +119,7 @@ export default async function GramPage() {
             "name": "What is the silver price per gram today?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `Silver is currently ${silverSpot > 0 ? `$${(silverSpot / 31.1035).toFixed(4)} per gram` : "available on this page — calculated from live spot prices"}. Fine .999 silver is calculated by dividing the troy ounce spot price by 31.1035 grams per troy oz.`,
+              "text": `Silver is currently ${silverSpot > 0 ? `$${(silverSpot / 31.1035).toFixed(4)} per gram` : "available on this page — calculated from today's spot prices"}. Fine .999 silver is calculated by dividing the troy ounce spot price by 31.1035 grams per troy oz.`,
             },
           },
           {
@@ -135,7 +135,7 @@ export default async function GramPage() {
             "name": "What is the gold price per gram for 14k gold?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `14k gold is 58.3% pure (14 ÷ 24). ${goldSpot > 0 ? `At today's spot price, 14k gold is worth approximately $${(goldSpot * (14/24) / 31.1035).toFixed(2)} per gram.` : "Use the calculator above to see the current 14k gold price per gram based on live spot prices."}`,
+              "text": `14k gold is 58.3% pure (14 ÷ 24). ${goldSpot > 0 ? `At today's spot price, 14k gold is worth approximately $${(goldSpot * (14/24) / 31.1035).toFixed(2)} per gram.` : "Use the calculator above to see the current 14k gold price per gram based on today's spot prices."}`,
             },
           },
         ],
@@ -279,7 +279,7 @@ export default async function GramPage() {
               <p className="text-sm text-gray-400 leading-relaxed">
                 {silverSpot > 0
                   ? `Fine .999 silver is currently ${formatCurrency(silverSpot / 31.1035)} per gram, based on a spot price of ${fmtSpot(silverSpot)} per troy ounce. Sterling silver (92.5% pure) is ${formatCurrency(silverSpot * 0.925 / 31.1035)} per gram.`
-                  : "The current silver price per gram is shown in the calculator and reference table above, calculated from the live spot price."}
+                  : "The current silver price per gram is shown in the calculator and reference table above, calculated from today's spot price."}
               </p>
             </div>
 
@@ -341,7 +341,7 @@ export default async function GramPage() {
           <div className="text-left max-w-sm">
             <InlineSignup
               heading="Track your full stack on Lode"
-              subtext="Portfolio tracker, price alerts, and live spot for all four metals. Free — 30 seconds."
+              subtext="Portfolio tracker, price alerts, and daily prices for all four metals. Free — 30 seconds."
               callbackUrl="/dashboard?onboarding=1"
             />
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">

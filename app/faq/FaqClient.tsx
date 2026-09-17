@@ -373,11 +373,11 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
 
         {/* Tools & prices grid */}
         <section className="border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-          <h2 className="text-base font-bold text-white">Lode tools &amp; live prices</h2>
+          <h2 className="text-base font-bold text-white">Lode tools &amp; prices</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
-              { href: "/gold-price",             label: "Gold Price Today",        desc: "Live spot, 30-day chart" },
-              { href: "/silver-price",           label: "Silver Price Today",      desc: "Live spot, 30-day chart" },
+              { href: "/gold-price",             label: "Gold Price Today",        desc: "Spot price, 30-day chart" },
+              { href: "/silver-price",           label: "Silver Price Today",      desc: "Spot price, 30-day chart" },
               { href: "/compare",                label: "Compare Dealers",         desc: "Who's cheapest today" },
               { href: "/coin-melt-calculator",   label: "Coin Melt Calculator",    desc: "Eagles, junk silver & more" },
               { href: "/gram",                   label: "Price Per Gram",          desc: "Gold and silver by gram" },

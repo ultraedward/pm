@@ -204,7 +204,7 @@ function buildDigestHtml(params: {
             <td style="padding-top:28px;text-align:center;">
               <a href="https://lode.rocks/dashboard"
                  style="display:inline-block;padding:13px 28px;background:#D4AF37;color:#000;font-weight:800;text-decoration:none;border-radius:999px;font-size:14px;letter-spacing:0.01em;">
-                ${hasHoldings ? "Check your portfolio →" : "See live prices →"}
+                ${hasHoldings ? "Check your portfolio →" : "See today's prices →"}
               </a>
             </td>
           </tr>

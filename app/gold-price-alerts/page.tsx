@@ -178,7 +178,7 @@ export default function GoldPriceAlertsPage() {
               />
               <div className="mt-4">
                 <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-                  View live spot prices →
+                  View today's prices →
                 </Link>
               </div>
             </div>

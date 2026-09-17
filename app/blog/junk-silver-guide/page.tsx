@@ -337,7 +337,7 @@ export default function JunkSilverGuidePage() {
               <Link href="/junk-silver-calculator" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">
                 Lode junk silver calculator
               </Link>{" "}
-              pulls live spot prices and lets you enter either a face value amount or count coins
+              applies today's spot price and lets you enter either a face value amount or count coins
               individually — useful if you have a mixed bag with both 90% and 40% halves. For melt
               values on gold and modern bullion coins too, see the{" "}
               <Link href="/blog/coin-melt-value-guide" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">
@@ -431,7 +431,7 @@ export default function JunkSilverGuidePage() {
                   over spot on a large lot, you&apos;ve lost the key benefit. Know spot before you buy —
                   the{" "}
                   <Link href="/silver-price" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">
-                    live silver price
+                    silver price
                   </Link>{" "}
                   is one click away. On small retail quantities, 10–15% over melt is normal; on $100+
                   face bags, push back if a dealer quotes higher than 5%.

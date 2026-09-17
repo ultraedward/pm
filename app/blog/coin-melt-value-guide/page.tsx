@@ -410,7 +410,7 @@ export default function CoinMeltValueGuidePage() {
           <section className="border p-6 sm:p-8 text-center" style={{ borderColor: "rgba(212,175,55,0.25)", background: "var(--surface-2)" }}>
             <h2 className="text-xl font-bold text-white mb-2">Calculate your coins&apos; exact melt value</h2>
             <p className="text-gray-400 text-sm mb-5">
-              Enter your coin and quantity — Lode pulls live spot prices automatically.
+              Enter your coin and quantity — Lode applies today's spot price automatically.
             </p>
             <Link
               href="/coin-melt-calculator"

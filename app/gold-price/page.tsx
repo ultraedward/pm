@@ -23,12 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
     : null;
   const title = priceStr
     ? `Gold Price Today: ${priceStr}/oz`
-    : "Gold Price Today — Live Spot Price Per Ounce";
+    : "Gold Price Today — Spot Price Per Ounce";
 
   return {
     title,
     description:
-      "Live gold spot price per troy ounce, updated daily. See today's gold price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
+      "Gold spot price per troy ounce, updated daily. See today's gold price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
     keywords: [
       "gold price today",
       "gold price per ounce",
@@ -50,14 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description:
-        "Live gold spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
+        "Gold spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
       url: "https://lode.rocks/gold-price",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description:
-        "Live gold spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
+        "Gold spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
     },
   };
 }
@@ -108,8 +108,8 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://lode.rocks/gold-price#page",
       "url": "https://lode.rocks/gold-price",
-      "name": "Gold Price Today — Live Spot Price Per Ounce",
-      "description": "Live gold spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
+      "name": "Gold Price Today — Spot Price Per Ounce",
+      "description": "Gold spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
     {
@@ -224,7 +224,7 @@ export default async function GoldPricePage() {
             />
           </div>
           <div className="relative z-10 mx-auto max-w-2xl space-y-3">
-            <p className="label">Live spot</p>
+            <p className="label">Spot price</p>
             <h1 className="font-black leading-none" style={{ fontSize: "clamp(2.25rem, 5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
               Gold Price Today
             </h1>
@@ -382,7 +382,7 @@ export default async function GoldPricePage() {
                   <Link href="/gram" className="link-gold">
                     gold price per gram calculator
                   </Link>
-                  {" "}which covers 24k, 22k, 18k, 14k, 10k, and 9k gold at live spot.
+                  {" "}which covers 24k, 22k, 18k, 14k, 10k, and 9k gold at today's spot price.
                 </p>
               </div>
 

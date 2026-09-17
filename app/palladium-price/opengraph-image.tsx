@@ -7,7 +7,7 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 // bypassed the once-daily DB-read path every other page uses (see commit
 // 1a72417), so the OG image's price could drift from what the actual page
 // shows. Now reads the same stored value as the page itself.
-export const alt = "Palladium Price Today — Live Price | Lode";
+export const alt = "Palladium Price Today — Futures Price | Lode";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

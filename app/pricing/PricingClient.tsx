@@ -9,10 +9,10 @@ type Props = {
 };
 
 const FREE_FEATURES = [
-  "Live prices — gold, silver, platinum & palladium",
+  "Daily prices — gold, silver, platinum & palladium",
   "Unlimited price alerts — email when your target is hit",
   "Coin & gram melt calculators",
-  "Portfolio tracker — holdings & P&L at live price",
+  "Portfolio tracker — holdings & P&L at today's price",
   "7-day & 30-day price charts",
   "Dealer comparison — APMEX, JM Bullion, SD Bullion & Money Metals",
   "Weekly Monday digest",

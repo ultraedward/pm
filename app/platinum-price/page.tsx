@@ -23,12 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
     : null;
   const title = priceStr
     ? `Platinum Price Today: ${priceStr}/oz`
-    : "Platinum Price Today — Live Price Per Ounce";
+    : "Platinum Price Today — Futures Price Per Ounce";
 
   return {
     title,
     description:
-      "Live platinum price per troy ounce, updated daily. Sourced from futures data, not true spot — see today's platinum price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
+      "Platinum price per troy ounce, updated daily. Sourced from futures data, not true spot — see today's platinum price, 30-day chart, price per gram, price per kilo, and key stats. Free — no sign-up required.",
     keywords: [
       "platinum price today",
       "platinum price per ounce",
@@ -50,14 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description:
-        "Live platinum price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
+        "Platinum price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
       url: "https://lode.rocks/platinum-price",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description:
-        "Live platinum price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
+        "Platinum price per troy ounce (futures-based, not true spot) with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
     },
   };
 }
@@ -108,8 +108,8 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://lode.rocks/platinum-price#page",
       "url": "https://lode.rocks/platinum-price",
-      "name": "Platinum Price Today — Live Price Per Ounce",
-      "description": "Live platinum spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
+      "name": "Platinum Price Today — Futures Price Per Ounce",
+      "description": "Platinum futures price per troy ounce with chart, per-gram rates, and 30-day stats.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
     {
@@ -227,7 +227,7 @@ export default async function PlatinumPricePage() {
             />
           </div>
           <div className="relative z-10 mx-auto max-w-2xl space-y-3">
-            <p className="label">Live price</p>
+            <p className="label">Futures price</p>
             <h1 className="font-black leading-none" style={{ fontSize: "clamp(2.25rem, 5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
               Platinum Price Today
             </h1>

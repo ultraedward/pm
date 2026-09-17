@@ -50,7 +50,7 @@ const compareJsonLd = {
       "url": "https://lode.rocks/compare",
       "name": "Estimated Bullion Pricing Across Top US Dealers — Silver & Gold Eagle, Maple Leaf",
       "description":
-        "Estimated total cost per coin across top US bullion dealers, using today's live spot price plus dealer premiums we maintain by hand.",
+        "Estimated total cost per coin across top US bullion dealers, using today's spot price plus dealer premiums we maintain by hand.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
     {
@@ -79,7 +79,7 @@ const compareJsonLd = {
 export const metadata: Metadata = {
   title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
   description:
-    "Compare Silver Eagle, Gold Eagle, and Maple Leaf prices across APMEX, JM Bullion, SD Bullion, and Money Metals at today's live spot. Sorted by total cost — see who's cheapest right now.",
+    "Compare Silver Eagle, Gold Eagle, and Maple Leaf prices across APMEX, JM Bullion, SD Bullion, and Money Metals at today's spot price. Sorted by total cost — see who's cheapest right now.",
   alternates: {
     canonical: "https://lode.rocks/compare",
   },
@@ -98,14 +98,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
     description:
-      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Live spot plus hand-verified dealer premiums, sorted low to high.",
+      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Today's spot price plus hand-verified dealer premiums, sorted low to high.",
     url: "https://lode.rocks/compare",
   },
   twitter: {
     card: "summary_large_image",
     title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
     description:
-      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Live spot plus hand-verified dealer premiums, sorted low to high.",
+      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Today's spot price plus hand-verified dealer premiums, sorted low to high.",
   },
 };
 
@@ -155,7 +155,7 @@ export default async function ComparePage() {
             <span style={{ color: "var(--gold-bright)" }}>at today&rsquo;s spot.</span>
           </h1>
           <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — live spot plus verified dealer premiums, sorted low to high.{" "}
+            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — today's spot price plus verified dealer premiums, sorted low to high.{" "}
             <span className="text-gray-600">Some links are affiliate — Lode may earn a commission at no extra cost to you; rankings are not influenced.</span>
           </p>
 
@@ -172,7 +172,7 @@ export default async function ComparePage() {
                 className="inline-block h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: "#10b981" }}
               />
-              <span>Live spot price</span>
+              <span>Spot price</span>
               <span className="text-gray-700">·</span>
               <a
                 href="https://www.kitco.com/charts/livegold.html"
@@ -288,7 +288,7 @@ export default async function ComparePage() {
                   plus a markup that covers their minting costs, storage, shipping, and margin. A dealer advertising
                   a low per-coin price may still be more expensive overall if their premium is higher. This page
                   calculates total estimated cost as:{" "}
-                  <em>live spot × coin weight + dealer premium</em>, then sorts low to high so the cheapest
+                  <em>today&rsquo;s spot price × coin weight + dealer premium</em>, then sorts low to high so the cheapest
                   option is always at the top.
                 </p>
               </div>

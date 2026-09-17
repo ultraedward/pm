@@ -15,7 +15,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Junk Silver Calculator — US 90% & Canadian 80% Silver Coins",
   description:
-    "Free junk silver calculator with live spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars, war nickels, and Canadian pre-1968 80% silver coins by face value or coin count.",
+    "Free junk silver calculator with today's spot prices. Find the melt value of pre-1965 US silver dimes, quarters, half dollars, Morgan & Peace dollars, war nickels, and Canadian pre-1968 80% silver coins by face value or coin count.",
   keywords: [
     "junk silver calculator",
     "junk silver melt value calculator",
@@ -45,14 +45,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Junk Silver Calculator — US 90% & Canadian 80% Silver Coins",
     description:
-      "Calculate the melt value of pre-1965 US and Canadian junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
+      "Calculate the melt value of pre-1965 US and Canadian junk silver coins at today's spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
     url: "https://lode.rocks/junk-silver-calculator",
   },
   twitter: {
     card: "summary_large_image",
     title: "Junk Silver Calculator — US 90% & Canadian 80% Silver Coins",
     description:
-      "Calculate the melt value of pre-1965 US and Canadian junk silver coins at live spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
+      "Calculate the melt value of pre-1965 US and Canadian junk silver coins at today's spot prices. 90% silver dimes, quarters, half dollars, Morgan dollars, war nickels, and Canadian 80% silver coins.",
   },
 };
 
@@ -134,7 +134,7 @@ const jsonLd = {
           "name": "What is the melt value of a Morgan silver dollar?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "A Morgan or Peace silver dollar contains 0.77344 troy ounces of silver (90% silver, 26.73g total weight). To find the current melt value, multiply 0.77344 by the live silver spot price.",
+            "text": "A Morgan or Peace silver dollar contains 0.77344 troy ounces of silver (90% silver, 26.73g total weight). To find the current melt value, multiply 0.77344 by today's silver spot price.",
           },
         },
         {
@@ -142,7 +142,7 @@ const jsonLd = {
           "name": "What is the melt value of Canadian junk silver coins?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Canadian pre-1968 dimes, quarters, half dollars, and dollar coins are 80% silver (compared to 90% for US coins). A Canadian dime contains 0.0600 troy oz of silver, a quarter 0.1500 oz, a half dollar 0.3000 oz, and a dollar coin 0.6000 oz. $1 face value in Canadian 80% silver holds 0.600 troy oz — slightly less than the 0.715 oz in US 90% junk silver. Multiply any coin's silver content by the live spot price to find today's melt value.",
+            "text": "Canadian pre-1968 dimes, quarters, half dollars, and dollar coins are 80% silver (compared to 90% for US coins). A Canadian dime contains 0.0600 troy oz of silver, a quarter 0.1500 oz, a half dollar 0.3000 oz, and a dollar coin 0.6000 oz. $1 face value in Canadian 80% silver holds 0.600 troy oz — slightly less than the 0.715 oz in US 90% junk silver. Multiply any coin's silver content by today's spot price to find today's melt value.",
           },
         },
         {
@@ -223,7 +223,7 @@ export default async function JunkSilverCalculatorPage() {
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto">
-            Live melt values for US 90% silver coins, Canadian 80% pre-1968 silver coins, and war nickels.
+            Melt values at today's silver price for US 90% silver coins, Canadian 80% pre-1968 silver coins, and war nickels.
             Enter a face value amount or count coin by coin.
           </p>
           {silverSpot > 0 && (
@@ -393,7 +393,7 @@ export default async function JunkSilverCalculatorPage() {
           <div className="text-left max-w-sm">
             <InlineSignup
               heading="Track your silver stack on Lode"
-              subtext="Portfolio tracker, price alerts, and live spot for all four metals. Free — 30 seconds."
+              subtext="Portfolio tracker, price alerts, and daily prices for all four metals. Free — 30 seconds."
               callbackUrl="/dashboard?onboarding=1"
             />
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">

@@ -93,7 +93,7 @@ export default function AboutPage() {
               When you click a dealer link on the <a href="/compare" className="link-gold">compare</a> page and end up buying, Lode may earn an affiliate commission at no cost to you. That&rsquo;s disclosed on the page itself (the FTC requires it) and it&rsquo;s currently our only revenue stream — no ads, no tracking cookies sold to third parties, no data-broker relationships.
             </p>
             <p>
-              <span className="text-white font-semibold">Commissions do not affect rankings.</span> The compare page sorts by estimated total cost — live spot × coin weight + a hand-maintained dealer premium. A cheaper dealer that pays us nothing still ranks ahead of a more expensive dealer that pays us.
+              <span className="text-white font-semibold">Commissions do not affect rankings.</span> The compare page sorts by estimated total cost — today's spot price × coin weight + a hand-maintained dealer premium. A cheaper dealer that pays us nothing still ranks ahead of a more expensive dealer that pays us.
             </p>
           </section>
 

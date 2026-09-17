@@ -34,14 +34,14 @@ export const metadata: Metadata = {
     canonical: "https://lode.rocks/portfolio-tracker",
   },
   openGraph: {
-    title: "Precious Metals Portfolio Tracker — Track Gold & Silver at Live Spot",
+    title: "Precious Metals Portfolio Tracker — Track Gold & Silver at Today's Price",
     description:
       "Log your oz, see your total value and P&L at current spot prices. No account needed — your data stays on your device.",
     url: "https://lode.rocks/portfolio-tracker",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Precious Metals Portfolio Tracker — Track Gold & Silver at Live Spot",
+    title: "Precious Metals Portfolio Tracker — Track Gold & Silver at Today's Price",
     description:
       "Log your oz, see your total value and P&L at current spot prices. No account needed — your data stays on your device.",
   },
@@ -65,7 +65,7 @@ const jsonLd = {
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "description":
-        "Track gold, silver, platinum, and palladium holdings at live spot prices. See total value, P&L, and allocation. No account needed — data stays on your device.",
+        "Track gold, silver, platinum, and palladium holdings at today's prices, updated daily. See total value, P&L, and allocation. No account needed — data stays on your device.",
       "featureList": [
         "Gold portfolio tracker",
         "Silver holdings tracker",
@@ -182,12 +182,12 @@ export default async function PortfolioTrackerPage() {
             <span style={{ color: "var(--gold-bright)" }}>Portfolio Tracker</span>
           </h1>
           <p className="text-base text-gray-400 max-w-lg mx-auto leading-relaxed">
-            Log your holdings, see total value and P&L at live spot prices.
+            Log your holdings, see total value and P&L at today's prices.
             No account needed — your data stays on your device.
           </p>
           <div className="flex items-center justify-center gap-2 pt-1">
             <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
-              View live spot prices →
+              View today's prices →
             </Link>
           </div>
         </div>

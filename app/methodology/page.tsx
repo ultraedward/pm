@@ -56,7 +56,7 @@ export default function MethodologyPage() {
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Verify us in 30 seconds</p>
           <p className="text-gray-300">
-            Don&rsquo;t take our word for anything. Pick any metal, pull the live price from Lode, and cross-check it against{" "}
+            Don&rsquo;t take our word for anything. Pick any metal, pull the current price from Lode, and cross-check it against{" "}
             <a href="https://www.kitco.com/charts/livegold.html" target="_blank" rel="noopener noreferrer" className="link-gold">Kitco</a>,{" "}
             <a href="https://www.bullionvault.com/gold-price-chart.do" target="_blank" rel="noopener noreferrer" className="link-gold">BullionVault</a>, or your broker during market hours. The numbers should match within pennies. If they don&rsquo;t, please tell us — we&rsquo;ll fix it.
           </p>
@@ -109,7 +109,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Coin melt calculator</h2>
             <p>
-              Melt value = <span className="text-gray-300">fine weight (troy oz) × live spot price per troy oz</span>. Fine weight is derived from the coin&rsquo;s gross weight and fineness — e.g. a pre-1965 US 90% silver quarter is 6.25 g × 0.900 ÷ 31.1034768 g/ozt = 0.18084 troy oz of pure silver.
+              Melt value = <span className="text-gray-300">fine weight (troy oz) × today&rsquo;s price per troy oz</span>. Fine weight is derived from the coin&rsquo;s gross weight and fineness — e.g. a pre-1965 US 90% silver quarter is 6.25 g × 0.900 ÷ 31.1034768 g/ozt = 0.18084 troy oz of pure silver.
             </p>
             <p>
               We use standard mint specifications sourced from the issuing mint&rsquo;s published specs (US Mint, Royal Canadian Mint, Perth Mint, etc.). Melt value is theoretical — actual sale prices include a premium over melt that varies by dealer, coin, and market conditions.
@@ -143,7 +143,7 @@ export default function MethodologyPage() {
           <section className="space-y-3">
             <h2 className="text-base font-bold text-white">Dealer compare page</h2>
             <p>
-              The <a href="/compare" className="link-gold">compare</a> page shows an <em>estimated</em> total cost per coin, computed as <span className="text-gray-300">live spot × coin fine weight + dealer premium</span>. Dealer premiums are maintained by hand based on each dealer&rsquo;s typical over-spot pricing for 1–9 unit quantities; they are not scraped live from dealer sites.
+              The <a href="/compare" className="link-gold">compare</a> page shows an <em>estimated</em> total cost per coin, computed as <span className="text-gray-300">today&rsquo;s spot price × coin fine weight + dealer premium</span>. Dealer premiums are maintained by hand based on each dealer&rsquo;s typical over-spot pricing for 1–9 unit quantities; they are not scraped live from dealer sites.
             </p>
             <p>
               That means a dealer&rsquo;s real checkout price on any given day may differ from ours — especially during promotions, volume-tier discounts, or payment-method-specific pricing. Treat our number as a &ldquo;what you&rsquo;d typically pay here right now&rdquo; estimate, not a locked quote. We revisit the premiums regularly and when market conditions shift materially.
@@ -164,7 +164,7 @@ export default function MethodologyPage() {
             <ul className="list-disc pl-5 space-y-1.5 text-gray-400">
               <li><span className="text-white font-semibold">Day trading.</span> Prices are not tick-by-tick. If you need sub-second quotes, use a broker terminal.</li>
               <li><span className="text-white font-semibold">Intraday alerts.</span> Alerts fire on a daily cadence. Fast intraday moves can happen between checks.</li>
-              <li><span className="text-white font-semibold">Live dealer quotes.</span> The compare page estimates dealer totals from live spot plus our hand-maintained premiums — it is not a scraped checkout price. Click through to confirm before buying.</li>
+              <li><span className="text-white font-semibold">Live dealer quotes.</span> The compare page estimates dealer totals from today&rsquo;s spot price plus our hand-maintained premiums — it is not a scraped checkout price. Click through to confirm before buying.</li>
               <li><span className="text-white font-semibold">Intraday charts.</span> Sparklines use daily close snapshots, not intraday candles.</li>
               <li><span className="text-white font-semibold">Numismatic value.</span> We value coins at melt / spot only. Collectible premiums are out of scope.</li>
             </ul>

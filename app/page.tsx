@@ -250,7 +250,7 @@ export default async function HomePage() {
       {/* ── PRICES UNAVAILABLE BANNER ────────────────────────────── */}
       {pricesUnavailable && (
         <div className="w-full px-6 py-3 text-center text-xs font-semibold tracking-wide" style={{ background: "#1a1200", color: "#D4AF37", borderBottom: "1px solid #3a2d00" }}>
-          Live price feeds are temporarily unavailable — showing recent cached values.
+          Price data is temporarily unavailable — showing recent cached values.
         </div>
       )}
 

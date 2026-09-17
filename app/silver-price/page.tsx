@@ -24,12 +24,12 @@ export async function generateMetadata(): Promise<Metadata> {
     : null;
   const title = priceStr
     ? `Silver Price Today: ${priceStr}/oz`
-    : "Silver Price Today — Live Spot Price Per Ounce";
+    : "Silver Price Today — Spot Price Per Ounce";
 
   return {
     title,
     description:
-      "Live silver spot price per troy ounce, updated daily. See today's silver price, 30-day chart, price per gram, and key stats. Free — no sign-up required.",
+      "Silver spot price per troy ounce, updated daily. See today's silver price, 30-day chart, price per gram, and key stats. Free — no sign-up required.",
     keywords: [
       "silver price today",
       "silver price per ounce",
@@ -50,14 +50,14 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description:
-        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
+        "Silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
       url: "https://lode.rocks/silver-price",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description:
-        "Live silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
+        "Silver spot price per troy ounce with 30-day chart, per-gram and per-kilo rates, and key stats. Updated daily.",
     },
   };
 }
@@ -109,8 +109,8 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://lode.rocks/silver-price#page",
       "url": "https://lode.rocks/silver-price",
-      "name": "Silver Price Today — Live Spot Price Per Ounce",
-      "description": "Live silver spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
+      "name": "Silver Price Today — Spot Price Per Ounce",
+      "description": "Silver spot price per troy ounce with chart, per-gram rates, and 30-day stats.",
       "isPartOf": { "@id": "https://lode.rocks/#site" },
     },
     {
@@ -215,7 +215,7 @@ export default async function SilverPricePage() {
           />
         </div>
         <div className="relative z-10 mx-auto max-w-2xl space-y-3">
-          <p className="label">Live spot</p>
+          <p className="label">Spot price</p>
           <h1 className="font-black leading-none" style={{ fontSize: "clamp(2.25rem, 5vw, 3.5rem)", letterSpacing: "-0.04em" }}>
             Silver Price Today
           </h1>

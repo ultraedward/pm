@@ -52,7 +52,7 @@ export async function POST(req: Request) {
             <td style="padding-bottom:24px;">
               <h1 style="margin:0 0 12px;font-size:22px;font-weight:900;color:#fff;line-height:1.2;">You're in.</h1>
               <p style="margin:0;font-size:15px;color:#aaa;line-height:1.6;">
-                Every Monday morning, live spot prices for gold, silver, platinum, and palladium land in your inbox. No app to open.
+                Every Monday morning, gold, silver, platinum, and palladium prices land in your inbox. No app to open.
               </p>
             </td>
           </tr>
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
             <td style="padding-bottom:32px;">
               <a href="https://lode.rocks"
                  style="display:inline-block;padding:13px 28px;background:#D4AF37;color:#000;font-weight:800;text-decoration:none;border-radius:999px;font-size:14px;">
-                Check live prices →
+                Check today's prices →
               </a>
             </td>
           </tr>

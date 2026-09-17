@@ -14,7 +14,7 @@ import { fetchAllSpotPrices } from "@/lib/prices/fetchSpotPrices";
 export const metadata: Metadata = {
   title: "Silver Coin Melt Value Calculator — Dimes, Quarters, Dollars & Eagles",
   description:
-    "Free silver coin melt value calculator with live spot prices. Instantly find melt values for silver dimes, quarters, half dollars, Morgan dollars, American Silver Eagles, Canadian Maple Leafs, and gold coins.",
+    "Free silver coin melt value calculator with today's spot prices. Instantly find melt values for silver dimes, quarters, half dollars, Morgan dollars, American Silver Eagles, Canadian Maple Leafs, and gold coins.",
   keywords: [
     "silver coin melt value calculator",
     "silver dime melt value calculator",
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Silver Coin Melt Value Calculator — Dimes, Quarters, Dollars & Eagles",
     description:
-      "Instantly calculate the melt value of silver and gold coins at live spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
+      "Instantly calculate the melt value of silver and gold coins at today's spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
     url: "https://lode.rocks/coin-melt-calculator",
   },
   twitter: {
     card: "summary_large_image",
     title: "Silver Coin Melt Value Calculator — Dimes, Quarters, Dollars & Eagles",
     description:
-      "Instantly calculate the melt value of silver and gold coins at live spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
+      "Instantly calculate the melt value of silver and gold coins at today's spot prices. Dimes, quarters, half dollars, Morgan dollars, Silver Eagles, and more.",
   },
 };
 
@@ -65,7 +65,7 @@ const jsonLd = {
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "description":
-        "Calculate the melt value of silver and gold coins at live spot prices. Covers American Silver Eagles, Maple Leafs, pre-1965 junk silver, Morgan dollars, and gold coins.",
+        "Calculate the melt value of silver and gold coins at today's spot prices. Covers American Silver Eagles, Maple Leafs, pre-1965 junk silver, Morgan dollars, and gold coins.",
       "featureList": [
         "American Silver Eagle melt value",
         "Junk silver melt value (pre-1965 dimes, quarters, halves)",
@@ -180,7 +180,7 @@ export default async function CoinMeltCalculatorPage() {
             <span style={{ color: "var(--gold-bright)" }}>Calculator</span>
           </h1>
           <p className="text-sm text-gray-500 max-w-md mx-auto leading-relaxed">
-            Live melt values for pre-1965 junk silver (dimes, quarters, half dollars), American Silver Eagles, Morgan &amp; Peace dollars, Canadian Maple Leafs, and gold coins. Enter a quantity on any row to total your stack.
+            Melt values at today's spot price for pre-1965 junk silver (dimes, quarters, half dollars), American Silver Eagles, Morgan &amp; Peace dollars, Canadian Maple Leafs, and gold coins. Enter a quantity on any row to total your stack.
           </p>
         </div>
       </section>
@@ -304,7 +304,7 @@ export default async function CoinMeltCalculatorPage() {
               </Link>
             </p>
             <p className="text-sm pt-1" style={{ color: "var(--text-dim)" }}>
-              Live prices:{" "}
+              Metal prices:{" "}
               <Link href="/silver-price" className="transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>Silver</Link>
               {" · "}
               <Link href="/gold-price" className="transition-colors hover:text-gray-300" style={{ color: "var(--text-muted)" }}>Gold</Link>
@@ -314,7 +314,7 @@ export default async function CoinMeltCalculatorPage() {
           <div className="text-left max-w-sm">
             <InlineSignup
               heading="Know what your stack is worth"
-              subtext="Live spot prices, price alerts, and portfolio tracker. Free — 30 seconds."
+              subtext="Daily spot prices, price alerts, and portfolio tracker. Free — 30 seconds."
               callbackUrl="/dashboard?onboarding=1"
             />
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">
