@@ -366,35 +366,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── PRICE PANEL ─────────────────────────────────────────── */}
-      <section className="border-t reveal" style={{ borderColor: "var(--border)" }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-            <p className="label">Today&apos;s spot prices</p>
-            <div className="flex items-center gap-4">
-              <Link href="/gold-price"      className="link-gold text-[11px]">Gold →</Link>
-              <Link href="/silver-price"    className="link-gold text-[11px]">Silver →</Link>
-              <Link href="/platinum-price"  className="link-gold text-[11px] hidden sm:inline">Platinum →</Link>
-              <Link href="/palladium-price" className="link-gold text-[11px] hidden sm:inline">Palladium →</Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
-            {prices.map(([metal, data]) => {
-              const detailHref = metal === "gold" ? "/gold-price" : metal === "silver" ? "/silver-price" : metal === "platinum" ? "/platinum-price" : "/palladium-price";
-              return (
-                <Link key={metal} href={detailHref} className="block hover:bg-white/[0.01] transition-colors" aria-label={`${METAL_META[metal].label} price detail`}>
-                  <PriceTile metal={metal} data={data} />
-                </Link>
-              );
-            })}
-          </div>
-          <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-            <span className="label">Spot prices · 30-day trend</span>
-            <span className="text-[10px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{fmtUpdated(lastUpdated)}</span>
-          </div>
-        </div>
-      </section>
-
       {/* ── FEATURES ─────────────────────────────────────────────── */}
       <section className="border-t px-6 py-14 sm:py-20" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-6xl space-y-10">
@@ -483,6 +454,35 @@ export default async function HomePage() {
               palladium: palladium.price,
             }}
           />
+        </div>
+      </section>
+
+      {/* ── PRICE PANEL ─────────────────────────────────────────── */}
+      <section className="border-t reveal" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="px-7 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+            <p className="label">Today&apos;s spot prices</p>
+            <div className="flex items-center gap-4">
+              <Link href="/gold-price"      className="link-gold text-[11px]">Gold →</Link>
+              <Link href="/silver-price"    className="link-gold text-[11px]">Silver →</Link>
+              <Link href="/platinum-price"  className="link-gold text-[11px] hidden sm:inline">Platinum →</Link>
+              <Link href="/palladium-price" className="link-gold text-[11px] hidden sm:inline">Palladium →</Link>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-white/[0.06]">
+            {prices.map(([metal, data]) => {
+              const detailHref = metal === "gold" ? "/gold-price" : metal === "silver" ? "/silver-price" : metal === "platinum" ? "/platinum-price" : "/palladium-price";
+              return (
+                <Link key={metal} href={detailHref} className="block hover:bg-white/[0.01] transition-colors" aria-label={`${METAL_META[metal].label} price detail`}>
+                  <PriceTile metal={metal} data={data} />
+                </Link>
+              );
+            })}
+          </div>
+          <div className="border-t px-7 py-3 flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+            <span className="label">Spot prices · 30-day trend</span>
+            <span className="text-[10px] tracking-wide uppercase" style={{ color: "var(--text-dim)" }}>{fmtUpdated(lastUpdated)}</span>
+          </div>
         </div>
       </section>
 
