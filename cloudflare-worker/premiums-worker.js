@@ -135,15 +135,26 @@ const YF_HEADERS = {
 };
 
 async function fetchSpot() {
+  // NOTE: each symbol fetch is individually try/caught so a single flaky
+  // Yahoo Finance response (network blip, rate limit, non-JSON error page)
+  // can't throw and take down the entire scrapePremiums() run. A null here
+  // just means that metal's premiums fall back to the previous KV value —
+  // see the prevPremium fallback in scrapePremiums().
   const entries = await Promise.all(
     Object.entries(SPOT_SYMBOLS).map(async ([metal, symbol]) => {
-      const res = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`,
-        { headers: YF_HEADERS }
-      );
-      const data = await res.json();
-      const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-      return [metal, typeof price === "number" ? Number(price.toFixed(2)) : null];
+      try {
+        const res = await fetch(
+          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`,
+          { headers: YF_HEADERS }
+        );
+        if (!res.ok) return [metal, null];
+        const data = await res.json();
+        const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        return [metal, typeof price === "number" ? Number(price.toFixed(2)) : null];
+      } catch (err) {
+        console.error(`[premiums-worker] fetchSpot failed for ${metal} (${symbol}):`, err?.message || err);
+        return [metal, null];
+      }
     })
   );
   return Object.fromEntries(entries); // { gold: 4457.50, silver: 74.77 }
@@ -225,7 +236,11 @@ async function fetchBrowserPrice(env, url, dealerId) {
     console.error(`Browser fetch failed for ${dealerId} ${url}:`, err.message);
     return null;
   } finally {
-    await browser?.close();
+    try {
+      await browser?.close();
+    } catch (closeErr) {
+      console.error(`[premiums-worker] browser.close() failed for ${dealerId}:`, closeErr?.message || closeErr);
+    }
   }
 }
 
@@ -233,10 +248,20 @@ async function fetchBrowserPrice(env, url, dealerId) {
 // Main scrape — returns full premiums table
 // ---------------------------------------------------------------------------
 async function scrapePremiums(env) {
-  const [spot, previousRaw] = await Promise.all([
-    fetchSpot(),
-    env.PREMIUMS_KV.get("premiums", { type: "json" }),
-  ]);
+  // fetchSpot() is internally resilient (never throws — see its own try/catch),
+  // but env.PREMIUMS_KV.get() can still throw on a transient KV outage. Guard
+  // it here so a KV blip degrades to "no previous data" instead of aborting
+  // the whole run before any scraping happens.
+  let spot = {};
+  let previousRaw = null;
+  try {
+    [spot, previousRaw] = await Promise.all([
+      fetchSpot(),
+      env.PREMIUMS_KV.get("premiums", { type: "json" }),
+    ]);
+  } catch (err) {
+    console.error("[premiums-worker] failed to load spot price / previous KV state:", err?.message || err);
+  }
 
   const previous = previousRaw?.premiums ?? {};
   const results = {};
@@ -296,9 +321,17 @@ async function scrapePremiums(env) {
     log,
   };
 
-  await env.PREMIUMS_KV.put("premiums", JSON.stringify(payload), {
-    expirationTtl: 60 * 60 * 24 * 14, // keep for 14 days
-  });
+  try {
+    await env.PREMIUMS_KV.put("premiums", JSON.stringify(payload), {
+      expirationTtl: 60 * 60 * 24 * 14, // keep for 14 days
+    });
+  } catch (err) {
+    // If the write itself fails (KV outage/quota), surface it loudly — this
+    // is the one failure mode that previously left "verified [date]" frozen
+    // on /compare with zero visibility into why.
+    console.error("[premiums-worker] KV.put failed — scrapedAt will NOT update:", err?.message || err);
+    throw err;
+  }
 
   return payload;
 }
@@ -313,8 +346,18 @@ const CORS = {
 
 export default {
   // Cron trigger (wrangler.toml: crons = ["0 9 * * 2"])
+  // scrapePremiums() is now internally resilient to fetch/KV blips, but this
+  // catch is the last line of defense: it guarantees any unforeseen failure
+  // is logged (visible in `wrangler tail` / the Cloudflare dashboard) instead
+  // of disappearing as a silent unhandled rejection — which is what made the
+  // previous staleness (scrapedAt frozen for 6+ days with no error trace)
+  // impossible to diagnose.
   async scheduled(_event, env, ctx) {
-    ctx.waitUntil(scrapePremiums(env));
+    ctx.waitUntil(
+      scrapePremiums(env).catch((err) => {
+        console.error("[premiums-worker] scheduled run failed:", err?.stack || err?.message || err);
+      })
+    );
   },
 
   // HTTP handler

@@ -64,7 +64,7 @@ async function getMetalData(metal: Metal, livePrice: number | null): Promise<Met
 
     if (!rows.length) return { price, percentChange: null, history30D: [], week52High: null, week52Low: null, updatedAt };
 
-    const cutoff = new Date(Date.now() - 20 * 60 * 60 * 1000);
+    const cutoff = new Date(Date.now() - 28 * 60 * 60 * 1000);
     const prevRow = [...rows].reverse().find((r) => r.timestamp <= cutoff);
     const percentChange = prevRow?.price ? ((price - prevRow.price) / prevRow.price) * 100 : null;
 
