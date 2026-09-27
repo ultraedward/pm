@@ -1,4 +1,4 @@
-import { isPromoActive, AMERICA_250_PROMO } from "@/lib/promo";
+import { activePromo } from "@/lib/promo";
 
 interface Props {
   /** sub_id suffix appended to the affiliate URL for placement tracking */
@@ -6,17 +6,17 @@ interface Props {
 }
 
 /**
- * Site-wide promo strip for the Birch Gold America 250 promotion.
- * Renders only when today is within the promo window — returns null otherwise,
- * so there is zero layout impact after July 10.
+ * Site-wide promo strip — renders whichever Birch Gold promo is currently active,
+ * or nothing at all outside any promo window.
  */
 export function America250Banner({ subId = "banner" }: Props) {
-  if (!isPromoActive()) return null;
+  const promo = activePromo();
+  if (!promo) return null;
 
   const base = process.env.AFFILIATE_BIRCH_URL;
   if (!base) return null;
 
-  const url = `${base}&sub_id=america250_${subId}`;
+  const url = `${base}&sub_id=${promo.id}_${subId}`;
 
   return (
     <div
@@ -39,12 +39,12 @@ export function America250Banner({ subId = "banner" }: Props) {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6 py-2 flex items-center justify-between gap-3">
-        {/* Left: flag + copy */}
+        {/* Left: emoji + copy */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap min-w-0">
-          <span aria-hidden="true" className="text-base leading-none flex-shrink-0">🇺🇸</span>
+          <span aria-hidden="true" className="text-base leading-none flex-shrink-0">{promo.emoji}</span>
 
           <span className="text-[11px] sm:text-xs font-bold tracking-wide whitespace-nowrap" style={{ color: "#ffffff" }}>
-            {AMERICA_250_PROMO.headline}
+            {promo.headline}
           </span>
 
           <span aria-hidden="true" className="hidden sm:inline text-[10px]" style={{ color: "#aaaaaa" }}>·</span>
@@ -56,7 +56,7 @@ export function America250Banner({ subId = "banner" }: Props) {
           <span aria-hidden="true" className="hidden md:inline text-[10px]" style={{ color: "#aaaaaa" }}>·</span>
 
           <span className="hidden md:inline text-[10px] font-mono tracking-wider" style={{ color: "#fbbf24" }}>
-            Jun 8 – Jul 10
+            {promo.dateLabel}
           </span>
         </div>
 
