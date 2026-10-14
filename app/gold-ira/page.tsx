@@ -20,10 +20,11 @@ const BIRCH_ELIGIBILITY  = BIRCH_BASE ? `${BIRCH_BASE}&sub_id=eligibility` : nul
 const currentPromo = activePromo();
 const promoActive  = currentPromo !== null;
 
-// During a promo window, use promo-specific sub_ids for better attribution reporting.
-const BIRCH_CARD_PROMO        = BIRCH_BASE && currentPromo ? `${BIRCH_BASE}&sub_id=${currentPromo.id}_ira_card` : null;
-const BIRCH_DEEPDIVE_PROMO    = BIRCH_BASE && currentPromo ? `${BIRCH_BASE}&sub_id=${currentPromo.id}_ira_deep` : null;
-const BIRCH_ELIGIBILITY_PROMO = BIRCH_BASE && currentPromo ? `${BIRCH_BASE}&sub_id=${currentPromo.id}_ira_elig` : null;
+// During a promo window, use the promo's landing page (urlId) and promo-specific sub_ids for attribution.
+const birchPromoBase          = BIRCH_BASE && currentPromo?.urlId ? `${BIRCH_BASE}&url_id=${currentPromo.urlId}` : BIRCH_BASE;
+const BIRCH_CARD_PROMO        = birchPromoBase && currentPromo ? `${birchPromoBase}&sub_id=${currentPromo.id}_ira_card` : null;
+const BIRCH_DEEPDIVE_PROMO    = birchPromoBase && currentPromo ? `${birchPromoBase}&sub_id=${currentPromo.id}_ira_deep` : null;
+const BIRCH_ELIGIBILITY_PROMO = birchPromoBase && currentPromo ? `${birchPromoBase}&sub_id=${currentPromo.id}_ira_elig` : null;
 
 // Per-company CTA lookup — keeps COMPANIES array clean (no runtime values in `as const`)
 // During the promo window, Birch URLs use promo-specific sub_ids for attribution.

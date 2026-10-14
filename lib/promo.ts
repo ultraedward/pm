@@ -12,6 +12,7 @@ export type Promo = {
   badge:    string;
   emoji:    string;
   dateLabel: string; // human-readable window shown in banner
+  urlId?:   string;  // HasOffers url_id for the promo landing page (appended to base URL when set)
 };
 
 export const AMERICA_250_PROMO: Promo = {
@@ -34,6 +35,7 @@ export const VETERANS_DAY_PROMO: Promo = {
   badge:     "Limited offer · ends Oct 30",
   emoji:     "🎖️",
   dateLabel: "Oct 14 – Oct 30",
+  urlId:     "71",
 };
 
 /** All promos in priority order — first active one wins. */
