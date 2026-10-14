@@ -209,7 +209,12 @@ export default function CoinMeltValueGuidePage() {
               Note the phrase &ldquo;pure metal content,&rdquo; not total coin weight. Most bullion gold
               coins are alloyed with copper or silver for durability, so the coin&apos;s gross weight is
               higher than its actual gold content. The table below distinguishes the two for every
-              major coin.
+              major coin. Live spot prices for the calculation:{" "}
+              <Link href="/gold-price" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">gold price today</Link>
+              {" "}·{" "}
+              <Link href="/silver-price" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">silver price today</Link>
+              {" "}·{" "}
+              <Link href="/gram" className="text-amber-400 hover:text-amber-300 underline underline-offset-2 transition-colors">price per gram</Link>.
             </p>
           </section>
 

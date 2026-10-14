@@ -38,11 +38,14 @@ function Accordion({ items }: { items: FaqItem[] }) {
                 +
               </span>
             </button>
-            {isOpen && (
-              <div className="pb-6 text-sm text-gray-400 leading-relaxed space-y-3">
-                {item.a}
-              </div>
-            )}
+            {/* Always render answer content in DOM so Google can index it;
+                CSS visibility (not conditional render) controls the accordion. */}
+            <div
+              className="pb-6 text-sm text-gray-400 leading-relaxed space-y-3"
+              style={{ display: isOpen ? "block" : "none" }}
+            >
+              {item.a}
+            </div>
           </div>
         );
       })}

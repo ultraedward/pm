@@ -327,6 +327,10 @@ export default async function GramPage() {
               </Link>
             </p>
             <p className="text-sm text-gray-500 pt-1">
+              Read:{" "}
+              <Link href="/blog/coin-melt-value-guide" className="text-gray-400 hover:text-gray-200 transition-colors">Coin melt value guide →</Link>
+            </p>
+            <p className="text-sm text-gray-500 pt-1">
               Track the full market:{" "}
               <Link href="/gold-price" className="text-gray-400 hover:text-gray-200 transition-colors">Gold</Link>
               {" · "}
@@ -347,6 +351,7 @@ export default async function GramPage() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-6">
               <Link href="/compare" className="hover:text-gray-400 transition-colors">Compare dealers →</Link>
               <Link href="/coin-melt-calculator" className="hover:text-gray-400 transition-colors">Coin melt calculator</Link>
+              <Link href="/blog/coin-melt-value-guide" className="hover:text-gray-400 transition-colors">Coin melt value guide</Link>
             </div>
           </div>
         )}

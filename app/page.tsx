@@ -506,6 +506,44 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── GUIDES ───────────────────────────────────────────────── */}
+      <section className="border-t px-6 py-12 sm:py-16 reveal" style={{ borderColor: "var(--border)" }}>
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="flex items-baseline justify-between">
+            <p className="label">Guides</p>
+            <Link href="/blog" className="text-[11px] font-bold uppercase tracking-widest transition-colors link-gold">All guides →</Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link
+              href="/blog/junk-silver-guide"
+              className="group border p-5 transition-colors hover:border-white/20"
+              style={{ borderColor: "var(--border)", background: "rgba(255,255,255,0.02)" }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "var(--text-dim)" }}>Buying guide</p>
+              <p className="text-sm font-bold text-white group-hover:[color:var(--gold)] transition-colors leading-snug mb-1">
+                The Complete Guide to Buying Junk Silver Coins →
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                What to buy, where to buy it, how to spot fakes, and what premiums to expect.
+              </p>
+            </Link>
+            <Link
+              href="/blog/coin-melt-value-guide"
+              className="group border p-5 transition-colors hover:border-white/20"
+              style={{ borderColor: "var(--border)", background: "rgba(255,255,255,0.02)" }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "var(--text-dim)" }}>Reference</p>
+              <p className="text-sm font-bold text-white group-hover:[color:var(--gold)] transition-colors leading-snug mb-1">
+                Coin Melt Value: What Your Gold & Silver Coins Are Really Worth →
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                Exact metal content for every major bullion coin and pre-1965 US silver coins.
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <SiteFooter />
 
     </main>

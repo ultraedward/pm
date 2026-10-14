@@ -457,6 +457,9 @@ export default async function GoldPricePage() {
                 <Link href="/compare" className="text-gray-400 hover:text-gray-200 transition-colors">
                   Compare dealers →
                 </Link>
+                <Link href="/blog/coin-melt-value-guide" className="text-gray-400 hover:text-gray-200 transition-colors">
+                  Coin melt value guide →
+                </Link>
               </div>
             </>
           ) : (
@@ -470,6 +473,7 @@ export default async function GoldPricePage() {
                 <Link href="/compare" className="hover:text-gray-400 transition-colors">Compare dealers →</Link>
                 <Link href="/silver-price" className="hover:text-gray-400 transition-colors">Silver price</Link>
                 <Link href="/gold-ira" className="hover:text-gray-400 transition-colors">Gold IRA guide</Link>
+                <Link href="/blog/coin-melt-value-guide" className="hover:text-gray-400 transition-colors">Coin melt guide</Link>
               </div>
             </div>
           )}
