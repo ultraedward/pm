@@ -15,6 +15,8 @@ import { PRICE_SOURCES } from "@/lib/priceSourceInfo";
 import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/entitlements";
 
 export async function generateMetadata(): Promise<Metadata> {
   const spots = await fetchAllSpotPrices();
@@ -177,6 +179,14 @@ export default async function SilverPricePage() {
   ]);
 
   const isLoggedIn = !!session?.user?.email;
+  let isPro = false;
+  if (isLoggedIn && session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { subscriptionStatus: true, proUntil: true },
+    });
+    isPro = hasProAccess({ stripeStatus: dbUser?.subscriptionStatus, proUntil: dbUser?.proUntil });
+  }
   const spot = spots.silver ?? 0;
   const promoActive = isPromoActive();
   const birchBase = process.env.AFFILIATE_BIRCH_URL ?? null;
@@ -269,7 +279,7 @@ export default async function SilverPricePage() {
       {/* ── Chart ────────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 pb-8">
         <div className="mx-auto max-w-2xl">
-          <SilverPriceChart livePrice={spot > 0 ? spot : undefined} />
+          <SilverPriceChart livePrice={spot > 0 ? spot : undefined} isPro={isPro} />
         </div>
       </section>
 

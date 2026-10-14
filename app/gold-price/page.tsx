@@ -14,6 +14,8 @@ import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { PRICE_SOURCES } from "@/lib/priceSourceInfo";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { hasProAccess } from "@/lib/entitlements";
 
 export async function generateMetadata(): Promise<Metadata> {
   const spots = await fetchAllSpotPrices();
@@ -184,6 +186,14 @@ export default async function GoldPricePage() {
   ]);
 
   const isLoggedIn = !!session?.user?.email;
+  let isPro = false;
+  if (isLoggedIn && session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { subscriptionStatus: true, proUntil: true },
+    });
+    isPro = hasProAccess({ stripeStatus: dbUser?.subscriptionStatus, proUntil: dbUser?.proUntil });
+  }
   const spot = spots.gold ?? 0;
 
   const change30 = stats?.oldest && spot ? spot - stats.oldest : null;
@@ -278,7 +288,7 @@ export default async function GoldPricePage() {
         {/* ── Chart ────────────────────────────────────────────────── */}
         <section className="px-4 sm:px-6 pb-8">
           <div className="mx-auto max-w-2xl">
-            <MetalPriceChart metal="gold" livePrice={spot > 0 ? spot : undefined} />
+            <MetalPriceChart metal="gold" livePrice={spot > 0 ? spot : undefined} isPro={isPro} />
           </div>
         </section>
 

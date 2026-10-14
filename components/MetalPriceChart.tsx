@@ -65,9 +65,11 @@ interface Props {
    *  so this figure agrees with the live price pills shown elsewhere on the
    *  page rather than lagging behind the once-daily price ingestion. */
   livePrice?: number;
+  /** Whether the current user has Pro access. Controls 90-day chart visibility. */
+  isPro?: boolean;
 }
 
-export function MetalPriceChart({ metal, livePrice }: Props) {
+export function MetalPriceChart({ metal, livePrice, isPro = false }: Props) {
   const color = METAL_COLOR_FIXED[metal] ?? METAL_COLOR_VAR[metal] ?? "#C0C0C0";
   const gradId = `${metal}-grad`;
 
@@ -76,6 +78,11 @@ export function MetalPriceChart({ metal, livePrice }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (range === "90d" && !isPro) {
+      setLoading(false);
+      setData([]);
+      return;
+    }
     setLoading(true);
     fetch(`/api/charts/prices?range=${range}`)
       .then((r) => r.json())
@@ -84,7 +91,7 @@ export function MetalPriceChart({ metal, livePrice }: Props) {
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, [range, metal]);
+  }, [range, metal, isPro]);
 
   const prices = data.map((d) => d.price);
   const high   = prices.length ? Math.max(...prices) : null;
@@ -101,20 +108,23 @@ export function MetalPriceChart({ metal, livePrice }: Props) {
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-600 uppercase tracking-widest font-bold">Price history</p>
         <div className="flex gap-1">
-          {RANGES.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setRange(key)}
-              className="px-3 py-1 rounded-lg text-xs font-bold transition-colors"
-              style={{
-                background: range === key ? "rgba(212,175,55,0.15)" : "transparent",
-                color:      range === key ? "var(--gold-bright)" : "var(--text-muted)",
-                border:     `1px solid ${range === key ? "rgba(212,175,55,0.3)" : "var(--border-strong)"}`,
-              }}
-            >
-              {label}
-            </button>
-          ))}
+          {RANGES.map(({ key, label }) => {
+            const locked = key === "90d" && !isPro;
+            return (
+              <button
+                key={key}
+                onClick={() => setRange(key)}
+                className="px-3 py-1 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1"
+                style={{
+                  background: range === key ? "rgba(212,175,55,0.15)" : "transparent",
+                  color:      range === key ? "var(--gold-bright)" : "var(--text-muted)",
+                  border:     `1px solid ${range === key ? "rgba(212,175,55,0.3)" : "var(--border-strong)"}`,
+                }}
+              >
+                {label}{locked && <span aria-hidden="true" style={{ fontSize: "9px", opacity: 0.5 }}>🔒</span>}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -123,7 +133,22 @@ export function MetalPriceChart({ metal, livePrice }: Props) {
         className="border overflow-hidden"
         style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)", height: 200 }}
       >
-        {loading ? (
+        {range === "90d" && !isPro ? (
+          <div className="h-full flex flex-col items-center justify-center gap-3 px-6 text-center">
+            <span style={{ fontSize: "22px" }}>🔒</span>
+            <div>
+              <p className="text-sm font-bold text-white">90-day charts are a Pro feature</p>
+              <p className="text-xs text-gray-500 mt-1">Upgrade to see 90-day &amp; all-time price history.</p>
+            </div>
+            <a
+              href="/pricing"
+              className="inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors"
+              style={{ background: "rgba(212,175,55,0.15)", color: "var(--gold-bright)", border: "1px solid rgba(212,175,55,0.3)" }}
+            >
+              Start free 7-day trial →
+            </a>
+          </div>
+        ) : loading ? (
           <div className="h-full flex items-center justify-center">
             <span className="text-xs text-gray-700">Loading…</span>
           </div>
