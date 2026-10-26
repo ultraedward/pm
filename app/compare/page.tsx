@@ -324,9 +324,11 @@ export default async function ComparePage() {
                   Premiums vary by coin type, quantity, and payment method. Government-minted coins (Silver Eagles,
                   Gold Eagles, Maple Leafs) carry higher premiums than privately minted rounds or bars because of
                   the added minting and distribution costs. Buying in larger quantities — a full monster box of
-                  500 Silver Eagles, for example — typically reduces the per-coin premium. Paying by check or bank
-                  wire instead of credit card usually saves another 3–4% that dealers charge to offset card
-                  processing fees.
+                  500 Silver Eagles, for example — typically reduces the per-coin premium. Payment method creates
+                  three distinct price tiers at most dealers: credit card is the most expensive (dealers add 3–4%
+                  to offset processing fees); cryptocurrency (Bitcoin, ETH, USDC) typically lands in the middle —
+                  cheaper than card but slightly above wire; and check or bank wire is usually the cheapest option.
+                  The prices on this page use each dealer&rsquo;s wire/check rate — the lowest available tier.
                 </p>
               </div>
 
