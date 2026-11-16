@@ -38,8 +38,20 @@ export const VETERANS_DAY_PROMO: Promo = {
   urlId:     "71",
 };
 
+export const BLACK_FRIDAY_PROMO: Promo = {
+  id:        "blackfriday2026",
+  start:     new Date("2026-11-12T00:00:00-05:00"),
+  end:       new Date("2026-12-23T23:59:59-05:00"),
+  headline:  "Black Friday Gold Bonus",
+  body:      "Free 1-gram gold bar for every $20,000 in qualifying precious metals — IRAs and physical delivery both eligible. Customers must claim eligibility by Nov 27.",
+  badge:     "Limited offer · claim by Nov 27",
+  emoji:     "🥇",
+  dateLabel: "Nov 12 – Dec 23",
+  urlId:     "75",
+};
+
 /** All promos in priority order — first active one wins. */
-const ALL_PROMOS: Promo[] = [VETERANS_DAY_PROMO, AMERICA_250_PROMO];
+const ALL_PROMOS: Promo[] = [BLACK_FRIDAY_PROMO, VETERANS_DAY_PROMO, AMERICA_250_PROMO];
 
 /** Returns the currently active promo, or null if none is running. */
 export function activePromo(): Promo | null {
