@@ -16,7 +16,8 @@ export function America250Banner({ subId = "banner" }: Props) {
   const base = process.env.AFFILIATE_BIRCH_URL;
   if (!base) return null;
 
-  const url = `${base}&sub_id=${promo.id}_${subId}`;
+  const promoBase = promo.urlId ? `${base}&url_id=${promo.urlId}` : base;
+  const url = `${promoBase}&sub_id=${promo.id}_${subId}`;
 
   return (
     <div
