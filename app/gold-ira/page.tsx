@@ -151,7 +151,7 @@ const COMPANIES = [
     id:          "augusta",
     name:        "Augusta Precious Metals",
     tagline:     "Best overall — highest-rated, most transparent",
-    verdict:     "The strongest all-round choice: top ratings on every platform, lifetime account support, and genuinely transparent pricing.",
+    verdict:     "The strongest all-round choice: consistently high ratings, lifetime account support, and transparent pricing.",
     bestFor:     "Investors rolling over $50k+ who want hands-on education and a dedicated account team",
     bestForShort: "$50k+ rollover, hands-on support",
     founded:     2012,
@@ -168,7 +168,7 @@ const COMPANIES = [
     pros: [
       "Education directors are paid to educate, not sell — no commissioned salespeople, ever",
       "Free one-on-one web conference with a Harvard-trained economic analyst before you commit",
-      "Zero BBB complaints on record · A+ accredited · Fees disclosed in writing before you open",
+      "A+ BBB rating · Fees disclosed in writing before you open",
       "Lifetime support — same dedicated account agent from opening through retirement",
     ],
     cons: [
@@ -224,7 +224,7 @@ const COMPANIES = [
     affiliate:  true,
     pros: [
       "Lowest minimum in the category — $10,000 for both IRAs and cash purchases",
-      "Longest track record of any major Gold IRA company — operating since 2003",
+      "Longest track record of the four companies we reviewed — operating since 2003",
       "Up to $10,000 in free precious metals on qualified purchases · Buyback guarantee at no charge",
       "First-year fees waived on accounts over $50,000",
       "Six US storage locations — Delaware, Brinks, and IDS facilities in TX, LA, NYC, and CA",
@@ -436,7 +436,7 @@ export default function GoldIraPage() {
             </table>
           </div>
           <p className="text-[11px] text-gray-600 mt-2">
-            Fees shown are typical ranges for standard accounts. Contact each company for exact pricing. Last reviewed {fmtReviewed(LAST_REVIEWED)}.
+            Fees, minimums and ratings are based on each company&apos;s published information and change over time. Confirm current terms directly with each company before opening an account. Last reviewed {fmtReviewed(LAST_REVIEWED)}.
           </p>
         </div>
       </section>
@@ -480,7 +480,7 @@ export default function GoldIraPage() {
                   {
                     step: "2",
                     title: "One-on-one web conference",
-                    desc: "Augusta's Harvard-trained economic analyst walks you through IRS rules, eligible metals, and fee structure. Education directors are not commissioned salespeople.",
+                    desc: "Augusta's Harvard-trained economic analyst walks you through IRS rules, eligible metals, and fee structure.",
                   },
                   {
                     step: "3",
@@ -590,7 +590,7 @@ export default function GoldIraPage() {
                 <ul className="space-y-2">
                   {[
                     "Lowest minimum in the category — $10,000 for both IRAs and cash purchases",
-                    "Longest track record of any major Gold IRA company — operating since 2003",
+                    "Longest track record of the four companies we reviewed — operating since 2003",
                     "Up to $10,000 in free precious metals on qualified purchases · Buyback guarantee at no charge",
                     "Six US storage locations — Delaware, Brinks, and IDS facilities in TX, LA, NYC, and CA",
                   ].map((pro) => (

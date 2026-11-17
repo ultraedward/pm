@@ -34,20 +34,20 @@ type FxCache = { rates: Record<string, number>; ts: number };
 let _cache: FxCache | null = null;
 const TTL_MS = 60 * 60 * 1000; // 1 hour
 
-// Fallback rates (approximate, May 2026) — used if frankfurter.app is unreachable
+// Fallback rates (approximate, Nov 2026) — used if frankfurter.app is unreachable
 const FALLBACK_RATES: Record<string, number> = {
   USD: 1,
-  AUD: 1.55,
-  CAD: 1.37,
-  GBP: 0.79,
-  EUR: 0.92,
+  AUD: 1.48,
+  CAD: 1.43,
+  GBP: 0.76,
+  EUR: 0.91,
 };
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
  * Returns a map of USD → each supported currency.
- * e.g. { USD: 1, AUD: 1.55, CAD: 1.37, GBP: 0.79, EUR: 0.92 }
+ * e.g. { USD: 1, AUD: 1.48, CAD: 1.43, GBP: 0.76, EUR: 0.91 }
  */
 export async function getFxRates(): Promise<Record<string, number>> {
   const now = Date.now();

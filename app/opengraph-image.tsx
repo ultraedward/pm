@@ -5,11 +5,14 @@ export const alt = "Lode — Know what your stack is worth. Live gold, silver, p
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Static illustrative snapshot (approx. mid-Nov 2026). Decorative only — the
+// live site always shows real-time stored prices. No % change is shown, since a
+// fixed image can't honestly claim a "24H" move.
 const METALS = [
-  { label: "GOLD",      price: "$4,274", pct: "+1.23%", up: true,  color: "#D4AF37" },
-  { label: "SILVER",    price: "$63.04",  pct: "−0.84%", up: false, color: "#C0C0C0" },
-  { label: "PLATINUM",  price: "$1,762",  pct: "−0.94%", up: false, color: "#E5E4E2" },
-  { label: "PALLADIUM", price: "$1,287",  pct: "−1.98%", up: false, color: "#9FA8C7" },
+  { label: "GOLD",      price: "$3,890", color: "#D4AF37" },
+  { label: "SILVER",    price: "$49.83", color: "#C0C0C0" },
+  { label: "PLATINUM",  price: "$1,497", color: "#E5E4E2" },
+  { label: "PALLADIUM", price: "$1,082", color: "#9FA8C7" },
 ];
 
 export default async function OGImage() {
@@ -46,7 +49,7 @@ export default async function OGImage() {
             whiteSpace: "nowrap",
           }}
         >
-          $4,274
+          $3,890
         </div>
 
         {/* Left gold accent rule */}
@@ -136,7 +139,7 @@ export default async function OGImage() {
 
           {/* Price tiles */}
           <div style={{ display: "flex", gap: "8px" }}>
-            {METALS.map(({ label, price, pct, up, color }) => (
+            {METALS.map(({ label, price, color }) => (
               <div
                 key={label}
                 style={{
@@ -186,16 +189,15 @@ export default async function OGImage() {
                   {price}
                 </span>
 
-                {/* Pct change */}
+                {/* Unit label */}
                 <span
                   style={{
                     fontSize: "13px",
                     fontWeight: 700,
-                    color: up ? "#34d399" : "#f87171",
-                    fontVariantNumeric: "tabular-nums",
+                    color: "rgba(255,255,255,0.35)",
                   }}
                 >
-                  {pct} 24H
+                  USD / oz
                 </span>
               </div>
             ))}

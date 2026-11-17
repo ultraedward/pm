@@ -98,14 +98,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
     description:
-      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Today's spot price plus hand-verified dealer premiums, sorted low to high.",
+      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Today's spot price plus estimated dealer premiums, sorted low to high.",
     url: "https://lode.rocks/compare",
   },
   twitter: {
     card: "summary_large_image",
     title: "Compare Silver & Gold Bullion Prices — APMEX vs JM Bullion vs SD Bullion",
     description:
-      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Today's spot price plus hand-verified dealer premiums, sorted low to high.",
+      "See who's cheapest for Silver Eagles, Gold Eagles, and Maple Leafs right now. Today's spot price plus estimated dealer premiums, sorted low to high.",
   },
 };
 
@@ -125,11 +125,22 @@ function buildAvailability(): DealerAvailabilityMap {
   return map;
 }
 
+// Premiums older than this are flagged as possibly out of date on the page.
+const PREMIUMS_STALE_AFTER_DAYS = 30;
+
+function premiumsAgeDays(iso: string): number {
+  const normalized = iso.includes("T") ? iso : `${iso}T12:00:00Z`;
+  const t = new Date(normalized).getTime();
+  if (Number.isNaN(t)) return 0;
+  return Math.floor((Date.now() - t) / 86_400_000);
+}
+
 export default async function ComparePage() {
-  const [live, { premiums, lastReviewed }] = await Promise.all([
+  const [live, { premiums, lastReviewed, source }] = await Promise.all([
     fetchAllSpotPrices(),
     getLivePremiums(),
   ]);
+  const premiumsStale = premiumsAgeDays(lastReviewed) > PREMIUMS_STALE_AFTER_DAYS;
   const spots = {
     gold:   live.gold   ?? 0,
     silver: live.silver ?? 0,
@@ -155,7 +166,7 @@ export default async function ComparePage() {
             <span style={{ color: "var(--gold-bright)" }}>at today&rsquo;s spot.</span>
           </h1>
           <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — today's spot price plus verified dealer premiums, sorted low to high.{" "}
+            Estimated total cost per coin across APMEX, JM Bullion, SD Bullion, and Money Metals — today's spot price plus estimated dealer premiums, sorted low to high.{" "}
             <span className="text-gray-600">Some links are affiliate — Lode may earn a commission at no extra cost to you; rankings are not influenced.</span>
           </p>
 
@@ -185,10 +196,20 @@ export default async function ComparePage() {
             </span>
             <span className="text-gray-700">·</span>
             <span>
-              Dealer premiums verified{" "}
+              Dealer premiums {source === "worker" ? "updated" : "last verified"}{" "}
               <span className="text-gray-300">{fmtPremiumsReviewed(lastReviewed)}</span>
             </span>
           </div>
+          {premiumsStale && (
+            <p
+              className="text-[11px] leading-relaxed pt-1"
+              style={{ color: "#d4a017" }}
+              role="note"
+            >
+              Heads up: these dealer premiums haven&rsquo;t been refreshed recently and may be out of date.
+              Treat the ranking as a rough guide and confirm the final price on the dealer&rsquo;s site.
+            </p>
+          )}
         </div>
       </section>
 

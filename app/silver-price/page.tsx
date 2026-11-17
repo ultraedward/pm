@@ -10,7 +10,7 @@ import { SilverPriceChart } from "@/components/SilverPriceChart";
 import { EmailCapture } from "@/components/EmailCapture";
 import { InlineSignup } from "@/components/InlineSignup";
 import { SiteFooter } from "@/components/SiteFooter";
-import { isPromoActive, AMERICA_250_PROMO } from "@/lib/promo";
+import { activePromo } from "@/lib/promo";
 import { PRICE_SOURCES } from "@/lib/priceSourceInfo";
 import { SimpleAccordion } from "@/components/SimpleAccordion";
 import { getServerSession } from "next-auth";
@@ -147,7 +147,7 @@ const jsonLd = {
           "name": "What is the difference between silver spot price and silver coin price?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The spot price is the raw market price for pure silver. When you buy a silver coin from a dealer, you pay the spot price plus a premium — currently $8–$17 per ounce for American Silver Eagles at single-coin quantities. Generic silver rounds carry lower premiums, typically $1–4 per ounce. The premium covers minting, distribution, and dealer margin. Use lode.rocks/compare to see verified premiums across major dealers.",
+            "text": "The spot price is the raw market price for pure silver. When you buy a silver coin from a dealer, you pay the spot price plus a premium — typically about $5–$17 per ounce for American Silver Eagles at single-coin quantities, depending on the dealer and market conditions. Generic silver rounds carry lower premiums, typically $1–4 per ounce. The premium covers minting, distribution, and dealer margin. Use lode.rocks/compare to see estimated premiums across major dealers.",
           },
         },
         {
@@ -188,9 +188,10 @@ export default async function SilverPricePage() {
     isPro = hasProAccess({ stripeStatus: dbUser?.subscriptionStatus, proUntil: dbUser?.proUntil });
   }
   const spot = spots.silver ?? 0;
-  const promoActive = isPromoActive();
+  const currentPromo = activePromo();
   const birchBase = process.env.AFFILIATE_BIRCH_URL ?? null;
-  const birchPromoUrl = birchBase ? `${birchBase}&sub_id=america250_silver` : null;
+  const birchPromoBase = birchBase && currentPromo?.urlId ? `${birchBase}&url_id=${currentPromo.urlId}` : birchBase;
+  const birchPromoUrl = birchPromoBase && currentPromo ? `${birchPromoBase}&sub_id=${currentPromo.id}_silver` : null;
 
   const change30 = stats?.oldest && spot ? spot - stats.oldest : null;
   const pct30    = stats?.oldest && change30 != null ? (change30 / stats.oldest) * 100 : null;
@@ -331,8 +332,8 @@ export default async function SilverPricePage() {
         </div>
       </section>
 
-      {/* ── America 250 promo callout ────────────────────────────── */}
-      {promoActive && birchPromoUrl && (
+      {/* ── Active Birch Gold promo callout (driven by lib/promo.ts) ── */}
+      {currentPromo && birchPromoUrl && (
         <section className="px-4 sm:px-6 pb-8">
           <div className="mx-auto max-w-2xl">
             <a
@@ -345,16 +346,15 @@ export default async function SilverPricePage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1.5 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span aria-hidden="true" className="text-base leading-none">🇺🇸</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--gold)" }}>{AMERICA_250_PROMO.headline}</span>
-                    <span className="text-[10px] font-mono text-amber-500/50">· ends Jul 10</span>
+                    <span aria-hidden="true" className="text-base leading-none">{currentPromo.emoji}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--gold)" }}>{currentPromo.headline}</span>
+                    <span className="text-[10px] font-mono text-amber-500/50">· {currentPromo.dateLabel}</span>
                   </div>
                   <p className="text-sm font-semibold text-white leading-snug">
-                    Buying silver? Get a free America 250 collectible silver round with every $10,000 at Birch Gold.
+                    {currentPromo.body}
                   </p>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Available for both physical silver purchases and Precious Metals IRA rollovers.
-                    While supplies last — promotion runs through July 10, 2026.
+                    Available through Birch Gold Group. Terms apply; offers cannot be combined.
                   </p>
                 </div>
                 <span className="flex-shrink-0 self-center text-sm font-bold link-gold">→</span>
@@ -424,7 +424,7 @@ export default async function SilverPricePage() {
                 The spot price shown on this page is not what you pay at a dealer — it&rsquo;s the raw market price
                 for pure silver. Dealers charge a <strong className="text-white">premium over spot</strong> that
                 covers minting costs, distribution, and their margin. For common government-minted coins like
-                American Silver Eagles, single-coin premiums currently run $8–$17 per ounce above spot.
+                American Silver Eagles, single-coin premiums typically run about $5–$17 per ounce above spot, depending on dealer and market conditions.
                 Generic silver rounds carry lower premiums — often $1–4 per ounce. Buying in larger
                 quantities (a full monster box — the standard 500-coin bulk case — usually reduces
                 the per-coin premium meaningfully).

@@ -96,7 +96,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Affiliate / editorial pages — high-intent, monetised
     {
       url: `${base}/gold-ira`,
-      lastModified: new Date("2026-05-08"),
+      lastModified: new Date("2026-11-17"),
       changeFrequency: "monthly",
       priority: 0.85,
     },

@@ -20,12 +20,12 @@ export type PriceResult = PriceMap & {
 };
 
 // Last-resort fallback — only used if the CF Worker / Yahoo Finance fails.
-// Updated April 2026. If you see these values in production, the live source is down.
+// Updated November 2026. If you see these values in production, the live source is down.
 const FALLBACK_PRICES: PriceMap = {
-  Gold: 4830.00,
-  Silver: 80.40,
-  Platinum: 2102.00,
-  Palladium: 1580.00,
+  Gold: 3890.00,
+  Silver: 49.80,
+  Platinum: 1500.00,
+  Palladium: 1080.00,
 };
 
 // ─── In-memory cache ──────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export async function getLivePrices(): Promise<PriceResult> {
     // fall through to hardcoded fallback
   }
 
-  // 2️⃣ Last resort: hardcoded prices (accurate as of April 2026).
+  // 2️⃣ Last resort: hardcoded prices (accurate as of November 2026).
   // Do NOT cache this so the next request retries live sources immediately.
   console.error("[prices] Live source failed — returning hardcoded fallback prices");
   return { ...FALLBACK_PRICES, source: "fallback", goldSilverSource: null };

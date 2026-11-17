@@ -404,7 +404,7 @@ export default async function GoldPricePage() {
                   <strong className="text-white">premium over spot</strong> that covers minting,
                   distribution, and their margin. For common government-minted coins like American Gold
                   Eagles or Canadian Gold Maple Leafs, single-coin premiums currently run roughly
-                  $150–$220 per ounce above spot — approximately 4–5% at today&rsquo;s price levels. Gold
+                  roughly $150–$250 per ounce above spot — approximately 4–6% at today&rsquo;s price levels. Gold
                   bars carry lower premiums than coins. Buying in larger quantities (kilo bars, for
                   example) often reduces the per-ounce cost further.
                 </p>

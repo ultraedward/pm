@@ -33,11 +33,11 @@ export async function checkPriceHealth(live: PriceResult, previous: PreviousPric
       );
     }
 
-    // 2) Everything is on the hardcoded emergency fallback (April 2026 prices).
+    // 2) Everything is on the hardcoded emergency fallback (November 2026 prices).
     if (live.source === "fallback") {
       issues.push(
         `All 4 metals are serving the hardcoded emergency fallback prices ` +
-          `(last updated April 2026) — both the CF Worker and direct Yahoo Finance are unreachable.`
+          `(last updated November 2026) — both the CF Worker and direct Yahoo Finance are unreachable.`
       );
     }
 
