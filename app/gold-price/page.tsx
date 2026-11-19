@@ -209,7 +209,8 @@ export default async function GoldPricePage() {
   const high30 = stats ? (spot > 0 ? Math.max(stats.high30, spot) : stats.high30) : null;
   const low30  = stats ? (spot > 0 ? Math.min(stats.low30,  spot) : stats.low30)  : null;
 
-  const weightRows = spot > 0 ? buildWeightRows(spot) : [];
+  const spotForTable = spot > 0 ? spot : (stats?.high30 ?? 0);
+  const weightRows = spotForTable > 0 ? buildWeightRows(spotForTable) : [];
 
   const updatedLabel = formatUpdated(spots.fetchedAt);
 

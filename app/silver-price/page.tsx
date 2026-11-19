@@ -205,7 +205,10 @@ export default async function SilverPricePage() {
   const high30 = stats ? (spot > 0 ? Math.max(stats.high30, spot) : stats.high30) : null;
   const low30  = stats ? (spot > 0 ? Math.min(stats.low30,  spot) : stats.low30)  : null;
 
-  const weightRows = spot > 0 ? buildWeightRows(spot) : [];
+  // Use 30-day high as fallback when today's spot is unavailable (cron failure),
+  // so the weight reference table still renders for Google.
+  const spotForTable = spot > 0 ? spot : (stats?.high30 ?? 0);
+  const weightRows = spotForTable > 0 ? buildWeightRows(spotForTable) : [];
 
   const updatedLabel = formatUpdated(spots.fetchedAt);
 

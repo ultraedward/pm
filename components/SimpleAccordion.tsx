@@ -35,11 +35,14 @@ export function SimpleAccordion({ items }: { items: AccordionItem[] }) {
                 +
               </span>
             </button>
-            {isOpen && (
-              <div className="pb-5 text-sm text-gray-400 leading-relaxed">
-                {item.answer}
-              </div>
-            )}
+            {/* Always render answer in DOM so Google can index it;
+                CSS visibility controls the accordion, not conditional render. */}
+            <div
+              className="pb-5 text-sm text-gray-400 leading-relaxed"
+              style={{ display: isOpen ? "block" : "none" }}
+            >
+              {item.answer}
+            </div>
           </div>
         );
       })}
