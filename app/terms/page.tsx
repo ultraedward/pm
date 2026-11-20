@@ -35,50 +35,50 @@ export default function TermsPage() {
           <p className="mt-3 text-sm text-gray-500">Last updated: {LAST_UPDATED}</p>
         </div>
 
-        <div className="space-y-8 text-sm text-gray-400 leading-relaxed">
+        <div className="space-y-8 text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">1. Acceptance of Terms</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>1. Acceptance of Terms</h2>
             <p>By accessing or using Lode ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">2. Description of Service</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>2. Description of Service</h2>
             <p>Lode provides price tracking, price alerts, and portfolio tracking for gold, silver, platinum, and palladium. Prices are sourced from third-party data providers and are provided for informational purposes only. See the <a href="/methodology" className="link-gold">Methodology</a> page for data sources and refresh cadence.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">3. Not Financial Advice</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>3. Not Financial Advice</h2>
             <p>Nothing on this platform constitutes financial, investment, or trading advice. Spot prices may be delayed or inaccurate. You are solely responsible for any investment decisions you make. Always consult a qualified financial advisor before making investment decisions.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">4. Accounts</h2>
-            <p>You must sign in with a valid Google account to use the Service. You are responsible for maintaining the security of your account. You may not use the Service for any illegal or unauthorized purpose.</p>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>4. Accounts</h2>
+            <p>Most features — including price tracking, calculators, and the portfolio tracker — work without an account. An account (via Google sign-in) is required for price alerts and cross-device portfolio sync. You are responsible for the security of your account. You may not use the Service for any illegal or unauthorized purpose.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">5. Free Service</h2>
-            <p>Lode is provided free of charge. All features — including unlimited price alerts, portfolio tracking, calculators, and the weekly digest — are available to all registered users at no cost.</p>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>5. Free Service</h2>
+            <p>Lode is free to use. Core features — price tracking, calculators, portfolio tracking, price alerts, and the weekly digest — are available at no charge to registered users.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">6. Availability</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>6. Availability</h2>
             <p>We strive for high availability but do not guarantee uninterrupted service. Price alerts depend on periodic data ingestion and may not fire instantly. We are not liable for missed alerts or delayed notifications.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">7. Termination</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>7. Termination</h2>
             <p>We reserve the right to suspend or terminate any account that violates these terms. You may delete your account at any time by contacting us.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">8. Limitation of Liability</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>8. Limitation of Liability</h2>
             <p>To the maximum extent permitted by law, the Service is provided "as is" without warranty of any kind. We are not liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">9. Contact</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>9. Contact</h2>
             <p>Questions about these terms can be directed to <a href="mailto:hello@lode.rocks" className="link-gold">hello@lode.rocks</a>.</p>
           </section>
 

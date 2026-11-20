@@ -381,7 +381,7 @@ export default async function HomePage() {
                   className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   style={{ background: "var(--gold)" }}
                 />
-                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>
+                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
                   0{i + 1}
                 </p>
                 <p className="text-sm font-bold text-white transition-colors duration-150" style={{ transition: "color 0.15s ease" }}
@@ -392,7 +392,7 @@ export default async function HomePage() {
                 <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--text-muted)" }}>
                   {body}
                 </p>
-                <p className="text-[11px] group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>
+                <p className="text-[11px] group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-muted)" }}>
                   Explore →
                 </p>
               </Link>
@@ -412,9 +412,9 @@ export default async function HomePage() {
                   <span className="text-xs font-bold group-hover:[color:var(--gold)] transition-colors duration-150 text-white">
                     {label}
                   </span>
-                  <span className="text-xs group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-dim)" }}>→</span>
+                  <span className="text-xs group-hover:[color:var(--gold)] transition-colors duration-150" style={{ color: "var(--text-muted)" }}>→</span>
                 </div>
-                <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-dim)" }}>{body}</p>
+                <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>{body}</p>
               </Link>
             ))}
           </div>

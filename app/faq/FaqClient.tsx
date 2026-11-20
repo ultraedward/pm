@@ -196,9 +196,8 @@ const lodeFaq: FaqItem[] = [
           </li>
         </ul>
         <p>
-          Third-party scanners like Gridinsoft and Scamadviser give newer sites cautious scores by default
-          because domain age is weighted heavily. That&rsquo;s a signal about time-in-market, not a finding
-          of wrongdoing.
+          Third-party scanners like Gridinsoft and Scamadviser score newer sites cautiously because domain
+          age is weighted heavily. That&rsquo;s a signal about time-in-market, not a finding of anything wrong.
         </p>
       </>
     ),
@@ -245,10 +244,10 @@ const lodeFaq: FaqItem[] = [
     q: "How fresh are the prices?",
     a: (
       <p>
-        We fetch a new price once a day and store it — every page reads that same stored value rather
-        than fetching fresh on each visit. Every price on Lode shows exactly when it was last updated
-        (e.g. &ldquo;Updated 6h ago&rdquo;), so you can see its age instead of assuming it&rsquo;s
-        real-time. On weekends and holidays the price reflects the last traded value — markets are closed.
+        We fetch a new price once a day and store it — every page reads that stored value. Every price
+        shows exactly when it was last updated (e.g. &ldquo;Updated 6h ago&rdquo;) so you know its age
+        rather than assuming it&rsquo;s real-time. On weekends and holidays the price reflects the last
+        traded value — markets are closed.
       </p>
     ),
   },
@@ -256,10 +255,9 @@ const lodeFaq: FaqItem[] = [
     q: "Why don't the sparklines move during the day?",
     a: (
       <p>
-        Both the sparkline and the price tile next to it come from the same daily snapshot in our
-        database, not intraday ticks — see &ldquo;How fresh are the prices?&rdquo; above. Intraday
-        history from paid data APIs gets expensive quickly, and daily closes are enough to see the
-        meaningful trend.
+        Both the sparkline and the price tile come from the same daily snapshot — not intraday ticks.
+        See &ldquo;How fresh are the prices?&rdquo; above. Daily closes are enough to see the meaningful
+        trend, and intraday data from paid APIs gets expensive fast.
       </p>
     ),
   },
@@ -348,7 +346,7 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
         <div>
           <p className="label mb-2">Questions</p>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Frequently Asked Questions</h1>
-          <p className="mt-3 text-sm text-gray-500">
+          <p className="mt-3 text-sm" style={{ color: "var(--text-muted)" }}>
             Precious metals basics and answers to common questions about Lode.
           </p>
         </div>
@@ -376,7 +374,7 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
 
         {/* Tools & prices grid */}
         <section className="border p-6 space-y-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-          <h2 className="text-base font-bold text-white">Lode tools &amp; prices</h2>
+          <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Lode tools &amp; prices</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
               { href: "/gold-price",             label: "Gold Price Today",        desc: "Spot price, 30-day chart" },
@@ -392,7 +390,7 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
                 className="rounded-xl border p-3 space-y-1 transition-colors hover:border-white/20 block"
                 style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}
               >
-                <p className="text-xs font-semibold text-white">{label}</p>
+                <p className="text-xs font-semibold" style={{ color: "var(--text)" }}>{label}</p>
                 <p className="text-xs" style={{ color: "var(--text-muted)" }}>{desc}</p>
               </Link>
             ))}
@@ -401,7 +399,7 @@ export function FaqClient({ footer }: { footer?: React.ReactNode }) {
 
         {/* Still have questions */}
         <section className="space-y-2 text-sm text-gray-400">
-          <h2 className="text-base font-bold text-white">Still have questions?</h2>
+          <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Still have questions?</h2>
           <p>
             <a href="mailto:hello@lode.rocks" className="link-gold">
               hello@lode.rocks

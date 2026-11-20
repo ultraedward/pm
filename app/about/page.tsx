@@ -56,7 +56,7 @@ export default function AboutPage() {
         <div>
           <p className="label mb-2">About</p>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">About Lode</h1>
-          <p className="mt-3 text-sm text-gray-500">
+          <p className="mt-3 text-sm" style={{ color: "var(--text-muted)" }}>
             An independent precious metals price tracker, built for people who actually hold physical metal.
           </p>
         </div>
@@ -66,8 +66,8 @@ export default function AboutPage() {
           className="border p-6 space-y-3 text-sm"
           style={{ borderColor: "var(--border)" }}
         >
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">At a glance</p>
-          <ul className="space-y-2 text-gray-300">
+          <p className="label">At a glance</p>
+          <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
             <li><span className="text-white font-semibold">What it is:</span> gold and silver spot prices, plus platinum and palladium — a coin melt calculator, gram converter, portfolio tracker, and email price alerts.</li>
             <li><span className="text-white font-semibold">What it isn&rsquo;t:</span> a dealer, a broker, an exchange, or financial advice. We don&rsquo;t hold anything for you.</li>
             <li><span className="text-white font-semibold">How we fund it:</span> affiliate commissions on dealer clicks from the <a href="/compare" className="link-gold">compare</a> page. No ads, no data sales. Rankings sort by price, not by who pays us.</li>
@@ -75,10 +75,10 @@ export default function AboutPage() {
           </ul>
         </section>
 
-        <div className="space-y-8 text-sm text-gray-400 leading-relaxed">
+        <div className="space-y-8 text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">What Lode does</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>What Lode does</h2>
             <p>
               Lode tracks gold and silver spot prices, plus platinum and palladium (futures-based — see our methodology page). It lets you calculate coin melt values, convert between troy ounces and grams, track a physical-metal portfolio at current prices, and get an email when a price target you set is crossed.
             </p>
@@ -88,17 +88,17 @@ export default function AboutPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">How we make money</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>How we make money</h2>
             <p>
               When you click a dealer link on the <a href="/compare" className="link-gold">compare</a> page and end up buying, Lode may earn an affiliate commission at no cost to you. That&rsquo;s disclosed on the page itself (the FTC requires it) and it&rsquo;s currently our only revenue stream — no ads, no tracking cookies sold to third parties, no data-broker relationships.
             </p>
             <p>
-              <span className="text-white font-semibold">Commissions do not affect rankings.</span> The compare page sorts by estimated total cost — today's spot price × coin weight + a hand-maintained dealer premium. A cheaper dealer that pays us nothing still ranks ahead of a more expensive dealer that pays us.
+              <span className="font-semibold" style={{ color: "var(--text)" }}>Commissions do not affect rankings.</span> The compare page sorts by estimated total cost — today's spot price × coin weight + a hand-maintained dealer premium. A cheaper dealer that pays us nothing still ranks ahead of a more expensive dealer that pays us.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Dig deeper</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Dig deeper</h2>
             <ul className="list-disc pl-5 space-y-1.5">
               <li><a href="/methodology" className="link-gold">Methodology</a> — where prices come from and how calculations work.</li>
               <li><a href="/faq" className="link-gold">FAQ</a> — how alerts work, what happens to your data, and common questions.</li>

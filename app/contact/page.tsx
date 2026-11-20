@@ -30,15 +30,15 @@ export default function ContactPage() {
         <div>
           <p className="label mb-2">Get in touch</p>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Contact</h1>
-          <p className="mt-3 text-sm text-gray-500">
+          <p className="mt-3 text-sm" style={{ color: "var(--text-muted)" }}>
             Questions, feedback, partnerships, or press — we read every message.
           </p>
         </div>
 
-        <div className="space-y-8 text-sm text-gray-400 leading-relaxed">
+        <div className="space-y-8 text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Email</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Email</h2>
             <p>
               The fastest way to reach us is{" "}
               <a
@@ -52,14 +52,14 @@ export default function ContactPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">What to include</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>What to include</h2>
             <p>
               If you&rsquo;re reporting a bug, a short description and what you were doing when it happened helps us fix it faster. For feature requests, tell us what problem you&rsquo;re trying to solve — we&rsquo;ll often find a better way to help than the specific feature you had in mind.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Other ways to reach us</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Other ways to reach us</h2>
             <p>
               Account-related questions can also be sent from the{" "}
               <a

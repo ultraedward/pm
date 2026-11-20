@@ -44,7 +44,7 @@ export default function MethodologyPage() {
         <div>
           <p className="label mb-2">How it works</p>
           <h1 className="text-4xl font-black tracking-tight">Methodology</h1>
-          <p className="mt-3 text-sm text-gray-500">
+          <p className="mt-3 text-sm" style={{ color: "var(--text-muted)" }}>
             Where our data comes from, how every calculation is done, and what this tool is not good for. No black boxes.
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function MethodologyPage() {
           className="border p-6 space-y-3 text-sm"
           style={{ borderColor: "var(--border)" }}
         >
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">Verify us in 30 seconds</p>
+          <p className="label">Verify us in 30 seconds</p>
           <p className="text-gray-300">
             Don&rsquo;t take our word for anything. Pick any metal, pull the current price from Lode, and cross-check it against{" "}
             <a href="https://www.kitco.com/charts/livegold.html" target="_blank" rel="noopener noreferrer" className="link-gold">Kitco</a>,{" "}
@@ -65,12 +65,12 @@ export default function MethodologyPage() {
         <div className="space-y-8 text-sm text-gray-400 leading-relaxed">
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Spot price sources</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Spot price sources</h2>
             <p>
               Gold and silver spot prices come from <a href={PRICE_SOURCES.gold.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.gold.provider}</a>&rsquo;s live rate feed — true spot, not futures — routed through a Cloudflare Worker. {PRICE_SOURCES.gold.provider} requires request headers that only work from a server, not a browser, so the Worker proxies the request from Cloudflare&rsquo;s edge network before returning prices to the app.
             </p>
             <p>
-              Platinum and palladium currently come from <a href={PRICE_SOURCES.platinum.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.platinum.provider}</a> futures data ({PRICE_SOURCES.platinum.ticker}, {PRICE_SOURCES.palladium.ticker}) instead of true spot — we haven&rsquo;t found a free spot source for these two that&rsquo;s reliable and openly documented (rather than an undocumented feed we&rsquo;d be depending on staying available). Futures track spot closely, but {FUTURES_GAP_NOTE}. If precise platinum or palladium pricing matters for a purchase decision, cross-check against Kitco first. See the note below on the gold/silver pricing bug we fixed in September 2026.
+              Platinum and palladium currently come from <a href={PRICE_SOURCES.platinum.providerUrl} target="_blank" rel="noopener noreferrer" className="link-gold">{PRICE_SOURCES.platinum.provider}</a> futures data ({PRICE_SOURCES.platinum.ticker}, {PRICE_SOURCES.palladium.ticker}) rather than true spot — we haven&rsquo;t found a free, reliably documented spot source for these two. Futures track spot closely, but {FUTURES_GAP_NOTE}. For purchase decisions involving platinum or palladium, cross-check against Kitco first.
             </p>
             <p>
               Prices are quoted in USD per troy ounce, consistent with COMEX and LBMA conventions. We do not modify, smooth, or adjust prices before displaying them — the number you see is what the provider returned.
@@ -84,7 +84,7 @@ export default function MethodologyPage() {
             className="border p-6 space-y-3 text-sm"
             style={{ borderColor: "var(--border)" }}
           >
-            <h2 className="text-base font-bold text-white">A note on a pricing bug we found and fixed (September 2026)</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>A note on a pricing bug we found and fixed (September 2026)</h2>
             <p className="text-gray-300">
               From roughly May to September 2026, gold and silver spot prices on Lode were sourced from Yahoo Finance&rsquo;s COMEX futures contracts (GC=F, SI=F) instead of true spot. Futures track spot closely but run 1&ndash;2% above or below it depending on market conditions &mdash; so prices shown during that window were off from Kitco or a broker terminal by a small, systematic amount.
             </p>
@@ -97,9 +97,9 @@ export default function MethodologyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Refresh cadence</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Refresh cadence</h2>
             <p>
-              We pull a fresh price once a day and store it — every page reads that stored value rather than each fetching live on every visit. That&rsquo;s a deliberate choice, not a limitation we&rsquo;re working around: Lode&rsquo;s calculators, portfolio tracker, and dealer comparison don&rsquo;t need sub-hour price precision to be useful, and fetching live on every one of the thousands of pageviews a day this site gets would put far more load on free upstream sources than a supporting number justifies. Every price on the site shows exactly when it was last updated (e.g. &ldquo;Updated 6h ago&rdquo;) so you always know its age rather than assuming it&rsquo;s real-time.
+              We pull a fresh price once a day and store it — every page reads that stored value rather than fetching live on each visit. That&rsquo;s a deliberate choice: daily prices are precise enough for calculators, a portfolio tracker, and dealer comparisons. Every price shows exactly when it was last updated (e.g. &ldquo;Updated 6h ago&rdquo;) so you know its age rather than assuming it&rsquo;s real-time.
             </p>
             <p>
               Historical sparklines, 52-week high/low, and 24-hour percent change are computed from that same daily snapshot series. Over time this gives us an independent history series we can plot without depending on a paid history API.
@@ -107,7 +107,7 @@ export default function MethodologyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Coin melt calculator</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Coin melt calculator</h2>
             <p>
               Melt value = <span className="text-gray-300">fine weight (troy oz) × today&rsquo;s price per troy oz</span>. Fine weight is derived from the coin&rsquo;s gross weight and fineness — e.g. a pre-1965 US 90% silver quarter is 6.25 g × 0.900 ÷ 31.1034768 g/ozt = 0.18084 troy oz of pure silver.
             </p>
@@ -117,14 +117,14 @@ export default function MethodologyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Gram / ounce converter</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Gram / ounce converter</h2>
             <p>
               We use the troy ounce (31.1034768 grams) exclusively, as is standard for precious metals. We do <em>not</em> use the avoirdupois ounce (28.3495 grams), which is used for everyday weight but never for bullion. If another site gives you a different answer to a gold conversion, check which ounce they&rsquo;re using first.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Portfolio tracker</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Portfolio tracker</h2>
             <p>
               Holdings are valued at <span className="text-gray-300">quantity (troy oz) × current spot price</span>. The tracker does not estimate dealer premium, numismatic value, or resale spread — the figure is a clean spot-value floor, useful for checking how your stack has moved with the market.
             </p>
@@ -134,14 +134,14 @@ export default function MethodologyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Price alerts</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Price alerts</h2>
             <p>
               Alerts are evaluated once per day at the same time as the daily price snapshot, against the spot price we just fetched. When a threshold is crossed (e.g. gold above $2,400/ozt), we send one email to the address on your account and mark the alert as triggered to prevent re-firing until you reset it. Email is the only channel — no SMS, no push, no phone calls.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Dealer compare page</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Dealer compare page</h2>
             <p>
               The <a href="/compare" className="link-gold">compare</a> page shows an <em>estimated</em> total cost per coin, computed as <span className="text-gray-300">today&rsquo;s spot price × coin fine weight + dealer premium</span>. Dealer premiums are maintained by hand based on each dealer&rsquo;s typical over-spot pricing for 1–9 unit quantities; they are not scraped live from dealer sites.
             </p>
@@ -157,7 +157,7 @@ export default function MethodologyPage() {
             className="border p-6 space-y-3 text-sm"
             style={{ borderColor: "var(--border)" }}
           >
-            <h2 className="text-base font-bold text-white">What this tool is not good for</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>What this tool is not good for</h2>
             <p className="text-gray-400">
               We&rsquo;d rather tell you up front:
             </p>
@@ -171,7 +171,7 @@ export default function MethodologyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-white">Corrections and feedback</h2>
+            <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Corrections and feedback</h2>
             <p>
               If you spot a number that looks wrong, a coin spec that&rsquo;s off, or a calculation that disagrees with another source, please tell us:{" "}
               <a href="mailto:hello@lode.rocks" className="link-gold">

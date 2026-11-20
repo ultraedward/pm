@@ -44,7 +44,7 @@ export async function SiteFooter() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pb-2">
           {/* Spot prices */}
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Spot Prices</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Spot Prices</p>
             {[
               { href: "/gold-price",      label: "Gold Price"      },
               { href: "/silver-price",    label: "Silver Price"    },
@@ -59,7 +59,7 @@ export async function SiteFooter() {
 
           {/* Tools */}
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Tools</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Tools</p>
             {[
               { href: "/compare",              label: "Compare Dealers"    },
               { href: "/coin-melt-calculator", label: "Coin Melt Value"    },
@@ -74,7 +74,7 @@ export async function SiteFooter() {
 
           {/* Investing */}
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Investing</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Investing</p>
             {[
               { href: "/gold-ira",          label: "Gold IRA Guide"      },
               { href: "/gold-price-alerts", label: "Price Alerts"        },
@@ -89,7 +89,7 @@ export async function SiteFooter() {
 
           {/* Company */}
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-dim)" }}>Company</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Company</p>
             {[
               { href: "/pricing",     label: "Pricing"     },
               { href: "/about",       label: "About"       },
@@ -116,7 +116,7 @@ export async function SiteFooter() {
           >
             Lode
           </Link>
-          <span className="text-xs" style={{ color: "var(--text-dim)" }}>
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
             © {year} Lode
           </span>
         </div>
