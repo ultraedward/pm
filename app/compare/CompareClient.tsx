@@ -141,8 +141,8 @@ export default function CompareClient({ spots, available, premiums }: Props) {
           >
             {fmtUSD(best.total)}
           </span>
-          <span className="text-sm text-gray-500">
-            at <span className="text-white font-semibold">{best.dealerName}</span>
+          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+            at <span className="font-semibold" style={{ color: "var(--text)" }}>{best.dealerName}</span>
           </span>
         </div>
         {rows.length > 1 && rows[rows.length - 1].total > best.total && (
@@ -151,7 +151,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
             most expensive of {rows.length} dealers
           </p>
         )}
-        <p className="text-xs text-gray-600 tabular-nums">
+        <p className="text-xs tabular-nums" style={{ color: "var(--text-muted)" }}>
           Spot melt: {fmtUSD(melt)} · {coin.oz} oz {coin.metal}
         </p>
       </div>
@@ -185,7 +185,7 @@ export default function CompareClient({ spots, available, premiums }: Props) {
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-gray-600 tabular-nums mt-0.5">
+                  <p className="text-[11px] tabular-nums mt-0.5" style={{ color: "var(--text-muted)" }}>
                     spot + {fmtUSD(r.premium)} premium
                     <a
                       href={`mailto:hello@lode.rocks?subject=${encodeURIComponent(
